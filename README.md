@@ -6,7 +6,7 @@ librf是一个基于C++ Coroutines提案 ‘Stackless Resumable Functions’编�
 
 目前仅支持:
 
-    Windows (使用VS2015/2016编译)
+    Windows (使用VS2015/2017编译)
 
 
 librf有以下特点：
