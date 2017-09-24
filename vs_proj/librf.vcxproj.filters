@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="librf">
+      <UniqueIdentifier>{27e93efb-a01d-48f5-b10b-155fc8d52101}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="librf\src">
+      <UniqueIdentifier>{7cbfb0bd-8820-4639-9235-93ff984a9bb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="librf\src\unix">
+      <UniqueIdentifier>{46825786-52e6-4092-9418-cad7045aa118}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tutorial">
+      <UniqueIdentifier>{d82e4930-c171-4b70-9ebb-cdec7218ff9c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="librf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\librf\src\event.cpp">
+      <Filter>librf\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\librf\src\mutex.cpp">
+      <Filter>librf\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\librf\src\rf_task.cpp">
+      <Filter>librf\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\librf\src\scheduler.cpp">
+      <Filter>librf\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\librf\src\sleep.cpp">
+      <Filter>librf\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\librf\src\timer.cpp">
+      <Filter>librf\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_cb.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_channel.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_dynamic_go.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_event.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_event_timeout.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_exception.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_mutex.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_resumable.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_routine.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_sleep.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_suspend_always.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_timer.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_yield_return.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\librf\librf.h">
+      <Filter>librf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\_awaker.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\asio_task.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\channel.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\def.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\event.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\future.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\generator.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\mutex.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\rf_task.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\scheduler.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\sleep.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\spinlock.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\state.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\timer.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\utils.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\unix\coroutine.h">
+      <Filter>librf\src\unix</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
