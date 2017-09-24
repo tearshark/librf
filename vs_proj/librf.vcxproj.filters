@@ -17,6 +17,9 @@
     <Filter Include="tutorial">
       <UniqueIdentifier>{d82e4930-c171-4b70-9ebb-cdec7218ff9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="benchmark">
+      <UniqueIdentifier>{0fd1274a-193b-4d6a-b19e-58db935ed5c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="librf.cpp">
@@ -78,6 +81,9 @@
     </ClCompile>
     <ClCompile Include="..\tutorial\test_async_yield_return.cpp">
       <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\benchmark\benchmark_async_mem.cpp">
+      <Filter>benchmark</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

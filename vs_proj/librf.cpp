@@ -15,8 +15,13 @@ extern void resumable_main_dynamic_go();
 extern void resumable_main_channel();
 extern void resumable_main_cb();
 
+extern void resumable_main_benchmark_mem();
+
 int main(int argc, const char * argv[])
 {
+	resumable_main_benchmark_mem();
+	return 0;
+
 	resumable_main_yield_return();
 	resumable_main_timer();
 	resumable_main_suspend_always();

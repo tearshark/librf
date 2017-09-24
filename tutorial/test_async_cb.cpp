@@ -14,11 +14,10 @@ auto async_get_long(int64_t val)
 
 	resumef::promise_t<int64_t> awaitable;
 
-	std::thread([val, st = awaitable._state->lock()]
+	std::thread([val, st = awaitable._state]
 	{
 		std::this_thread::sleep_for(500ms);
 		st->set_value(val * val);
-		st->unlock();
 	}).detach();
 
 	return awaitable.get_future();

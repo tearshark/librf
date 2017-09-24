@@ -12,9 +12,9 @@ librf是一个基于C++ Coroutines提案 ‘Stackless Resumable Functions’编�
 librf有以下特点：
 
  *   1.基于C++17提案'Stackless Resumable Functions'编写的非对称stackless协程库，可以以同步的方式编写简单的代码，同时获得异步的性能
- *   2.理论上支持海量协程, 创建100万个协程只需使用<待测试>物理内存
+ *   2.理论上支持海量协程, 创建100万个协程只需使用<820M>物理内存
  *   3.提供协程锁(mutex), 定时器, channel等特性, 帮助用户更加容易地编写程序 
- *   4.可以很好的跟asio,libuv等库结合，能更现有的callback范式的异步/延迟代码结合
+ *   4.可以很好的跟asio,libuv等库结合，能跟现有的callback范式的异步/延迟代码很好的结合
  *   5.目前还处于实验状态，不对今后正式的C++ Coroutines支持有任何正式的承诺
  
  *   如果你发现了任何bug、有好的建议、或使用上有不明之处，可以提交到issue，也可以直接联系作者:
