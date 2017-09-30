@@ -9,6 +9,7 @@ std::atomic<intptr_t> g_resumef_evtctx_count = 0;
 
 namespace resumef
 {
+
 	static const char * future_error_string[(size_t)future_error::max__]
 	{
 		"none",

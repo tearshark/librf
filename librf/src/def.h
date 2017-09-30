@@ -44,6 +44,24 @@ namespace resumef
 	template<class... _Mutexes>
 	using scoped_lock = std::lock_guard<_Mutexes...>;
 #endif
+	template<typename _PromiseT = void>
+	using coroutine_handle = std::experimental::coroutine_handle<_PromiseT>;
+
+	template<typename _PromiseT = void>
+	inline void * _coro_function_ptr(coroutine_handle<> coro)
+	{
+		auto frame_prefix = (coroutine_handle<void>::_Resumable_frame_prefix*)coro.address();
+		return reinterpret_cast<void *>(frame_prefix->_Fn);
+	}
+
+	template<typename _PromiseT>
+	inline _PromiseT * _coro_promise_ptr__(void * _Ptr)
+	{
+		using coroutine_instance = coroutine_handle<_PromiseT>;
+		return reinterpret_cast<_PromiseT *>(reinterpret_cast<char *>(_Ptr) - coroutine_instance::_ALIGNED_SIZE);
+	}
+
+#define _coro_promise_ptr(T) _coro_promise_ptr__<resumef::promise_t<T> >(_coro_frame_ptr())
 
 	enum struct future_error
 	{

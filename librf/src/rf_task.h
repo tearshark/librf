@@ -112,6 +112,7 @@ namespace resumef
 		virtual bool go_next(scheduler * schdler) override
 		{
 			auto * _state = _future._state.get();
+			_state->current_scheduler(schdler);
 			_state->resume();
 			return !_state->ready() && !_state->_done;
 		}

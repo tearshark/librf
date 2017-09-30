@@ -6,13 +6,19 @@
 
 namespace resumef
 {
+	template <typename T = void>
+	struct promise_t;
+
 	struct state_base
 	{
 	protected:
 		std::mutex	_mtx;		//for value, _exception
 		RF_API void set_value_none_lock();
+	private:
+		void * _this_promise = nullptr;
+		scheduler * _current_scheduler = nullptr;
 	public:
-		std::experimental::coroutine_handle<> _coro;
+		coroutine_handle<> _coro;
 		std::atomic<intptr_t> _count = 0;				// tracks reference count of state object
 		std::exception_ptr _exception;
 
@@ -75,9 +81,13 @@ namespace resumef
 		{
 			if (_coro)
 			{
+				std::cout << "scheduler=" << current_scheduler()
+					<< ",coro=" << _coro.address()
+					<< ",this_promise=" << this_promise()
+					<< ",parent_promise=" << parent_promise() << std::endl;
+
 				auto coro = _coro;
 				_coro = nullptr;
-				//std::cout << "resume from " << coro.address() << " on thread " << std::this_thread::get_id() << std::endl;
 				coro();
 			}
 		}
@@ -94,6 +104,27 @@ namespace resumef
 				delete this;
 		}
 
+		promise_t<void> * parent_promise() const;
+		scheduler * parent_scheduler() const;
+
+		void * this_promise() const
+		{
+			return _this_promise;
+		}
+		void this_promise(void * promise_)
+		{
+			_this_promise = promise_;
+		}
+
+		scheduler * current_scheduler() const
+		{
+			return _current_scheduler;
+		}
+		void current_scheduler(scheduler * sch_)
+		{
+			_current_scheduler = sch_;
+		}
+
 		//------------------------------------------------------------------------------------------
 		//以下是通过future_t/promise_t, 与编译器生成的resumable function交互的接口
 
@@ -101,7 +132,7 @@ namespace resumef
 		{
 			return _ready;
 		}
-		void await_suspend(std::experimental::coroutine_handle<> resume_cb)
+		void await_suspend(coroutine_handle<> resume_cb)
 		{
 			_coro = resume_cb;
 		}
@@ -162,6 +193,11 @@ namespace resumef
 			state_base::reset_none_lock();
 			_value = value_type{};
 		}
+
+		promise_t<_Ty> * parent_promise() const
+		{
+			return reinterpret_cast<promise_t<_Ty> *>(state_base::parent_promise());
+		}
 	};
 
 	template<>
@@ -191,6 +227,11 @@ namespace resumef
 			scoped_lock<std::mutex> __guard(_mtx);
 
 			reset_none_lock();
+		}
+
+		promise_t<void> * parent_promise() const
+		{
+			return reinterpret_cast<promise_t<void> *>(state_base::parent_promise());
 		}
 	};
 

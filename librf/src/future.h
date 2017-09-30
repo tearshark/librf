@@ -5,9 +5,6 @@
 
 namespace resumef
 {
-	template <typename T = void>
-	struct promise_t;
-
 	template <typename T>
 	struct future_impl_t
 	{
@@ -34,7 +31,7 @@ namespace resumef
 		{
 			return _state->_ready;
 		}
-		void await_suspend(std::experimental::coroutine_handle<> resume_cb)
+		void await_suspend(coroutine_handle<> resume_cb)
 		{
 			_state->await_suspend(resume_cb);
 		}
@@ -147,6 +144,15 @@ namespace resumef
 
 	using future_vt = future_t<void>;
 
+	template<class state_type>
+	struct awaitor_initial_suspend
+	{
+		counted_ptr<state_type> _state;
+		bool await_ready() noexcept;
+		void await_suspend(coroutine_handle<> resume_cb) noexcept;
+		void await_resume() noexcept;
+	};
+
 	template <typename T>
 	struct promise_impl_t
 	{
@@ -159,9 +165,22 @@ namespace resumef
 		promise_impl_t()
 			: _state(make_counted<state_type>())
 		{
+			_state->this_promise(this);
 		}
-		promise_impl_t(promise_impl_t&&) = default;
-		promise_impl_t & operator = (promise_impl_t&&) = default;
+		promise_impl_t(promise_impl_t&& _Right)
+			: _state(std::move(_Right._state))
+		{
+			_state->this_promise(this);
+		}
+		promise_impl_t & operator = (promise_impl_t&& _Right)
+		{
+			if (this != _Right)
+			{
+				_state = std::move(_Right._state);
+				_state->this_promise(this);
+			}
+			return *this;
+		}
 		promise_impl_t(const promise_impl_t&) = delete;
 		promise_impl_t & operator = (const promise_impl_t&) = delete;
 
@@ -196,37 +215,18 @@ namespace resumef
 		//	2、通过await启动另外一个子函数
 		//	(1)情况下，无法区分是否已经拥有的resume_cb，可以特殊处理
 		//	(2)情况下，返回准备好了，让编译器继续运行
-		std::experimental::suspend_never initial_suspend() noexcept
+		auto initial_suspend() noexcept
 		{
-			return {};
-/*
-			struct AWaitor
-			{
-				counted_ptr<state_tt> _state;
-				bool await_ready() _NOEXCEPT
-				{
-					return false;
-				}
-				void await_suspend(std::experimental::coroutine_handle<> resume_cb) _NOEXCEPT
-				{
-					_state->await_suspend(resume_cb);
-					_state->run_in_coroutine(this_coroutine());
-				}
-				void await_resume() _NOEXCEPT
-				{
-				}
-			};
-
-			return AWaitor{ _state };
-*/
+			return std::experimental::suspend_never{};
+			//return awaitor_initial_suspend<state_type>{ _state };
 		}
 
 		//这在一个协程被销毁之时调用。
 		//我们选择不挂起协程，只是通知state的对象，本协程已经准备好了删除了
-		std::experimental::suspend_never final_suspend() noexcept
+		auto final_suspend() noexcept
 		{
 			_state->final_suspend();
-			return{};
+			return std::experimental::suspend_never{};
 		}
 
 		//返回与之关联的future对象
@@ -326,7 +326,7 @@ namespace resumef
 		{
 			return _state->_ready;
 		}
-		void await_suspend(std::experimental::coroutine_handle<> resume_cb)
+		void await_suspend(coroutine_handle<> resume_cb)
 		{
 			_state->await_suspend(resume_cb);
 		}
@@ -341,5 +341,42 @@ namespace resumef
 	};
 
 	using awaitable_vt = awaitable_t<void>;
+
+	inline promise_t<void> * state_base::parent_promise() const
+	{
+		if (_coro) return _coro_promise_ptr__<promise_t<void>>(_coro.address());
+		return nullptr;
+	}
+
+	inline scheduler * state_base::parent_scheduler() const
+	{
+		auto promise_ = parent_promise();
+		if (promise_)
+			return promise_->_state->current_scheduler();
+		return nullptr;
+	}
+
+
+	template<class state_type>
+	bool awaitor_initial_suspend<state_type>::await_ready() noexcept
+	{
+		return false;
+	}
+	template<class state_type>
+	void awaitor_initial_suspend<state_type>::await_suspend(coroutine_handle<> resume_cb) noexcept
+	{
+		_state->await_suspend(resume_cb);
+
+		scheduler * sch_ = _state->parent_scheduler();
+		if (sch_ != nullptr)
+		{
+			_state->current_scheduler(sch_);
+			_state->resume();
+		}
+	}
+	template<class state_type>
+	void awaitor_initial_suspend<state_type>::await_resume() noexcept
+	{
+	}
 }
 

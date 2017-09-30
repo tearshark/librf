@@ -36,6 +36,7 @@ namespace resumef
 		}
 		virtual bool go_next(scheduler * schdler) override
 		{
+			_state->current_scheduler(schdler);
 			_state->resume();
 			return false;
 		}
@@ -61,7 +62,8 @@ namespace resumef
 		// Set all members first as calling coroutine may reset stuff here.
 		_ready = true;
 
-		this_scheduler()->push_task_internal(new awaitable_task_t<state_base>(this));
+		auto sch_ = this->parent_scheduler();
+		sch_->push_task_internal(new awaitable_task_t<state_base>(this));
 	}
 
 	void state_base::set_exception(std::exception_ptr && e_)
@@ -73,6 +75,7 @@ namespace resumef
 		// Set all members first as calling coroutine may reset stuff here.
 		_ready = true;
 
-		this_scheduler()->push_task_internal(new awaitable_task_t<state_base>(this));
+		auto sch_ = this->parent_scheduler();
+		sch_->push_task_internal(new awaitable_task_t<state_base>(this));
 	}
 }
