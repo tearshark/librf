@@ -41,7 +41,7 @@ void test_dynamic_go()
 	go co_star(1);
 	go co_star(2);
 
-	resumef::g_scheduler.run_until_notask();
+	resumef::this_scheduler()->run_until_notask();
 
 	std::cout << "dynamic_go_count = " << dynamic_go_count << std::endl;
 	for (auto & j : dynamic_cells)

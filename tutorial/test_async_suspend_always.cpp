@@ -54,7 +54,7 @@ void resumable_main_suspend_always()
 {
 	go test_recursive_await();
 	go test_recursive_go();
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 }
 
 /*

@@ -67,7 +67,7 @@ void test_channel_read_first()
 	go test_channel_read(c);
 	go test_channel_write(c);
 
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 }
 
 void test_channel_write_first()
@@ -77,7 +77,7 @@ void test_channel_write_first()
 	go test_channel_write(c);
 	go test_channel_read(c);
 
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 }
 
 void resumable_main_channel()

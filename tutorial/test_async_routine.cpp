@@ -38,5 +38,5 @@ void resumable_main_routine()
 {
 	go test_routine_use_timer_2();
 	//go test_routine_use_timer();
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 }

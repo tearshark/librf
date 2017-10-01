@@ -2,6 +2,7 @@
 #pragma once
 
 #include "def.h"
+#include "counted_ptr.h"
 #include <iostream>
 
 namespace resumef
@@ -17,13 +18,13 @@ namespace resumef
 	private:
 		void * _this_promise = nullptr;
 		scheduler * _current_scheduler = nullptr;
+		std::vector<counted_ptr<state_base>> _depend_states;
 	public:
 		coroutine_handle<> _coro;
 		std::atomic<intptr_t> _count = 0;				// tracks reference count of state object
 		std::exception_ptr _exception;
 
 		bool _ready = false;
-		bool _future_acquired = false;
 		bool _cancellation = false;
 		bool _done = false;
 
@@ -62,7 +63,6 @@ namespace resumef
 		{
 			_coro = nullptr;
 			_ready = false;
-			_future_acquired = false;
 		}
 
 		void cancel()
@@ -81,11 +81,18 @@ namespace resumef
 		{
 			if (_coro)
 			{
-				std::cout << "scheduler=" << current_scheduler()
-					<< ",coro=" << _coro.address()
-					<< ",this_promise=" << this_promise()
-					<< ",parent_promise=" << parent_promise() << std::endl;
+#if RESUMEF_DEBUG_COUNTER
+				{
+					scoped_lock<std::mutex> __lock(g_resumef_cout_mutex);
 
+					std::cout << "scheduler=" << current_scheduler()
+						<< ",coro=" << _coro.address()
+						<< ",this_promise=" << this_promise()
+						<< ",parent_promise=" << parent_promise()
+						<< ",thread=" << std::this_thread::get_id()
+						<< std::endl;
+				}
+#endif
 				auto coro = _coro;
 				_coro = nullptr;
 				coro();
@@ -105,7 +112,7 @@ namespace resumef
 		}
 
 		promise_t<void> * parent_promise() const;
-		scheduler * parent_scheduler() const;
+		//scheduler * parent_scheduler() const;
 
 		void * this_promise() const
 		{
@@ -120,34 +127,15 @@ namespace resumef
 		{
 			return _current_scheduler;
 		}
-		void current_scheduler(scheduler * sch_)
-		{
-			_current_scheduler = sch_;
-		}
+		void current_scheduler(scheduler * sch_);
 
 		//------------------------------------------------------------------------------------------
 		//以下是通过future_t/promise_t, 与编译器生成的resumable function交互的接口
-
-		bool await_ready()
-		{
-			return _ready;
-		}
-		void await_suspend(coroutine_handle<> resume_cb)
-		{
-			_coro = resume_cb;
-		}
-		void await_resume()
-		{
-		}
+		void await_suspend(coroutine_handle<> resume_cb);
 		void final_suspend()
 		{
 			_done = true;
 		}
-		bool cancellation_requested() const
-		{
-			return _cancellation;
-		}
-
 		//以上是通过future_t/promise_t, 与编译器生成的resumable function交互的接口
 		//------------------------------------------------------------------------------------------
 	};
@@ -235,91 +223,5 @@ namespace resumef
 		}
 	};
 
-	// counted_ptr is similar to shared_ptr but allows explicit control
-	// 
-	template <typename T>
-	struct counted_ptr
-	{
-		counted_ptr() = default;
-		counted_ptr(const counted_ptr& cp) : _p(cp._p)
-		{
-			_lock();
-		}
-
-		counted_ptr(T* p) : _p(p)
-		{
-			_lock();
-		}
-
-		counted_ptr(counted_ptr&& cp)
-		{
-			std::swap(_p, cp._p);
-		}
-
-		counted_ptr& operator=(const counted_ptr& cp)
-		{
-			if (&cp != this)
-			{
-				_unlock();
-				_lock(cp._p);
-			}
-			return *this;
-		}
-
-		counted_ptr& operator=(counted_ptr&& cp)
-		{
-			if (&cp != this)
-				std::swap(_p, cp._p);
-			return *this;
-		}
-
-		~counted_ptr()
-		{
-			_unlock();
-		}
-
-		T* operator->() const
-		{
-			return _p;
-		}
-
-		T* get() const
-		{
-			return _p;
-		}
-
-		void reset()
-		{
-			_unlock();
-		}
-	protected:
-		void _unlock()
-		{
-			if (_p != nullptr)
-			{
-				auto t = _p;
-				_p = nullptr;
-				t->unlock();
-			}
-		}
-		void _lock(T* p)
-		{
-			if (p != nullptr)
-				p->lock();
-			_p = p;
-		}
-		void _lock()
-		{
-			if (_p != nullptr)
-				_p->lock();
-		}
-		T* _p = nullptr;
-	};
-
-	template <typename T>
-	counted_ptr<T> make_counted()
-	{
-		return new T{};
-	}
 }
 

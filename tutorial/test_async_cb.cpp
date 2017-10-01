@@ -54,8 +54,8 @@ void resumable_main_cb()
 		auto val = co_await loop_get_long(2);
 		std::cout << val << std::endl;
 	};
-	//resumef::g_scheduler.run_until_notask();
+	//resumef::this_scheduler()->run_until_notask();
 
 	go resumable_get_long(3);
-	resumef::g_scheduler.run_until_notask();
+	resumef::this_scheduler()->run_until_notask();
 }

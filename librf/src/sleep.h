@@ -19,7 +19,7 @@ namespace resumef
 	template<class _Rep, class _Period>
 	awaitable_t<bool> sleep_for(const std::chrono::duration<_Rep, _Period>& dt_)
 	{
-		return std::move(sleep_for_(std::chrono::duration_cast<std::chrono::system_clock::duration>(dt_), g_scheduler));
+		return std::move(sleep_for_(std::chrono::duration_cast<std::chrono::system_clock::duration>(dt_), *this_scheduler()));
 	}
 
 	template<class _Clock, class _Duration = typename _Clock::duration>
@@ -30,6 +30,6 @@ namespace resumef
 	template<class _Clock, class _Duration>
 	awaitable_t<bool> sleep_until(const std::chrono::time_point<_Clock, _Duration>& tp_)
 	{
-		return std::move(sleep_until_(std::chrono::time_point_cast<std::chrono::system_clock::duration>(tp_), g_scheduler));
+		return std::move(sleep_until_(std::chrono::time_point_cast<std::chrono::system_clock::duration>(tp_), *this_scheduler()));
 	}
 }

@@ -2,6 +2,7 @@
 #include <assert.h>
 
 #if RESUMEF_DEBUG_COUNTER
+std::mutex g_resumef_cout_mutex;
 std::atomic<intptr_t> g_resumef_state_count = 0;
 std::atomic<intptr_t> g_resumef_task_count = 0;
 std::atomic<intptr_t> g_resumef_evtctx_count = 0;
@@ -31,10 +32,12 @@ namespace resumef
 		return future_error_string[(size_t)(fe)];
 	}
 
+	thread_local scheduler * th_scheduler_ptr = nullptr;
+
 	//获得当前线程下的调度器
 	scheduler * this_scheduler()
 	{
-		return &g_scheduler;
+		return th_scheduler_ptr ? th_scheduler_ptr : &scheduler::g_scheduler;
 	}
 
 	//获得当前线程下，正在由调度器调度的协程
@@ -50,6 +53,21 @@ namespace resumef
 		}
 	}
 */
+	local_scheduler::local_scheduler()
+	{
+		if (th_scheduler_ptr == nullptr)
+		{
+			_scheduler_ptr = new scheduler;
+			th_scheduler_ptr = _scheduler_ptr;
+		}
+	}
+
+	local_scheduler::~local_scheduler()
+	{
+		if (th_scheduler_ptr == _scheduler_ptr)
+			th_scheduler_ptr = nullptr;
+		delete _scheduler_ptr;
+	}
 
 	scheduler::scheduler()
 		: _task()
@@ -61,17 +79,9 @@ namespace resumef
 	scheduler::~scheduler()
 	{
 		cancel_all_task_();
-	}
 
-	scheduler::scheduler(scheduler && right_)
-	{
-		this->swap(right_);
-	}
-
-	scheduler & scheduler::operator = (scheduler && right_)
-	{
-		this->swap(right_);
-		return *this;
+		if (th_scheduler_ptr == this)
+			th_scheduler_ptr = nullptr;
 	}
 
 	void scheduler::new_task(task_base * task)
@@ -79,6 +89,7 @@ namespace resumef
 		if (task)
 		{
 			scoped_lock<std::recursive_mutex> __guard(_mtx_ready);
+			task->bind(this);
 			this->_ready_task.push_back(task);
 		}
 	}
@@ -115,6 +126,9 @@ namespace resumef
 
 	void scheduler::run_one_batch()
 	{
+		if (th_scheduler_ptr == nullptr)
+			th_scheduler_ptr = this;
+
 		{
 			scoped_lock<std::recursive_mutex> __guard(_mtx_task);
 
@@ -159,18 +173,5 @@ namespace resumef
 			this->run_one_batch();
 	}
 
-	void scheduler::swap(scheduler & right_)
-	{
-		if (this != &right_)
-		{
-			scoped_lock<std::recursive_mutex, std::recursive_mutex, std::recursive_mutex, std::recursive_mutex>
-				__guard(this->_mtx_ready, this->_mtx_task, right_._mtx_ready, right_._mtx_task);
-
-			std::swap(this->_ready_task, right_._ready_task);
-			std::swap(this->_task, right_._task);
-			std::swap(this->_timer, right_._timer);
-		}
-	}
-
-	scheduler g_scheduler;
+	scheduler scheduler::g_scheduler;
 }

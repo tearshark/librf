@@ -47,9 +47,9 @@ void test_wait_all_events_with_signal_by_sleep()
 		};
 	}
 
-	while (!g_scheduler.empty())
+	while (!this_scheduler()->empty())
 	{
-		g_scheduler.run_one_batch();
+		this_scheduler()->run_one_batch();
 		//std::cout << "press any key to continue." << std::endl;
 		//_getch();
 	}
@@ -58,7 +58,7 @@ void test_wait_all_events_with_signal_by_sleep()
 void resumable_main_sleep()
 {
 	go test_sleep_use_timer();
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 	std::cout << std::endl;
 
 	test_wait_all_events_with_signal_by_sleep();

@@ -81,10 +81,10 @@ future_vt test_bomb_exception()
 void resumable_main_exception()
 {
 	go test_signal_exception();
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 
 	std::cout << std::endl;
 
 	go test_bomb_exception();
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 }

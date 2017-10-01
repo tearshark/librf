@@ -30,6 +30,7 @@
 #endif
 
 #if RESUMEF_DEBUG_COUNTER
+extern std::mutex g_resumef_cout_mutex;
 extern std::atomic<intptr_t> g_resumef_state_count;
 extern std::atomic<intptr_t> g_resumef_task_count;
 extern std::atomic<intptr_t> g_resumef_evtctx_count;

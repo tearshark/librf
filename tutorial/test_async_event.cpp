@@ -37,7 +37,7 @@ void test_wait_one()
 		event_t evt;
 		go resumable_wait_event(evt);
 		auto tt = async_set_event(evt, 1000ms);
-		g_scheduler.run_until_notask();
+		this_scheduler()->run_until_notask();
 
 		tt.join();
 	}
@@ -56,7 +56,7 @@ void test_wait_one()
 		std::cout << std::this_thread::get_id() << std::endl;
 		auto tt = async_set_event(evt2, 1000ms);
 
-		g_scheduler.run_until_notask();
+		this_scheduler()->run_until_notask();
 
 		tt.join();
 	}
@@ -85,7 +85,7 @@ void test_wait_any()
 		vtt.emplace_back(async_set_event(e, 1ms * (500 + rand() % 1000)));
 	}
 
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 
 	for (auto & tt : vtt)
 		tt.join();
@@ -113,7 +113,7 @@ void test_wait_all()
 		vtt.emplace_back(async_set_event(e, 1ms * (500 + rand() % 1000)));
 	}
 
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 
 	for (auto & tt : vtt)
 		tt.join();
@@ -141,7 +141,7 @@ void test_wait_all_timeout()
 		vtt.emplace_back(async_set_event(e, 1ms * (500 + rand() % 1000)));
 	}
 
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 
 	for (auto & tt : vtt)
 		tt.join();

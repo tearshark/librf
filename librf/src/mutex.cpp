@@ -115,7 +115,7 @@ namespace resumef
 			});
 		_locker->lock_(awaker);
 		
-		g_scheduler.timer()->add(tp, 
+		this_scheduler()->timer()->add(tp,
 			[awaker](bool bValue)
 			{
 				awaker->awake(nullptr, 1);

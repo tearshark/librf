@@ -14,7 +14,6 @@ namespace resumef
 
 		future_impl_t(const counted_ptr<state_type>& state) : _state(state)
 		{
-			_state->_future_acquired = true;
 		}
 
 		// movable, but not copyable
@@ -144,15 +143,6 @@ namespace resumef
 
 	using future_vt = future_t<void>;
 
-	template<class state_type>
-	struct awaitor_initial_suspend
-	{
-		counted_ptr<state_type> _state;
-		bool await_ready() noexcept;
-		void await_suspend(coroutine_handle<> resume_cb) noexcept;
-		void await_resume() noexcept;
-	};
-
 	template <typename T>
 	struct promise_impl_t
 	{
@@ -188,8 +178,6 @@ namespace resumef
 		//callback里，不应该调用 get_return_object()
 		future_type get_future()
 		{
-			if (_state->_future_acquired)
-				throw future_exception{ future_error::already_acquired };
 			return future_type(_state);
 		}
 
@@ -197,9 +185,6 @@ namespace resumef
 		// cause multiple callbacks.
 		future_type next_future()
 		{
-			// reset and return another future
-			if (_state->_future_acquired)
-				_state->reset();
 			return future_type(_state);
 		}
 
@@ -218,7 +203,6 @@ namespace resumef
 		auto initial_suspend() noexcept
 		{
 			return std::experimental::suspend_never{};
-			//return awaitor_initial_suspend<state_type>{ _state };
 		}
 
 		//这在一个协程被销毁之时调用。
@@ -348,6 +332,7 @@ namespace resumef
 		return nullptr;
 	}
 
+/*
 	inline scheduler * state_base::parent_scheduler() const
 	{
 		auto promise_ = parent_promise();
@@ -355,28 +340,7 @@ namespace resumef
 			return promise_->_state->current_scheduler();
 		return nullptr;
 	}
+*/
 
-
-	template<class state_type>
-	bool awaitor_initial_suspend<state_type>::await_ready() noexcept
-	{
-		return false;
-	}
-	template<class state_type>
-	void awaitor_initial_suspend<state_type>::await_suspend(coroutine_handle<> resume_cb) noexcept
-	{
-		_state->await_suspend(resume_cb);
-
-		scheduler * sch_ = _state->parent_scheduler();
-		if (sch_ != nullptr)
-		{
-			_state->current_scheduler(sch_);
-			_state->resume();
-		}
-	}
-	template<class state_type>
-	void awaitor_initial_suspend<state_type>::await_resume() noexcept
-	{
-	}
 }
 

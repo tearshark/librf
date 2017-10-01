@@ -85,6 +85,12 @@
     <ClCompile Include="..\benchmark\benchmark_async_mem.cpp">
       <Filter>benchmark</Filter>
     </ClCompile>
+    <ClCompile Include="..\librf\src\state.cpp">
+      <Filter>librf\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_multi_thread.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\librf\librf.h">
@@ -137,6 +143,9 @@
     </ClInclude>
     <ClInclude Include="..\librf\src\unix\coroutine.h">
       <Filter>librf\src\unix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\counted_ptr.h">
+      <Filter>librf\src</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

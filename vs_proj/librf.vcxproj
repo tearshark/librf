@@ -100,7 +100,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;RESUMEF_DEBUG_COUNTER=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\librf;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/await /std:c++latest </AdditionalOptions>
@@ -153,6 +153,7 @@
     <ClCompile Include="..\librf\src\rf_task.cpp" />
     <ClCompile Include="..\librf\src\scheduler.cpp" />
     <ClCompile Include="..\librf\src\sleep.cpp" />
+    <ClCompile Include="..\librf\src\state.cpp" />
     <ClCompile Include="..\librf\src\timer.cpp" />
     <ClCompile Include="..\tutorial\test_async_cb.cpp" />
     <ClCompile Include="..\tutorial\test_async_channel.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="..\tutorial\test_async_event.cpp" />
     <ClCompile Include="..\tutorial\test_async_event_timeout.cpp" />
     <ClCompile Include="..\tutorial\test_async_exception.cpp" />
+    <ClCompile Include="..\tutorial\test_async_multi_thread.cpp" />
     <ClCompile Include="..\tutorial\test_async_mutex.cpp" />
     <ClCompile Include="..\tutorial\test_async_resumable.cpp" />
     <ClCompile Include="..\tutorial\test_async_routine.cpp" />
@@ -173,6 +175,7 @@
     <ClInclude Include="..\librf\librf.h" />
     <ClInclude Include="..\librf\src\asio_task.h" />
     <ClInclude Include="..\librf\src\channel.h" />
+    <ClInclude Include="..\librf\src\counted_ptr.h" />
     <ClInclude Include="..\librf\src\def.h" />
     <ClInclude Include="..\librf\src\event.h" />
     <ClInclude Include="..\librf\src\future.h" />

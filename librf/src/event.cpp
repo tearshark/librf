@@ -94,7 +94,7 @@ namespace resumef
 			});
 		_event->wait_(awaker);
 		
-		g_scheduler.timer()->add(tp, 
+		this_scheduler()->timer()->add(tp,
 			[awaker](bool bValue)
 			{
 				awaker->awake(nullptr, 1);
@@ -209,7 +209,7 @@ namespace resumef
 			e->wait_(awaker);
 		}
 
-		g_scheduler.timer()->add(tp, 
+		this_scheduler()->timer()->add(tp,
 			[awaker](bool bValue)
 			{
 				awaker->awake(nullptr, 1);
@@ -322,7 +322,7 @@ namespace resumef
 		awaitable_t<bool> awaitable;
 		if (evts.size() <= 0)
 		{
-			g_scheduler.timer()->add_handler(tp,
+			this_scheduler()->timer()->add_handler(tp,
 				[st = awaitable._state](bool bValue)
 				{
 					st->set_value(false);
@@ -334,7 +334,7 @@ namespace resumef
 		ctx->st = awaitable._state;
 		ctx->evts_waited.reserve(evts.size());
 		ctx->evts = std::move(evts);
-		ctx->th = std::move(g_scheduler.timer()->add_handler(tp,
+		ctx->th = std::move(this_scheduler()->timer()->add_handler(tp,
 			[ctx](bool bValue)
 			{
 				ctx->awake(nullptr);

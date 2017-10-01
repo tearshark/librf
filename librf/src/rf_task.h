@@ -19,6 +19,7 @@ namespace resumef
 		virtual bool go_next(scheduler *) = 0;
 		virtual void cancel() = 0;
 		virtual void * get_id() = 0;
+		virtual void bind(scheduler *) = 0;
 	};
 
 	//----------------------------------------------------------------------------------------------
@@ -75,6 +76,10 @@ namespace resumef
 		{
 			return nullptr;
 		}
+		virtual void bind(scheduler *) override
+		{
+
+		}
 	};
 
 	template<class _Ty>
@@ -112,7 +117,6 @@ namespace resumef
 		virtual bool go_next(scheduler * schdler) override
 		{
 			auto * _state = _future._state.get();
-			_state->current_scheduler(schdler);
 			_state->resume();
 			return !_state->ready() && !_state->_done;
 		}
@@ -123,6 +127,11 @@ namespace resumef
 		virtual void * get_id() override
 		{
 			return _future._state.get();
+		}
+		virtual void bind(scheduler * schdler) override
+		{
+			auto * _state = _future._state.get();
+			_state->current_scheduler(schdler);
 		}
 	};
 

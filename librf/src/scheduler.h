@@ -11,6 +11,8 @@
 
 namespace resumef
 {
+	struct local_scheduler;
+
 	struct scheduler : public std::enable_shared_from_this<scheduler>
 	{
 	private:
@@ -53,7 +55,6 @@ namespace resumef
 		}
 
 		RF_API void break_all();
-		RF_API void swap(scheduler & right_);
 
 		inline timer_manager * timer() const
 		{
@@ -61,20 +62,34 @@ namespace resumef
 		}
 
 		friend struct task_base;
+		friend struct local_scheduler;
 
+	protected:
 		RF_API scheduler();
+	public:
 		RF_API ~scheduler();
-		RF_API scheduler(scheduler && right_);
-		RF_API scheduler & operator = (scheduler && right_);
 
+		scheduler(scheduler && right_) = delete;
+		scheduler & operator = (scheduler && right_) = delete;
 		scheduler(const scheduler &) = delete;
 		scheduler & operator = (const scheduler &) = delete;
+
+		static scheduler g_scheduler;
 	};
 
+	struct local_scheduler
+	{
+		RF_API local_scheduler();
+		RF_API ~local_scheduler();
 
+		local_scheduler(local_scheduler && right_) = delete;
+		local_scheduler & operator = (local_scheduler && right_) = delete;
+		local_scheduler(const local_scheduler &) = delete;
+		local_scheduler & operator = (const local_scheduler &) = delete;
+	private:
+		scheduler * _scheduler_ptr;
+	};
 //--------------------------------------------------------------------------------------------------
-
-	extern scheduler g_scheduler;
 
 #if !defined(_DISABLE_RESUMEF_GO_MACRO)
 #define go (*::resumef::this_scheduler()) + 
@@ -83,12 +98,3 @@ namespace resumef
 
 //--------------------------------------------------------------------------------------------------
 }
-
-namespace std
-{
-	inline void swap(resumef::scheduler & _Left, resumef::scheduler & right_)
-	{
-		_Left.swap(right_);
-	}
-}
-

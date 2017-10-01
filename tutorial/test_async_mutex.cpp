@@ -51,5 +51,5 @@ void resumable_main_mutex()
 	go test_mutex_push();
 	go test_mutex_pop(1);
 
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 }

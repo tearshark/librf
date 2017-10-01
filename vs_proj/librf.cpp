@@ -14,12 +14,13 @@ extern void resumable_main_event_timeout();
 extern void resumable_main_dynamic_go();
 extern void resumable_main_channel();
 extern void resumable_main_cb();
+extern void resumable_main_multi_thread();
 
 extern void resumable_main_benchmark_mem();
 
 int main(int argc, const char * argv[])
 {
-	resumable_main_routine();
+	resumable_main_multi_thread();
 	return 0;
 
 	resumable_main_yield_return();

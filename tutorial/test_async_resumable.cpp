@@ -38,7 +38,7 @@ void resumable_switch(int coro)
 			return N / coro;
 		};
 	}
-	resumef::g_scheduler.run_until_notask();
+	resumef::this_scheduler()->run_until_notask();
 
 	auto end = std::chrono::steady_clock::now();
 	dump("BenchmarkSwitch_" + std::to_string(coro), N, start, end);

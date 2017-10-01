@@ -64,8 +64,8 @@ auto test_yield_void()
 void resumable_main_yield_return()
 {
 	go test_yield_int();
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 
 	go test_yield_void();
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 }

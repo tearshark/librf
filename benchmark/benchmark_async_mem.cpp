@@ -22,5 +22,5 @@ void resumable_main_benchmark_mem()
 		};
 	}
 
-	resumef::g_scheduler.run_until_notask();
+	resumef::this_scheduler()->run_until_notask();
 }

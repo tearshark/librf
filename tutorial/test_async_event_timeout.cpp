@@ -48,7 +48,7 @@ void test_wait_timeout_one()
 	async_set_event(evt, 10s + 50ms);
 	//go resumalbe_set_event(evt, 10s + 50ms);
 
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 }
 
 void test_wait_timeout_any_invalid()
@@ -65,7 +65,7 @@ void test_wait_timeout_any_invalid()
 		assert(idx < 0);
 		std::cout << "invalid wait!" << std::endl;
 	};
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 }
 
 void test_wait_timeout_any()
@@ -93,7 +93,7 @@ void test_wait_timeout_any()
 		}
 
 		//取消剩下的定时器，以便于协程调度器退出来
-		g_scheduler.timer()->clear();
+		this_scheduler()->timer()->clear();
 	};
 
 	srand((int)time(nullptr));
@@ -103,7 +103,7 @@ void test_wait_timeout_any()
 		async_set_event(e, 1ms * (1000 + rand() % 5000));
 	}
 
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 }
 
 void test_wait_timeout_all_invalid()
@@ -120,7 +120,7 @@ void test_wait_timeout_all_invalid()
 		assert(!result);
 		std::cout << "invalid wait!" << std::endl;
 	};
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 }
 
 void test_wait_timeout_all()
@@ -154,7 +154,7 @@ void test_wait_timeout_all()
 		//async_set_event(e, 1ms * (1000 + rand() % 5000));
 	}
 
-	g_scheduler.run_until_notask();
+	this_scheduler()->run_until_notask();
 }
 
 void resumable_main_event_timeout()
