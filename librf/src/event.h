@@ -13,9 +13,12 @@ namespace resumef
 		struct event_impl : public std::enable_shared_from_this<event_impl>
 		{
 		private:
+			//typedef spinlock lock_type;
+			typedef std::recursive_mutex lock_type;
+
 			std::list<event_awaker_ptr> _awakes;
 			intptr_t _counter;
-			spinlock _lock;
+			lock_type _lock;
 		public:
 			RF_API event_impl(intptr_t initial_counter_);
 

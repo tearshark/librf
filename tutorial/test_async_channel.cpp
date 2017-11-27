@@ -11,9 +11,9 @@
 
 using namespace resumef;
 
-const size_t MAX_CHANNEL_QUEUE = 0;		//0, 1, 5, 10, -1
+const size_t MAX_CHANNEL_QUEUE = 5;		//0, 1, 5, 10, -1
 
-future_vt test_channel_read(const channel_t<size_t> & c)
+future_vt test_channel_read(const channel_t<std::string> & c)
 {
 	using namespace std::chrono;
 
@@ -21,8 +21,8 @@ future_vt test_channel_read(const channel_t<size_t> & c)
 	{
 		try
 		{
-			//auto val = co_await c.read();
-			auto val = co_await c;		//第二种从channel读出数据的方法。利用重载operator co_await()，而不是c是一个awaitable_t。
+			auto val = co_await c.read();
+			//auto val = co_await c;		//第二种从channel读出数据的方法。利用重载operator co_await()，而不是c是一个awaitable_t。
 
 			std::cout << val << ":";
 #if _DEBUG
@@ -41,14 +41,14 @@ future_vt test_channel_read(const channel_t<size_t> & c)
 	}
 }
 
-future_vt test_channel_write(const channel_t<size_t> & c)
+future_vt test_channel_write(const channel_t<std::string> & c)
 {
 	using namespace std::chrono;
 
 	for (size_t i = 0; i < 10; ++i)
 	{
-		//co_await c.write(i);
-		co_await (c << i);				//第二种写入数据到channel的方法。因为优先级关系，需要将'c << i'括起来
+		co_await c.write(std::to_string(i));
+		//co_await (c << std::to_string(i));				//第二种写入数据到channel的方法。因为优先级关系，需要将'c << i'括起来
 		std::cout << "<" << i << ">:";
 		
 #if _DEBUG
@@ -62,7 +62,7 @@ future_vt test_channel_write(const channel_t<size_t> & c)
 
 void test_channel_read_first()
 {
-	channel_t<size_t> c(MAX_CHANNEL_QUEUE);
+	channel_t<std::string> c(MAX_CHANNEL_QUEUE);
 
 	go test_channel_read(c);
 	go test_channel_write(c);
@@ -72,7 +72,7 @@ void test_channel_read_first()
 
 void test_channel_write_first()
 {
-	channel_t<size_t> c(MAX_CHANNEL_QUEUE);
+	channel_t<std::string> c(MAX_CHANNEL_QUEUE);
 
 	go test_channel_write(c);
 	go test_channel_read(c);

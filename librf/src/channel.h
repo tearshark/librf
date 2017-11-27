@@ -16,7 +16,10 @@ namespace resumef
 			typedef std::shared_ptr<channel_write_awaker> channel_write_awaker_ptr;
 			typedef std::pair<channel_write_awaker_ptr, _Ty> write_tuple_type;
 		private:
-			spinlock _lock;										//保证访问本对象是线程安全的
+			//typedef spinlock lock_type;
+			typedef std::recursive_mutex lock_type;
+
+			lock_type _lock;									//保证访问本对象是线程安全的
 			const size_t _max_counter;							//数据队列的容量上限
 			std::deque<_Ty> _values;							//数据队列
 			std::list<channel_read_awaker_ptr> _read_awakes;	//读队列
@@ -39,23 +42,19 @@ namespace resumef
 			{
 				return read_(std::make_shared<channel_read_awaker>(std::forward<callee_t>(awaker)));
 			}
-			template<class callee_t, class = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, channel_write_awaker_ptr>::value>>
-			auto write(callee_t && awaker, const _Ty& val)
+			template<class callee_t, class _Ty2, class = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, channel_write_awaker_ptr>::value>>
+			auto write(callee_t && awaker, _Ty2&& val)
 			{
-				return write_(std::make_shared<channel_write_awaker>(std::forward<callee_t>(awaker)), val);
-			}
-			template<class callee_t, class = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, channel_write_awaker_ptr>::value>>
-			auto write(callee_t && awaker, _Ty&& val)
-			{
-				return write_(std::make_shared<channel_write_awaker>(std::forward<callee_t>(awaker)), std::forward<_Ty>(val));
+				return write_(std::make_shared<channel_write_awaker>(std::forward<callee_t>(awaker)), std::forward<_Ty2>(val));
 			}
 
 			//如果已经触发了awaker,则返回true
+			//设计目标是线程安全的，实际情况待考察
 			bool read_(channel_read_awaker_ptr && r_awaker)
 			{
 				assert(r_awaker);
 
-				scoped_lock<spinlock> lock_(this->_lock);
+				scoped_lock<lock_type> lock_(this->_lock);
 
 				bool ret_value;
 				if (_values.size() > 0)
@@ -80,36 +79,19 @@ namespace resumef
 				return ret_value;
 			}
 
-			void write_(channel_write_awaker_ptr && w_awaker, const _Ty& val)
+			//设计目标是线程安全的，实际情况待考察
+			template<class _Ty2>
+			void write_(channel_write_awaker_ptr && w_awaker, _Ty2&& val)
 			{
 				assert(w_awaker);
-				scoped_lock<spinlock> lock_(this->_lock);
+				scoped_lock<lock_type> lock_(this->_lock);
 
 				//如果满了，则不添加到数据队列，而是将“写等待”和值，放入“写队列”
 				bool is_full = _values.size() >= _max_counter;
 				if (is_full)
-					_write_awakes.push_back(std::make_pair(std::forward<channel_write_awaker_ptr>(w_awaker), val));
+					_write_awakes.push_back(std::make_pair(std::forward<channel_write_awaker_ptr>(w_awaker), std::forward<_Ty2>(val)));
 				else
-					_values.push_back(val);
-
-				//如果已有读队列，则唤醒一个“读等待”
-				awake_one_reader_();
-
-				//触发 没有放入“写队列”的“写等待”
-				if (!is_full) w_awaker->awake(this, 1);
-			}
-
-			void write_(channel_write_awaker_ptr && w_awaker, _Ty&& val)
-			{
-				assert(w_awaker);
-				scoped_lock<spinlock> lock_(this->_lock);
-
-				//如果满了，则不添加到数据队列，而是将“写等待”和值，放入“写队列”
-				bool is_full = _values.size() >= _max_counter;
-				if (is_full)
-					_write_awakes.push_back(std::make_pair(std::forward<channel_write_awaker_ptr>(w_awaker), std::forward<_Ty>(val)));
-				else
-					_values.push_back(std::forward<_Ty>(val));
+					_values.push_back(std::forward<_Ty2>(val));
 
 				//如果已有读队列，则唤醒一个“读等待”
 				awake_one_reader_();
@@ -119,6 +101,7 @@ namespace resumef
 			}
 
 		private:
+			//只能被write_函数调用，内部不再需要加锁
 			void awake_one_reader_()
 			{
 				//assert(!(_read_awakes.size() >= 0 && _values.size() == 0));
@@ -139,6 +122,7 @@ namespace resumef
 				}
 			}
 
+			//只能被read_函数调用，内部不再需要加锁
 			void awake_one_writer_()
 			{
 				for (auto iter = _write_awakes.begin(); iter != _write_awakes.end(); )
@@ -181,7 +165,8 @@ namespace resumef
 			
 		}
 
-		awaitable_t<bool> write(_Ty&& val) const
+		template<class _Ty2>
+		awaitable_t<bool> write(_Ty2&& val) const
 		{
 			awaitable_t<bool> awaitable;
 
@@ -191,24 +176,11 @@ namespace resumef
 				st->set_value(chan ? true : false);
 				return true;
 			});
-			_chan->write_(std::move(awaker), std::forward<_Ty>(val));
+			_chan->write_(std::move(awaker), std::forward<_Ty2>(val));
 
 			return awaitable;
 		}
-		awaitable_t<bool> write(const _Ty& val) const
-		{
-			awaitable_t<bool> awaitable;
 
-			auto awaker = std::make_shared<channel_write_awaker>(
-				[st = awaitable._state](channel_impl_type * chan) -> bool
-			{
-				st->set_value(chan ? true : false);
-				return true;
-			});
-			_chan->write_(std::move(awaker), val);
-
-			return awaitable;
-		}
 		awaitable_t<_Ty> read() const
 		{
 			awaitable_t<_Ty> awaitable;
@@ -228,13 +200,10 @@ namespace resumef
 			return awaitable;
 		}
 
-		awaitable_t<bool> operator << (_Ty&& val) const
+		template<class _Ty2>
+		awaitable_t<bool> operator << (_Ty2&& val) const
 		{
-			return std::move(write(std::forward<_Ty>(val)));
-		}
-		awaitable_t<bool> operator << (const _Ty& val) const
-		{
-			return std::move(write(val));
+			return std::move(write(std::forward<_Ty2>(val)));
 		}
 
 		awaitable_t<_Ty> operator co_await () const
@@ -243,6 +212,7 @@ namespace resumef
 		}
 
 #if _DEBUG
+		//非线程安全，返回的队列也不是线程安全的
 		const auto & debug_queue() const
 		{
 			return _chan->debug_queue();
@@ -256,5 +226,5 @@ namespace resumef
 	};
 
 
-	typedef channel_t<bool>	semaphore_t;
+	using semaphore_t = channel_t<bool>;
 }

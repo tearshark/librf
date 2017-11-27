@@ -57,13 +57,14 @@ namespace resumef
 			if (sch_ == nullptr)
 				sch_ = this_scheduler();
 */
-			sch_->push_task_internal(new awaitable_task_t<state_base>(this));
+			if (sch_)
+				sch_->push_task_internal(new awaitable_task_t<state_base>(this));
 		}
 	}
 
 	void state_base::set_exception(std::exception_ptr && e_)
 	{
-		scoped_lock<std::mutex> __guard(_mtx);
+		scoped_lock<lock_type> __guard(_mtx);
 
 		_exception = std::move(e_);
 		// Set all members first as calling coroutine may reset stuff here.
@@ -76,7 +77,8 @@ namespace resumef
 			if (sch_ == nullptr)
 				sch_ = this_scheduler();
 */
-			sch_->push_task_internal(new awaitable_task_t<state_base>(this));
+			if (sch_)
+				sch_->push_task_internal(new awaitable_task_t<state_base>(this));
 		}
 	}
 

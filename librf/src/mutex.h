@@ -13,9 +13,12 @@ namespace resumef
 		struct mutex_impl : public std::enable_shared_from_this<mutex_impl>
 		{
 		private:
+			//typedef spinlock lock_type;
+			typedef std::recursive_mutex lock_type;
+
 			std::list<mutex_awaker_ptr> _awakes;
 			mutex_awaker_ptr _owner;
-			spinlock _lock;
+			lock_type _lock;
 		public:
 			RF_API mutex_impl();
 

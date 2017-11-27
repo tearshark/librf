@@ -91,6 +91,9 @@
     <ClCompile Include="..\tutorial\test_async_multi_thread.cpp">
       <Filter>tutorial</Filter>
     </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_channel_mult_thread.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\librf\librf.h">

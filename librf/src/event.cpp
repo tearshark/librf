@@ -1,6 +1,5 @@
 ﻿#include "event.h"
 #include <assert.h>
-#include <mutex>
 #include "scheduler.h"
 
 namespace resumef
@@ -14,7 +13,7 @@ namespace resumef
 
 		void event_impl::signal()
 		{
-			scoped_lock<spinlock> lock_(this->_lock);
+			scoped_lock<lock_type> lock_(this->_lock);
 
 			++this->_counter;
 
@@ -33,7 +32,7 @@ namespace resumef
 
 		void event_impl::reset()
 		{
-			scoped_lock<spinlock> lock_(this->_lock);
+			scoped_lock<lock_type> lock_(this->_lock);
 
 			this->_awakes.clear();
 			this->_counter = 0;
@@ -43,7 +42,7 @@ namespace resumef
 		{
 			assert(awaker);
 
-			scoped_lock<spinlock> lock_(this->_lock);
+			scoped_lock<lock_type> lock_(this->_lock);
 
 			if (this->_counter > 0)
 			{
@@ -246,11 +245,14 @@ namespace resumef
 
 	struct event_t::wait_all_ctx
 	{
+		//typedef spinlock lock_type;
+		typedef std::recursive_mutex lock_type;
+
 		counted_ptr<state_t<bool>>		st;
 		std::vector<event_impl_ptr>		evts;
 		std::vector<event_impl_ptr>		evts_waited;
 		timer_handler					th;
-		spinlock						_lock;
+		lock_type						_lock;
 
 		wait_all_ctx()
 		{
@@ -268,7 +270,7 @@ namespace resumef
 
 		bool awake(detail::event_impl * eptr)
 		{
-			scoped_lock<spinlock> lock_(this->_lock);
+			scoped_lock<lock_type> lock_(this->_lock);
 
 			//如果st为nullptr，则说明之前已经返回过值了。本环境无效了。
 			if (!st.get())

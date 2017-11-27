@@ -97,15 +97,6 @@ namespace resumef
 	void scheduler::cancel_all_task_()
 	{
 		{
-			scoped_lock<std::recursive_mutex> __guard(_mtx_ready);
-			for (auto task : this->_ready_task)
-			{
-				task->cancel();
-				delete task;
-			}
-			this->_ready_task.clear();
-		}
-		{
 			scoped_lock<std::recursive_mutex> __guard(_mtx_task);
 			for (auto task : this->_task)
 			{
@@ -113,6 +104,15 @@ namespace resumef
 				delete task;
 			}
 			this->_task.clear();
+		}
+		{
+			scoped_lock<std::recursive_mutex> __guard(_mtx_ready);
+			for (auto task : this->_ready_task)
+			{
+				task->cancel();
+				delete task;
+			}
+			this->_ready_task.clear();
 		}
 	}
 
@@ -156,13 +156,14 @@ namespace resumef
 				iter = this->_task.erase(iter);
 				delete task;
 			}
-		}
-		{
-			scoped_lock<std::recursive_mutex> __guard(_mtx_ready);
-			if (this->_ready_task.size() > 0)
+
 			{
-				this->_task.insert(this->_task.end(), this->_ready_task.begin(), this->_ready_task.end());
-				this->_ready_task.clear();
+				scoped_lock<std::recursive_mutex> __guard(_mtx_ready);
+				if (this->_ready_task.size() > 0)
+				{
+					this->_task.insert(this->_task.end(), this->_ready_task.begin(), this->_ready_task.end());
+					this->_ready_task.clear();
+				}
 			}
 		}
 	}

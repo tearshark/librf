@@ -13,7 +13,8 @@ namespace resumef
 	struct state_base
 	{
 	protected:
-		std::mutex	_mtx;		//for value, _exception
+		typedef std::recursive_mutex lock_type;
+		lock_type	_mtx;		//for value, _exception
 		RF_API void set_value_none_lock();
 	private:
 		void * _this_promise = nullptr;
@@ -67,7 +68,7 @@ namespace resumef
 
 		void cancel()
 		{
-			scoped_lock<std::mutex> __guard(_mtx);
+			scoped_lock<lock_type> __guard(_mtx);
 
 			_cancellation = true;
 			_coro = nullptr;
@@ -83,7 +84,7 @@ namespace resumef
 			{
 #if RESUMEF_DEBUG_COUNTER
 				{
-					scoped_lock<std::mutex> __lock(g_resumef_cout_mutex);
+					scoped_lock<lock_type> __lock(g_resumef_cout_mutex);
 
 					std::cout << "scheduler=" << current_scheduler()
 						<< ",coro=" << _coro.address()
@@ -155,21 +156,21 @@ namespace resumef
 
 		void set_value(const value_type& t)
 		{
-			scoped_lock<std::mutex> __guard(_mtx);
+			scoped_lock<lock_type> __guard(_mtx);
 
 			_value = t;
 			state_base::set_value_none_lock();
 		}
 		void set_value(value_type&& t)
 		{
-			scoped_lock<std::mutex> __guard(_mtx);
+			scoped_lock<lock_type> __guard(_mtx);
 
 			_value = std::forward<value_type>(t);
 			state_base::set_value_none_lock();
 		}
 		_Ty & get_value()
 		{
-			scoped_lock<std::mutex> __guard(_mtx);
+			scoped_lock<lock_type> __guard(_mtx);
 
 			if (!_ready)
 				throw future_exception{ future_error::not_ready };
@@ -177,7 +178,7 @@ namespace resumef
 		}
 		void reset()
 		{
-			scoped_lock<std::mutex> __guard(_mtx);
+			scoped_lock<lock_type> __guard(_mtx);
 			state_base::reset_none_lock();
 			_value = value_type{};
 		}
@@ -199,20 +200,20 @@ namespace resumef
 
 		void set_value()
 		{
-			scoped_lock<std::mutex> __guard(_mtx);
+			scoped_lock<lock_type> __guard(_mtx);
 
 			set_value_none_lock();
 		}
 		void get_value()
 		{
-			scoped_lock<std::mutex> __guard(_mtx);
+			scoped_lock<lock_type> __guard(_mtx);
 
 			if (!_ready)
 				throw future_exception{ future_error::not_ready };
 		}
 		void reset()
 		{
-			scoped_lock<std::mutex> __guard(_mtx);
+			scoped_lock<lock_type> __guard(_mtx);
 
 			reset_none_lock();
 		}

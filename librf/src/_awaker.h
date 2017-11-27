@@ -19,7 +19,10 @@ namespace resumef
 			//		返回false表示此事件已经无效，event内部只删除此awaker
 			typedef std::function<bool(_Ety * e, _Types...)> callee_type;
 		private:
-			spinlock _lock;
+			//typedef spinlock lock_type;
+			typedef std::recursive_mutex lock_type;
+
+			lock_type _lock;
 			callee_type _callee;
 			std::atomic<intptr_t> _counter;
 		public:
@@ -35,7 +38,7 @@ namespace resumef
 			bool awake(_Ety * e, intptr_t count_, const _Types&... args)
 			{
 				assert(count_ > 0);
-				scoped_lock<spinlock> lock_(this->_lock);
+				scoped_lock<lock_type> lock_(this->_lock);
 
 				if ((this->_counter.fetch_sub(count_) - count_) <= 0)
 				{

@@ -27,7 +27,7 @@ namespace resumef
 	template<class _Ty>
 	struct task_t;
 
-	//co_task接受的是一个experimental::generator<_Ty>类型，是调用一个支持异步的函数后返回的结果
+	//task_t接受的是一个experimental::generator<_Ty>类型，是调用一个支持异步的函数后返回的结果
 	template<class _Ty>
 	struct task_t<std::experimental::generator<_Ty> > : public task_base
 	{
@@ -137,7 +137,7 @@ namespace resumef
 
 	//----------------------------------------------------------------------------------------------
 
-	//co_task_with_ctx接受的是一个'函数对象'
+	//ctx_task_t接受的是一个'函数对象'
 	//这个'函数对象'被调用后，返回generator<_Ty>/future_t<_Ty>类型
 	//然后'函数对象'作为异步执行的上下文状态保存起来
 	template<class _Ctx>
