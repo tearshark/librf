@@ -66,33 +66,33 @@ void resumable_main_channel_mult_thread()
 {
 	channel_t<std::string> c(MAX_CHANNEL_QUEUE);
 
-	std::thread wth([&]
+	std::thread write_th([&]
 	{
 		//local_scheduler my_scheduler;		//2017/11/27日，仍然存在BUG。真多线程下调度，存在有协程无法被调度完成的BUG
 		go test_channel_producer(c, BATCH * N);
 		this_scheduler()->run_until_notask();
 
-		std::cout << "Write OK" << std::endl;
+		std::cout << "Write OK\r\n";
 	});
 
 	//std::this_thread::sleep_for(100ms);
 
-	std::thread rth[N];
+	std::thread read_th[N];
 	for (size_t i = 0; i < N; ++i)
 	{
-		rth[i] = std::thread([&]
+		read_th[i] = std::thread([&]
 		{
 			//local_scheduler my_scheduler;		//2017/11/27日，仍然存在BUG。真多线程下调度，存在有协程无法被调度完成的BUG
 			go test_channel_consumer(c, BATCH);
 			this_scheduler()->run_until_notask();
 
-			std::cout << "Read OK" << std::endl;
+			std::cout << "Read OK\r\n";
 		});
 	}
 
-	for(auto & th : rth)
+	for(auto & th : read_th)
 		th.join();
-	wth.join();
+	write_th.join();
 
 	std::cout << "OK" << std::endl;
 	_getch();

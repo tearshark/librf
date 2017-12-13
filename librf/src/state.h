@@ -16,10 +16,12 @@ namespace resumef
 		typedef std::recursive_mutex lock_type;
 		lock_type	_mtx;		//for value, _exception
 		RF_API void set_value_none_lock();
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 	private:
 		void * _this_promise = nullptr;
 		scheduler * _current_scheduler = nullptr;
 		std::vector<counted_ptr<state_base>> _depend_states;
+#endif
 	public:
 		coroutine_handle<> _coro;
 		std::atomic<intptr_t> _count = 0;				// tracks reference count of state object
@@ -84,13 +86,17 @@ namespace resumef
 			{
 #if RESUMEF_DEBUG_COUNTER
 				{
-					scoped_lock<lock_type> __lock(g_resumef_cout_mutex);
+					scoped_lock<std::mutex> __lock(g_resumef_cout_mutex);
 
-					std::cout << "scheduler=" << current_scheduler()
-						<< ",coro=" << _coro.address()
+					std::cout 
+						<< "coro=" << _coro.address()
+						<< ",thread=" << std::this_thread::get_id()
+#if RESUMEF_ENABLE_MULT_SCHEDULER
+
+						<< ",scheduler=" << current_scheduler()
 						<< ",this_promise=" << this_promise()
 						<< ",parent_promise=" << parent_promise()
-						<< ",thread=" << std::this_thread::get_id()
+#endif
 						<< std::endl;
 				}
 #endif
@@ -112,6 +118,7 @@ namespace resumef
 				delete this;
 		}
 
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		promise_t<void> * parent_promise() const;
 		//scheduler * parent_scheduler() const;
 
@@ -129,6 +136,7 @@ namespace resumef
 			return _current_scheduler;
 		}
 		void current_scheduler(scheduler * sch_);
+#endif
 
 		//------------------------------------------------------------------------------------------
 		//以下是通过future_t/promise_t, 与编译器生成的resumable function交互的接口
@@ -173,7 +181,7 @@ namespace resumef
 			scoped_lock<lock_type> __guard(_mtx);
 
 			if (!_ready)
-				throw future_exception{ future_error::not_ready };
+				throw future_exception{ error_code::not_ready };
 			return _value;
 		}
 		void reset()
@@ -209,7 +217,7 @@ namespace resumef
 			scoped_lock<lock_type> __guard(_mtx);
 
 			if (!_ready)
-				throw future_exception{ future_error::not_ready };
+				throw future_exception{ error_code::not_ready };
 		}
 		void reset()
 		{
@@ -218,10 +226,12 @@ namespace resumef
 			reset_none_lock();
 		}
 
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		promise_t<void> * parent_promise() const
 		{
 			return reinterpret_cast<promise_t<void> *>(state_base::parent_promise());
 		}
+#endif
 	};
 
 }

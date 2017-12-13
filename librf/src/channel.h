@@ -9,7 +9,7 @@ namespace resumef
 		template<class _Ty>
 		struct channel_impl : public std::enable_shared_from_this<channel_impl<_Ty>>
 		{
-			typedef _awaker<channel_impl<_Ty>, _Ty *, future_error> channel_read_awaker;
+			typedef _awaker<channel_impl<_Ty>, _Ty *, error_code> channel_read_awaker;
 			typedef std::shared_ptr<channel_read_awaker> channel_read_awaker_ptr;
 
 			typedef _awaker<channel_impl<_Ty>> channel_write_awaker;
@@ -63,7 +63,7 @@ namespace resumef
 					auto val = std::move(_values.front());
 					_values.pop_front();
 
-					r_awaker->awake(this, 1, &val, future_error::none);
+					r_awaker->awake(this, 1, &val, error_code::none);
 					ret_value = true;
 				}
 				else
@@ -111,7 +111,7 @@ namespace resumef
 					auto r_awaker = *iter;
 					iter = _read_awakes.erase(iter);
 
-					if (r_awaker->awake(this, 1, _values.size() ? &_values.front() : nullptr, future_error::read_before_write))
+					if (r_awaker->awake(this, 1, _values.size() ? &_values.front() : nullptr, error_code::read_before_write))
 					{
 						if(_values.size()) _values.pop_front();
 
@@ -186,7 +186,7 @@ namespace resumef
 			awaitable_t<_Ty> awaitable;
 
 			auto awaker = std::make_shared<channel_read_awaker>(
-				[st = awaitable._state](channel_impl_type *, _Ty * val, future_error fe) -> bool
+				[st = awaitable._state](channel_impl_type *, _Ty * val, error_code fe) -> bool
 			{
 				if(val)
 					st->set_value(std::move(*val));

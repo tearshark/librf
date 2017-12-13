@@ -11,7 +11,7 @@ std::atomic<intptr_t> g_resumef_evtctx_count = 0;
 namespace resumef
 {
 
-	static const char * future_error_string[(size_t)future_error::max__]
+	static const char * future_error_string[(size_t)error_code::max__]
 	{
 		"none",
 		"not_ready",
@@ -22,7 +22,7 @@ namespace resumef
 
 	static char sz_future_error_buffer[256];
 
-	const char * get_error_string(future_error fe, const char * classname)
+	const char * get_error_string(error_code fe, const char * classname)
 	{
 		if (classname)
 		{
@@ -32,6 +32,7 @@ namespace resumef
 		return future_error_string[(size_t)(fe)];
 	}
 
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 	thread_local scheduler * th_scheduler_ptr = nullptr;
 
 	//获得当前线程下的调度器
@@ -39,34 +40,26 @@ namespace resumef
 	{
 		return th_scheduler_ptr ? th_scheduler_ptr : &scheduler::g_scheduler;
 	}
+#endif
 
-	//获得当前线程下，正在由调度器调度的协程
-/*
-	namespace detail
-	{
-		state_base * current_coroutine()
-		{
-			scheduler * schdler = this_scheduler();
-			if (schdler->current_state)
-				return schdler->current_state;
-			return schdler->top_state();
-		}
-	}
-*/
 	local_scheduler::local_scheduler()
 	{
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (th_scheduler_ptr == nullptr)
 		{
 			_scheduler_ptr = new scheduler;
 			th_scheduler_ptr = _scheduler_ptr;
 		}
+#endif
 	}
 
 	local_scheduler::~local_scheduler()
 	{
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (th_scheduler_ptr == _scheduler_ptr)
 			th_scheduler_ptr = nullptr;
 		delete _scheduler_ptr;
+#endif
 	}
 
 	scheduler::scheduler()
@@ -79,9 +72,10 @@ namespace resumef
 	scheduler::~scheduler()
 	{
 		cancel_all_task_();
-
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (th_scheduler_ptr == this)
 			th_scheduler_ptr = nullptr;
+#endif
 	}
 
 	void scheduler::new_task(task_base * task)
@@ -89,7 +83,9 @@ namespace resumef
 		if (task)
 		{
 			scoped_lock<std::recursive_mutex> __guard(_mtx_ready);
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 			task->bind(this);
+#endif
 			this->_ready_task.push_back(task);
 		}
 	}
@@ -126,9 +122,10 @@ namespace resumef
 
 	void scheduler::run_one_batch()
 	{
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (th_scheduler_ptr == nullptr)
 			th_scheduler_ptr = this;
-
+#endif
 		{
 			scoped_lock<std::recursive_mutex> __guard(_mtx_task);
 

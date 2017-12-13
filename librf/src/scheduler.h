@@ -86,10 +86,19 @@ namespace resumef
 		local_scheduler & operator = (local_scheduler && right_) = delete;
 		local_scheduler(const local_scheduler &) = delete;
 		local_scheduler & operator = (const local_scheduler &) = delete;
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 	private:
 		scheduler * _scheduler_ptr;
+#endif
 	};
 //--------------------------------------------------------------------------------------------------
+#if !RESUMEF_ENABLE_MULT_SCHEDULER
+	//获得当前线程下的调度器
+	inline scheduler * this_scheduler()
+	{
+		return &scheduler::g_scheduler;
+	}
+#endif
 
 #if !defined(_DISABLE_RESUMEF_GO_MACRO)
 #define go (*::resumef::this_scheduler()) + 

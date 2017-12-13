@@ -19,7 +19,9 @@ namespace resumef
 		virtual bool go_next(scheduler *) = 0;
 		virtual void cancel() = 0;
 		virtual void * get_id() = 0;
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		virtual void bind(scheduler *) = 0;
+#endif
 	};
 
 	//----------------------------------------------------------------------------------------------
@@ -76,10 +78,12 @@ namespace resumef
 		{
 			return nullptr;
 		}
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		virtual void bind(scheduler *) override
 		{
 
 		}
+#endif
 	};
 
 	template<class _Ty>
@@ -128,11 +132,13 @@ namespace resumef
 		{
 			return _future._state.get();
 		}
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		virtual void bind(scheduler * schdler) override
 		{
 			auto * _state = _future._state.get();
 			_state->current_scheduler(schdler);
 		}
+#endif
 	};
 
 	//----------------------------------------------------------------------------------------------

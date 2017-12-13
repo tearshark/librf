@@ -33,9 +33,11 @@ namespace resumef
 		{
 			return _state.get();
 		}
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		virtual void bind(scheduler * ) override
 		{
 		}
+#endif
 	};
 
 	state_base::~state_base()
@@ -52,12 +54,13 @@ namespace resumef
 
 		if (_coro)
 		{
-//			auto sch_ = this->current_scheduler();
-			auto sch_ = this_scheduler();
-/*
+#if RESUMEF_ENABLE_MULT_SCHEDULER
+			auto sch_ = this->current_scheduler();
 			if (sch_ == nullptr)
 				sch_ = this_scheduler();
-*/
+#else
+			auto sch_ = this_scheduler();
+#endif
 			sch_->push_task_internal(new awaitable_task_t<state_base>(this));
 		}
 	}
@@ -72,12 +75,13 @@ namespace resumef
 
 		if (_coro)
 		{
-//			auto sch_ = this->current_scheduler();
-			auto sch_ = this_scheduler();
-/*
+#if RESUMEF_ENABLE_MULT_SCHEDULER
+			auto sch_ = this->current_scheduler();
 			if (sch_ == nullptr)
 				sch_ = this_scheduler();
-*/
+#else
+			auto sch_ = this_scheduler();
+#endif
 			sch_->push_task_internal(new awaitable_task_t<state_base>(this));
 		}
 	}
@@ -88,7 +92,7 @@ namespace resumef
 
 		_coro = resume_cb;
 
-/*
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (_current_scheduler == nullptr)
 		{
 			auto * promise_ = this->parent_promise();
@@ -107,12 +111,12 @@ namespace resumef
 				stptr->current_scheduler(_current_scheduler);
 			_depend_states.clear();
 		}
-*/
+#endif
 	}
 
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 	void state_base::current_scheduler(scheduler * sch_)
 	{
-/*
 		scoped_lock<lock_type> __guard(_mtx);
 
 		_current_scheduler = sch_;
@@ -120,6 +124,6 @@ namespace resumef
 		for (auto & stptr : _depend_states)
 			stptr->current_scheduler(sch_);
 		_depend_states.clear();
-*/
 	}
+#endif
 }

@@ -64,7 +64,7 @@ namespace resumef
 
 #define _coro_promise_ptr(T) _coro_promise_ptr__<resumef::promise_t<T> >(_coro_frame_ptr())
 
-	enum struct future_error
+	enum struct error_code
 	{
 		none,
 		not_ready,			// get_value called when value not available
@@ -75,13 +75,13 @@ namespace resumef
 		max__
 	};
 
-	const char * get_error_string(future_error fe, const char * classname);
+	const char * get_error_string(error_code fe, const char * classname);
 	//const char * future_error_string[size_t(future_error::max__)];
 
 	struct future_exception : std::exception
 	{
-		future_error _error;
-		future_exception(future_error fe) 
+		error_code _error;
+		future_exception(error_code fe) 
 			: exception(get_error_string(fe, "future_exception"))
 			, _error(fe)
 		{
@@ -90,8 +90,8 @@ namespace resumef
 
 	struct lock_exception : std::exception
 	{
-		future_error _error;
-		lock_exception(future_error fe)
+		error_code _error;
+		lock_exception(error_code fe)
 			: exception(get_error_string(fe, "lock_exception"))
 			, _error(fe)
 		{
@@ -100,8 +100,8 @@ namespace resumef
 
 	struct channel_exception : std::exception
 	{
-		future_error _error;
-		channel_exception(future_error fe)
+		error_code _error;
+		channel_exception(error_code fe)
 			: exception(get_error_string(fe, "channel_exception"))
 			, _error(fe)
 		{
@@ -112,14 +112,7 @@ namespace resumef
 	struct state_base;
 
 	//获得当前线程下的调度器
-	extern scheduler * this_scheduler();
-	//获得当前线程下，正在由调度器调度的协程
-	//extern state_base * this_coroutine();
-
-	//namespace detail
-	//{
-	//	extern state_base * current_coroutine();
-	//}
+	scheduler * this_scheduler();
 }
 
 #define co_yield_void co_yield nullptr

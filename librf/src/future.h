@@ -155,19 +155,25 @@ namespace resumef
 		promise_impl_t()
 			: _state(make_counted<state_type>())
 		{
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 			_state->this_promise(this);
+#endif
 		}
 		promise_impl_t(promise_impl_t&& _Right)
 			: _state(std::move(_Right._state))
 		{
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 			_state->this_promise(this);
+#endif
 		}
 		promise_impl_t & operator = (promise_impl_t&& _Right)
 		{
 			if (this != _Right)
 			{
 				_state = std::move(_Right._state);
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 				_state->this_promise(this);
+#endif
 			}
 			return *this;
 		}
@@ -326,13 +332,13 @@ namespace resumef
 
 	using awaitable_vt = awaitable_t<void>;
 
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 	inline promise_t<void> * state_base::parent_promise() const
 	{
 		if (_coro) return _coro_promise_ptr__<promise_t<void>>(_coro.address());
 		return nullptr;
 	}
 
-/*
 	inline scheduler * state_base::parent_scheduler() const
 	{
 		auto promise_ = parent_promise();
@@ -340,7 +346,7 @@ namespace resumef
 			return promise_->_state->current_scheduler();
 		return nullptr;
 	}
-*/
+#endif
 
 }
 
