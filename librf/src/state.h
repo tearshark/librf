@@ -18,19 +18,20 @@ namespace resumef
 		RF_API void set_value_none_lock();
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 	private:
-		void * _this_promise = nullptr;
+		std::atomic<void *> _this_promise = nullptr;
 		scheduler * _current_scheduler = nullptr;
 		std::vector<counted_ptr<state_base>> _depend_states;
 #endif
-	public:
+	protected:
 		coroutine_handle<> _coro;
 		std::atomic<intptr_t> _count = 0;				// tracks reference count of state object
 		std::exception_ptr _exception;
 
-		bool _ready = false;
-		bool _cancellation = false;
-		bool _done = false;
+		std::atomic<bool> _ready = false;
+		std::atomic<bool> _cancellation = false;
+		std::atomic<bool> _done = false;
 
+	public:
 		state_base()
 		{
 #if RESUMEF_DEBUG_COUNTER
@@ -61,9 +62,15 @@ namespace resumef
 		{
 			return _ready;
 		}
+		bool done() const
+		{
+			return _done;
+		}
 
 		void reset_none_lock()
 		{
+			scoped_lock<lock_type> __guard(_mtx);
+
 			_coro = nullptr;
 			_ready = false;
 		}
@@ -82,6 +89,8 @@ namespace resumef
 		}
 		void resume()
 		{
+			scoped_lock<lock_type> __guard(_mtx);
+
 			if (_coro)
 			{
 #if RESUMEF_DEBUG_COUNTER
@@ -102,6 +111,7 @@ namespace resumef
 #endif
 				auto coro = _coro;
 				_coro = nullptr;
+
 				coro();
 			}
 		}
@@ -120,7 +130,7 @@ namespace resumef
 
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 		promise_t<void> * parent_promise() const;
-		//scheduler * parent_scheduler() const;
+		scheduler * parent_scheduler() const;
 
 		void * this_promise() const
 		{
@@ -143,6 +153,7 @@ namespace resumef
 		void await_suspend(coroutine_handle<> resume_cb);
 		void final_suspend()
 		{
+			scoped_lock<lock_type> __guard(_mtx);
 			_done = true;
 		}
 		//以上是通过future_t/promise_t, 与编译器生成的resumable function交互的接口
@@ -191,10 +202,12 @@ namespace resumef
 			_value = value_type{};
 		}
 
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		promise_t<_Ty> * parent_promise() const
 		{
 			return reinterpret_cast<promise_t<_Ty> *>(state_base::parent_promise());
 		}
+#endif
 	};
 
 	template<>

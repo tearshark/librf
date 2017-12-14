@@ -56,12 +56,10 @@ namespace resumef
 		{
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 			auto sch_ = this->current_scheduler();
-			if (sch_ == nullptr)
-				sch_ = this_scheduler();
 #else
 			auto sch_ = this_scheduler();
 #endif
-			sch_->push_task_internal(new awaitable_task_t<state_base>(this));
+			if(sch_) sch_->push_task_internal(new awaitable_task_t<state_base>(this));
 		}
 	}
 
@@ -77,12 +75,10 @@ namespace resumef
 		{
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 			auto sch_ = this->current_scheduler();
-			if (sch_ == nullptr)
-				sch_ = this_scheduler();
 #else
 			auto sch_ = this_scheduler();
 #endif
-			sch_->push_task_internal(new awaitable_task_t<state_base>(this));
+			if (sch_) sch_->push_task_internal(new awaitable_task_t<state_base>(this));
 		}
 	}
 

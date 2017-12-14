@@ -14,6 +14,7 @@ using namespace resumef;
 
 using namespace std::chrono;
 static std::mutex cout_mutex;
+std::atomic<intptr_t> gcounter = 0;
 
 #define OUTPUT_DEBUG	0
 
@@ -24,6 +25,7 @@ future_vt test_channel_consumer(const channel_t<std::string> & c, size_t cnt)
 		try
 		{
 			auto val = co_await c.read();
+			++gcounter;
 #if OUTPUT_DEBUG
 			{
 				scoped_lock<std::mutex> __lock(cout_mutex);
@@ -68,10 +70,11 @@ void resumable_main_channel_mult_thread()
 
 	std::thread write_th([&]
 	{
-		//local_scheduler my_scheduler;		//2017/11/27日，仍然存在BUG。真多线程下调度，存在有协程无法被调度完成的BUG
+		local_scheduler my_scheduler;		//2017/12/14日，仍然存在BUG。真多线程下调度，存在有协程无法被调度完成的BUG
 		go test_channel_producer(c, BATCH * N);
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 		this_scheduler()->run_until_notask();
-
+#endif
 		std::cout << "Write OK\r\n";
 	});
 
@@ -82,18 +85,23 @@ void resumable_main_channel_mult_thread()
 	{
 		read_th[i] = std::thread([&]
 		{
-			//local_scheduler my_scheduler;		//2017/11/27日，仍然存在BUG。真多线程下调度，存在有协程无法被调度完成的BUG
+			local_scheduler my_scheduler;		//2017/12/14日，仍然存在BUG。真多线程下调度，存在有协程无法被调度完成的BUG
 			go test_channel_consumer(c, BATCH);
+#if RESUMEF_ENABLE_MULT_SCHEDULER
 			this_scheduler()->run_until_notask();
-
+#endif
 			std::cout << "Read OK\r\n";
 		});
 	}
-
+	
+#if !RESUMEF_ENABLE_MULT_SCHEDULER
+	std::this_thread::sleep_for(100ms);
+	scheduler::g_scheduler.run_until_notask();
+#endif
 	for(auto & th : read_th)
 		th.join();
 	write_th.join();
 
-	std::cout << "OK" << std::endl;
+	std::cout << "OK: counter = " << gcounter.load() << std::endl;
 	_getch();
 }

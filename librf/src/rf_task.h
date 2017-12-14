@@ -122,7 +122,7 @@ namespace resumef
 		{
 			auto * _state = _future._state.get();
 			_state->resume();
-			return !_state->ready() && !_state->_done;
+			return !_state->ready() && !_state->done();
 		}
 		virtual void cancel() override
 		{

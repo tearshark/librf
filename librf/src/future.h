@@ -28,7 +28,7 @@ namespace resumef
 
 		bool await_ready()
 		{
-			return _state->_ready;
+			return _state->ready();
 		}
 		void await_suspend(coroutine_handle<> resume_cb)
 		{
@@ -43,7 +43,7 @@ namespace resumef
 		//if ready, can get value
 		bool ready()
 		{
-			return _state->_ready;
+			return _state->ready();
 		}
 		auto & get_value()
 		{
@@ -314,7 +314,7 @@ namespace resumef
 
 		bool await_ready()
 		{
-			return _state->_ready;
+			return _state->ready();
 		}
 		void await_suspend(coroutine_handle<> resume_cb)
 		{
