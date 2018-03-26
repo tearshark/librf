@@ -21,3 +21,4 @@
 #include "src/channel.h"
 #include "src/scheduler.h"
 #include "src/sleep.h"
+#include "src/when.h"

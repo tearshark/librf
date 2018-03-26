@@ -5,9 +5,9 @@
 namespace resumef
 {
 
-	awaitable_t<bool> sleep_until_(const std::chrono::system_clock::time_point& tp_, scheduler & scheduler_)
+	future_t<bool> sleep_until_(const std::chrono::system_clock::time_point& tp_, scheduler & scheduler_)
 	{
-		resumef::awaitable_t<bool> awaitable;
+		promise_t<bool> awaitable;
 
 		scheduler_.timer()->add(tp_, 
 			[st = awaitable._state](bool cancellation_requested)
@@ -15,6 +15,6 @@ namespace resumef
 				st->set_value(cancellation_requested);
 			});
 
-		return awaitable;
+		return awaitable.get_future();
 	}
 }

@@ -20,8 +20,8 @@ namespace resumef
 		future_impl_t() = default;
 		future_impl_t(future_impl_t&& f) = default;
 		future_impl_t & operator = (future_impl_t&& f) = default;
-		future_impl_t(const future_impl_t&) = delete;
-		future_impl_t & operator = (const future_impl_t&) = delete;
+		future_impl_t(const future_impl_t&) = default;
+		future_impl_t & operator = (const future_impl_t&) = default;
 
 		//------------------------------------------------------------------------------------------
 		//以下是与编译器生成的resumable function交互的接口
@@ -78,11 +78,11 @@ namespace resumef
 		}
 
 		// movable, but not copyable
-		future_t(const future_t&) = delete;
+		future_t(const future_t&) = default;
 		future_t(future_t&& f) = default;
 		future_t() = default;
 
-		future_t & operator = (const future_t&) = delete;
+		future_t & operator = (const future_t&) = default;
 		future_t & operator = (future_t&& f) = default;
 
 		//------------------------------------------------------------------------------------------
@@ -290,6 +290,7 @@ namespace resumef
 
 	using promise_vt = promise_t<void>;
 
+	/*
 	template <typename T = void>
 	struct awaitable_t
 	{
@@ -331,6 +332,7 @@ namespace resumef
 	};
 
 	using awaitable_vt = awaitable_t<void>;
+	*/
 
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 	inline promise_t<void> * state_base::parent_promise() const

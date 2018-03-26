@@ -12,7 +12,7 @@ using namespace resumef;
 //请打开结构化异常(/EHa)
 auto async_signal_exception(const intptr_t dividend)
 {
-	awaitable_t<int64_t> awaitable;
+	promise_t<int64_t> awaitable;
 
 	std::thread([dividend, st = awaitable._state]
 	{
@@ -30,12 +30,12 @@ auto async_signal_exception(const intptr_t dividend)
 		}
 	}).detach();
 
-	return awaitable;
+	return awaitable.get_future();
 }
 
 auto async_signal_exception2(const intptr_t dividend)
 {
-	awaitable_t<int64_t> awaitable;
+	promise_t<int64_t> awaitable;
 
 	std::thread([dividend, st = awaitable._state]
 	{
@@ -46,7 +46,7 @@ auto async_signal_exception2(const intptr_t dividend)
 			st->set_value(10000 / dividend);
 	}).detach();
 
-	return awaitable;
+	return awaitable.get_future();
 }
 
 future_vt test_signal_exception()

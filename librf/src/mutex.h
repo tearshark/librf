@@ -57,7 +57,7 @@ namespace resumef
 		}
 
 
-		RF_API awaitable_t<bool> 
+		RF_API future_t<bool>
 			lock() const;
 		RF_API bool
 			try_lock() const;
@@ -83,13 +83,13 @@ namespace resumef
 		RF_API mutex_t & operator = (const mutex_t &) = default;
 		RF_API mutex_t & operator = (mutex_t &&) = default;
 	private:
-		inline awaitable_t<bool> try_lock_for_(const clock_type::duration & dt) const
+		inline future_t<bool> try_lock_for_(const clock_type::duration & dt) const
 		{
 			return try_lock_until_(clock_type::now() + dt);
 		}
-		RF_API awaitable_t<bool> try_lock_until_(const clock_type::time_point & tp) const;
+		RF_API future_t<bool> try_lock_until_(const clock_type::time_point & tp) const;
 	};
 
-#define resumf_guard_lock(lker) (lker).lock(); resumef::scoped_lock<resumef::mutex_t> __resumf_guard##lker##__((lker), std::adopt_lock)
+#define resumf_guard_lock(lker) (lker).lock(); resumef::scoped_lock<resumef::mutex_t> __resumf_guard##lker##__(std::adopt_lock, (lker))
 
 }

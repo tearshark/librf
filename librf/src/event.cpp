@@ -66,9 +66,9 @@ namespace resumef
 	{
 	}
 
-	awaitable_t<bool> event_t::wait() const
+	future_t<bool> event_t::wait() const
 	{
-		awaitable_t<bool> awaitable;
+		promise_t<bool> awaitable;
 
 		auto awaker = std::make_shared<detail::event_awaker>(
 			[st = awaitable._state](detail::event_impl * e) -> bool
@@ -78,12 +78,12 @@ namespace resumef
 			});
 		_event->wait_(awaker);
 
-		return awaitable;
+		return awaitable.get_future();
 	}
 
-	awaitable_t<bool> event_t::wait_until_(const clock_type::time_point & tp) const
+	future_t<bool> event_t::wait_until_(const clock_type::time_point & tp) const
 	{
-		awaitable_t<bool> awaitable;
+		promise_t<bool> awaitable;
 
 		auto awaker = std::make_shared<detail::event_awaker>(
 			[st = awaitable._state](detail::event_impl * e) -> bool
@@ -99,7 +99,7 @@ namespace resumef
 				awaker->awake(nullptr, 1);
 			});
 
-		return awaitable;
+		return awaitable.get_future();
 	}
 
 	struct wait_any_awaker
@@ -137,14 +137,14 @@ namespace resumef
 		}
 	};
 
-	awaitable_t<intptr_t> event_t::wait_any_(std::vector<event_impl_ptr> && evts)
+	future_t<intptr_t> event_t::wait_any_(std::vector<event_impl_ptr> && evts)
 	{
-		awaitable_t<intptr_t> awaitable;
+		promise_t<intptr_t> awaitable;
 
 		if (evts.size() <= 0)
 		{
 			awaitable._state->set_value(-1);
-			return awaitable;
+			return awaitable.get_future();
 		}
 
 		auto awaker = std::make_shared<detail::event_awaker>(
@@ -174,12 +174,12 @@ namespace resumef
 			e->wait_(awaker);
 		}
 
-		return awaitable;
+		return awaitable.get_future();
 	}
 	
-	awaitable_t<intptr_t> event_t::wait_any_until_(const clock_type::time_point & tp, std::vector<event_impl_ptr> && evts)
+	future_t<intptr_t> event_t::wait_any_until_(const clock_type::time_point & tp, std::vector<event_impl_ptr> && evts)
 	{
-		awaitable_t<intptr_t> awaitable;
+		promise_t<intptr_t> awaitable;
 
 		auto awaker = std::make_shared<detail::event_awaker>(
 			[st = awaitable._state, evts](detail::event_impl * e) -> bool
@@ -214,16 +214,16 @@ namespace resumef
 				awaker->awake(nullptr, 1);
 			});
 
-		return awaitable;
+		return awaitable.get_future();
 	}
 
-	awaitable_t<bool> event_t::wait_all_(std::vector<event_impl_ptr> && evts)
+	future_t<bool> event_t::wait_all_(std::vector<event_impl_ptr> && evts)
 	{
-		awaitable_t<bool> awaitable;
+		promise_t<bool> awaitable;
 		if (evts.size() <= 0)
 		{
 			awaitable._state->set_value(false);
-			return awaitable;
+			return awaitable.get_future();
 		}
 
 		auto awaker = std::make_shared<detail::event_awaker>(
@@ -239,7 +239,7 @@ namespace resumef
 			e->wait_(awaker);
 		}
 
-		return awaitable;
+		return awaitable.get_future();
 	}
 
 
@@ -319,9 +319,9 @@ namespace resumef
 	//超时后的行为应该表现为：
 	//要么所有的事件计数减一，要么所有事件计数不动
 	//则需要超时后，恢复已经等待的事件计数
-	awaitable_t<bool> event_t::wait_all_until_(const clock_type::time_point & tp, std::vector<event_impl_ptr> && evts)
+	future_t<bool> event_t::wait_all_until_(const clock_type::time_point & tp, std::vector<event_impl_ptr> && evts)
 	{
-		awaitable_t<bool> awaitable;
+		promise_t<bool> awaitable;
 		if (evts.size() <= 0)
 		{
 			this_scheduler()->timer()->add_handler(tp,
@@ -329,7 +329,7 @@ namespace resumef
 				{
 					st->set_value(false);
 				});
-			return awaitable;
+			return awaitable.get_future();
 		}
 
 		auto ctx = std::make_shared<wait_all_ctx>();
@@ -353,6 +353,6 @@ namespace resumef
 		}
 
 
-		return awaitable;
+		return awaitable.get_future();
 	}
 }

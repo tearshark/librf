@@ -63,16 +63,16 @@ namespace resumef
 
 
 
-		RF_API awaitable_t<bool>
+		RF_API future_t<bool>
 			wait() const;
 		template<class _Rep, class _Period> 
-		awaitable_t<bool>
+		future_t<bool>
 			wait_for(const std::chrono::duration<_Rep, _Period> & dt) const
 		{
 			return wait_for_(std::chrono::duration_cast<clock_type::duration>(dt));
 		}
 		template<class _Clock, class _Duration> 
-		awaitable_t<bool>
+		future_t<bool>
 			wait_until(const std::chrono::time_point<_Clock, _Duration> & tp) const
 		{
 			return wait_until_(std::chrono::time_point_cast<clock_type::duration>(tp));
@@ -83,39 +83,39 @@ namespace resumef
 
 
 		template<class _Iter>
-		static awaitable_t<intptr_t>
+		static future_t<intptr_t>
 			wait_any(_Iter begin_, _Iter end_)
 		{
 			return wait_any_(make_event_vector(begin_, end_));
 		}
 		template<class _Cont>
-		static awaitable_t<intptr_t>
+		static future_t<intptr_t>
 			wait_any(const _Cont & cnt_)
 		{
 			return wait_any_(make_event_vector(std::begin(cnt_), std::end(cnt_)));
 		}
 
 		template<class _Rep, class _Period, class _Iter>
-		static awaitable_t<intptr_t>
+		static future_t<intptr_t>
 			wait_any_for(const std::chrono::duration<_Rep, _Period> & dt, _Iter begin_, _Iter end_)
 		{
 			return wait_any_for_(std::chrono::duration_cast<clock_type::duration>(dt), make_event_vector(begin_, end_));
 		}
 		template<class _Rep, class _Period, class _Cont>
-		static awaitable_t<intptr_t>
+		static future_t<intptr_t>
 			wait_any_for(const std::chrono::duration<_Rep, _Period> & dt, const _Cont & cnt_)
 		{
 			return wait_any_for_(std::chrono::duration_cast<clock_type::duration>(dt), make_event_vector(std::begin(cnt_), std::end(cnt_)));
 		}
 
 		template<class _Clock, class _Duration, class _Iter> 
-		static awaitable_t<intptr_t>
+		static future_t<intptr_t>
 			wait_any_until(const std::chrono::time_point<_Clock, _Duration> & tp, _Iter begin_, _Iter end_)
 		{
 			return wait_any_until_(std::chrono::time_point_cast<clock_type::duration>(tp), make_event_vector(begin_, end_));
 		}
 		template<class _Clock, class _Duration, class _Cont>
-		static awaitable_t<intptr_t>
+		static future_t<intptr_t>
 			wait_any_until(const std::chrono::time_point<_Clock, _Duration> & tp, const _Cont & cnt_)
 		{
 			return wait_any_until_(std::chrono::time_point_cast<clock_type::duration>(tp), make_event_vector(std::begin(cnt_), std::end(cnt_)));
@@ -126,44 +126,43 @@ namespace resumef
 
 
 		template<class _Iter>
-		static awaitable_t<bool>
+		static future_t<bool>
 			wait_all(_Iter begin_, _Iter end_)
 		{
 			return wait_all_(make_event_vector(begin_, end_));
 		}
 		template<class _Cont>
-		static awaitable_t<bool>
+		static future_t<bool>
 			wait_all(const _Cont & cnt_)
 		{
 			return wait_all(std::begin(cnt_), std::end(cnt_));
 		}
 
 		template<class _Rep, class _Period, class _Iter>
-		static awaitable_t<bool>
+		static future_t<bool>
 			wait_all_for(const std::chrono::duration<_Rep, _Period> & dt, _Iter begin_, _Iter end_)
 		{
 			return wait_all_for_(std::chrono::duration_cast<clock_type::duration>(dt), make_event_vector(begin_, end_));
 		}
 		template<class _Rep, class _Period, class _Cont>
-		static awaitable_t<bool>
+		static future_t<bool>
 			wait_all_for(const std::chrono::duration<_Rep, _Period> & dt, const _Cont & cnt_)
 		{
 			return wait_all_for_(std::chrono::duration_cast<clock_type::duration>(dt), make_event_vector(std::begin(cnt_), std::end(cnt_)));
 		}
 
 		template<class _Clock, class _Duration, class _Iter>
-		static awaitable_t<bool>
+		static future_t<bool>
 			wait_all_until(const std::chrono::time_point<_Clock, _Duration> & tp, _Iter begin_, _Iter end_)
 		{
 			return wait_all_until_(std::chrono::time_point_cast<clock_type::duration>(tp), make_event_vector(begin_, end_));
 		}
 		template<class _Clock, class _Duration, class _Cont>
-		static awaitable_t<bool>
+		static future_t<bool>
 			wait_all_until(const std::chrono::time_point<_Clock, _Duration> & tp, const _Cont & cnt_)
 		{
 			return wait_all_until_(std::chrono::time_point_cast<clock_type::duration>(tp), make_event_vector(std::begin(cnt_), std::end(cnt_)));
 		}
-
 
 
 
@@ -184,27 +183,28 @@ namespace resumef
 			return std::move(evts);
 		}
 
-		inline awaitable_t<bool> wait_for_(const clock_type::duration & dt) const
+	public:
+		inline future_t<bool> wait_for_(const clock_type::duration & dt) const
 		{
 			return wait_until_(clock_type::now() + dt);
 		}
-		RF_API awaitable_t<bool> wait_until_(const clock_type::time_point & tp) const;
+		RF_API future_t<bool> wait_until_(const clock_type::time_point & tp) const;
 
 
-		RF_API static awaitable_t<intptr_t> wait_any_(std::vector<event_impl_ptr> && evts);
-		inline static awaitable_t<intptr_t> wait_any_for_(const clock_type::duration & dt, std::vector<event_impl_ptr> && evts)
+		RF_API static future_t<intptr_t> wait_any_(std::vector<event_impl_ptr> && evts);
+		inline static future_t<intptr_t> wait_any_for_(const clock_type::duration & dt, std::vector<event_impl_ptr> && evts)
 		{
 			return wait_any_until_(clock_type::now() + dt, std::forward<std::vector<event_impl_ptr>>(evts));
 		}
-		RF_API static awaitable_t<intptr_t> wait_any_until_(const clock_type::time_point & tp, std::vector<event_impl_ptr> && evts);
+		RF_API static future_t<intptr_t> wait_any_until_(const clock_type::time_point & tp, std::vector<event_impl_ptr> && evts);
 
 
-		RF_API static awaitable_t<bool> wait_all_(std::vector<event_impl_ptr> && evts);
-		inline static awaitable_t<bool> wait_all_for_(const clock_type::duration & dt, std::vector<event_impl_ptr> && evts)
+		RF_API static future_t<bool> wait_all_(std::vector<event_impl_ptr> && evts);
+		inline static future_t<bool> wait_all_for_(const clock_type::duration & dt, std::vector<event_impl_ptr> && evts)
 		{
 			return wait_all_until_(clock_type::now() + dt, std::forward<std::vector<event_impl_ptr>>(evts));
 		}
-		RF_API static awaitable_t<bool> wait_all_until_(const clock_type::time_point & tp, std::vector<event_impl_ptr> && evts);
+		RF_API static future_t<bool> wait_all_until_(const clock_type::time_point & tp, std::vector<event_impl_ptr> && evts);
 	};
 
 }

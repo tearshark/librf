@@ -16,12 +16,13 @@ extern void resumable_main_channel();
 extern void resumable_main_cb();
 extern void resumable_main_multi_thread();
 extern void resumable_main_channel_mult_thread();
+extern void resumable_main_when_all();
 
 extern void resumable_main_benchmark_mem();
 
 int main(int argc, const char * argv[])
 {
-	resumable_main_channel_mult_thread();
+	resumable_main_when_all();
 	//resumable_main_multi_thread();
 	return 0;
 

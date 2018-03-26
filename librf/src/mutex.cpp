@@ -78,9 +78,9 @@ namespace resumef
 	{
 	}
 
-	awaitable_t<bool> mutex_t::lock() const
+	future_t<bool> mutex_t::lock() const
 	{
-		awaitable_t<bool> awaitable;
+		promise_t<bool> awaitable;
 
 		auto awaker = std::make_shared<detail::mutex_awaker>(
 			[st = awaitable._state](detail::mutex_impl * e) -> bool
@@ -90,7 +90,7 @@ namespace resumef
 			});
 		_locker->lock_(awaker);
 
-		return awaitable;
+		return awaitable.get_future();
 	}
 
 	bool mutex_t::try_lock() const
@@ -103,9 +103,9 @@ namespace resumef
 		return _locker->try_lock_(dummy_awaker);
 	}
 
-	awaitable_t<bool> mutex_t::try_lock_until_(const clock_type::time_point & tp) const
+	future_t<bool> mutex_t::try_lock_until_(const clock_type::time_point & tp) const
 	{
-		awaitable_t<bool> awaitable;
+		promise_t<bool> awaitable;
 
 		auto awaker = std::make_shared<detail::mutex_awaker>(
 			[st = awaitable._state](detail::mutex_impl * e) -> bool
@@ -121,6 +121,6 @@ namespace resumef
 				awaker->awake(nullptr, 1);
 			});
 
-		return awaitable;
+		return awaitable.get_future();
 	}
 }

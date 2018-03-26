@@ -166,47 +166,47 @@ namespace resumef
 		}
 
 		template<class _Ty2>
-		awaitable_t<bool> write(_Ty2&& val) const
+		future_t<bool> write(_Ty2&& val) const
 		{
-			awaitable_t<bool> awaitable;
+			promise_t<bool> awaitable;
 
 			auto awaker = std::make_shared<channel_write_awaker>(
 				[st = awaitable._state](channel_impl_type * chan) -> bool
-			{
-				st->set_value(chan ? true : false);
-				return true;
-			});
+				{
+					st->set_value(chan ? true : false);
+					return true;
+				});
 			_chan->write_(std::move(awaker), std::forward<_Ty2>(val));
 
-			return awaitable;
+			return awaitable.get_future();
 		}
 
-		awaitable_t<_Ty> read() const
+		future_t<_Ty> read() const
 		{
-			awaitable_t<_Ty> awaitable;
+			promise_t<_Ty> awaitable;
 
 			auto awaker = std::make_shared<channel_read_awaker>(
 				[st = awaitable._state](channel_impl_type *, _Ty * val, error_code fe) -> bool
-			{
-				if(val)
-					st->set_value(std::move(*val));
-				else
-					st->throw_exception(channel_exception{ fe });
+				{
+					if(val)
+						st->set_value(std::move(*val));
+					else
+						st->throw_exception(channel_exception{ fe });
 
-				return true;
-			});
+					return true;
+				});
 			_chan->read_(std::move(awaker));
 
-			return awaitable;
+			return awaitable.get_future();
 		}
 
 		template<class _Ty2>
-		awaitable_t<bool> operator << (_Ty2&& val) const
+		future_t<bool> operator << (_Ty2&& val) const
 		{
 			return std::move(write(std::forward<_Ty2>(val)));
 		}
 
-		awaitable_t<_Ty> operator co_await () const
+		future_t<_Ty> operator co_await () const
 		{
 			return read();
 		}
