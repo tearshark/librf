@@ -1,10 +1,5 @@
 ﻿#include "when.h"
 #include <assert.h>
-#include "scheduler.h"
-
-#pragma once
-
-#include "_awaker.h"
 
 namespace resumef
 {
