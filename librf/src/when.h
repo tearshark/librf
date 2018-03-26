@@ -62,21 +62,21 @@ namespace resumef
 		};
 
 
-		inline void when_one__(scheduler * s, const detail::when_impl_ptr & e)
+		inline void when_one__(scheduler & s, const detail::when_impl_ptr & e)
 		{
 		}
 
 		template<class _Fty, class... _Rest>
-		inline void when_one__(scheduler * s, const detail::when_impl_ptr & e, future_t<_Fty> f, _Rest&&... rest)
+		inline void when_one__(scheduler & s, const detail::when_impl_ptr & e, future_t<_Fty> f, _Rest&&... rest)
 		{
-			(*s) + when_one_functor<_Fty>{e, std::move(f)};
+			s + when_one_functor<_Fty>{e, std::move(f)};
 
 			when_one__(s, e, std::forward<_Rest>(rest)...);
 		}
 	}
 
 	template<class... _Fty>
-	future_t<bool> when_count(size_t counter, scheduler * s, _Fty&&... f)
+	future_t<bool> when_count(size_t counter, scheduler & s, _Fty&&... f)
 	{
 		promise_t<bool> awaitable;
 
@@ -95,7 +95,7 @@ namespace resumef
 	}
 
 	template<class... _Fty>
-	future_t<bool> when_all(scheduler * s, _Fty&&... f)
+	future_t<bool> when_all(scheduler & s, _Fty&&... f)
 	{
 		return when_count(sizeof...(_Fty), s, std::forward<_Fty>(f)...);
 	}
@@ -103,11 +103,11 @@ namespace resumef
 	template<class... _Fty>
 	future_t<bool> when_all(_Fty&&... f)
 	{
-		return when_count(sizeof...(_Fty), this_scheduler(), std::forward<_Fty>(f)...);
+		return when_count(sizeof...(_Fty), *this_scheduler(), std::forward<_Fty>(f)...);
 	}
 
 	template<class... _Fty>
-	future_t<bool> when_any(scheduler * s, _Fty&&... f)
+	future_t<bool> when_any(scheduler & s, _Fty&&... f)
 	{
 		static_assert(sizeof...(_Fty) > 0);
 		return when_count(1, s, std::forward<_Fty>(f)...);
@@ -117,6 +117,6 @@ namespace resumef
 	future_t<bool> when_any(_Fty&&... f)
 	{
 		static_assert(sizeof...(_Fty) > 0);
-		return when_count(1, this_scheduler(), std::forward<_Fty>(f)...);
+		return when_count(1, *this_scheduler(), std::forward<_Fty>(f)...);
 	}
 }
