@@ -29,7 +29,7 @@ namespace resumef
 			RF_API bool wait_(const event_awaker_ptr & awaker);
 
 			template<class callee_t, class dummy_t = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, event_awaker_ptr>::value>>
-			auto wait(callee_t && awaker, dummy_t * dummy_ = nullptr)
+			decltype(auto) wait(callee_t && awaker, dummy_t * dummy_ = nullptr)
 			{
 				return wait_(std::make_shared<event_awaker>(std::forward<callee_t>(awaker)));
 			}
@@ -183,7 +183,6 @@ namespace resumef
 			return std::move(evts);
 		}
 
-	public:
 		inline future_t<bool> wait_for_(const clock_type::duration & dt) const
 		{
 			return wait_until_(clock_type::now() + dt);

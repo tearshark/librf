@@ -38,12 +38,12 @@ namespace resumef
 #endif
 
 			template<class callee_t, class = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, channel_read_awaker_ptr>::value>>
-			auto read(callee_t && awaker)
+			decltype(auto) read(callee_t && awaker)
 			{
 				return read_(std::make_shared<channel_read_awaker>(std::forward<callee_t>(awaker)));
 			}
 			template<class callee_t, class _Ty2, class = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, channel_write_awaker_ptr>::value>>
-			auto write(callee_t && awaker, _Ty2&& val)
+			decltype(auto) write(callee_t && awaker, _Ty2&& val)
 			{
 				return write_(std::make_shared<channel_write_awaker>(std::forward<callee_t>(awaker)), std::forward<_Ty2>(val));
 			}

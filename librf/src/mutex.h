@@ -28,7 +28,7 @@ namespace resumef
 			RF_API void unlock();
 
 			template<class callee_t, class dummy_t = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, mutex_awaker_ptr>::value>>
-			auto lock(callee_t && awaker, dummy_t * dummy_ = nullptr)
+			decltype(auto) lock(callee_t && awaker, dummy_t * dummy_ = nullptr)
 			{
 				return lock_(std::make_shared<mutex_awaker>(std::forward<callee_t>(awaker)));
 			}

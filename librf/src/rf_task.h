@@ -149,6 +149,9 @@ namespace resumef
 	template<class _Ctx>
 	struct ctx_task_t : public task_t<typename std::result_of<_Ctx()>::type>
 	{
+		typedef task_t<typename std::result_of<_Ctx()>::type> base_type;
+		using base_type::_future;
+
 		typedef _Ctx context_type;
 		context_type	_context;
 

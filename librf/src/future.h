@@ -72,6 +72,9 @@ namespace resumef
 	template <typename T = void>
 	struct future_t : public future_impl_t<T>
 	{
+		using state_type = typename future_impl_t<T>::state_type;
+		using future_impl_t<T>::_state;
+
 		future_t(const counted_ptr<state_type>& state)
 			: future_impl_t<T>(state)
 		{
@@ -110,6 +113,8 @@ namespace resumef
 	template <>
 	struct future_t<void> : public future_impl_t<void>
 	{
+		using future_impl_t<void>::_state;
+
 		future_t(const counted_ptr<state_type>& state)
 			: future_impl_t<void>(state)
 		{
@@ -246,6 +251,7 @@ namespace resumef
 	struct promise_t : public promise_impl_t<T>
 	{
 		typedef promise_t<T> promise_type;
+		using promise_impl_t<T>::_state;
 
 		//------------------------------------------------------------------------------------------
 		//以下是与编译器生成的resumable function交互的接口
@@ -275,6 +281,7 @@ namespace resumef
 	struct promise_t<void> : public promise_impl_t<void>
 	{
 		typedef promise_t<void> promise_type;
+		using promise_impl_t<void>::_state;
 
 		//------------------------------------------------------------------------------------------
 		//以下是与编译器生成的resumable function交互的接口
