@@ -46,9 +46,9 @@ namespace resumef
 		template<class _Ty>
 		struct remove_future
 		{
-			using type = _Ty;
-			using value_type = _Ty;
-			using optional_type = std::optional<_Ty>;
+			using type = std::remove_reference_t<_Ty>;
+			using value_type = type;
+			using optional_type = std::optional<type>;
 		};
 		template<>
 		struct remove_future<void>
@@ -162,21 +162,10 @@ namespace resumef
 			inline future_vt operator ()() const
 			{
 				co_await _f;
-				_val.get() = ignore_type();		//让外面感知到optional已经赋值了
+				_val.get() = std::ignore;		//让外面感知到optional已经赋值了
 				_e->signal();
 			}
 		};
-
-		template<class... _Ty>
-		size_t sizeof_tuple(const std::tuple<_Ty...> & val)
-		{
-			return sizeof...(_Ty);
-		}
-		template<class _Cont>
-		size_t sizeof_tuple(const _Cont & val)
-		{
-			return val.typename size();
-		}
 
 		template<class _Tup, size_t _N>
 		inline void when_one__(scheduler & s, const detail::when_impl_ptr & e, _Tup & t)
@@ -262,16 +251,16 @@ namespace resumef
 		return when_all(*this_scheduler(), std::forward<_Fty>(f)...);
 	}
 	template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-	auto when_all(scheduler & s, _Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_vt<decltype(*std::declval<_Iter>())> > >
+	auto when_all(scheduler & s, _Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_vt<_Fty> > >
 	{
-		using value_type = detail::remove_future_vt<decltype(*std::declval<_Iter>())>;
+		using value_type = detail::remove_future_vt<_Fty>;
 		using vector_type = std::vector<value_type>;
 		auto vals = std::make_shared<vector_type>(std::distance(begin, end));
 
-		return detail::when_range(std::distance(begin, end), vals, s, begin, end);
+		return detail::when_range(vals->size(), vals, s, begin, end);
 	}
 	template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-	auto when_all(_Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_vt<decltype(*std::declval<_Iter>())> > >
+	auto when_all(_Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_vt<_Fty> > >
 	{
 		return when_all(*this_scheduler(), begin, end);
 	}
@@ -295,16 +284,16 @@ namespace resumef
 		return when_any(*this_scheduler(), std::forward<_Fty>(f)...);
 	}
 	template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-	auto when_any(scheduler & s, _Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_ot<decltype(*std::declval<_Iter>())> > >
+	auto when_any(scheduler & s, _Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_ot<_Fty> > >
 	{
-		using value_type = detail::remove_future_ot<decltype(*std::declval<_Iter>())>;
+		using value_type = detail::remove_future_ot<_Fty>;
 		using vector_type = std::vector<value_type>;
 		auto vals = std::make_shared<vector_type>(std::distance(begin, end));
 
-		return detail::when_range(std::distance(begin, end) ? 1 : 0, vals, s, begin, end);
+		return detail::when_range(vals->size() ? 1 : 0, vals, s, begin, end);
 	}
 	template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-	auto when_any(_Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_ot<decltype(*std::declval<_Iter>())> > >
+	auto when_any(_Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_ot<_Fty> > >
 	{
 		return when_any(*this_scheduler(), begin, end);
 	}

@@ -34,7 +34,7 @@ namespace resumef
 		inline void operator + (_Ty && t_)
 		{
 			typedef typename std::conditional<
-				decltype(std::_IsCallable(t_, 0))::value,
+				std::is_callable_v<_Ty>,
 				ctx_task_t<_Ty>,
 				task_t<_Ty> >::type task_type;
 			return new_task(new task_type(std::forward<_Ty>(t_)));
