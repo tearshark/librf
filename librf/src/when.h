@@ -45,11 +45,12 @@ namespace resumef
 		template<class _Fty>
 		struct when_one_functor
 		{
+			typedef future_t<std::remove_reference_t<_Fty> > future_type;
 			when_impl_ptr _e;
-			mutable future_t<_Fty> _f;
+			mutable future_type _f;
 
-			when_one_functor(const detail::when_impl_ptr & e, future_t<_Fty> f)
-				:_e(e)
+			when_one_functor(const detail::when_impl_ptr & e, future_type f)
+				: _e(e)
 				, _f(std::move(f))
 			{}
 			when_one_functor(when_one_functor &&) = default;
@@ -60,7 +61,16 @@ namespace resumef
 				_e->signal();
 			}
 		};
+		template<class _Fty>
+		struct when_one_functor<future_t<_Fty> > : public when_one_functor<_Fty>
+		{
+			using future_type = typename when_one_functor<_Fty>::future_type;
 
+			when_one_functor(const detail::when_impl_ptr & e, future_type f)
+				: when_one_functor<_Fty>(e, std::move(f))
+			{}
+			when_one_functor(when_one_functor &&) = default;
+		};
 
 		inline void when_one__(scheduler & s, const detail::when_impl_ptr & e)
 		{
@@ -72,6 +82,14 @@ namespace resumef
 			s + when_one_functor<_Fty>{e, std::move(f)};
 
 			when_one__(s, e, std::forward<_Rest>(rest)...);
+		}
+
+		template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
+		inline void when_one__(scheduler & s, const detail::when_impl_ptr & e, _Iter begin, _Iter end)
+		{
+			using future_type = std::remove_reference_t<_Fty>;
+			for(; begin != end; ++begin)
+				s + when_one_functor<future_type>{e, *begin};
 		}
 	}
 
@@ -94,29 +112,44 @@ namespace resumef
 		return awaitable.get_future();
 	}
 
+
 	template<class... _Fty>
 	future_t<bool> when_all(scheduler & s, _Fty&&... f)
 	{
 		return when_count(sizeof...(_Fty), s, std::forward<_Fty>(f)...);
 	}
-
 	template<class... _Fty>
 	future_t<bool> when_all(_Fty&&... f)
 	{
 		return when_count(sizeof...(_Fty), *this_scheduler(), std::forward<_Fty>(f)...);
 	}
+	template<class _Iter, typename = decltype(*std::declval<_Iter>())>
+	future_t<bool> when_all(_Iter begin, _Iter end)
+	{
+		return when_count(std::distance(begin, end), *this_scheduler(), begin, end);
+	}
+
+
+
+
 
 	template<class... _Fty>
 	future_t<bool> when_any(scheduler & s, _Fty&&... f)
 	{
 		static_assert(sizeof...(_Fty) > 0);
-		return when_count(1, s, std::forward<_Fty>(f)...);
+		return when_count(sizeof...(_Fty) ? 1 : 0, s, std::forward<_Fty>(f)...);
 	}
-
 	template<class... _Fty>
 	future_t<bool> when_any(_Fty&&... f)
 	{
 		static_assert(sizeof...(_Fty) > 0);
-		return when_count(1, *this_scheduler(), std::forward<_Fty>(f)...);
+		return when_count(sizeof...(_Fty) ? 1 : 0, *this_scheduler(), std::forward<_Fty>(f)...);
+	}
+	template<class _Iter, typename = decltype(*std::declval<_Iter>())>
+	future_t<bool> when_any(_Iter begin, _Iter end)
+	{
+		assert(std::distance(begin, end) > 0);	//???
+
+		return when_count(std::distance(begin, end) ? 1 : 0, *this_scheduler(), begin, end);
 	}
 }

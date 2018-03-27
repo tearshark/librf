@@ -4,7 +4,7 @@
 #include <string>
 #include <conio.h>
 #include <thread>
-#include <experimental/resumable>
+#include <inttypes.h>
 
 #include "librf.h"
 
@@ -54,11 +54,21 @@ void test_when_all()
 	GO
 	{
 		co_await when_all();
-		std::cout << "zero!" << std::endl;
+		std::cout << "zero!" << std::endl << std::endl;
 
 		co_await when_all(my_sleep("a"), my_sleep("b"));
+		std::cout << std::endl;
+
 		co_await my_sleep("c");
+		std::cout << std::endl;
+
 		co_await when_all(my_sleep("d"), my_sleep("e"), my_sleep("f"));
+		std::cout << std::endl;
+
+		std::vector<future_vt> v{ my_sleep("g"), my_sleep("h"), my_sleep("i") };
+		co_await when_all(std::begin(v), std::end(v));
+		std::cout << std::endl;
+
 		std::cout << "all done!" << std::endl;
 	};
 	this_scheduler()->run_until_notask();

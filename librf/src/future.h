@@ -121,11 +121,11 @@ namespace resumef
 		}
 
 		// movable, but not copyable
-		future_t(const future_t&) = delete;
+		future_t(const future_t&) = default;
 		future_t(future_t&& f) = default;
 		future_t() = default;
 
-		future_t & operator = (const future_t&) = delete;
+		future_t & operator = (const future_t&) = default;
 		future_t & operator = (future_t&& f) = default;
 
 		//------------------------------------------------------------------------------------------
