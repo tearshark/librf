@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "_awaker.h"
+#include <optional>
 
 namespace resumef
 {
@@ -47,12 +48,14 @@ namespace resumef
 		{
 			using type = _Ty;
 			using value_type = _Ty;
+			using optional_type = std::optional<_Ty>;
 		};
 		template<>
 		struct remove_future<void>
 		{
 			using type = void;
 			using value_type = ignore_type;
+			using optional_type = std::optional<ignore_type>;
 		};
 		template<class _Ty>
 		struct remove_future<future_t<_Ty> > : public remove_future<_Ty>
@@ -68,27 +71,28 @@ namespace resumef
 		};
 		template<class _Ty>
 		using remove_future_t = typename remove_future<_Ty>::type;
-
 		template<class _Ty>
 		using remove_future_vt = typename remove_future<_Ty>::value_type;
+		template<class _Ty>
+		using remove_future_ot = typename remove_future<_Ty>::optional_type;
 
 
 		template<class _Fty, class _Ty>
-		struct when_one_functor_impl
+		struct when_one_functor
 		{
 			using value_type = _Ty;
-			using future_type = future_t<value_type>;
+			using future_type = _Fty;
 
 			when_impl_ptr _e;
 			mutable future_type _f;
 			mutable std::reference_wrapper<value_type> _val;
 
-			when_one_functor_impl(const detail::when_impl_ptr & e, future_type f, value_type & v)
+			when_one_functor(const detail::when_impl_ptr & e, future_type f, value_type & v)
 				: _e(e)
 				, _f(std::move(f))
 				, _val(v)
 			{}
-			when_one_functor_impl(when_one_functor_impl &&) = default;
+			when_one_functor(when_one_functor &&) = default;
 
 			inline future_vt operator ()() const
 			{
@@ -97,19 +101,19 @@ namespace resumef
 			}
 		};
 		template<class _Fty>
-		struct when_one_functor_impl<_Fty, void>
+		struct when_one_functor<_Fty, void>
 		{
 			using value_type = ignore_type;
-			using future_type = future_t<void>;
+			using future_type = _Fty;
 
 			when_impl_ptr _e;
 			mutable future_type _f;
 
-			when_one_functor_impl(const detail::when_impl_ptr & e, future_type f, value_type & v)
+			when_one_functor(const detail::when_impl_ptr & e, future_type f, value_type &)
 				: _e(e)
 				, _f(std::move(f))
 			{}
-			when_one_functor_impl(when_one_functor_impl &&) = default;
+			when_one_functor(when_one_functor &&) = default;
 
 			inline future_vt operator ()() const
 			{
@@ -117,18 +121,50 @@ namespace resumef
 				_e->signal();
 			}
 		};
-
 		template<class _Fty>
-		struct when_one_functor : public when_one_functor_impl<_Fty, remove_future_t<_Fty> >
+		struct when_one_functor<_Fty, ignore_type>
 		{
-			using base_type = when_one_functor_impl<_Fty, remove_future_t<_Fty> >;
-			using value_type = typename base_type::value_type;
-			using future_type = typename base_type::future_type;
+			using value_type = ignore_type;
+			using future_type = _Fty;
 
-			when_one_functor(const detail::when_impl_ptr & e, future_type f, value_type & v)
-				: when_one_functor_impl<_Fty, remove_future_t<_Fty> >(e, std::move(f), v)
+			when_impl_ptr _e;
+			mutable future_type _f;
+
+			when_one_functor(const detail::when_impl_ptr & e, future_type f, value_type &)
+				: _e(e)
+				, _f(std::move(f))
 			{}
 			when_one_functor(when_one_functor &&) = default;
+
+			inline future_vt operator ()() const
+			{
+				co_await _f;
+				_e->signal();
+			}
+		};
+		template<class _Fty>
+		struct when_one_functor<_Fty, std::optional<ignore_type> >
+		{
+			using value_type = std::optional<ignore_type>;
+			using future_type = _Fty;
+
+			when_impl_ptr _e;
+			mutable future_type _f;
+			mutable std::reference_wrapper<value_type> _val;
+
+			when_one_functor(const detail::when_impl_ptr & e, future_type f, value_type & v)
+				: _e(e)
+				, _f(std::move(f))
+				, _val(v)
+			{}
+			when_one_functor(when_one_functor &&) = default;
+
+			inline future_vt operator ()() const
+			{
+				co_await _f;
+				_val.get() = ignore_type();		//让外面感知到optional已经赋值了
+				_e->signal();
+			}
 		};
 
 		template<class... _Ty>
@@ -143,112 +179,74 @@ namespace resumef
 		}
 
 		template<class _Tup, size_t _N>
-		inline void when_all_one__(scheduler & s, const detail::when_impl_ptr & e, _Tup & t)
+		inline void when_one__(scheduler & s, const detail::when_impl_ptr & e, _Tup & t)
 		{
 		}
 
 		template<class _Tup, size_t _N, class _Fty, class... _Rest>
-		inline void when_all_one__(scheduler & s, const detail::when_impl_ptr & e, _Tup & t, _Fty f, _Rest&&... rest)
+		inline void when_one__(scheduler & s, const detail::when_impl_ptr & e, _Tup & t, _Fty f, _Rest&&... rest)
 		{
-			s + when_one_functor<_Fty>{e, std::move(f), std::get<_N>(t)};
+			s + when_one_functor<_Fty, std::tuple_element_t<_N, _Tup> >{e, std::move(f), std::get<_N>(t)};
 
-			when_all_one__<_Tup, _N + 1, _Rest...>(s, e, t, std::forward<_Rest>(rest)...);
+			when_one__<_Tup, _N + 1, _Rest...>(s, e, t, std::forward<_Rest>(rest)...);
 		}
 
 		template<class _Val, class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-		inline void when_all_range__(scheduler & s, const detail::when_impl_ptr & e, std::vector<_Val> & t, _Iter begin, _Iter end)
+		inline void when_range__(scheduler & s, const detail::when_impl_ptr & e, std::vector<_Val> & t, _Iter begin, _Iter end)
 		{
 			using future_type = std::remove_reference_t<_Fty>;
 
 			const auto _First = begin;
 			for(; begin != end; ++begin)
-				s + when_one_functor<future_type>{e, *begin, t[begin - _First]};
+				s + when_one_functor<future_type, _Val>{e, *begin, t[begin - _First]};
 		}
 
-		inline void when_any_one__(scheduler & s, const detail::when_impl_ptr & e)
+
+
+		template<class _Tup, class... _Fty>
+		future_t<_Tup> when_count(size_t count, const std::shared_ptr<_Tup> & vals, scheduler & s, _Fty&&... f)
 		{
+			promise_t<_Tup> awaitable;
+
+			when_impl_ptr _event = std::make_shared<when_impl>(count);
+			auto awaker = std::make_shared<when_awaker>(
+				[st = awaitable._state, vals](when_impl * e) -> bool
+				{
+					if (e)
+						st->set_value(*vals);
+					else
+						st->throw_exception(channel_exception{ error_code::not_ready });
+					return true;
+				});
+			_event->wait_(awaker);
+
+			when_one__<_Tup, 0u, _Fty...>(s, _event, *vals, std::forward<_Fty>(f)...);
+
+			return awaitable.get_future();
 		}
 
-		template<class _Fty, class... _Rest>
-		inline void when_any_one__(scheduler & s, const detail::when_impl_ptr & e, future_t<_Fty> f, _Rest&&... rest)
+		template<class _Tup, class _Iter>
+		future_t<_Tup> when_range(size_t count, const std::shared_ptr<_Tup> & vals, scheduler & s, _Iter begin, _Iter end)
 		{
-			s + when_one_functor<_Fty>{e, std::move(f)};
+			promise_t<_Tup> awaitable;
 
-			when_any_one__(s, e, std::forward<_Rest>(rest)...);
+			when_impl_ptr _event = std::make_shared<when_impl>(count);
+			auto awaker = std::make_shared<when_awaker>(
+				[st = awaitable._state, vals](when_impl * e) -> bool
+				{
+					if (e)
+						st->set_value(*vals);
+					else
+						st->throw_exception(channel_exception{ error_code::not_ready });
+					return true;
+				});
+			_event->wait_(awaker);
+
+			when_range__(s, _event, *vals, begin, end);
+
+			return awaitable.get_future();
 		}
-
-		template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-		inline void when_any_one__(scheduler & s, const detail::when_impl_ptr & e, _Iter begin, _Iter end)
-		{
-			using future_type = std::remove_reference_t<_Fty>;
-			for (; begin != end; ++begin)
-				s + when_one_functor<future_type>{e, *begin};
-		}
 	}
-
-	template<class _Tup, class... _Fty>
-	future_t<_Tup> when_all_count(const std::shared_ptr<_Tup> & vals, scheduler & s, _Fty&&... f)
-	{
-		promise_t<_Tup> awaitable;
-
-		detail::when_impl_ptr _event = std::make_shared<detail::when_impl>(detail::sizeof_tuple(*vals));
-		auto awaker = std::make_shared<detail::when_awaker>(
-			[st = awaitable._state, vals](detail::when_impl * e) -> bool
-			{
-				if (e)
-					st->set_value(*vals);
-				else
-					st->throw_exception(channel_exception{ error_code::not_ready });
-				return true;
-			});
-		_event->wait_(awaker);
-
-		detail::when_all_one__<_Tup, 0u, _Fty...>(s, _event, *vals, std::forward<_Fty>(f)...);
-
-		return awaitable.get_future();
-	}
-
-	template<class _Tup, class _Iter>
-	future_t<_Tup> when_all_range(const std::shared_ptr<_Tup> & vals, scheduler & s, _Iter begin, _Iter end)
-	{
-		promise_t<_Tup> awaitable;
-
-		detail::when_impl_ptr _event = std::make_shared<detail::when_impl>(detail::sizeof_tuple(*vals));
-		auto awaker = std::make_shared<detail::when_awaker>(
-			[st = awaitable._state, vals](detail::when_impl * e) -> bool
-			{
-				if (e)
-					st->set_value(*vals);
-				else
-					st->throw_exception(channel_exception{ error_code::not_ready });
-				return true;
-			});
-		_event->wait_(awaker);
-
-		detail::when_all_range__(s, _event, *vals, begin, end);
-
-		return awaitable.get_future();
-	}
-
-	template<class... _Fty>
-	future_t<bool> when_any_count(size_t counter, scheduler & s, _Fty&&... f)
-	{
-		promise_t<bool> awaitable;
-
-		detail::when_impl_ptr _event = std::make_shared<detail::when_impl>(counter);
-		auto awaker = std::make_shared<detail::when_awaker>(
-			[st = awaitable._state](detail::when_impl * e) -> bool
-			{
-				st->set_value(e ? true : false);
-				return true;
-			});
-		_event->wait_(awaker);
-
-		detail::when_any_one__(s, _event, std::forward<_Fty>(f)...);
-
-		return awaitable.get_future();
-	}
-
 
 	template<class... _Fty>
 	auto when_all(scheduler & s, _Fty&&... f) -> future_t<std::tuple<detail::remove_future_vt<_Fty>...> >
@@ -256,47 +254,58 @@ namespace resumef
 		using tuple_type = std::tuple<detail::remove_future_vt<_Fty>...>;
 		auto vals = std::make_shared<tuple_type>();
 
-		return when_all_count(vals, s, std::forward<_Fty>(f)...);
+		return detail::when_count(sizeof...(_Fty), vals, s, std::forward<_Fty>(f)...);
 	}
 	template<class... _Fty>
 	auto when_all(_Fty&&... f) -> future_t<std::tuple<detail::remove_future_vt<_Fty>...> >
 	{
-		using tuple_type = std::tuple<detail::remove_future_vt<_Fty>...>;
-		auto vals = std::make_shared<tuple_type>();
-
-		return when_all_count(vals, *this_scheduler(), std::forward<_Fty>(f)...);
+		return when_all(*this_scheduler(), std::forward<_Fty>(f)...);
 	}
 	template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-	auto when_all(_Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_vt<decltype(*std::declval<_Iter>())> > >
+	auto when_all(scheduler & s, _Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_vt<decltype(*std::declval<_Iter>())> > >
 	{
 		using value_type = detail::remove_future_vt<decltype(*std::declval<_Iter>())>;
 		using vector_type = std::vector<value_type>;
 		auto vals = std::make_shared<vector_type>(std::distance(begin, end));
 
-		return when_all_range(vals, *this_scheduler(), begin, end);
+		return detail::when_range(std::distance(begin, end), vals, s, begin, end);
 	}
-
+	template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
+	auto when_all(_Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_vt<decltype(*std::declval<_Iter>())> > >
+	{
+		return when_all(*this_scheduler(), begin, end);
+	}
 
 
 
 
 	template<class... _Fty>
-	future_t<bool> when_any(scheduler & s, future_t<_Fty>&&... f)
+	auto when_any(scheduler & s, _Fty&&... f) -> future_t<std::tuple<detail::remove_future_ot<_Fty>...> >
 	{
 		static_assert(sizeof...(_Fty) > 0);
-		return when_any_count(sizeof...(_Fty) ? 1 : 0, s, std::forward<future_t<_Fty>>(f)...);
+
+		using tuple_type = std::tuple<detail::remove_future_ot<_Fty>...>;
+		auto vals = std::make_shared<tuple_type>();
+
+		return detail::when_count(sizeof...(_Fty) ? 1 : 0, vals, s, std::forward<_Fty>(f)...);
 	}
 	template<class... _Fty>
-	future_t<bool> when_any(future_t<_Fty>&&... f)
+	auto when_any(_Fty&&... f) -> future_t<std::tuple<detail::remove_future_ot<_Fty>...> >
 	{
-		static_assert(sizeof...(_Fty) > 0);
-		return when_any_count(sizeof...(_Fty) ? 1 : 0, *this_scheduler(), std::forward<future_t<_Fty>>(f)...);
+		return when_any(*this_scheduler(), std::forward<_Fty>(f)...);
 	}
-	template<class _Iter, typename = decltype(*std::declval<_Iter>())>
-	future_t<bool> when_any(_Iter begin, _Iter end)
+	template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
+	auto when_any(scheduler & s, _Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_ot<decltype(*std::declval<_Iter>())> > >
 	{
-		assert(std::distance(begin, end) > 0);	//???
+		using value_type = detail::remove_future_ot<decltype(*std::declval<_Iter>())>;
+		using vector_type = std::vector<value_type>;
+		auto vals = std::make_shared<vector_type>(std::distance(begin, end));
 
-		return when_any_count(std::distance(begin, end) ? 1 : 0, *this_scheduler(), begin, end);
+		return detail::when_range(std::distance(begin, end) ? 1 : 0, vals, s, begin, end);
+	}
+	template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
+	auto when_any(_Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_ot<decltype(*std::declval<_Iter>())> > >
+	{
+		return when_any(*this_scheduler(), begin, end);
 	}
 }

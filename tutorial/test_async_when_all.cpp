@@ -9,7 +9,6 @@
 #include "librf.h"
 
 using namespace resumef;
-/*
 
 void test_when_any()
 {
@@ -17,30 +16,35 @@ void test_when_any()
 
 	GO
 	{
-		co_await when_any(
+		auto vals = co_await when_any(
+			[]() ->future_t<int>
+			{
+				auto dt = rand() % 1000;
+				co_await sleep_for(1ms * dt);
+				std::cout << dt << "@a" << std::endl;
+
+				return dt;
+			}(),
 			[]() ->future_vt
 			{
 				auto dt = rand() % 1000;
 				co_await sleep_for(1ms * dt);
-				std::cout << dt << "@1000" << std::endl;
+				std::cout << dt << "@b" << std::endl;
 			}(),
 			[]() ->future_vt
 			{
-				auto dt = rand() % 2000;
+				auto dt = rand() % 1000;
 				co_await sleep_for(1ms * dt);
-				std::cout << dt << "@2000" << std::endl;
-			}(),
-			[]() ->future_vt
-			{
-				auto dt = rand() % 3000;
-				co_await sleep_for(1ms * dt);
-				std::cout << dt << "@3000" << std::endl;
+				std::cout << dt << "@c" << std::endl;
 			}());
-		std::cout << "any done!" << std::endl;
+
+		if (std::get<0>(vals).has_value())
+			std::cout << "first done!" << std::endl;
+		else
+			std::cout << "any done!" << std::endl;
 	};
 	this_scheduler()->run_until_notask();
 }
-*/
 
 void test_when_all()
 {
@@ -65,18 +69,18 @@ void test_when_all()
 
 	GO
 	{
-		when_all();
+		co_await when_all();
 		std::cout << "zero!" << std::endl << std::endl;
 
 		auto [a, b] = co_await when_all(my_sleep("a"), my_sleep_v("b"));
-		b;
+		b;		//b is std::ignore
 		std::cout << a << std::endl << std::endl;
 
 		auto c = co_await my_sleep("c");
 		std::cout << c << std::endl << std::endl;
 
 		auto [d, e, f] = co_await when_all(my_sleep("d"), my_sleep_v("e"), my_sleep("f"));
-		e;
+		e;		//e is std::ignore
 		std::cout << d << "," << f << std::endl << std::endl;
 
 		std::vector<future_t<int> > v{ my_sleep("g"), my_sleep("h"), my_sleep("i") };
@@ -92,7 +96,7 @@ void resumable_main_when_all()
 {
 	srand((uint32_t)time(nullptr));
 
-	//test_when_any();
+	test_when_any();
 	std::cout << std::endl;
 	test_when_all();
 }
