@@ -8,6 +8,7 @@ namespace resumef
 	template <typename T>
 	struct future_impl_t
 	{
+		typedef T value_type;
 		typedef promise_t<T> promise_type;
 		typedef state_t<T> state_type;
 		counted_ptr<state_type> _state;

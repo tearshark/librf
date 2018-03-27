@@ -20,14 +20,6 @@ namespace resumef
 			}
 		}
 
-		void when_impl::reset(intptr_t initial_counter_)
-		{
-			scoped_lock<lock_type> lock_(this->_lock);
-
-			this->_awakes = nullptr;
-			this->_counter = initial_counter_;
-		}
-
 		bool when_impl::wait_(const when_awaker_ptr & awaker)
 		{
 			assert(awaker);
