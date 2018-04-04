@@ -16,7 +16,9 @@ void test_when_any()
 
 	GO
 	{
-		auto vals = co_await when_any(
+		auto vals = co_await when_any();
+
+		vals = co_await when_any(
 			[]() ->future_t<int>
 			{
 				auto dt = rand() % 1000;
@@ -38,10 +40,26 @@ void test_when_any()
 				std::cout << dt << "@c" << std::endl;
 			}());
 
-		if (std::get<0>(vals).has_value())
-			std::cout << "first done!" << std::endl;
+		if (vals.first == 0)
+			std::cout << "first done! value is " << std::any_cast<int>(vals.second) << std::endl;
 		else
-			std::cout << "any done!" << std::endl;
+			std::cout << "any done! index is " << vals.first << std::endl;
+
+		co_await sleep_for(1010ms);
+		std::cout << std::endl;
+
+		auto my_sleep = [](const char * name) -> future_t<int>
+		{
+			auto dt = rand() % 1000;
+			co_await sleep_for(1ms * dt);
+			std::cout << dt << "@" << name << std::endl;
+
+			return dt;
+		};
+
+		std::vector<future_t<int> > v{ my_sleep("g"), my_sleep("h"), my_sleep("i") };
+		vals = co_await when_any(std::begin(v), std::end(v));
+		std::cout << "any range done! index is " << vals.first << ", valus is " << std::any_cast<int>(vals.second) << std::endl;
 	};
 	this_scheduler()->run_until_notask();
 }
@@ -87,7 +105,7 @@ void test_when_all()
 		auto vals = co_await when_all(std::begin(v), std::end(v));
 		std::cout << vals[0] << "," << vals[1] << "," << vals[2] << "," << std::endl << std::endl;
 
-		std::cout << "all done!" << std::endl;
+		std::cout << "all range done!" << std::endl;
 	};
 	this_scheduler()->run_until_notask();
 }
