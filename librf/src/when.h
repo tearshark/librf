@@ -2,6 +2,8 @@
 
 #include "_awaker.h"
 #include <optional>
+#include <any>
+#include <variant>
 
 namespace resumef
 {
@@ -76,7 +78,6 @@ namespace resumef
 		template<class _Ty>
 		using remove_future_ot = typename remove_future<_Ty>::optional_type;
 
-
 		template<class _Fty, class _Ty>
 		struct when_one_functor
 		{
@@ -96,73 +97,16 @@ namespace resumef
 
 			inline future_vt operator ()() const
 			{
-				_val.get() = co_await _f;
-				_e->signal();
-			}
-		};
-		template<class _Fty>
-		struct when_one_functor<_Fty, void>
-		{
-			using value_type = ignore_type;
-			using future_type = _Fty;
+				if constexpr(std::is_same_v<future_type, future_vt>)
+				{
+					co_await _f;
+					_val.get() = std::ignore;
+				}
+				else
+				{
+					_val.get() = co_await _f;
+				}
 
-			when_impl_ptr _e;
-			mutable future_type _f;
-
-			when_one_functor(const detail::when_impl_ptr & e, future_type f, value_type &)
-				: _e(e)
-				, _f(std::move(f))
-			{}
-			when_one_functor(when_one_functor &&) = default;
-
-			inline future_vt operator ()() const
-			{
-				co_await _f;
-				_e->signal();
-			}
-		};
-		template<class _Fty>
-		struct when_one_functor<_Fty, ignore_type>
-		{
-			using value_type = ignore_type;
-			using future_type = _Fty;
-
-			when_impl_ptr _e;
-			mutable future_type _f;
-
-			when_one_functor(const detail::when_impl_ptr & e, future_type f, value_type &)
-				: _e(e)
-				, _f(std::move(f))
-			{}
-			when_one_functor(when_one_functor &&) = default;
-
-			inline future_vt operator ()() const
-			{
-				co_await _f;
-				_e->signal();
-			}
-		};
-		template<class _Fty>
-		struct when_one_functor<_Fty, std::optional<ignore_type> >
-		{
-			using value_type = std::optional<ignore_type>;
-			using future_type = _Fty;
-
-			when_impl_ptr _e;
-			mutable future_type _f;
-			mutable std::reference_wrapper<value_type> _val;
-
-			when_one_functor(const detail::when_impl_ptr & e, future_type f, value_type & v)
-				: _e(e)
-				, _f(std::move(f))
-				, _val(v)
-			{}
-			when_one_functor(when_one_functor &&) = default;
-
-			inline future_vt operator ()() const
-			{
-				co_await _f;
-				_val.get() = std::ignore;		//让外面感知到optional已经赋值了
 				_e->signal();
 			}
 		};
