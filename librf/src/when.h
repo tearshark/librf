@@ -1,9 +1,13 @@
 ﻿#pragma once
 
 #include "_awaker.h"
-#include <optional>
 #include <any>
-#include <variant>
+
+//纠结过when_any的返回值，是选用index + std::any，还是选用std::variant<>。最终选择了std::any。
+//std::variant<>存在第一个元素不能默认构造的问题，需要使用std::monostate来占位，导致下标不是从0开始。
+//而且，std::variant<>里面存在类型重复的问题，好几个操作都是病态的
+//最最重要的，要统一ranged when_any的返回值，还得做一个运行时通过下标设置std::variant<>的东西
+//std::any除了内存布局不太理想，其他方面几乎没缺点（在此应用下）
 
 namespace resumef
 {
