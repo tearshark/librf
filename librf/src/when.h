@@ -112,12 +112,12 @@ namespace resumef
 		};
 
 		template<class _Tup, size_t _Idx>
-		inline void when_all_one__(scheduler & s, const detail::when_impl_ptr & e, _Tup & t)
+		inline void when_all_one__(scheduler & s, const when_impl_ptr & e, _Tup & t)
 		{
 		}
 
 		template<class _Tup, size_t _Idx, class _Fty, class... _Rest>
-		inline void when_all_one__(scheduler & s, const detail::when_impl_ptr & e, _Tup & t, _Fty f, _Rest&&... rest)
+		inline void when_all_one__(scheduler & s, const when_impl_ptr & e, _Tup & t, _Fty f, _Rest&&... rest)
 		{
 			s + when_all_functor<_Fty, std::tuple_element_t<_Idx, _Tup> >{e, std::move(f), std::get<_Idx>(t)};
 
@@ -125,7 +125,7 @@ namespace resumef
 		}
 
 		template<class _Val, class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-		inline void when_all_range__(scheduler & s, const detail::when_impl_ptr & e, std::vector<_Val> & t, _Iter begin, _Iter end)
+		inline void when_all_range__(scheduler & s, const when_impl_ptr & e, std::vector<_Val> & t, _Iter begin, _Iter end)
 		{
 			using future_type = std::remove_reference_t<_Fty>;
 
@@ -194,7 +194,7 @@ namespace resumef
 			mutable when_any_result_ptr _val;
 			intptr_t _Idx;
 
-			when_any_functor(const detail::when_impl_ptr & e, future_type f, const when_any_result_ptr & v, intptr_t idx)
+			when_any_functor(const when_impl_ptr & e, future_type f, const when_any_result_ptr & v, intptr_t idx)
 				: _e(e)
 				, _f(std::move(f))
 				, _val(v)
@@ -238,12 +238,12 @@ namespace resumef
 		};
 
 		template<intptr_t _Idx>
-		inline void when_any_one__(scheduler & s, const detail::when_impl_ptr & e, const when_any_result_ptr & t)
+		inline void when_any_one__(scheduler & s, const when_impl_ptr & e, const when_any_result_ptr & t)
 		{
 		}
 
 		template<intptr_t _Idx, class _Fty, class... _Rest>
-		inline void when_any_one__(scheduler & s, const detail::when_impl_ptr & e, const when_any_result_ptr & t, _Fty f, _Rest&&... rest)
+		inline void when_any_one__(scheduler & s, const when_impl_ptr & e, const when_any_result_ptr & t, _Fty f, _Rest&&... rest)
 		{
 			s + when_any_functor<_Fty>{e, std::move(f), t, _Idx};
 
@@ -274,7 +274,7 @@ namespace resumef
 	
 
 		template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-		inline void when_any_range__(scheduler & s, const detail::when_impl_ptr & e, const when_any_result_ptr & t, _Iter begin, _Iter end)
+		inline void when_any_range__(scheduler & s, const when_impl_ptr & e, const when_any_result_ptr & t, _Iter begin, _Iter end)
 		{
 			using future_type = std::remove_reference_t<_Fty>;
 

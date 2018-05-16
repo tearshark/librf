@@ -24,7 +24,7 @@ namespace resumef
 #endif
 	protected:
 		coroutine_handle<> _coro;
-		std::atomic<intptr_t> _count = 0;				// tracks reference count of state object
+		std::atomic<intptr_t> _count{0};				// tracks reference count of state object
 		std::exception_ptr _exception;
 
 		std::atomic<bool> _ready = false;
