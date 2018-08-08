@@ -7,8 +7,8 @@
 #include "librf.h"
 
 
-//static const int N = 100000000;
-static const int N = 10;
+static const int N = 10000000;
+//static const int N = 10;
 
 template <typename T>
 void dump(std::string name, int n, T start, T end)
@@ -47,6 +47,10 @@ void resumable_switch(int coro)
 void resumable_main_resumable()
 {
 	resumable_switch(1);
+	resumable_switch(10);
+	resumable_switch(100);
 	resumable_switch(1000);
-	resumable_switch(1000000);
+	resumable_switch(10000);
+
+	//resumable_switch(10000000);
 }

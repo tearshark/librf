@@ -2,6 +2,7 @@
 #pragma once
 
 #include "def.h"
+#include "spinlock.h"
 #include "counted_ptr.h"
 #include <iostream>
 
@@ -13,7 +14,9 @@ namespace resumef
 	struct state_base
 	{
 	protected:
+		//typedef spinlock lock_type;
 		typedef std::recursive_mutex lock_type;
+
 		lock_type	_mtx;		//for value, _exception
 		RF_API void set_value_none_lock();
 #if RESUMEF_ENABLE_MULT_SCHEDULER

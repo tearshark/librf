@@ -22,6 +22,8 @@ namespace resumef
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 		virtual void bind(scheduler *) = 0;
 #endif
+		task_base * _next_node;
+		task_base * _prev_node;
 	};
 
 	//----------------------------------------------------------------------------------------------

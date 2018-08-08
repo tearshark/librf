@@ -9,36 +9,54 @@ namespace resumef
 {
 	struct spinlock
 	{
-		volatile std::atomic_flag lck;
+		static const size_t MAX_ACTIVE_SPIN = 4000;
+		static const int FREE_VALUE = 0;
+		static const int LOCKED_VALUE = 1;
+
+		volatile std::atomic<int> lck;
 
 		spinlock()
 		{
-			lck.clear();
+			lck = FREE_VALUE;
 		}
 
 		void lock()
 		{
-			if (std::atomic_flag_test_and_set_explicit(&lck, std::memory_order_acquire))
+			using namespace std::chrono;
+
+			int val = FREE_VALUE;
+			if (!lck.compare_exchange_weak(val, LOCKED_VALUE, std::memory_order_acquire))
 			{
-				using namespace std::chrono;
+				size_t spinCount = 0;
 				auto dt = 1ms;
-				while (std::atomic_flag_test_and_set_explicit(&lck, std::memory_order_acquire))
+				do
 				{
-					std::this_thread::sleep_for(dt);
-					dt *= 2;
-				}
+					while (lck.load(std::memory_order_relaxed) != FREE_VALUE)
+					{
+						if (spinCount < MAX_ACTIVE_SPIN)
+							++spinCount;
+						else
+						{
+							std::this_thread::sleep_for(dt);
+							dt *= 2;
+						}
+					}
+
+					val = FREE_VALUE;
+				} while (!lck.compare_exchange_weak(val, LOCKED_VALUE, std::memory_order_acquire));
 			}
 		}
 
 		bool try_lock()
 		{
-			bool ret = !std::atomic_flag_test_and_set_explicit(&lck, std::memory_order_acquire);
+			int val = FREE_VALUE;
+			bool ret = lck.compare_exchange_weak(val, LOCKED_VALUE, std::memory_order_acquire);
 			return ret;
 		}
 
 		void unlock()
 		{
-			std::atomic_flag_clear_explicit(&lck, std::memory_order_release);
+			lck.store(FREE_VALUE, std::memory_order_release);
 		}
 	};
 }

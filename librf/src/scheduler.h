@@ -6,6 +6,7 @@
 //#include <yvals.h>
 
 #include "rf_task.h"
+#include "task_list.h"
 #include "utils.h"
 #include "timer.h"
 
@@ -16,11 +17,14 @@ namespace resumef
 	struct scheduler : public std::enable_shared_from_this<scheduler>
 	{
 	private:
-		mutable std::recursive_mutex _mtx_ready;
-		std::deque<task_base *> _ready_task;
+		//typedef spinlock lock_type;
+		typedef std::recursive_mutex lock_type;
 
-		mutable std::recursive_mutex _mtx_task;
-		std::list<task_base *> _task;
+		mutable spinlock _mtx_ready;
+		task_list _ready_task;
+
+		mutable lock_type _mtx_task;
+		task_list _task;
 		timer_mgr_ptr	_timer;
 
 		RF_API void new_task(task_base * task);
@@ -47,11 +51,9 @@ namespace resumef
 
 		inline bool empty() const
 		{
-			scoped_lock<std::recursive_mutex, std::recursive_mutex> __guard(_mtx_ready, _mtx_task);
+			scoped_lock<spinlock, lock_type> __guard(_mtx_ready, _mtx_task);
 
-			return
-				(this->_task.size() + this->_ready_task.size()) == 0 &&
-				this->_timer->empty();
+			return this->_task.empty() && this->_ready_task.empty() && this->_timer->empty();
 		}
 
 		RF_API void break_all();

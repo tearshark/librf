@@ -82,7 +82,7 @@ namespace resumef
 	{
 		if (task)
 		{
-			scoped_lock<std::recursive_mutex> __guard(_mtx_ready);
+			scoped_lock<spinlock> __guard(_mtx_ready);
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 			task->bind(this);
 #endif
@@ -93,22 +93,12 @@ namespace resumef
 	void scheduler::cancel_all_task_()
 	{
 		{
-			scoped_lock<std::recursive_mutex> __guard(_mtx_task);
-			for (auto task : this->_task)
-			{
-				task->cancel();
-				delete task;
-			}
-			this->_task.clear();
+			scoped_lock<lock_type> __guard(_mtx_task);
+			this->_task.clear(true);
 		}
 		{
-			scoped_lock<std::recursive_mutex> __guard(_mtx_ready);
-			for (auto task : this->_ready_task)
-			{
-				task->cancel();
-				delete task;
-			}
-			this->_ready_task.clear();
+			scoped_lock<spinlock> __guard(_mtx_ready);
+			this->_ready_task.clear(true);
 		}
 	}
 
@@ -116,7 +106,7 @@ namespace resumef
 	{
 		cancel_all_task_();
 
-		scoped_lock<std::recursive_mutex> __guard(_mtx_task);
+		scoped_lock<lock_type> __guard(_mtx_task);
 		this->_timer->clear();
 	}
 
@@ -127,13 +117,13 @@ namespace resumef
 			th_scheduler_ptr = this;
 #endif
 		{
-			scoped_lock<std::recursive_mutex> __guard(_mtx_task);
+			scoped_lock<lock_type> __guard(_mtx_task);
 
 			this->_timer->update();
 
 			using namespace std::chrono;
 
-			for (auto iter = this->_task.begin(); iter != this->_task.end(); )
+			for (auto task = this->_task.begin(); task != nullptr; )
 			{
 #if _DEBUG
 #define MAX_TIME_COST 10000us
@@ -142,24 +132,21 @@ namespace resumef
 #endif
 //				time_cost_evaluation<microseconds> eva(MAX_TIME_COST);
 
-				auto task = *iter;
 				if (task->is_suspend() || task->go_next(this))
 				{
 //					eva.add("coscheduler");
-					++iter;
+					task = task->_next_node;
 					continue;
 				}
 
-				iter = this->_task.erase(iter);
-				delete task;
+				task = this->_task.erase(task, false);
 			}
 
 			{
-				scoped_lock<std::recursive_mutex> __guard(_mtx_ready);
-				if (this->_ready_task.size() > 0)
+				scoped_lock<spinlock> __guard(_mtx_ready);
+				if (!this->_ready_task.empty())
 				{
-					this->_task.insert(this->_task.end(), this->_ready_task.begin(), this->_ready_task.end());
-					this->_ready_task.clear();
+					this->_task.merge_back(this->_ready_task);
 				}
 			}
 		}

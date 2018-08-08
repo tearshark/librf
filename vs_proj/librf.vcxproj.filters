@@ -159,5 +159,8 @@
     <ClInclude Include="..\librf\src\when.h">
       <Filter>librf\src</Filter>
     </ClInclude>
+    <ClInclude Include="..\librf\src\task_list.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

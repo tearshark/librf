@@ -6,6 +6,8 @@
 namespace resumef
 {
 	task_base::task_base()
+		: _next_node(nullptr)
+		, _prev_node(nullptr)
 	{
 #if RESUMEF_DEBUG_COUNTER
 		++g_resumef_task_count;

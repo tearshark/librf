@@ -203,6 +203,7 @@
     <ClInclude Include="..\librf\src\event.h" />
     <ClInclude Include="..\librf\src\future.h" />
     <ClInclude Include="..\librf\src\generator.h" />
+    <ClInclude Include="..\librf\src\task_list.h" />
     <ClInclude Include="..\librf\src\mutex.h" />
     <ClInclude Include="..\librf\src\rf_task.h" />
     <ClInclude Include="..\librf\src\scheduler.h" />
