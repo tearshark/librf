@@ -71,6 +71,7 @@ namespace resumef
 		already_acquired,	// attempt to get another future
 		unlock_more,		// unlock 次数多余lock次数
 		read_before_write,	// 0容量的channel，先读后写
+		timer_canceled,		// 定时器被意外取消
 
 		max__
 	};
@@ -103,6 +104,16 @@ namespace resumef
 		error_code _error;
 		channel_exception(error_code fe)
 			: exception(get_error_string(fe, "channel_exception"))
+			, _error(fe)
+		{
+		}
+	};
+
+	struct timer_canceled_exception : public std::exception
+	{
+		error_code _error;
+		timer_canceled_exception(error_code fe)
+			: exception(get_error_string(fe, "timer canceled"))
 			, _error(fe)
 		{
 		}

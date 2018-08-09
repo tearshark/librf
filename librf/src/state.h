@@ -35,7 +35,7 @@ namespace resumef
 		std::atomic<bool> _done = false;
 
 	public:
-		state_base()
+		state_base() noexcept
 		{
 #if RESUMEF_DEBUG_COUNTER
 			++g_resumef_state_count;
@@ -190,7 +190,16 @@ namespace resumef
 			_value = std::forward<value_type>(t);
 			state_base::set_value_none_lock();
 		}
-		_Ty & get_value()
+
+		value_type & set_value__()
+		{
+			scoped_lock<lock_type> __guard(_mtx);
+			state_base::set_value_none_lock();
+
+			return _value;
+		}
+		
+		value_type & get_value()
 		{
 			scoped_lock<lock_type> __guard(_mtx);
 
@@ -198,6 +207,7 @@ namespace resumef
 				throw future_exception{ error_code::not_ready };
 			return _value;
 		}
+
 		void reset()
 		{
 			scoped_lock<lock_type> __guard(_mtx);

@@ -18,6 +18,7 @@ namespace resumef
 		"already_acquired",
 		"unlock_more",
 		"read_before_write",
+		"timer_canceled",
 	};
 
 	static char sz_future_error_buffer[256];

@@ -13,13 +13,20 @@ future_vt test_sleep_use_timer()
 {
 	using namespace std::chrono;
 
+	resumef::sleep_for(100ms);		//incorrect!!!
+
 	co_await resumef::sleep_for(100ms);
 	std::cout << "timer after 100ms." << std::endl;
 
-	if (co_await resumef::sleep_until(system_clock::now() + 200ms))
-		std::cout << "timer canceled." << std::endl;
-	else
+	try
+	{
+		co_await resumef::sleep_until(system_clock::now() + 200ms);
 		std::cout << "timer after 200ms." << std::endl;
+	}
+	catch (resumef::timer_canceled_exception)
+	{
+		std::cout << "timer canceled." << std::endl;
+	}
 }
 
 void test_wait_all_events_with_signal_by_sleep()
@@ -37,7 +44,7 @@ void test_wait_all_events_with_signal_by_sleep()
 	};
 
 	srand((int)time(nullptr));
-	for(size_t i=0; i<_countof(evts); ++i)
+	for (size_t i = 0; i < _countof(evts); ++i)
 	{
 		go[&, i]() -> future_vt
 		{

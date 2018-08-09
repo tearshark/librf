@@ -4,15 +4,17 @@
 
 namespace resumef
 {
-
-	future_t<bool> sleep_until_(const std::chrono::system_clock::time_point& tp_, scheduler & scheduler_)
+	future_vt sleep_until_(const std::chrono::system_clock::time_point& tp_, scheduler & scheduler_)
 	{
-		promise_t<bool> awaitable;
+		promise_vt awaitable;
 
 		scheduler_.timer()->add(tp_, 
 			[st = awaitable._state](bool cancellation_requested)
 			{
-				st->set_value(cancellation_requested);
+				if (cancellation_requested)
+					st->throw_exception(timer_canceled_exception{ error_code::timer_canceled });
+				else
+					st->set_value();
 			});
 
 		return awaitable.get_future();
