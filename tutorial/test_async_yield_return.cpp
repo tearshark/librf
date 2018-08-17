@@ -43,9 +43,6 @@ auto test_yield_void()
 }
 */
 
-#define co_yield_void co_yield nullptr
-#define co_return_void co_return nullptr
-
 auto test_yield_void()
 {
 	std::cout << "block 1 will yield return" << std::endl;

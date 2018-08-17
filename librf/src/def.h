@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#define RESUMEF_LIB_INCLUDE	1
+
 //#include <yvals.h>
 #include <atomic>
 #include <memory>

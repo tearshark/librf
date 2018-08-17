@@ -88,22 +88,22 @@ void test_when_all()
 	GO
 	{
 		co_await when_all();
-		std::cout << "zero!" << std::endl << std::endl;
+		std::cout << "when all: zero!" << std::endl << std::endl;
 
 		auto [a, b] = co_await when_all(my_sleep("a"), my_sleep_v("b"));
-		b;		//b is std::ignore
-		std::cout << a << std::endl << std::endl;
+		(void)b;		//b is std::ignore
+		std::cout << "when all:" << a << std::endl << std::endl;
 
 		auto c = co_await my_sleep("c");
-		std::cout << c << std::endl << std::endl;
+		std::cout << "when all:" << c << std::endl << std::endl;
 
 		auto [d, e, f] = co_await when_all(my_sleep("d"), my_sleep_v("e"), my_sleep("f"));
-		e;		//e is std::ignore
-		std::cout << d << "," << f << std::endl << std::endl;
+		(void)e;		//e is std::ignore
+		std::cout << "when all:" << d << "," << f << std::endl << std::endl;
 
 		std::vector<future_t<int> > v{ my_sleep("g"), my_sleep("h"), my_sleep("i") };
 		auto vals = co_await when_all(std::begin(v), std::end(v));
-		std::cout << vals[0] << "," << vals[1] << "," << vals[2] << "," << std::endl << std::endl;
+		std::cout << "when all:" << vals[0] << "," << vals[1] << "," << vals[2] << "," << std::endl << std::endl;
 
 		std::cout << "all range done!" << std::endl;
 	};

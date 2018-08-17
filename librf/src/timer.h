@@ -61,9 +61,9 @@ namespace resumef
 	public:
 		timer_handler() = default;
 		timer_handler(const timer_handler &) = default;
-		timer_handler(timer_handler && right_);
+		timer_handler(timer_handler && right_) noexcept;
 		timer_handler & operator = (const timer_handler &) = default;
-		timer_handler & operator = (timer_handler && right_);
+		timer_handler & operator = (timer_handler && right_) noexcept;
 
 		timer_handler(timer_manager * manager_, const detail::timer_target_ptr & target_);
 
@@ -141,13 +141,13 @@ namespace resumef
 		, _target(target_)
 	{
 	}
-	inline timer_handler::timer_handler(timer_handler && right_)
+	inline timer_handler::timer_handler(timer_handler && right_) noexcept
 		: _manager(std::move(right_._manager))
 		, _target(std::move(right_._target))
 	{
 	}
 
-	inline timer_handler & timer_handler::operator = (timer_handler && right_)
+	inline timer_handler & timer_handler::operator = (timer_handler && right_) noexcept
 	{
 		if (this != &right_)
 		{

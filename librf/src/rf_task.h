@@ -162,6 +162,11 @@ namespace resumef
 		{
 			_future = std::move(_context());
 		}
+		ctx_task_t(const context_type & ctx)
+			: _context(ctx)
+		{
+			_future = std::move(_context());
+		}
 	};
 
 }
