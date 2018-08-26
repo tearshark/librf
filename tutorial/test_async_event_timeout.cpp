@@ -63,6 +63,8 @@ void test_wait_timeout_any_invalid()
 	{
 		intptr_t idx = co_await event_t::wait_any_for(500ms, std::begin(evts), std::end(evts));
 		assert(idx < 0);
+		(void)idx;
+
 		std::cout << "invalid wait!" << std::endl;
 	};
 	this_scheduler()->run_until_notask();
@@ -118,6 +120,8 @@ void test_wait_timeout_all_invalid()
 	{
 		bool result = co_await event_t::wait_all_for(500ms, std::begin(evts), std::end(evts));
 		assert(!result);
+		(void)result;
+
 		std::cout << "invalid wait!" << std::endl;
 	};
 	this_scheduler()->run_until_notask();

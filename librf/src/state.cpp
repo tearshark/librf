@@ -20,7 +20,7 @@ namespace resumef
 		{
 			return !_state->ready();
 		}
-		virtual bool go_next(scheduler * schdler) override
+		virtual bool go_next(scheduler * ) override
 		{
 			_state->resume();
 			return false;

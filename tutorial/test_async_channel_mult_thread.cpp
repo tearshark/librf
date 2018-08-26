@@ -103,5 +103,5 @@ void resumable_main_channel_mult_thread()
 	write_th.join();
 
 	std::cout << "OK: counter = " << gcounter.load() << std::endl;
-	_getch();
+	(void)_getch();
 }

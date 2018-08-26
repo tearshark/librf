@@ -91,7 +91,7 @@ namespace resumef
 				, _f(std::move(f))
 				, _val(v)
 			{}
-			when_all_functor(when_all_functor &&) = default;
+			when_all_functor(when_all_functor &&) noexcept = default;
 			when_all_functor & operator = (const when_all_functor &) = default;
 			when_all_functor & operator = (when_all_functor &&) = default;
 
@@ -112,7 +112,7 @@ namespace resumef
 		};
 
 		template<class _Tup, size_t _Idx>
-		inline void when_all_one__(scheduler & s, const when_impl_ptr & e, _Tup & t)
+		inline void when_all_one__(scheduler & , const when_impl_ptr & , _Tup & )
 		{
 		}
 
@@ -202,7 +202,7 @@ namespace resumef
 			{
 				assert(idx >= 0);
 			}
-			when_any_functor(when_any_functor &&) = default;
+			when_any_functor(when_any_functor &&) noexcept = default;
 			when_any_functor & operator = (const when_any_functor &) = default;
 			when_any_functor & operator = (when_any_functor &&) = default;
 
@@ -238,7 +238,7 @@ namespace resumef
 		};
 
 		template<intptr_t _Idx>
-		inline void when_any_one__(scheduler & s, const when_impl_ptr & e, const when_any_result_ptr & t)
+		inline void when_any_one__(scheduler & , const when_impl_ptr & , const when_any_result_ptr & )
 		{
 		}
 

@@ -39,7 +39,7 @@ union uarray
 
 #define BUF_SIZE 1024
 
-intptr_t g_echo_count = 0;
+std::atomic<intptr_t> g_echo_count = 0;
 
 future_vt RunEchoSession(tcp::socket socket)
 {
@@ -55,7 +55,7 @@ future_vt RunEchoSession(tcp::socket socket)
 				co_await asio::async_write(socket, asio::buffer(buffer, buffer.size()), rf_task);
 				bytes_transferred = 0;
 
-				++g_echo_count;
+				g_echo_count.fetch_add(1, std::memory_order_release);
 			}
 		}
 		catch (std::exception & e)
@@ -82,7 +82,7 @@ void AcceptConnections(tcp::acceptor & acceptor, uarray<tcp::socket, _N> & socke
 						co_await acceptor.async_accept(socketes.c[idx], rf_task);
 						go RunEchoSession(std::move(socketes.c[idx]));
 					}
-					catch (std::exception e)
+					catch (std::exception & e)
 					{
 						std::cerr << e.what() << std::endl;
 					}
@@ -96,30 +96,160 @@ void AcceptConnections(tcp::acceptor & acceptor, uarray<tcp::socket, _N> & socke
 	}
 }
 
-void resumable_main_benchmark_asio_server()
+void StartPrintEchoCount()
 {
 	using namespace std::literals;
-
-	asio::io_service io_service;
-	tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), 3456));
-	uarray<tcp::socket, 128> socketes(acceptor.get_io_service());
-
-	AcceptConnections(acceptor, socketes);
 
 	GO
 	{
 		for (;;)
 		{
-			g_echo_count = 0;
+			g_echo_count.exchange(0, std::memory_order_release);
 			co_await 1s;
-			std::cout << g_echo_count << std::endl;
-		}		
+			std::cout << g_echo_count.load(std::memory_order_acquire) << std::endl;
+		}
 	};
+}
+
+void RunOneBenchmark(bool bMain)
+{
+	resumef::local_scheduler ls;
+
+	asio::io_service io_service;
+	tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), 3456));
+	uarray<tcp::socket, 16> socketes(acceptor.get_io_service());
+
+	AcceptConnections(acceptor, socketes);
+	if (bMain) StartPrintEchoCount();
 
 	for (;;)
 	{
 		io_service.poll();
 		this_scheduler()->run_one_batch();
+	}
+}
+
+void resumable_main_benchmark_asio_server()
+{
+#if RESUMEF_ENABLE_MULT_SCHEDULER
+	std::array<std::thread, 2> thds;
+	for (size_t i = 0; i < thds.size(); ++i)
+	{
+		thds[i] = std::thread(&RunOneBenchmark, i == 0);
+	}
+
+	for (auto & t : thds)
+		t.join();
+#else
+	RunOneBenchmark(true);
+#endif
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+future_vt RunPipelineEchoClient(asio::io_service & ios, tcp::resolver::iterator ep)
+{
+	std::shared_ptr<tcp::socket> sptr = std::make_shared<tcp::socket>(ios);
+
+	try
+	{
+		co_await asio::async_connect(*sptr, ep, rf_task);
+
+		GO
+		{
+			std::array<char, BUF_SIZE> write_buff_;
+			for (auto & c : write_buff_)
+				c = 'A' + rand() % 52;
+
+			try
+			{
+				for (;;)
+				{
+					co_await asio::async_write(*sptr, asio::buffer(write_buff_), rf_task);
+				}
+			}
+			catch (std::exception & e)
+			{
+				std::cerr << e.what() << std::endl;
+			}
+		};
+
+		GO
+		{
+			try
+			{
+				std::array<char, BUF_SIZE> read_buff_;
+				for (;;)
+				{
+					co_await sptr->async_read_some(asio::buffer(read_buff_), rf_task);
+				}
+			}
+			catch (std::exception & e)
+			{
+				std::cerr << e.what() << std::endl;
+			}
+		};
+	}
+	catch (std::exception & e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+}
+
+future_vt RunPingPongEchoClient(asio::io_service & ios, tcp::resolver::iterator ep)
+{
+	tcp::socket socket_{ ios };
+
+	std::array<char, BUF_SIZE> read_buff_;
+	std::array<char, BUF_SIZE> write_buff_;
+
+	try
+	{
+		co_await asio::async_connect(socket_, ep, rf_task);
+
+		for (auto & c : write_buff_)
+			c = 'A' + rand() % 52;
+
+		for (;;)
+		{
+			co_await when_all(
+				asio::async_write(socket_, asio::buffer(write_buff_), rf_task),
+				socket_.async_read_some(asio::buffer(read_buff_), rf_task)
+			);
+		}
+	}
+	catch (std::exception & e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+}
+
+void resumable_main_benchmark_asio_client_with_rf(intptr_t nNum)
+{
+	nNum = std::max((intptr_t)1, nNum);
+
+	try
+	{
+		asio::io_service ios;
+
+		asio::ip::tcp::resolver resolver_(ios);
+		asio::ip::tcp::resolver::query query_("localhost", "3456");
+		tcp::resolver::iterator iter = resolver_.resolve(query_);
+
+		for (intptr_t i = 0; i < nNum; ++i)
+		{
+			go RunPingPongEchoClient(ios, iter);
+		}
+
+		for (;;)
+		{
+			ios.poll();
+			this_scheduler()->run_one_batch();
+		}
+	}
+	catch (std::exception & e)
+	{
+		std::cout << e.what() << std::endl;
 	}
 }
 
@@ -162,7 +292,7 @@ private:
 	{
 		auto self(shared_from_this());
 		socket_.async_read_some(asio::buffer(read_buff_),
-			[this, self](const asio::error_code& ec, std::size_t size)
+			[this, self](const asio::error_code& ec, std::size_t )
 			{
 				if (!ec)
 				{
@@ -200,7 +330,7 @@ private:
 	std::array<char, BUF_SIZE> write_buff_;
 };
 
-void resumable_main_benchmark_asio_client(intptr_t nNum)
+void resumable_main_benchmark_asio_client_with_callback(intptr_t nNum)
 {
 	nNum = std::max((intptr_t)1, nNum);
 
@@ -224,4 +354,9 @@ void resumable_main_benchmark_asio_client(intptr_t nNum)
 	{
 		std::cout << "Exception: " << e.what() << "\n";
 	}
+}
+
+void resumable_main_benchmark_asio_client(intptr_t nNum)
+{
+	resumable_main_benchmark_asio_client_with_callback(nNum);
 }

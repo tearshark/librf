@@ -32,5 +32,5 @@ void resumable_main_benchmark_mem()
 	}
 
 	resumef::this_scheduler()->run_until_notask();
-	_getch();
+	(void)_getch();
 }

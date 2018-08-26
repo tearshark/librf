@@ -115,8 +115,8 @@ namespace resumef
 			});
 		_locker->lock_(awaker);
 		
-		this_scheduler()->timer()->add(tp,
-			[awaker](bool bValue)
+		(void)this_scheduler()->timer()->add(tp,
+			[awaker](bool )
 			{
 				awaker->awake(nullptr, 1);
 			});

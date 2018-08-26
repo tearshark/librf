@@ -8,7 +8,7 @@ namespace resumef
 	{
 		promise_vt awaitable;
 
-		scheduler_.timer()->add(tp_, 
+		(void)scheduler_.timer()->add(tp_,
 			[st = awaitable._state](bool cancellation_requested)
 			{
 				if (cancellation_requested)

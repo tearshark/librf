@@ -120,7 +120,7 @@ namespace resumef
 
 		//返回true，表示任务还未完成，后续还需要继续执行
 		//否则，任务从调度器里删除
-		virtual bool go_next(scheduler * schdler) override
+		virtual bool go_next(scheduler * ) override
 		{
 			auto * _state = _future._state.get();
 			_state->resume();

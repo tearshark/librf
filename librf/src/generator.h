@@ -204,12 +204,13 @@ namespace experimental {
 
 		generator &operator=(generator const &) = delete;
 
-		generator(generator &&right_) : _Coro(right_._Coro)
+		generator(generator &&right_) noexcept 
+			: _Coro(right_._Coro)
 		{
 			right_._Coro = nullptr;
 		}
 
-		generator &operator=(generator &&right_)
+		generator &operator=(generator &&right_) noexcept
 		{
 			if (&right_ != this) {
 				_Coro = right_._Coro;
