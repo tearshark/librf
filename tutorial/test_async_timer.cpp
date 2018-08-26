@@ -15,19 +15,19 @@ void resumable_main_timer()
 
 	auto th = this_scheduler()->timer()->add_handler(system_clock::now() + 5s, 
 		[](bool bValue) 
-	{
-		if (bValue)
-			std::cout << "timer canceled." << std::endl;
-		else
-			std::cout << "timer after 5s." << std::endl;
-	});
+		{
+			if (bValue)
+				std::cout << "timer canceled." << std::endl;
+			else
+				std::cout << "timer after 5s." << std::endl;
+		});
 
 	auto th2 = this_scheduler()->timer()->add_handler(1s, 
 		[&th](bool)
-	{
-		std::cout << "timer after 1s." << std::endl;
-		th.stop();
-	});
+		{
+			std::cout << "timer after 1s." << std::endl;
+			th.stop();
+		});
 
 	this_scheduler()->run_until_notask();
 

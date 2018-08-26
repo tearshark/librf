@@ -100,6 +100,9 @@
     <ClCompile Include="..\librf\src\when.cpp">
       <Filter>librf\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\benchmark\benchmark_asio_echo.cpp">
+      <Filter>benchmark</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\librf\librf.h">

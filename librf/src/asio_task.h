@@ -1,19 +1,22 @@
 ﻿
 #pragma once
 
+#include <asio.hpp>
 #include "future.h"
-#include "asio/detail/config.hpp"
 #include <memory>
 
 #include "asio/detail/push_options.hpp"
+/*
+#include "asio/detail/config.hpp"
 #include "asio/async_result.hpp"
 #include "asio/error_code.hpp"
 #include "asio/handler_type.hpp"
 #include "asio/system_error.hpp"
+*/
 
 namespace asio {
 
-	template<typename Allocator = std::allocator<void> >
+	template<typename Allocator = std::allocator<int> >
 	class rf_task_t
 	{
 	public:

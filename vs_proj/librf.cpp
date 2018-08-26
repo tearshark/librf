@@ -19,10 +19,15 @@ extern void resumable_main_channel_mult_thread();
 extern void resumable_main_when_all();
 
 extern void resumable_main_benchmark_mem();
+extern void resumable_main_benchmark_asio_server();
+extern void resumable_main_benchmark_asio_client(intptr_t nNum);
 
 int main(int argc, const char * argv[])
 {
-	resumable_main_sleep();
+	if (argc > 1)
+		resumable_main_benchmark_asio_client(atoi(argv[1]));
+	else
+		resumable_main_benchmark_asio_server();
 	return 0;
 	//resumable_main_resumable();
 
