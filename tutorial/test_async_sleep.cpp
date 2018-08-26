@@ -16,7 +16,9 @@ future_vt test_sleep_use_timer()
 	resumef::sleep_for(100ms);		//incorrect!!!
 
 	co_await resumef::sleep_for(100ms);
-	std::cout << "timer after 100ms." << std::endl;
+	std::cout << "sleep_for 100ms." << std::endl;
+	co_await 100ms;
+	std::cout << "co_await 100ms." << std::endl;
 
 	try
 	{

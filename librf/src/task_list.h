@@ -35,7 +35,7 @@ namespace resumef
 		task_list(const task_list& _Right) = delete;
 		task_list& operator=(const task_list& _Right) = delete;
 
-		task_list(task_list&& _Right)
+		task_list(task_list&& _Right) noexcept
 		{
 			_M_header = _Right._M_header;
 			_Right._M_header = nullptr;
@@ -43,7 +43,7 @@ namespace resumef
 			_Right._M_last = nullptr;
 		}
 
-		task_list& operator=(task_list&& _Right)
+		task_list& operator=(task_list&& _Right) noexcept
 		{	// assign by moving _Right
 			if (this != std::addressof(_Right))
 			{	// different, assign it

@@ -37,7 +37,7 @@ namespace resumef
 			template<class callee_t, class dummy_t = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, event_awaker_ptr>::value>>
 			auto wait(callee_t && awaker, dummy_t * dummy_ = nullptr)
 			{
-				return wait_(std::make_shared<event_awaker>(std::forward<callee_t>(awaker)));
+				return wait_(std::make_shared<when_awaker>(std::forward<callee_t>(awaker)));
 			}
 
 			when_impl(const when_impl &) = delete;

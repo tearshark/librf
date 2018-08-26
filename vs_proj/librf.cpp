@@ -22,7 +22,8 @@ extern void resumable_main_benchmark_mem();
 
 int main(int argc, const char * argv[])
 {
-	//resumable_main_sleep();
+	resumable_main_sleep();
+	return 0;
 	//resumable_main_resumable();
 
 	resumable_main_when_all();

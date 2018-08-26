@@ -101,7 +101,7 @@ namespace experimental {
 
 		_Ty const &operator*() const
 		{
-			return *_Coro.promise()._CurrentValue;
+			return *this->_Coro.promise()._CurrentValue;
 		}
 
 		_Ty const *operator->() const
@@ -166,7 +166,7 @@ namespace experimental {
 				return _Al.allocate(_Size);
 			}
 
-			void operator delete(void *_Ptr, size_t _Size)_NOEXCEPT
+			void operator delete(void *_Ptr, size_t _Size)
 			{
 				_Alloc_of_char_type _Al;
 				return _Al.deallocate(static_cast<char *>(_Ptr), _Size);

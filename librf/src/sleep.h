@@ -36,4 +36,11 @@ namespace resumef
 	{
 		return std::move(sleep_until_(std::chrono::time_point_cast<std::chrono::system_clock::duration>(tp_), *this_scheduler()));
 	}
+
+	template <class Rep, class Period>
+	auto operator co_await(std::chrono::duration<Rep, Period> dt_)
+	{
+		return sleep_for(dt_);
+	}
+
 }

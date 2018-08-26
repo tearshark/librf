@@ -17,7 +17,7 @@ namespace resumef
 			_lock();
 		}
 
-		counted_ptr(counted_ptr&& cp)
+		counted_ptr(counted_ptr&& cp) noexcept
 		{
 			std::swap(_p, cp._p);
 		}
@@ -32,7 +32,7 @@ namespace resumef
 			return *this;
 		}
 
-		counted_ptr& operator=(counted_ptr&& cp)
+		counted_ptr& operator=(counted_ptr&& cp) noexcept
 		{
 			if (&cp != this)
 				std::swap(_p, cp._p);

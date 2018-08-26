@@ -165,14 +165,14 @@ namespace resumef
 			_state->this_promise(this);
 #endif
 		}
-		promise_impl_t(promise_impl_t&& _Right)
+		promise_impl_t(promise_impl_t&& _Right) noexcept
 			: _state(std::move(_Right._state))
 		{
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 			_state->this_promise(this);
 #endif
 		}
-		promise_impl_t & operator = (promise_impl_t&& _Right)
+		promise_impl_t & operator = (promise_impl_t&& _Right) noexcept
 		{
 			if (this != _Right)
 			{

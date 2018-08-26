@@ -104,7 +104,7 @@ namespace resumef
 
 #if !defined(_DISABLE_RESUMEF_GO_MACRO)
 #define go (*::resumef::this_scheduler()) + 
-#define GO (*::resumef::this_scheduler()) + [=]()->resumef::future_vt
+#define GO (*::resumef::this_scheduler()) + [=]()mutable->resumef::future_vt
 #endif
 
 //--------------------------------------------------------------------------------------------------
