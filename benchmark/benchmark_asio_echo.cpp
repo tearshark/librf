@@ -196,6 +196,8 @@ future_vt RunPipelineEchoClient(asio::io_service & ios, tcp::resolver::iterator 
 	}
 }
 
+#if _HAS_CXX17
+
 future_vt RunPingPongEchoClient(asio::io_service & ios, tcp::resolver::iterator ep)
 {
 	tcp::socket socket_{ ios };
@@ -252,6 +254,7 @@ void resumable_main_benchmark_asio_client_with_rf(intptr_t nNum)
 		std::cout << e.what() << std::endl;
 	}
 }
+#endif
 
 class chat_session : public std::enable_shared_from_this<chat_session>
 {

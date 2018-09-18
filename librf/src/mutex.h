@@ -90,6 +90,10 @@ namespace resumef
 		RF_API future_t<bool> try_lock_until_(const clock_type::time_point & tp) const;
 	};
 
+#if _HAS_CXX17
 #define resumf_guard_lock(lker) (lker).lock(); resumef::scoped_lock<resumef::mutex_t> __resumf_guard##lker##__(std::adopt_lock, (lker))
+#else
+#define resumf_guard_lock(lker) (lker).lock(); resumef::scoped_lock<resumef::mutex_t> __resumf_guard##lker##__((lker), std::adopt_lock)
+#endif
 
 }

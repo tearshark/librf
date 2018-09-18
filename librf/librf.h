@@ -21,4 +21,6 @@
 #include "src/channel.h"
 #include "src/scheduler.h"
 #include "src/sleep.h"
+#if _HAS_CXX17
 #include "src/when.h"
+#endif

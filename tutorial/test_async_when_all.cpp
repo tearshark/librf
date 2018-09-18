@@ -8,6 +8,8 @@
 
 #include "librf.h"
 
+#if _HAS_CXX17
+
 using namespace resumef;
 
 void test_when_any()
@@ -109,12 +111,16 @@ void test_when_all()
 	};
 	this_scheduler()->run_until_notask();
 }
+#endif
 
 void resumable_main_when_all()
 {
+#if _HAS_CXX17
 	srand((uint32_t)time(nullptr));
 
 	test_when_any();
 	std::cout << std::endl;
 	test_when_all();
+#endif
 }
+

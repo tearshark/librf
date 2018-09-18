@@ -24,12 +24,12 @@ extern void resumable_main_benchmark_asio_client(intptr_t nNum);
 
 int main(int argc, const char * argv[])
 {
-	if (argc > 1)
-		resumable_main_benchmark_asio_client(atoi(argv[1]));
-	else
-		resumable_main_benchmark_asio_server();
+	resumable_main_resumable();
+	//if (argc > 1)
+	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
+	//else
+	//	resumable_main_benchmark_asio_server();
 	return 0;
-	//resumable_main_resumable();
 
 	resumable_main_when_all();
 	resumable_main_multi_thread();

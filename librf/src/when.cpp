@@ -1,4 +1,8 @@
-﻿#include "when.h"
+﻿#include "_awaker.h"
+
+#if _HAS_CXX17
+
+#include "when.h"
 #include <assert.h>
 
 namespace resumef
@@ -38,3 +42,5 @@ namespace resumef
 		}
 	}
 }
+
+#endif
