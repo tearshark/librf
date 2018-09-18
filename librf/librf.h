@@ -21,6 +21,6 @@
 #include "src/channel.h"
 #include "src/scheduler.h"
 #include "src/sleep.h"
-#if _HAS_CXX17
+#if _HAS_CXX17 || RESUMEF_USE_BOOST_ANY
 #include "src/when.h"
 #endif

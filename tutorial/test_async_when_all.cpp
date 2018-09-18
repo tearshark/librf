@@ -8,7 +8,7 @@
 
 #include "librf.h"
 
-#if _HAS_CXX17
+#if _HAS_CXX17 || RESUMEF_USE_BOOST_ANY
 
 using namespace resumef;
 
@@ -43,7 +43,7 @@ void test_when_any()
 			}());
 
 		if (vals.first == 0)
-			std::cout << "first done! value is " << std::any_cast<int>(vals.second) << std::endl;
+			std::cout << "first done! value is " << resumef::any_cast<int>(vals.second) << std::endl;
 		else
 			std::cout << "any done! index is " << vals.first << std::endl;
 
@@ -61,7 +61,7 @@ void test_when_any()
 
 		std::vector<future_t<int> > v{ my_sleep("g"), my_sleep("h"), my_sleep("i") };
 		vals = co_await when_any(std::begin(v), std::end(v));
-		std::cout << "any range done! index is " << vals.first << ", valus is " << std::any_cast<int>(vals.second) << std::endl;
+		std::cout << "any range done! index is " << vals.first << ", valus is " << resumef::any_cast<int>(vals.second) << std::endl;
 	};
 	this_scheduler()->run_until_notask();
 }
@@ -92,16 +92,16 @@ void test_when_all()
 		co_await when_all();
 		std::cout << "when all: zero!" << std::endl << std::endl;
 
-		auto [a, b] = co_await when_all(my_sleep("a"), my_sleep_v("b"));
-		(void)b;		//b is std::ignore
-		std::cout << "when all:" << a << std::endl << std::endl;
+		auto ab = co_await when_all(my_sleep("a"), my_sleep_v("b"));
+		//ab.1 is std::ignore
+		std::cout << "when all:" << std::get<0>(ab) << std::endl << std::endl;
 
 		auto c = co_await my_sleep("c");
 		std::cout << "when all:" << c << std::endl << std::endl;
 
-		auto [d, e, f] = co_await when_all(my_sleep("d"), my_sleep_v("e"), my_sleep("f"));
-		(void)e;		//e is std::ignore
-		std::cout << "when all:" << d << "," << f << std::endl << std::endl;
+		auto def = co_await when_all(my_sleep("d"), my_sleep_v("e"), my_sleep("f"));
+		//def.1 is std::ignore
+		std::cout << "when all:" << std::get<0>(def) << "," << std::get<2>(def) << std::endl << std::endl;
 
 		std::vector<future_t<int> > v{ my_sleep("g"), my_sleep("h"), my_sleep("i") };
 		auto vals = co_await when_all(std::begin(v), std::end(v));
@@ -115,7 +115,7 @@ void test_when_all()
 
 void resumable_main_when_all()
 {
-#if _HAS_CXX17
+#if _HAS_CXX17 || RESUMEF_USE_BOOST_ANY
 	srand((uint32_t)time(nullptr));
 
 	test_when_any();

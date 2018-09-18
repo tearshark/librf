@@ -1,7 +1,21 @@
 ﻿#pragma once
 
 #include "_awaker.h"
+#if RESUMEF_USE_BOOST_ANY
+#include <boost/any.hpp>
+namespace resumef
+{
+	using any_t = boost::any;
+	using boost::any_cast;
+}
+#else
 #include <any>
+namespace resumef
+{
+	using any_t = std::any;
+	using std::any_cast;
+}
+#endif
 
 //纠结过when_any的返回值，是选用index + std::any，还是选用std::variant<>。最终选择了std::any。
 //std::variant<>存在第一个元素不能默认构造的问题，需要使用std::monostate来占位，导致下标不是从0开始。
@@ -97,16 +111,34 @@ namespace resumef
 
 			inline future_vt operator ()() const
 			{
-				if constexpr(std::is_same_v<future_type, future_vt>)
-				{
-					co_await _f;
-					_val.get() = std::ignore;
-				}
-				else
-				{
-					_val.get() = co_await _f;
-				}
+				_val.get() = co_await _f;
+				_e->signal();
+			}
+		};
 
+		template<class _Ty>
+		struct when_all_functor<future_vt, _Ty>
+		{
+			using value_type = _Ty;
+			using future_type = future_vt;
+
+			when_impl_ptr _e;
+			mutable future_type _f;
+			mutable std::reference_wrapper<value_type> _val;
+
+			when_all_functor(const detail::when_impl_ptr & e, future_type f, value_type & v)
+				: _e(e)
+				, _f(std::move(f))
+				, _val(v)
+			{}
+			when_all_functor(when_all_functor &&) noexcept = default;
+			when_all_functor & operator = (const when_all_functor &) = default;
+			when_all_functor & operator = (when_all_functor &&) = default;
+
+			inline future_vt operator ()() const
+			{
+				co_await _f;
+				_val.get() = std::ignore;
 				_e->signal();
 			}
 		};
@@ -180,7 +212,7 @@ namespace resumef
 			return awaitable.get_future();
 		}
 
-		using when_any_pair = std::pair<intptr_t, std::any>;
+		using when_any_pair = std::pair<intptr_t, any_t>;
 		using when_any_result_ptr = std::shared_ptr<when_any_pair>;
 
 		template<class _Fty>
@@ -210,24 +242,53 @@ namespace resumef
 			{
 				if (_val->first < 0)
 				{
-					if constexpr(std::is_same_v<future_type, future_vt>)
+					auto tval = co_await _f;
+					if (_val->first < 0)
 					{
-						co_await _f;
-						if (_val->first < 0)
-						{
-							_val->first = _Idx;
-							_e->signal();
-						}
+						_val->first = _Idx;
+						_val->second = std::move(tval);
+						_e->signal();
 					}
-					else
+				}
+				else
+				{
+					co_await _f;
+				}
+			}
+		};
+
+		template<>
+		struct when_any_functor<future_vt>
+		{
+			using value_type = when_any_pair;
+			using future_type = future_vt;
+
+			when_impl_ptr _e;
+			mutable future_type _f;
+			mutable when_any_result_ptr _val;
+			intptr_t _Idx;
+
+			when_any_functor(const when_impl_ptr & e, future_type f, const when_any_result_ptr & v, intptr_t idx)
+				: _e(e)
+				, _f(std::move(f))
+				, _val(v)
+				, _Idx(idx)
+			{
+				assert(idx >= 0);
+			}
+			when_any_functor(when_any_functor &&) noexcept = default;
+			when_any_functor & operator = (const when_any_functor &) = default;
+			when_any_functor & operator = (when_any_functor &&) = default;
+
+			inline future_vt operator ()() const
+			{
+				if (_val->first < 0)
+				{
+					co_await _f;
+					if (_val->first < 0)
 					{
-						auto tval = co_await _f;
-						if (_val->first < 0)
-						{
-							_val->first = _Idx;
-							_val->second = std::move(tval);
-							_e->signal();
-						}
+						_val->first = _Idx;
+						_e->signal();
 					}
 				}
 				else
@@ -340,7 +401,7 @@ namespace resumef
 	template<class... _Fty>
 	auto when_any(scheduler & s, _Fty&&... f) -> future_t<detail::when_any_pair>
 	{
-		auto vals = std::make_shared<detail::when_any_pair>(-1, std::any{});
+		auto vals = std::make_shared<detail::when_any_pair>(-1, any_t{});
 
 		return detail::when_any_count(sizeof...(_Fty) ? 1 : 0, vals, s, std::forward<_Fty>(f)...);
 	}
@@ -352,7 +413,7 @@ namespace resumef
 	template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
 	auto when_any(scheduler & s, _Iter begin, _Iter end) -> future_t<detail::when_any_pair>
 	{
-		auto vals = std::make_shared<detail::when_any_pair>(-1, std::any{});
+		auto vals = std::make_shared<detail::when_any_pair>(-1, any_t{});
 
 		return detail::when_any_range((begin != end) ? 1 : 0, vals, s, begin, end);
 	}
