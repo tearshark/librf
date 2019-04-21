@@ -103,6 +103,9 @@
     <ClCompile Include="..\benchmark\benchmark_asio_echo.cpp">
       <Filter>benchmark</Filter>
     </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_modern_cb.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\librf\librf.h">

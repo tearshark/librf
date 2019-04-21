@@ -6,7 +6,7 @@ librf是一个基于C++ Coroutines提案 ‘Stackless Resumable Functions’编�
 
 目前仅支持:
 
-    Windows (使用2017编译)(由于使用了SFINAE导致不再支持VS2015)
+    Windows (使用VS2015/2017编译)
 
 
 librf有以下特点：
@@ -16,7 +16,7 @@ librf有以下特点：
  *   3.提供协程锁(mutex), 定时器, channel等特性, 帮助用户更加容易地编写程序 
  *   4.可以很好的跟asio,libuv等库结合，能跟现有的callback范式的异步/延迟代码很好的结合
  *   5.目前还处于实验状态，不对今后正式的C++ Coroutines支持有任何正式的承诺
- 
+
  *   如果你发现了任何bug、有好的建议、或使用上有不明之处，可以提交到issue，也可以直接联系作者:
       email: tearshark@163.net  QQ交流群: 296561497
 
