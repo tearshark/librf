@@ -99,18 +99,18 @@ auto tostring_async(_Input_t&& value, _Callable_t&& token)
 }
 
 //或者宏版本写法
-#define MODERN_CALLBACK_TRAITS(signature) \
-	using _Adapter_t = modern_callback_adapter_t<std::decay_t<_Callable_t>, signature>; \
-	auto adapter = typename _Adapter_t::traits(std::forward<_Callable_t>(token))
-#define MODERN_CALLBACK_CALL() callback = std::move(std::get<0>(adapter))
-#define MODERN_CALLBACK_RETURN() return std::move(std::get<1>(adapter)).get()
+#define MODERN_CALLBACK_TRAITS(_Token_value, _Signature_t) \
+	using _Adapter_t = modern_callback_adapter_t<std::decay_t<_Callable_t>, _Signature_t>; \
+	auto _Adapter_value = typename _Adapter_t::traits(std::forward<_Callable_t>(_Token_value))
+#define MODERN_CALLBACK_CALL() std::move(std::get<0>(_Adapter_value))
+#define MODERN_CALLBACK_RETURN() return std::move(std::get<1>(_Adapter_value)).get()
 
 template<typename _Input_t, typename _Callable_t>
-auto tostring_async_macro(_Input_t&& value, _Callable_t&& callback)
+auto tostring_async_macro(_Input_t&& value, _Callable_t&& token)
 {
-	MODERN_CALLBACK_TRAITS(void(std::string));
+	MODERN_CALLBACK_TRAITS(token, void(std::string));
 
-	std::thread([MODERN_CALLBACK_CALL(), value = std::forward<_Input_t>(value)]
+	std::thread([callback = MODERN_CALLBACK_CALL(), value = std::forward<_Input_t>(value)]
 		{
 			callback(std::to_string(value));
 		}).detach();
@@ -330,9 +330,9 @@ struct modern_callback_adapter_t<use_librf_t, R(_Result_t...)> : public modern_c
 template<typename _Ty1, typename _Ty2, typename _Callable_t>
 auto add_async(_Ty1&& val1, _Ty2&& val2, _Callable_t&& token)
 {
-	MODERN_CALLBACK_TRAITS(void(decltype(val1 + val2)));
+	MODERN_CALLBACK_TRAITS(token, void(decltype(val1 + val2)));
 
-	std::thread([=, MODERN_CALLBACK_CALL()]
+	std::thread([=, callback = MODERN_CALLBACK_CALL()]
 		{
 			using namespace std::literals;
 			std::this_thread::sleep_for(0.1s);
@@ -346,9 +346,9 @@ auto add_async(_Ty1&& val1, _Ty2&& val2, _Callable_t&& token)
 template<typename _Ty1, typename _Ty2, typename _Callable_t>
 auto muldiv_async(_Ty1&& val1, _Ty2&& val2, _Callable_t&& token)
 {
-	MODERN_CALLBACK_TRAITS(void(std::exception_ptr, decltype(val1 * val2), decltype(val1 / val2)));
+	MODERN_CALLBACK_TRAITS(token, void(std::exception_ptr, decltype(val1 * val2), decltype(val1 / val2)));
 
-	std::thread([=, MODERN_CALLBACK_CALL()]
+	std::thread([=, callback = MODERN_CALLBACK_CALL()]
 		{
 			using namespace std::literals;
 			std::this_thread::sleep_for(0.1s);
