@@ -182,6 +182,7 @@
   <ItemGroup>
     <ClCompile Include="..\benchmark\benchmark_asio_echo.cpp" />
     <ClCompile Include="..\benchmark\benchmark_async_mem.cpp" />
+    <ClCompile Include="..\benchmark\benchmark_channel_passing_next.cpp" />
     <ClCompile Include="..\librf\src\event.cpp" />
     <ClCompile Include="..\librf\src\mutex.cpp" />
     <ClCompile Include="..\librf\src\rf_task.cpp" />
