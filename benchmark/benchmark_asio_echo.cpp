@@ -1,4 +1,4 @@
-#include <SDKDDKVer.h>
+﻿#include <SDKDDKVer.h>
 
 /*
 #include <chrono>
@@ -117,7 +117,7 @@ void RunOneBenchmark(bool bMain)
 
 	asio::io_service io_service;
 	tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), 3456));
-	uarray<tcp::socket, 16> socketes(acceptor.get_io_service());
+	uarray<tcp::socket, 16> socketes(io_service);
 
 	AcceptConnections(acceptor, socketes);
 	if (bMain) StartPrintEchoCount();

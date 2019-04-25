@@ -172,4 +172,12 @@
       <Filter>librf\src</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\librf\src\asio_task_1.12.0.inl">
+      <Filter>librf\src</Filter>
+    </None>
+    <None Include="..\librf\src\asio_task_1.10.0.inl">
+      <Filter>librf\src</Filter>
+    </None>
+  </ItemGroup>
 </Project>

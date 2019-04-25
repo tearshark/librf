@@ -1,4 +1,4 @@
-
+﻿
 #include "librf.h"
 
 extern void resumable_main_yield_return();
@@ -25,12 +25,12 @@ extern void resumable_main_benchmark_asio_client(intptr_t nNum);
 
 int main(int argc, const char * argv[])
 {
-	resumable_main_modern_cb();
+	//resumable_main_modern_cb();
 	//resumable_main_benchmark_mem();
-	//if (argc > 1)
-	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
-	//else
-	//	resumable_main_benchmark_asio_server();
+	if (argc > 1)
+		resumable_main_benchmark_asio_client(atoi(argv[1]));
+	else
+		resumable_main_benchmark_asio_server();
 	return 0;
 
 	resumable_main_when_all();
