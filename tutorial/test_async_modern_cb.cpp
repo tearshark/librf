@@ -146,37 +146,8 @@ struct use_future_callback_base_t
 //此类的实例作为真正的callback，交给异步回调函数，替换token。
 //在实际应用中，需要针对是否有异常参数，结果值为0，1，多个等情况做特殊处理，故还需要通过更多的偏特化版本来支持。
 //具体的异常参数，需要根据实际应用去特里化。这里仅演示通过std::exception_ptr作为异常传递的情况。
-//
-//无异常，多结果的callback类型：void(_Result_t...)
-template<typename _Promise_traits, typename... _Result_t>
-struct use_future_callback_t : public use_future_callback_base_t<_Promise_traits, std::tuple<_Result_t...> >
-{
-	using use_future_callback_base_t<_Promise_traits, std::tuple<_Result_t...> >::use_future_callback_base_t;
-
-	template<typename... Args>
-	void operator()(Args&&... args) const
-	{
-		static_assert(sizeof...(Args) == sizeof...(_Result_t), "");
-		_promise.set_value(std::make_tuple(std::forward<Args>(args)...));
-	}
-};
-
-//有异常，多结果的callback类型：void(std::exception_ptr, _Result_t...)
-template <typename _Promise_traits, typename... _Result_t>
-struct use_future_callback_t<_Promise_traits, std::exception_ptr, _Result_t...> : public use_future_callback_base_t<_Promise_traits, std::tuple<_Result_t...> >
-{
-	using use_future_callback_base_t<_Promise_traits, std::tuple<_Result_t...> >::use_future_callback_base_t;
-
-	template<typename... Args>
-	void operator()(std::exception_ptr eptr, Args&&... args) const
-	{
-		static_assert(sizeof...(Args) == sizeof...(_Result_t), "");
-		if (!eptr)
-			_promise.set_value(std::make_tuple(std::forward<Args>(args)...));
-		else
-			_promise.set_exception(std::move(eptr));
-	}
-};
+template<typename...>
+struct use_future_callback_t;
 
 //无异常，无结果的callback类型：void()
 template<typename _Promise_traits>
@@ -234,6 +205,37 @@ struct use_future_callback_t<_Promise_traits, std::exception_ptr, _Result_t> : p
 	}
 };
 
+//无异常，多结果的callback类型：void(_Result_t...)
+template<typename _Promise_traits, typename... _Result_t>
+struct use_future_callback_t<_Promise_traits, _Result_t...> : public use_future_callback_base_t<_Promise_traits, std::tuple<_Result_t...> >
+{
+	using use_future_callback_base_t<_Promise_traits, std::tuple<_Result_t...> >::use_future_callback_base_t;
+
+	template<typename... Args>
+	void operator()(Args&&... args) const
+	{
+		static_assert(sizeof...(Args) == sizeof...(_Result_t), "");
+		_promise.set_value(std::make_tuple(std::forward<Args>(args)...));
+	}
+};
+
+//有异常，多结果的callback类型：void(std::exception_ptr, _Result_t...)
+template <typename _Promise_traits, typename... _Result_t>
+struct use_future_callback_t<_Promise_traits, std::exception_ptr, _Result_t...> : public use_future_callback_base_t<_Promise_traits, std::tuple<_Result_t...> >
+{
+	using use_future_callback_base_t<_Promise_traits, std::tuple<_Result_t...> >::use_future_callback_base_t;
+
+	template<typename... Args>
+	void operator()(std::exception_ptr eptr, Args&&... args) const
+	{
+		static_assert(sizeof...(Args) == sizeof...(_Result_t), "");
+		if (!eptr)
+			_promise.set_value(std::make_tuple(std::forward<Args>(args)...));
+		else
+			_promise.set_exception(std::move(eptr));
+	}
+};
+
 
 
 //与use_future_callback_t配套的获得_Return_t的类
@@ -250,6 +252,24 @@ struct use_future_return_t
 	future_type get()
 	{
 		return std::move(_future);
+	}
+};
+
+//利用use_future_callback_t + use_future_return_t 实现的callback适配器
+template<typename _Token_as_callable_t, typename... _Result_t>
+struct modern_callback_adapter_impl_t
+{
+	using traits_type = _Token_as_callable_t;
+	using callback_type = use_future_callback_t<traits_type, _Result_t...>;
+	using result_type = typename callback_type::result_type;
+	using return_type = use_future_return_t<traits_type, result_type>;
+
+	static std::tuple<callback_type, return_type> traits(const _Token_as_callable_t& /*没人关心这个变量*/)
+	{
+		callback_type callback{};
+		auto future = callback.get_future();
+
+		return { std::move(callback), std::move(future) };
 	}
 };
 
@@ -273,25 +293,7 @@ struct std_future_t
 //从而在tostring_async函数内，使用偏特化的modern_callback_adapter_t<std_future_t, ...>而已。
 constexpr std_future_t std_future{};
 
-//三、特例化的modern_callback_adapter_t的实现类
-template<typename _Token_as_callable_t, typename... _Result_t>
-struct modern_callback_adapter_impl_t
-{
-	using traits_type = _Token_as_callable_t;
-	using callback_type = use_future_callback_t<traits_type, _Result_t...>;
-	using result_type = typename callback_type::result_type;
-	using return_type = use_future_return_t<traits_type, result_type>;
-
-	static std::tuple<callback_type, return_type> traits(const _Token_as_callable_t& /*没人关心这个变量*/)
-	{
-		callback_type callback{};
-		auto future = callback.get_future();
-
-		return { std::move(callback), std::move(future) };
-	}
-};
-
-//四、偏特化_Callable_t为std_future_t类型的modern_callback_adapter_t
+//三、偏特化_Callable_t为std_future_t类型的modern_callback_adapter_t
 //真正的回调类型是use_future_callback_t，返回类型_Return_t是use_future_return_t。
 //配合use_future_callback_t的promise<result_type>，和use_future_return_t的future<result_type>，正好组成一对promise/future对。
 //promise在真正的回调里设置结果值；
