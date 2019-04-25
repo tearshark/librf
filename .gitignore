@@ -6,3 +6,5 @@
 /vs_proj/.vs
 /vs_proj/librf.vcxproj.user
 /.vs
+/vs_proj/Release
+/vs_proj/Debug

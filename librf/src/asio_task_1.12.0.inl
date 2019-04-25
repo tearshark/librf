@@ -21,31 +21,31 @@ namespace asio {
 	namespace librf {
 
 		template <typename Executor, typename T>
-		struct awaitable_handler_base
+		struct promise_handler_base
 		{
 		public:
 			typedef T result_type;
 			typedef resumef::state_t<result_type> state_type;
 
-			awaitable_handler_base()
+			promise_handler_base()
 				: state_(resumef::make_counted<state_type>())
-				{
-				}
+			{
+			}
 
 			resumef::counted_ptr<state_type> state_;
-			awaitable_handler_base(awaitable_handler_base &&) = default;
-			awaitable_handler_base(const awaitable_handler_base &) = default;
-			awaitable_handler_base & operator = (awaitable_handler_base &&) = default;
-			awaitable_handler_base & operator = (const awaitable_handler_base &) = default;
+			promise_handler_base(promise_handler_base &&) = default;
+			promise_handler_base(const promise_handler_base &) = default;
+			promise_handler_base & operator = (promise_handler_base &&) = default;
+			promise_handler_base & operator = (const promise_handler_base &) = default;
 		};
 
 		template <typename, typename...>
 		struct promise_handler;
 
 		template <typename Executor>
-		struct promise_handler<Executor, void> : public awaitable_handler_base<Executor, void>
+		struct promise_handler<Executor, void> : public promise_handler_base<Executor, void>
 		{
-			using awaitable_handler_base<Executor, void>::awaitable_handler_base;
+			using promise_handler_base<Executor, void>::promise_handler_base;
 
 			void operator()() const
 			{
@@ -54,9 +54,9 @@ namespace asio {
 		};
 
 		template <typename Executor>
-		struct promise_handler<Executor, asio::error_code> : public awaitable_handler_base<Executor, void>
+		struct promise_handler<Executor, asio::error_code> : public promise_handler_base<Executor, void>
 		{
-			using awaitable_handler_base<Executor, void>::awaitable_handler_base;
+			using promise_handler_base<Executor, void>::promise_handler_base;
 
 			void operator()(const asio::error_code& ec) const
 			{
@@ -68,9 +68,9 @@ namespace asio {
 		};
 
 		template <typename Executor>
-		struct promise_handler<Executor, std::exception_ptr> : public awaitable_handler_base<Executor, void>
+		struct promise_handler<Executor, std::exception_ptr> : public promise_handler_base<Executor, void>
 		{
-			using awaitable_handler_base<Executor, void>::awaitable_handler_base;
+			using promise_handler_base<Executor, void>::promise_handler_base;
 
 			void operator()(std::exception_ptr ex) const
 			{
@@ -84,9 +84,9 @@ namespace asio {
 
 
 		template <typename Executor, typename T>
-		struct promise_handler<Executor, T> : public awaitable_handler_base<Executor, T>
+		struct promise_handler<Executor, T> : public promise_handler_base<Executor, T>
 		{
-			using awaitable_handler_base<Executor, T>::awaitable_handler_base;
+			using promise_handler_base<Executor, T>::promise_handler_base;
 
 			template <typename Arg>
 			void operator()(Arg&& arg) const
@@ -96,9 +96,9 @@ namespace asio {
 		};
 
 		template <typename Executor, typename T>
-		struct promise_handler<Executor, asio::error_code, T> : public awaitable_handler_base<Executor, T>
+		struct promise_handler<Executor, asio::error_code, T> : public promise_handler_base<Executor, T>
 		{
-			using awaitable_handler_base<Executor, T>::awaitable_handler_base;
+			using promise_handler_base<Executor, T>::promise_handler_base;
 
 			template <typename Arg>
 			void operator()(const asio::error_code& ec, Arg&& arg) const
@@ -111,9 +111,9 @@ namespace asio {
 		};
 
 		template <typename Executor, typename T>
-		struct promise_handler<Executor, std::exception_ptr, T> : public awaitable_handler_base<Executor, T>
+		struct promise_handler<Executor, std::exception_ptr, T> : public promise_handler_base<Executor, T>
 		{
-			using awaitable_handler_base<Executor, T>::awaitable_handler_base;
+			using promise_handler_base<Executor, T>::promise_handler_base;
 
 			template <typename Arg>
 			void operator()(std::exception_ptr ex, Arg&& arg) const
@@ -128,9 +128,9 @@ namespace asio {
 
 
 		template <typename Executor, typename... Ts>
-		struct promise_handler : public awaitable_handler_base<Executor, std::tuple<Ts...>>
+		struct promise_handler : public promise_handler_base<Executor, std::tuple<Ts...>>
 		{
-			using awaitable_handler_base<Executor, std::tuple<Ts...>>::awaitable_handler_base;
+			using promise_handler_base<Executor, std::tuple<Ts...>>::promise_handler_base;
 
 			template <typename... Args>
 			void operator()(Args&&... args) const
@@ -140,9 +140,9 @@ namespace asio {
 		};
 
 		template <typename Executor, typename... Ts>
-		struct promise_handler<Executor, asio::error_code, Ts...> : public awaitable_handler_base<Executor, std::tuple<Ts...>>
+		struct promise_handler<Executor, asio::error_code, Ts...> : public promise_handler_base<Executor, std::tuple<Ts...>>
 		{
-			using awaitable_handler_base<Executor, std::tuple<Ts...>>::awaitable_handler_base;
+			using promise_handler_base<Executor, std::tuple<Ts...>>::promise_handler_base;
 
 			template <typename... Args>
 			void operator()(const asio::error_code& ec, Args&&... args) const
@@ -155,9 +155,9 @@ namespace asio {
 		};
 
 		template <typename Executor, typename... Ts>
-		struct promise_handler<Executor, std::exception_ptr, Ts...> : public awaitable_handler_base<Executor, std::tuple<Ts...>>
+		struct promise_handler<Executor, std::exception_ptr, Ts...> : public promise_handler_base<Executor, std::tuple<Ts...>>
 		{
-			using awaitable_handler_base<Executor, std::tuple<Ts...>>::awaitable_handler_base;
+			using promise_handler_base<Executor, std::tuple<Ts...>>::promise_handler_base;
 
 			template <typename... Args>
 			void operator()(std::exception_ptr ex, Args&&... args) const

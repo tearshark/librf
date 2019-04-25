@@ -276,6 +276,16 @@ namespace resumef
 
 		//以上是与编译器生成的resumable function交互的接口
 		//------------------------------------------------------------------------------------------
+
+		//兼容std::promise<>用法
+		void set_value(const T& val)
+		{
+			_state->set_value(val);
+		}
+		void set_value(T&& val)
+		{
+			_state->set_value(std::forward<T>(val));
+		}
 	};
 
 	template <>
