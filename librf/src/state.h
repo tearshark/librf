@@ -72,8 +72,6 @@ namespace resumef
 
 		void reset_none_lock()
 		{
-			scoped_lock<lock_type> __guard(_mtx);
-
 			_coro = nullptr;
 			_ready = false;
 		}

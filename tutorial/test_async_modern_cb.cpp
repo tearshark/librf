@@ -89,6 +89,8 @@ auto tostring_async(_Input_t&& value, _Callable_t&& token)
 	//callback与token未必是同一个变量，甚至未必是同一个类型
 	std::thread([callback = std::move(std::get<0>(adapter)), value = std::forward<_Input_t>(value)]
 		{
+			using namespace std::literals;
+			std::this_thread::sleep_for(0.1s);
 			callback(std::to_string(value));
 		}).detach();
 
@@ -98,7 +100,7 @@ auto tostring_async(_Input_t&& value, _Callable_t&& token)
 
 //或者宏版本写法
 #define MODERN_CALLBACK_TRAITS(signature) \
-	using _Adapter_t = modern_callback_adapter_t<std::decay_t<_Callable_t>, void(std::string)>; \
+	using _Adapter_t = modern_callback_adapter_t<std::decay_t<_Callable_t>, signature>; \
 	auto adapter = typename _Adapter_t::traits(std::forward<_Callable_t>(token))
 #define MODERN_CALLBACK_CALL() callback = std::move(std::get<0>(adapter))
 #define MODERN_CALLBACK_RETURN() return std::move(std::get<1>(adapter)).get()
@@ -151,9 +153,10 @@ struct use_future_callback_t : public use_future_callback_base_t<_Promise_traits
 {
 	using use_future_callback_base_t<_Promise_traits, std::tuple<_Result_t...> >::use_future_callback_base_t;
 
-	template <typename... Args>
+	template<typename... Args>
 	void operator()(Args&&... args) const
 	{
+		static_assert(sizeof...(Args) == sizeof...(_Result_t), "");
 		_promise.set_value(std::make_tuple(std::forward<Args>(args)...));
 	}
 };
@@ -164,9 +167,10 @@ struct use_future_callback_t<_Promise_traits, std::exception_ptr, _Result_t...> 
 {
 	using use_future_callback_base_t<_Promise_traits, std::tuple<_Result_t...> >::use_future_callback_base_t;
 
-	template <typename... Args>
+	template<typename... Args>
 	void operator()(std::exception_ptr eptr, Args&&... args) const
 	{
+		static_assert(sizeof...(Args) == sizeof...(_Result_t), "");
 		if (!eptr)
 			_promise.set_value(std::make_tuple(std::forward<Args>(args)...));
 		else
@@ -207,9 +211,10 @@ struct use_future_callback_t<_Promise_traits, _Result_t> : public use_future_cal
 {
 	using use_future_callback_base_t<_Promise_traits, _Result_t>::use_future_callback_base_t;
 
-	void operator()(result_type && arg) const
+	template<typename Arg>
+	void operator()(Arg && arg) const
 	{
-		_promise.set_value(std::forward<result_type>(arg));
+		_promise.set_value(std::forward<Arg>(arg));
 	}
 };
 
@@ -219,10 +224,11 @@ struct use_future_callback_t<_Promise_traits, std::exception_ptr, _Result_t> : p
 {
 	using use_future_callback_base_t<_Promise_traits, _Result_t>::use_future_callback_base_t;
 
-	void operator()(std::exception_ptr eptr, result_type && arg) const
+	template<typename Arg>
+	void operator()(std::exception_ptr eptr, Arg && arg) const
 	{
 		if (!eptr)
-			_promise.set_value(std::forward<result_type>(arg));
+			_promise.set_value(std::forward<Arg>(arg));
 		else
 			_promise.set_exception(std::move(eptr));
 	}
@@ -231,11 +237,11 @@ struct use_future_callback_t<_Promise_traits, std::exception_ptr, _Result_t> : p
 
 
 //与use_future_callback_t配套的获得_Return_t的类
-template<typename _Future_t, typename _Result_t>
+template<typename _Future_traits, typename _Result_t>
 struct use_future_return_t
 {
 	using result_type = _Result_t;
-	using future_type = typename _Future_t::template future_type<result_type>;
+	using future_type = typename _Future_traits::template future_type<result_type>;
 	future_type _future;
 
 	use_future_return_t(future_type && ft)
@@ -268,15 +274,15 @@ struct std_future_t
 constexpr std_future_t std_future{};
 
 //三、特例化的modern_callback_adapter_t的实现类
-template<typename _Token_t, typename... _Result_t>
+template<typename _Token_as_callable_t, typename... _Result_t>
 struct modern_callback_adapter_impl_t
 {
-	using traits_type = _Token_t;
+	using traits_type = _Token_as_callable_t;
 	using callback_type = use_future_callback_t<traits_type, _Result_t...>;
 	using result_type = typename callback_type::result_type;
 	using return_type = use_future_return_t<traits_type, result_type>;
 
-	static std::tuple<callback_type, return_type> traits(const _Token_t& /*没人关心这个变量*/)
+	static std::tuple<callback_type, return_type> traits(const _Token_as_callable_t& /*没人关心这个变量*/)
 	{
 		callback_type callback{};
 		auto future = callback.get_future();
@@ -305,7 +311,7 @@ struct use_librf_t
 	template<typename _Result_t>
 	using future_type = resumef::future_t<_Result_t>;
 };
-inline constexpr use_librf_t use_librf{};
+constexpr use_librf_t use_librf{};
 
 template<typename R, typename... _Result_t>
 struct modern_callback_adapter_t<use_librf_t, R(_Result_t...)> : public modern_callback_adapter_impl_t<use_librf_t, _Result_t...>
@@ -318,6 +324,44 @@ struct modern_callback_adapter_t<use_librf_t, R(_Result_t...)> : public modern_c
 //----------------------------------------------------------------------------------------------------------------------
 //使用范例
 
+//演示异步库有多个异步回调函数，只要按照Modern Callback范式去做回调，就不再需要写额外的代码，就可以适配到future+librf，以及更多的其他库
+template<typename _Ty1, typename _Ty2, typename _Callable_t>
+auto add_async(_Ty1&& val1, _Ty2&& val2, _Callable_t&& token)
+{
+	MODERN_CALLBACK_TRAITS(void(decltype(val1 + val2)));
+
+	std::thread([=, MODERN_CALLBACK_CALL()]
+		{
+			using namespace std::literals;
+			std::this_thread::sleep_for(0.1s);
+			callback(val1 + val2);
+		}).detach();
+
+	MODERN_CALLBACK_RETURN();
+}
+
+//演示异步库有多个异步回调函数，只要按照Modern Callback范式去做回调，就不再需要写额外的代码，就可以适配到future+librf，以及更多的其他库
+template<typename _Ty1, typename _Ty2, typename _Callable_t>
+auto muldiv_async(_Ty1&& val1, _Ty2&& val2, _Callable_t&& token)
+{
+	MODERN_CALLBACK_TRAITS(void(std::exception_ptr, decltype(val1 * val2), decltype(val1 / val2)));
+
+	std::thread([=, MODERN_CALLBACK_CALL()]
+		{
+			using namespace std::literals;
+			std::this_thread::sleep_for(0.1s);
+
+			auto v1 = val1 * val2;
+
+			if (val2 == 0)
+				callback(std::make_exception_ptr(std::logic_error("divided by zero")), v1, 0);
+			else
+				callback(nullptr, v1, val1 / val2);
+		}).detach();
+
+	MODERN_CALLBACK_RETURN();
+}
+
 __declspec(noinline)
 void resumable_main_modern_cb()
 {
@@ -328,13 +372,14 @@ void resumable_main_modern_cb()
 		{
 			std::cout << value << std::endl;
 		});
+	std::this_thread::sleep_for(0.5s);
 
 	tostring_async(1.0, [](std::string && value)
 		{
 			std::cout << value << std::endl;
 		});
 
-	std::this_thread::sleep_for(1s);
+	std::this_thread::sleep_for(0.5s);
 	std::cout << "......" << std::endl;
 
 	//支持future的用法
@@ -347,8 +392,29 @@ void resumable_main_modern_cb()
 	//支持librf的用法
 	GO
 	{
-		std::string result = co_await tostring_async(10.0, use_librf);
-		std::cout << result << std::endl;
+		try
+		{
+			int val = co_await add_async(1, 2, use_librf);
+
+			//muldiv_async函数可能会抛异常，取决于val是否是0
+			//异常将会带回到本协程里的代码，所以需要try-catch
+			auto ab = co_await muldiv_async(9, val, use_librf);
+			//C++17:
+			//auto [a, b] = co_await muldiv_async(9, val, use_librf);
+
+			std::string result = co_await tostring_async(std::get<0>(ab) + std::get<1>(ab), use_librf);
+
+			std::cout << result << std::endl;
+		}
+		catch (const std::exception& e)
+		{
+			std::cout << "exception signal : " << e.what() << std::endl;
+		}
+		catch (...)
+		{
+			std::cout << "exception signal : who knows?" << std::endl;
+		}
 	};
+
 	resumef::this_scheduler()->run_until_notask();
 }
