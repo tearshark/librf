@@ -21,7 +21,7 @@ void dump(size_t idx, std::string name, T start, T end)
 	std::cout << idx << ":" << name << "    ";
 	std::cout << N << "      " << ns << " ns      ";
 	std::cout << (ns / N) << " ns/op" << "    ";
-	std::cout << (N * 100 * 1000 / ns) << "w/cps" << std::endl;
+	std::cout << (N * 100ll * 1000ll / ns) << "w/cps" << std::endl;
 
 	lock_console.unlock();
 }

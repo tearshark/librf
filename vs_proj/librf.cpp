@@ -23,7 +23,7 @@ extern void resumable_main_benchmark_mem();
 extern void resumable_main_benchmark_asio_server();
 extern void resumable_main_benchmark_asio_client(intptr_t nNum);
 
-int main(int argc, const char * argv[])
+int main(int argc, const char* argv[])
 {
 	resumable_main_modern_cb();
 	//resumable_main_benchmark_mem();

@@ -41,6 +41,9 @@ namespace resumef
 		};
 	}
 
+	//提供一种在协程和非协程之间同步的手段。
+	//典型用法是在非协程的线程，或者异步代码里，调用signal()方法触发信号，
+	//协程代码里，调用co_await wait()等系列方法等待同步。
 	struct event_t
 	{
 		typedef std::shared_ptr<detail::event_impl> event_impl_ptr;
