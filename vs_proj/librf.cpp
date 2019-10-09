@@ -25,7 +25,7 @@ extern void resumable_main_benchmark_asio_client(intptr_t nNum);
 
 int main(int argc, const char* argv[])
 {
-	resumable_main_modern_cb();
+	resumable_main_resumable();
 	//resumable_main_benchmark_mem();
 /*
 	if (argc > 1)
