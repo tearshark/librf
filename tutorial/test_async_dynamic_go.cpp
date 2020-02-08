@@ -14,11 +14,11 @@ std::array<std::array<std::array<int32_t, M>, M>, 3> dynamic_cells;
 
 void test_dynamic_go()
 {
-	auto co_star = [](int j)
+	auto co_star = [](int j) -> resumef::future_t<int>
 	{
 		for (int i = 0; i < M; ++i)
 		{
-			go[=]()
+			go[=]() -> std::experimental::generator<int>
 			{
 				for (int k = 0; k < M; ++k)
 				{

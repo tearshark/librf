@@ -33,7 +33,7 @@ int main(int argc, const char* argv[])
 	else
 		resumable_main_benchmark_asio_server();
 */
-	return 0;
+	//return 0;
 
 	resumable_main_when_all();
 	resumable_main_multi_thread();

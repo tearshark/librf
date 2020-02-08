@@ -240,6 +240,12 @@ namespace resumef
 		{
 			return _state->cancellation_requested();
 		}
+/*
+		void unhandled_exception() 
+		{
+			std::terminate(); 
+		}
+*/
 
 		//return_value/return_void 只能由派生类去实现
 

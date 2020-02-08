@@ -10,7 +10,7 @@
 using namespace resumef;
 
 //std::experimental::generator<int>
-auto test_yield_int()
+auto test_yield_int() -> std::experimental::generator<int>
 {
 	std::cout << "1 will yield return" << std::endl;
 	co_yield 1;
@@ -43,7 +43,7 @@ auto test_yield_void()
 }
 */
 
-auto test_yield_void()
+auto test_yield_void() -> std::experimental::generator<std::nullptr_t>
 {
 	std::cout << "block 1 will yield return" << std::endl;
 	co_yield_void;
