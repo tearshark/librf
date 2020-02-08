@@ -38,6 +38,21 @@ extern std::atomic<intptr_t> g_resumef_task_count;
 extern std::atomic<intptr_t> g_resumef_evtctx_count;
 #endif
 
+namespace std
+{
+#if !_HAS_CXX20
+	template<class T>
+	struct remove_cvref
+	{
+		typedef std::remove_cv_t<std::remove_reference_t<T>> type;
+	};
+#if _HAS_CXX17
+	template<class T>
+	using remove_cvref_t = typename std::remove_cvref<T>::type;
+#endif
+#endif
+}
+
 namespace resumef
 {
 #if _HAS_CXX17
@@ -47,6 +62,7 @@ namespace resumef
 	template<class... _Mutexes>
 	using scoped_lock = std::lock_guard<_Mutexes...>;
 #endif
+
 	template<typename _PromiseT = void>
 	using coroutine_handle = std::experimental::coroutine_handle<_PromiseT>;
 

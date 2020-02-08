@@ -149,9 +149,9 @@ namespace resumef
 	//这个'函数对象'被调用后，返回generator<_Ty>/future_t<_Ty>类型
 	//然后'函数对象'作为异步执行的上下文状态保存起来
 	template<class _Ctx>
-	struct ctx_task_t : public task_t<typename std::decay<decltype(std::declval<_Ctx>()())>::type>
+	struct ctx_task_t : public task_t<typename std::remove_cvref<decltype(std::declval<_Ctx>()())>::type>
 	{
-		typedef task_t<typename std::decay<decltype(std::declval<_Ctx>()())>::type> base_type;
+		typedef task_t<typename std::remove_cvref<decltype(std::declval<_Ctx>()())>::type> base_type;
 		using base_type::_future;
 
 		typedef _Ctx context_type;
