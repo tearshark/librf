@@ -26,39 +26,6 @@ extern void resumable_main_benchmark_mem();
 extern void resumable_main_benchmark_asio_server();
 extern void resumable_main_benchmark_asio_client(intptr_t nNum);
 
-void async_get_long(int64_t val, std::function<void(int64_t)> cb)
-{
-	using namespace std::chrono;
-	std::thread([val, cb = std::move(cb)]
-		{
-			std::this_thread::sleep_for(10s);
-			cb(val * val);
-		}).detach();
-}
-
-//这种情况下，没有生成 frame-context，因此，并没有promise_type被内嵌在frame-context里
-resumef::future_t<int64_t> co_get_long(int64_t val)
-{
-	resumef::awaitable_t<int64_t > st;
-	std::cout << "co_get_long@1" << std::endl;
-	
-	async_get_long(val, [st](int64_t value)
-	{
-		std::cout << "co_get_long@2" << std::endl;
-		st.set_value(value);
-	});
-
-	std::cout << "co_get_long@3" << std::endl;
-	return st.get_future();
-}
-
-//这种情况下，会生成对应的 frame-context，一个promise_type被内嵌在frame-context里
-resumef::future_t<> test_librf2()
-{
-	auto f = co_await co_get_long(2);
-	std::cout << f << std::endl;
-}
-
 int main(int argc, const char* argv[])
 {
 	resumable_main_cb();

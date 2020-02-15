@@ -13,7 +13,8 @@ void callback_get_long(int64_t val, _Ctype&& cb)
 	using namespace std::chrono;
 	std::thread([val, cb = std::forward<_Ctype>(cb)]
 		{
-			std::this_thread::sleep_for(500ms);
+			//std::this_thread::sleep_for(500ms);
+			std::this_thread::sleep_for(10s);
 			cb(val * val);
 		}).detach();
 }
@@ -27,6 +28,11 @@ auto async_get_long(int64_t val)
 		st.set_value(val);
 	});
 	return st.get_future();
+}
+
+resumef::future_t<> wait_get_long(int64_t val)
+{
+	co_await async_get_long(val);
 }
 
 //这种情况下，会生成对应的 frame-context，一个promise_type被内嵌在frame-context里
@@ -49,20 +55,22 @@ resumef::future_t<int64_t> loop_get_long(int64_t val)
 		val = co_await async_get_long(val);
 		std::cout << val << std::endl;
 	}
-	return val;
+	co_return val;
 }
 
 void resumable_main_cb()
 {
 	std::cout << std::this_thread::get_id() << std::endl;
+	go wait_get_long(3);
+	resumef::this_scheduler()->run_until_notask();
 
-	go []()->resumef::future_t<>
+	GO
 	{
 		auto val = co_await loop_get_long(2);
 		std::cout << val << std::endl;
 	};
-	//resumef::this_scheduler()->run_until_notask();
+	resumef::this_scheduler()->run_until_notask();
 
-	go resumable_get_long(3);
+	//go resumable_get_long(3);
 	resumef::this_scheduler()->run_until_notask();
 }

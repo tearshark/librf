@@ -21,6 +21,7 @@
 #include "src/channel.h"
 #include "src/scheduler.h"
 #include "src/promise.inl"
+#include "src/state.inl"
 #include "src/sleep.h"
 #include "src/awaitable.h"
 

@@ -185,5 +185,8 @@
     <None Include="..\librf\src\promise.inl">
       <Filter>librf\src</Filter>
     </None>
+    <None Include="..\librf\src\state.inl">
+      <Filter>librf\src</Filter>
+    </None>
   </ItemGroup>
 </Project>

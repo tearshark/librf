@@ -63,15 +63,15 @@ namespace resumef
 	}
 
 	scheduler_t::scheduler_t()
-		: _task()
-		, _ready_task()
-		, _timer(std::make_shared<timer_manager>())
+		: _timer(std::make_shared<timer_manager>())
 	{
+		_runing_states.reserve(1024);
+		_cached_states.reserve(1024);
 	}
 
 	scheduler_t::~scheduler_t()
 	{
-		cancel_all_task_();
+		//cancel_all_task_();
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (th_scheduler_ptr == this)
 			th_scheduler_ptr = nullptr;
@@ -80,34 +80,78 @@ namespace resumef
 
 	void scheduler_t::new_task(task_base_t * task)
 	{
-		if (task)
-		{
-			scoped_lock<spinlock> __guard(_mtx_ready);
+		state_base_t* sptr = task->get_state();
 
-			this->_ready_task.push_back(task);
-			this->add_initial(task->get_state());
+		{
+			scoped_lock<spinlock> __guard(_lock_ready);
+			this->_ready_task.emplace(sptr, task);
+		}
+
+		//如果是单独的future，没有被co_await过，则handler是nullptr。
+		if (sptr->get_handler() != nullptr)
+			this->add_initial(sptr);
+		else
+			sptr->set_scheduler(this);
+	}
+
+	void scheduler_t::add_initial(state_base_t* sptr)
+	{
+		sptr->set_scheduler(this);
+
+		scoped_lock<lock_type> __guard(_lock_running);
+		_runing_states.emplace_back(sptr);
+	}
+
+	void scheduler_t::add_await(state_base_t* sptr, coroutine_handle<> handler)
+	{
+		sptr->set_scheduler(this);
+		sptr->set_handler(handler);
+		if (sptr->is_ready())
+		{
+			scoped_lock<lock_type> __guard(_lock_running);
+			_runing_states.emplace_back(sptr);
 		}
 	}
 
+	void scheduler_t::add_ready(state_base_t* sptr)
+	{
+		assert(sptr->get_scheduler() == this);
+
+		if (sptr->get_handler() != nullptr)
+		{
+			scoped_lock<lock_type> __guard(_lock_running);
+			_runing_states.emplace_back(sptr);
+		}
+		else
+		{
+			scoped_lock<spinlock> __guard(_lock_ready);
+			this->_ready_task.erase(sptr);
+		}
+	}
+
+	void scheduler_t::del_final(state_base_t* sptr)
+	{
+		assert(sptr->get_scheduler() == this);
+
+		scoped_lock<spinlock> __guard(_lock_ready);
+		this->_ready_task.erase(sptr);
+	}
+
+/*
 	void scheduler_t::cancel_all_task_()
 	{
-		{
-			scoped_lock<lock_type> __guard(_mtx_task);
-			this->_task.clear(true);
-		}
-		{
-			scoped_lock<spinlock> __guard(_mtx_ready);
-			this->_ready_task.clear(true);
-		}
+		scoped_lock<spinlock, lock_type> __guard(_lock_ready, _lock_running);
+		
+		this->_ready_task.clear();
+		this->_runing_states.clear();
 	}
 
 	void scheduler_t::break_all()
 	{
 		cancel_all_task_();
-
-		scoped_lock<lock_type> __guard(_mtx_task);
 		this->_timer->clear();
 	}
+*/
 
 	void scheduler_t::run_one_batch()
 	{
@@ -115,15 +159,17 @@ namespace resumef
 		if (th_scheduler_ptr == nullptr)
 			th_scheduler_ptr = this;
 #endif
+		this->_timer->update();
+
 		{
-			scoped_lock<lock_type> __guard(_mtx_task);
-
-			this->_timer->update();
-
-			state_vector states = std::move(_runing_states);
-			for (state_sptr& sptr : states)
-				sptr->resume();
+			scoped_lock<lock_type> __guard(_lock_running);
+			std::swap(_cached_states, _runing_states);
 		}
+
+		for (state_sptr& sptr : _cached_states)
+			sptr->resume();
+
+		_cached_states.clear();
 	}
 
 	void scheduler_t::run_until_notask()
