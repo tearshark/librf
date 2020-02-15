@@ -1,12 +1,16 @@
-# librf
+# librf 2.0
 
 ### librf  - 协程库
+
+2020-02-16 更新：
+    更新调度器算法，深入应用Coroutines的特性，以期获得更高调度性能。
+    不再支持C++14。
 
 librf是一个基于C++ Coroutines提案 ‘Stackless Resumable Functions’编写的非对称stackless协程库。
 
 目前仅支持:
 
-    Windows (使用VS2015/2017编译)
+    Windows (使用VS2017/VS2019编译)
 
 
 librf有以下特点：

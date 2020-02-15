@@ -35,7 +35,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -48,7 +48,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -93,7 +93,7 @@
       <AdditionalIncludeDirectories>..\librf;..\..\asio\asio\include;..\..\asio-1.10.6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/await</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -109,7 +109,7 @@
       <AdditionalIncludeDirectories>..\librf;..\..\asio\asio\include;..\..\asio-1.10.6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/await</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
       <CLanguageStandard>c11</CLanguageStandard>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
@@ -132,7 +132,7 @@
       <AdditionalIncludeDirectories>..\librf;..\..\asio\asio\include;..\..\asio-1.10.6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/await</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
@@ -162,7 +162,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <StringPooling>true</StringPooling>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <SDLCheck>
