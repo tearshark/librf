@@ -18,7 +18,7 @@ future_t<> test_routine_use_timer()
 	{
 		co_await resumef::sleep_for(100ms);
 		std::cout << "timer after 100ms" << std::endl;
-		std::cout << "1:frame=" << _coro_frame_ptr() << ",promise=" << _coro_promise_ptr(void) << std::endl << std::endl;
+		std::cout << "1:frame=" << _coro_frame_ptr() << std::endl;
 	}
 }
 
@@ -27,11 +27,11 @@ future_t<> test_routine_use_timer_2()
 	std::cout << "test_routine_use_timer_2" << std::endl;
 
 	co_await test_routine_use_timer();
-	std::cout << "2:frame=" << _coro_frame_ptr() << ",promise=" << _coro_promise_ptr(void) << std::endl << std::endl;
+	std::cout << "2:frame=" << _coro_frame_ptr() << std::endl;
 	co_await test_routine_use_timer();
-	std::cout << "2:frame=" << _coro_frame_ptr() << ",promise=" << _coro_promise_ptr(void) << std::endl << std::endl;
+	std::cout << "2:frame=" << _coro_frame_ptr() << std::endl;
 	co_await test_routine_use_timer();
-	std::cout << "2:frame=" << _coro_frame_ptr() << ",promise=" << _coro_promise_ptr(void) << std::endl << std::endl;
+	std::cout << "2:frame=" << _coro_frame_ptr() << std::endl;
 }
 
 void resumable_main_routine()

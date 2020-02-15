@@ -9,6 +9,25 @@ namespace resumef
 	{
 	}
 
+	void state_base_t::resume()
+	{
+		coroutine_handle<> handler;
+
+		scoped_lock<lock_type> __guard(_mtx);
+		if (_initor != nullptr)
+		{
+			handler = _initor;
+			_initor = nullptr;
+			handler();
+		}
+		else if (_coro != nullptr)
+		{
+			handler = _coro;
+			_coro = nullptr;
+			handler();
+		}
+	}
+
 	void state_base_t::set_exception(std::exception_ptr e)
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);

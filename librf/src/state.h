@@ -38,30 +38,13 @@ namespace resumef
 
 		RF_API virtual ~state_base_t();
 		virtual bool has_value() const = 0;
+		void resume();
 
 		bool is_ready() const
 		{
 			return _is_awaitor == false || has_value() || _exception != nullptr;
 		}
 
-		void resume()
-		{
-			coroutine_handle<> handler;
-
-			scoped_lock<lock_type> __guard(_mtx);
-			if (_initor != nullptr)
-			{
-				handler = _initor;
-				_initor = nullptr;
-				handler();
-			}
-			else if(_coro != nullptr)
-			{
-				handler = _coro;
-				_coro = nullptr;
-				handler();
-			}
-		}
 		coroutine_handle<> get_handler() const
 		{
 			return _coro;
@@ -71,12 +54,15 @@ namespace resumef
 			return _initor != nullptr || _coro != nullptr;
 		}
 
+		scheduler_t* get_scheduler() const
+		{
+			return _parent ? _parent->get_scheduler() : _scheduler;
+		}
 		void set_scheduler(scheduler_t* sch)
 		{
 			scoped_lock<lock_type> __guard(_mtx);
 			_scheduler = sch;
 		}
-
 		void set_scheduler_handler(scheduler_t* sch, coroutine_handle<> handler)
 		{
 			scoped_lock<lock_type> __guard(_mtx);
@@ -86,25 +72,10 @@ namespace resumef
 			_coro = handler;
 		}
 
-		scheduler_t* get_scheduler() const
-		{
-			return _parent ? _parent->get_scheduler() : _scheduler;
-		}
-
 		state_base_t * get_parent() const
 		{
 			return _parent;
 		}
-/*
-		const state_base_t* root_state() const
-		{
-			return _parent ? _parent->root_state() : this;
-		}
-		state_base_t* root_state()
-		{
-			return _parent ? _parent->root_state() : this;
-		}
-*/
 
 		void set_exception(std::exception_ptr e);
 
