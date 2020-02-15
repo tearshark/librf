@@ -12,7 +12,7 @@ namespace resumef
 		using future_type = future_t<value_type>;
 		using lock_type = typename state_type::lock_type;
 
-		counted_ptr<state_type> _state = make_counted<state_type>();
+		counted_ptr<state_type> _state = make_counted<state_type>(false);
 
 		promise_impl_t() {}
 		promise_impl_t(promise_impl_t&& _Right) noexcept = default;

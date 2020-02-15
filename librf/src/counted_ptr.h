@@ -99,10 +99,10 @@ namespace resumef
 		T* _p = nullptr;
 	};
 
-	template <typename T>
-	counted_ptr<T> make_counted()
+	template <typename T, typename... Args>
+	counted_ptr<T> make_counted(Args&&... args)
 	{
-		return new T{};
+		return new T{std::forward<Args>(args)...};
 	}
 }
 

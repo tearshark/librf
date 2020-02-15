@@ -43,7 +43,7 @@ namespace asio {
 
 			template<typename Allocator>
 			promise_handler(const rf_task_t<Allocator> &)
-				: state_(resumef::make_counted<state_type>())
+				: state_(resumef::make_counted<state_type>(true))
 			{
 			}
 
@@ -76,7 +76,7 @@ namespace asio {
 
 			template<typename Allocator>
 			promise_handler(const rf_task_t<Allocator> &)
-				: state_(resumef::make_counted<state_type>())
+				: state_(resumef::make_counted<state_type>(true))
 			{
 			}
 

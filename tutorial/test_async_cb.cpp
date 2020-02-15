@@ -14,7 +14,7 @@ void callback_get_long(int64_t val, _Ctype&& cb)
 	std::thread([val, cb = std::forward<_Ctype>(cb)]
 		{
 			//std::this_thread::sleep_for(500ms);
-			std::this_thread::sleep_for(10s);
+			std::this_thread::sleep_for(2s);
 			cb(val * val);
 		}).detach();
 }
@@ -61,16 +61,13 @@ resumef::future_t<int64_t> loop_get_long(int64_t val)
 void resumable_main_cb()
 {
 	std::cout << std::this_thread::get_id() << std::endl;
-	go wait_get_long(3);
-	resumef::this_scheduler()->run_until_notask();
 
 	GO
 	{
 		auto val = co_await loop_get_long(2);
-		std::cout << val << std::endl;
+		std::cout << "GO:" << val << std::endl;
 	};
-	resumef::this_scheduler()->run_until_notask();
 
-	//go resumable_get_long(3);
+	go resumable_get_long(3);
 	resumef::this_scheduler()->run_until_notask();
 }

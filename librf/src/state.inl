@@ -3,6 +3,37 @@
 namespace resumef
 {
 	template<class _PromiseT, typename _Enable>
+	inline void state_base_t::promise_initial_suspend(coroutine_handle<_PromiseT> handler)
+	{
+		_PromiseT& promise = handler.promise();
+
+		state_base_t* parent_state = promise._state.get();
+		assert(this == parent_state);
+		assert(this->_scheduler == nullptr);
+		assert(this->_coro == nullptr);
+		this->_initor = handler;
+	}
+
+	inline void state_base_t::promise_await_resume()
+	{
+	}
+
+	template<class _PromiseT, typename _Enable>
+	inline void state_base_t::promise_final_suspend(coroutine_handle<_PromiseT> handler)
+	{
+		scoped_lock<lock_type> __guard(this->_mtx);
+
+		_PromiseT& promise = handler.promise();
+
+		state_base_t* parent_state = promise._state.get();
+		assert(this == parent_state);
+
+		scheduler_t* sch = this->get_scheduler();
+		assert(sch != nullptr);
+		sch->del_final(this);
+	}
+
+	template<class _PromiseT, typename _Enable>
 	inline void state_base_t::future_await_suspend(coroutine_handle<_PromiseT> handler)
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
@@ -10,9 +41,17 @@ namespace resumef
 		_PromiseT& promise = handler.promise();
 
 		state_base_t* parent_state = promise._state.get();
-		this->_parent = parent_state;
-		scheduler_t* sch = parent_state->_scheduler;
-		sch->add_await(this, handler);
+		scheduler_t* sch = parent_state->get_scheduler();
+		if (this != parent_state)
+		{
+			this->_parent = parent_state;
+			this->_scheduler = sch;
+		}
+
+		if (this->_coro == nullptr)
+			this->_coro = handler;
+		if (sch != nullptr)
+			sch->add_await(this);
 	}
 
 	template<typename _Ty>
@@ -30,8 +69,9 @@ namespace resumef
 		scoped_lock<lock_type> __guard(this->_mtx);
 
 		this->_value = std::move(val);
-		if (this->_scheduler != nullptr)
-			this->_scheduler->add_ready(this);
+		scheduler_t* sch = this->get_scheduler();
+		if (sch != nullptr)
+			sch->add_ready(this);
 	}
 }
 

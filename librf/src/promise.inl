@@ -7,18 +7,38 @@ namespace resumef
 {
 	struct suspend_on_initial
 	{
-		counted_ptr<state_base_t> _state;
+		state_base_t* _state;
 
 		inline bool await_ready() noexcept
 		{
 			return false;
 		}
-		inline void await_suspend(coroutine_handle<> handler) noexcept
+		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+		inline void await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 		{
-			_state->set_handler(handler);
+			_state->promise_initial_suspend(handler);
 		}
 		inline void await_resume() noexcept
 		{
+			_state->promise_await_resume();
+		}
+	};
+	struct suspend_on_final
+	{
+		state_base_t* _state;
+
+		inline bool await_ready() noexcept
+		{
+			return false;
+		}
+		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+		inline void await_suspend(coroutine_handle<_PromiseT> handler) noexcept
+		{
+			_state->promise_final_suspend(handler);
+		}
+		inline void await_resume() noexcept
+		{
+			_state->promise_await_resume();
 		}
 	};
 
@@ -31,8 +51,7 @@ namespace resumef
 	template <typename _Ty>
 	inline auto promise_impl_t<_Ty>::final_suspend() noexcept
 	{
-		_state->promise_final_suspend();
-		return std::experimental::suspend_never{};
+		return suspend_on_final{ _state.get() };
 	}
 
 	template <typename _Ty>

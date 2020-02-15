@@ -11,7 +11,7 @@ namespace resumef
 		using lock_type = typename state_type::lock_type;
 
 	private:
-		mutable counted_ptr<state_type> _state = make_counted<state_type>();
+		mutable counted_ptr<state_type> _state = make_counted<state_type>(true);
 	public:
 		awaitable_t() {}
 		awaitable_t(const awaitable_t&) = default;
@@ -46,7 +46,7 @@ namespace resumef
 		using future_type = future_t<void>;
 		using lock_type = typename state_type::lock_type;
 
-		mutable counted_ptr<state_type> _state = make_counted<state_type>();
+		mutable counted_ptr<state_type> _state = make_counted<state_type>(true);
 
 		awaitable_t() {}
 		awaitable_t(const awaitable_t&) = default;

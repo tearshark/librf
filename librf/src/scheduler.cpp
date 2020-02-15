@@ -6,6 +6,7 @@ std::mutex g_resumef_cout_mutex;
 std::atomic<intptr_t> g_resumef_state_count = 0;
 std::atomic<intptr_t> g_resumef_task_count = 0;
 std::atomic<intptr_t> g_resumef_evtctx_count = 0;
+std::atomic<intptr_t> g_resumef_state_id = 0;
 #endif
 
 namespace resumef
@@ -88,24 +89,21 @@ namespace resumef
 		}
 
 		//如果是单独的future，没有被co_await过，则handler是nullptr。
-		if (sptr->get_handler() != nullptr)
+		sptr->set_scheduler(this);
+		if (sptr->has_handler())
 			this->add_initial(sptr);
-		else
-			sptr->set_scheduler(this);
 	}
 
 	void scheduler_t::add_initial(state_base_t* sptr)
 	{
-		sptr->set_scheduler(this);
+		scoped_lock<spinlock, lock_type> __guard(_lock_ready, _lock_running);
 
-		scoped_lock<lock_type> __guard(_lock_running);
 		_runing_states.emplace_back(sptr);
+		_ready_task.try_emplace(sptr, nullptr);
 	}
 
-	void scheduler_t::add_await(state_base_t* sptr, coroutine_handle<> handler)
+	void scheduler_t::add_await(state_base_t* sptr)
 	{
-		sptr->set_scheduler(this);
-		sptr->set_handler(handler);
 		if (sptr->is_ready())
 		{
 			scoped_lock<lock_type> __guard(_lock_running);
@@ -116,16 +114,12 @@ namespace resumef
 	void scheduler_t::add_ready(state_base_t* sptr)
 	{
 		assert(sptr->get_scheduler() == this);
+		assert(sptr->is_ready());
 
-		if (sptr->get_handler() != nullptr)
+		if (sptr->has_handler())
 		{
 			scoped_lock<lock_type> __guard(_lock_running);
 			_runing_states.emplace_back(sptr);
-		}
-		else
-		{
-			scoped_lock<spinlock> __guard(_lock_ready);
-			this->_ready_task.erase(sptr);
 		}
 	}
 
@@ -133,8 +127,15 @@ namespace resumef
 	{
 		assert(sptr->get_scheduler() == this);
 
-		scoped_lock<spinlock> __guard(_lock_ready);
-		this->_ready_task.erase(sptr);
+		{
+			scoped_lock<spinlock> __guard(_lock_ready);
+			this->_ready_task.erase(sptr);
+		}
+		if (sptr->has_handler())
+		{
+			scoped_lock<lock_type> __guard(_lock_running);
+			_runing_states.emplace_back(sptr);
+		}
 	}
 
 /*

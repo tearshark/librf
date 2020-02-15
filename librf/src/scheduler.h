@@ -56,8 +56,8 @@ namespace resumef
 
 		inline bool empty() const
 		{
-			scoped_lock<spinlock> __guard(_lock_ready);
-			return this->_ready_task.empty() && this->_timer->empty();
+			scoped_lock<spinlock, lock_type> __guard(_lock_ready, _lock_running);
+			return _ready_task.empty() && _runing_states.empty() && _timer->empty();
 		}
 
 		inline timer_manager * timer() const
@@ -66,7 +66,7 @@ namespace resumef
 		}
 
 		void add_initial(state_base_t* sptr);
-		void add_await(state_base_t* sptr, coroutine_handle<> handler);
+		void add_await(state_base_t* sptr);
 		void add_ready(state_base_t* sptr);
 		void del_final(state_base_t* sptr);
 
