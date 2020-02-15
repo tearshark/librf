@@ -128,7 +128,8 @@ namespace resumef
 
 	template<class _Ty = void>
 	struct future_t;
-	using future_vt = future_t<>;
+	
+	using future_vt [[deprecated]] = future_t<>;
 
 	template<class _Ty = void>
 	struct promise_t;

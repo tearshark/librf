@@ -13,7 +13,7 @@ using namespace resumef;
 mutex_t g_lock;
 std::deque<size_t> g_queue;
 
-future_vt test_mutex_pop(size_t idx)
+future_t<> test_mutex_pop(size_t idx)
 {
 	using namespace std::chrono;
 
@@ -32,7 +32,7 @@ future_vt test_mutex_pop(size_t idx)
 	}
 }
 
-future_vt test_mutex_push()
+future_t<> test_mutex_push()
 {
 	using namespace std::chrono;
 

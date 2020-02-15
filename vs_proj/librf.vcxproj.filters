@@ -172,7 +172,7 @@
       <Filter>librf\src</Filter>
     </ClInclude>
     <ClInclude Include="..\librf\src\awaitable.h">
-      <Filter>librf</Filter>
+      <Filter>librf\src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

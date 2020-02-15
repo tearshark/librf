@@ -9,45 +9,44 @@
 
 using namespace resumef;
 
-template<size_t _N>
-future_vt test_loop_sleep()
+future_t<> test_loop_sleep(size_t _N, char * ch)
 {
 	using namespace std::chrono;
 
 	for (size_t i = 0; i < _N; ++i)
 	{
 		co_await resumef::sleep_for(100ms);
-		std::cout << ".";
+		std::cout << ch;
 	}
 	std::cout << std::endl;
 }
 
-future_vt test_recursive_await()
+future_t<> test_recursive_await()
 {
-	std::cout << "---1" << std::endl;
-	co_await test_loop_sleep<5>();
+	std::cout << "A:---1" << std::endl;
+	co_await test_loop_sleep(5, "=");
 
-	std::cout << "---2" << std::endl;
-	co_await test_loop_sleep<6>();
+	std::cout << "A:---2" << std::endl;
+	co_await test_loop_sleep(6, "=");
 
-	std::cout << "---3" << std::endl;
-	co_await test_loop_sleep<7>();
+	std::cout << "A:---3" << std::endl;
+	co_await test_loop_sleep(7, "=");
 
-	std::cout << "---4" << std::endl;
+	std::cout << "A:---4" << std::endl;
 }
 
-future_vt test_recursive_go()
+future_t<> test_recursive_go()
 {
-	std::cout << "---1" << std::endl;
-	co_await test_loop_sleep<3>();
+	std::cout << "B:---1" << std::endl;
+	co_await test_loop_sleep(3, "+");
 
-	std::cout << "---2" << std::endl;
-	go test_loop_sleep<5>();
+	std::cout << "B:---2" << std::endl;
+	go test_loop_sleep(8, "*");
 
-	std::cout << "---3" << std::endl;
-	co_await test_loop_sleep<4>();
+	std::cout << "B:---3" << std::endl;
+	co_await test_loop_sleep(4, "+");
 
-	std::cout << "---4" << std::endl;
+	std::cout << "B:---4" << std::endl;
 }
 
 void resumable_main_suspend_always()

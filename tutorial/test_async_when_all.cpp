@@ -29,13 +29,13 @@ void test_when_any()
 
 				return dt;
 			}(),
-			[]() ->future_vt
+			[]() ->future_t<>
 			{
 				auto dt = rand() % 1000;
 				co_await sleep_for(1ms * dt);
 				std::cout << dt << "@b" << std::endl;
 			}(),
-			[]() ->future_vt
+			[]() ->future_t<>
 			{
 				auto dt = rand() % 1000;
 				co_await sleep_for(1ms * dt);
@@ -79,7 +79,7 @@ void test_when_all()
 		return dt;
 	};
 
-	auto my_sleep_v = [](const char * name) -> future_vt
+	auto my_sleep_v = [](const char * name) -> future_t<>
 	{
 		auto dt = rand() % 1000;
 		co_await sleep_for(1ms * dt);

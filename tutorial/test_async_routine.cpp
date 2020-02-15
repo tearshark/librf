@@ -9,7 +9,7 @@
 
 using namespace resumef;
 
-future_vt test_routine_use_timer()
+future_t<> test_routine_use_timer()
 {
 	using namespace std::chrono;
 	std::cout << "test_routine_use_timer" << std::endl;
@@ -22,7 +22,7 @@ future_vt test_routine_use_timer()
 	}
 }
 
-future_vt test_routine_use_timer_2()
+future_t<> test_routine_use_timer_2()
 {
 	std::cout << "test_routine_use_timer_2" << std::endl;
 

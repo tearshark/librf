@@ -13,8 +13,7 @@ void callback_get_long(int64_t val, _Ctype&& cb)
 	using namespace std::chrono;
 	std::thread([val, cb = std::forward<_Ctype>(cb)]
 		{
-			//std::this_thread::sleep_for(500ms);
-			std::this_thread::sleep_for(2s);
+			std::this_thread::sleep_for(500ms);
 			cb(val * val);
 		}).detach();
 }

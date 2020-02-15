@@ -26,7 +26,7 @@ auto async_heavy_computing_tasks(int64_t val)
 	return awaitable.get_future();
 }
 
-future_vt heavy_computing_sequential(int64_t val)
+future_t<> heavy_computing_sequential(int64_t val)
 {
 	for(size_t i = 0; i < 3; ++i)
 	{

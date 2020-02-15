@@ -29,6 +29,8 @@ extern void resumable_main_benchmark_asio_client(intptr_t nNum);
 int main(int argc, const char* argv[])
 {
 	resumable_main_cb();
+	resumable_main_suspend_always();
+	//resumable_main_exception();
 
 /*
 	resumable_main_resumable();
@@ -42,7 +44,6 @@ int main(int argc, const char* argv[])
 	resumable_main_multi_thread();
 	resumable_main_yield_return();
 	resumable_main_timer();
-	resumable_main_suspend_always();
 	resumable_main_sleep();
 	resumable_main_routine();
 	resumable_main_resumable();
@@ -52,7 +53,6 @@ int main(int argc, const char* argv[])
 	resumable_main_dynamic_go();
 	resumable_main_channel();
 	resumable_main_cb();
-	resumable_main_exception();
 */
 
 	return 0;

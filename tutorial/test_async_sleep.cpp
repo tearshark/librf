@@ -9,7 +9,7 @@
 
 using namespace resumef;
 
-future_vt test_sleep_use_timer()
+future_t<> test_sleep_use_timer()
 {
 	using namespace std::chrono;
 
@@ -37,7 +37,7 @@ void test_wait_all_events_with_signal_by_sleep()
 
 	event_t evts[8];
 
-	go[&]() -> future_vt
+	go[&]() -> future_t<>
 	{
 		if (co_await event_t::wait_all(evts))
 			std::cout << "all event signal!" << std::endl;
@@ -48,7 +48,7 @@ void test_wait_all_events_with_signal_by_sleep()
 	srand((int)time(nullptr));
 	for (size_t i = 0; i < _countof(evts); ++i)
 	{
-		go[&, i]() -> future_vt
+		go[&, i]() -> future_t<>
 		{
 			co_await resumef::sleep_for(1ms * (500 + rand() % 1000));
 			evts[i].signal();

@@ -12,9 +12,9 @@ using namespace resumef;
 //请打开结构化异常(/EHa)
 auto async_signal_exception(const intptr_t dividend)
 {
-	promise_t<int64_t> awaitable;
+	awaitable_t<int64_t> awaitable;
 
-	std::thread([dividend, st = awaitable._state]
+	std::thread([dividend, awaitable]
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		try
@@ -22,11 +22,11 @@ auto async_signal_exception(const intptr_t dividend)
 			//也可以注释掉这个判断，使用结构化异常。但就获得不了具体描述信息了
 			if (dividend == 0)
 				throw std::logic_error("divided by zero");
-			st->set_value(10000 / dividend);
+			awaitable.set_value(10000 / dividend);
 		}
 		catch (...)
 		{
-			st->set_exception(std::current_exception());
+			awaitable.set_exception(std::current_exception());
 		}
 	}).detach();
 
@@ -35,15 +35,15 @@ auto async_signal_exception(const intptr_t dividend)
 
 auto async_signal_exception2(const intptr_t dividend)
 {
-	promise_t<int64_t> awaitable;
+	awaitable_t<int64_t> awaitable;
 
-	std::thread([dividend, st = awaitable._state]
+	std::thread([dividend, awaitable]
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		if (dividend == 0)
-			st->throw_exception(std::logic_error("divided by zero"));
+			awaitable.throw_exception(std::logic_error("divided by zero"));
 		else
-			st->set_value(10000 / dividend);
+			awaitable.set_value(10000 / dividend);
 	}).detach();
 
 	return awaitable.get_future();
