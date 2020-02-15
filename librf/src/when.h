@@ -109,7 +109,7 @@ namespace resumef
 			when_all_functor & operator = (const when_all_functor &) = default;
 			when_all_functor & operator = (when_all_functor &&) = default;
 
-			inline future_vt operator ()() const
+			inline future_t<> operator ()() const
 			{
 				_val.get() = co_await _f;
 				_e->signal();
@@ -117,10 +117,10 @@ namespace resumef
 		};
 
 		template<class _Ty>
-		struct when_all_functor<future_vt, _Ty>
+		struct when_all_functor<future_t<>, _Ty>
 		{
 			using value_type = _Ty;
-			using future_type = future_vt;
+			using future_type = future_t<>;
 
 			when_impl_ptr _e;
 			mutable future_type _f;
@@ -135,7 +135,7 @@ namespace resumef
 			when_all_functor & operator = (const when_all_functor &) = default;
 			when_all_functor & operator = (when_all_functor &&) = default;
 
-			inline future_vt operator ()() const
+			inline future_t<> operator ()() const
 			{
 				co_await _f;
 				_val.get() = std::ignore;
@@ -144,12 +144,12 @@ namespace resumef
 		};
 
 		template<class _Tup, size_t _Idx>
-		inline void when_all_one__(scheduler & , const when_impl_ptr & , _Tup & )
+		inline void when_all_one__(scheduler_t & , const when_impl_ptr & , _Tup & )
 		{
 		}
 
 		template<class _Tup, size_t _Idx, class _Fty, class... _Rest>
-		inline void when_all_one__(scheduler & s, const when_impl_ptr & e, _Tup & t, _Fty f, _Rest&&... rest)
+		inline void when_all_one__(scheduler_t& s, const when_impl_ptr & e, _Tup & t, _Fty f, _Rest&&... rest)
 		{
 			s + when_all_functor<_Fty, std::tuple_element_t<_Idx, _Tup> >{e, std::move(f), std::get<_Idx>(t)};
 
@@ -157,7 +157,7 @@ namespace resumef
 		}
 
 		template<class _Val, class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-		inline void when_all_range__(scheduler & s, const when_impl_ptr & e, std::vector<_Val> & t, _Iter begin, _Iter end)
+		inline void when_all_range__(scheduler_t& s, const when_impl_ptr & e, std::vector<_Val> & t, _Iter begin, _Iter end)
 		{
 			using future_type = std::remove_reference_t<_Fty>;
 
@@ -169,7 +169,7 @@ namespace resumef
 
 
 		template<class _Tup, class... _Fty>
-		future_t<_Tup> when_all_count(size_t count, const std::shared_ptr<_Tup> & vals, scheduler & s, _Fty&&... f)
+		future_t<_Tup> when_all_count(size_t count, const std::shared_ptr<_Tup> & vals, scheduler_t & s, _Fty&&... f)
 		{
 			promise_t<_Tup> awaitable;
 
@@ -191,7 +191,7 @@ namespace resumef
 		}
 
 		template<class _Tup, class _Iter>
-		future_t<_Tup> when_all_range(size_t count, const std::shared_ptr<_Tup> & vals, scheduler & s, _Iter begin, _Iter end)
+		future_t<_Tup> when_all_range(size_t count, const std::shared_ptr<_Tup> & vals, scheduler_t& s, _Iter begin, _Iter end)
 		{
 			promise_t<_Tup> awaitable;
 
@@ -238,7 +238,7 @@ namespace resumef
 			when_any_functor & operator = (const when_any_functor &) = default;
 			when_any_functor & operator = (when_any_functor &&) = default;
 
-			inline future_vt operator ()() const
+			inline future_t<> operator ()() const
 			{
 				if (_val->first < 0)
 				{
@@ -258,10 +258,10 @@ namespace resumef
 		};
 
 		template<>
-		struct when_any_functor<future_vt>
+		struct when_any_functor<future_t<>>
 		{
 			using value_type = when_any_pair;
-			using future_type = future_vt;
+			using future_type = future_t<>;
 
 			when_impl_ptr _e;
 			mutable future_type _f;
@@ -280,7 +280,7 @@ namespace resumef
 			when_any_functor & operator = (const when_any_functor &) = default;
 			when_any_functor & operator = (when_any_functor &&) = default;
 
-			inline future_vt operator ()() const
+			inline future_t<> operator ()() const
 			{
 				if (_val->first < 0)
 				{
@@ -299,12 +299,12 @@ namespace resumef
 		};
 
 		template<intptr_t _Idx>
-		inline void when_any_one__(scheduler & , const when_impl_ptr & , const when_any_result_ptr & )
+		inline void when_any_one__(scheduler_t & , const when_impl_ptr & , const when_any_result_ptr & )
 		{
 		}
 
 		template<intptr_t _Idx, class _Fty, class... _Rest>
-		inline void when_any_one__(scheduler & s, const when_impl_ptr & e, const when_any_result_ptr & t, _Fty f, _Rest&&... rest)
+		inline void when_any_one__(scheduler_t & s, const when_impl_ptr & e, const when_any_result_ptr & t, _Fty f, _Rest&&... rest)
 		{
 			s + when_any_functor<_Fty>{e, std::move(f), t, _Idx};
 
@@ -312,7 +312,7 @@ namespace resumef
 		}
 
 		template<class... _Fty>
-		future_t<when_any_pair> when_any_count(size_t count, const when_any_result_ptr & val_ptr, scheduler & s, _Fty&&... f)
+		future_t<when_any_pair> when_any_count(size_t count, const when_any_result_ptr & val_ptr, scheduler_t & s, _Fty&&... f)
 		{
 			promise_t<when_any_pair> awaitable;
 
@@ -335,7 +335,7 @@ namespace resumef
 	
 
 		template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-		inline void when_any_range__(scheduler & s, const when_impl_ptr & e, const when_any_result_ptr & t, _Iter begin, _Iter end)
+		inline void when_any_range__(scheduler_t & s, const when_impl_ptr & e, const when_any_result_ptr & t, _Iter begin, _Iter end)
 		{
 			using future_type = std::remove_reference_t<_Fty>;
 
@@ -345,7 +345,7 @@ namespace resumef
 		}
 
 		template<class _Iter>
-		future_t<when_any_pair> when_any_range(size_t count, const when_any_result_ptr & val_ptr, scheduler & s, _Iter begin, _Iter end)
+		future_t<when_any_pair> when_any_range(size_t count, const when_any_result_ptr & val_ptr, scheduler_t & s, _Iter begin, _Iter end)
 		{
 			promise_t<when_any_pair> awaitable;
 
@@ -368,7 +368,7 @@ namespace resumef
 	}
 
 	template<class... _Fty>
-	auto when_all(scheduler & s, _Fty&&... f) -> future_t<std::tuple<detail::remove_future_vt<_Fty>...> >
+	auto when_all(scheduler_t & s, _Fty&&... f) -> future_t<std::tuple<detail::remove_future_vt<_Fty>...> >
 	{
 		using tuple_type = std::tuple<detail::remove_future_vt<_Fty>...>;
 		auto vals = std::make_shared<tuple_type>();
@@ -381,7 +381,7 @@ namespace resumef
 		return when_all(*this_scheduler(), std::forward<_Fty>(f)...);
 	}
 	template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-	auto when_all(scheduler & s, _Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_vt<_Fty> > >
+	auto when_all(scheduler_t & s, _Iter begin, _Iter end) -> future_t<std::vector<detail::remove_future_vt<_Fty> > >
 	{
 		using value_type = detail::remove_future_vt<_Fty>;
 		using vector_type = std::vector<value_type>;
@@ -399,7 +399,7 @@ namespace resumef
 
 
 	template<class... _Fty>
-	auto when_any(scheduler & s, _Fty&&... f) -> future_t<detail::when_any_pair>
+	auto when_any(scheduler_t & s, _Fty&&... f) -> future_t<detail::when_any_pair>
 	{
 		auto vals = std::make_shared<detail::when_any_pair>(-1, any_t{});
 
@@ -411,7 +411,7 @@ namespace resumef
 		return when_any(*this_scheduler(), std::forward<_Fty>(f)...);
 	}
 	template<class _Iter, typename _Fty = decltype(*std::declval<_Iter>())>
-	auto when_any(scheduler & s, _Iter begin, _Iter end) -> future_t<detail::when_any_pair>
+	auto when_any(scheduler_t & s, _Iter begin, _Iter end) -> future_t<detail::when_any_pair>
 	{
 		auto vals = std::make_shared<detail::when_any_pair>(-1, any_t{});
 

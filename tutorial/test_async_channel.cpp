@@ -13,7 +13,7 @@ using namespace resumef;
 
 const size_t MAX_CHANNEL_QUEUE = 5;		//0, 1, 5, 10, -1
 
-future_vt test_channel_read(const channel_t<std::string> & c)
+future_t<> test_channel_read(const channel_t<std::string> & c)
 {
 	using namespace std::chrono;
 
@@ -41,7 +41,7 @@ future_vt test_channel_read(const channel_t<std::string> & c)
 	}
 }
 
-future_vt test_channel_write(const channel_t<std::string> & c)
+future_t<> test_channel_write(const channel_t<std::string> & c)
 {
 	using namespace std::chrono;
 

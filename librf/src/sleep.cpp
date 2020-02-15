@@ -4,7 +4,7 @@
 
 namespace resumef
 {
-	future_vt sleep_until_(const std::chrono::system_clock::time_point& tp_, scheduler & scheduler_)
+	future_t<> sleep_until_(const std::chrono::system_clock::time_point& tp_, scheduler_t& scheduler_)
 	{
 		promise_vt awaitable;
 

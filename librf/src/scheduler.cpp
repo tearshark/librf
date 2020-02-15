@@ -10,7 +10,6 @@ std::atomic<intptr_t> g_resumef_evtctx_count = 0;
 
 namespace resumef
 {
-
 	static const char * future_error_string[(size_t)error_code::max__]
 	{
 		"none",
@@ -34,12 +33,12 @@ namespace resumef
 	}
 
 #if RESUMEF_ENABLE_MULT_SCHEDULER
-	thread_local scheduler * th_scheduler_ptr = nullptr;
+	thread_local scheduler_t * th_scheduler_ptr = nullptr;
 
 	//获得当前线程下的调度器
-	scheduler * this_scheduler()
+	scheduler_t * this_scheduler()
 	{
-		return th_scheduler_ptr ? th_scheduler_ptr : &scheduler::g_scheduler;
+		return th_scheduler_ptr ? th_scheduler_ptr : &scheduler_t::g_scheduler;
 	}
 #endif
 
@@ -48,7 +47,7 @@ namespace resumef
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (th_scheduler_ptr == nullptr)
 		{
-			_scheduler_ptr = new scheduler;
+			_scheduler_ptr = new scheduler_t;
 			th_scheduler_ptr = _scheduler_ptr;
 		}
 #endif
@@ -63,14 +62,14 @@ namespace resumef
 #endif
 	}
 
-	scheduler::scheduler()
+	scheduler_t::scheduler_t()
 		: _task()
 		, _ready_task()
 		, _timer(std::make_shared<timer_manager>())
 	{
 	}
 
-	scheduler::~scheduler()
+	scheduler_t::~scheduler_t()
 	{
 		cancel_all_task_();
 #if RESUMEF_ENABLE_MULT_SCHEDULER
@@ -79,19 +78,18 @@ namespace resumef
 #endif
 	}
 
-	void scheduler::new_task(task_base * task)
+	void scheduler_t::new_task(task_base_t * task)
 	{
 		if (task)
 		{
 			scoped_lock<spinlock> __guard(_mtx_ready);
-#if RESUMEF_ENABLE_MULT_SCHEDULER
-			task->bind(this);
-#endif
+
 			this->_ready_task.push_back(task);
+			this->add_initial(task->get_state());
 		}
 	}
 
-	void scheduler::cancel_all_task_()
+	void scheduler_t::cancel_all_task_()
 	{
 		{
 			scoped_lock<lock_type> __guard(_mtx_task);
@@ -103,7 +101,7 @@ namespace resumef
 		}
 	}
 
-	void scheduler::break_all()
+	void scheduler_t::break_all()
 	{
 		cancel_all_task_();
 
@@ -111,7 +109,7 @@ namespace resumef
 		this->_timer->clear();
 	}
 
-	void scheduler::run_one_batch()
+	void scheduler_t::run_one_batch()
 	{
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (th_scheduler_ptr == nullptr)
@@ -122,42 +120,23 @@ namespace resumef
 
 			this->_timer->update();
 
-			using namespace std::chrono;
-
-			for (auto task = this->_task.begin(); task != nullptr; )
-			{
-#if _DEBUG
-#define MAX_TIME_COST 10000us
-#else
-#define MAX_TIME_COST 1000us
-#endif
-//				time_cost_evaluation<microseconds> eva(MAX_TIME_COST);
-
-				if (task->is_suspend() || task->go_next(this))
-				{
-//					eva.add("coscheduler");
-					task = task->_next_node;
-					continue;
-				}
-
-				task = this->_task.erase(task, false);
-			}
-
-			{
-				scoped_lock<spinlock> __guard(_mtx_ready);
-				if (!this->_ready_task.empty())
-				{
-					this->_task.merge_back(this->_ready_task);
-				}
-			}
+			state_vector states = std::move(_runing_states);
+			for (state_sptr& sptr : states)
+				sptr->resume();
 		}
 	}
 
-	void scheduler::run_until_notask()
+	void scheduler_t::run_until_notask()
 	{
 		while (!this->empty())
 			this->run_one_batch();
 	}
 
-	scheduler scheduler::g_scheduler;
+	void scheduler_t::run()
+	{
+		for (;;)
+			this->run_one_batch();
+	}
+
+	scheduler_t scheduler_t::g_scheduler;
 }

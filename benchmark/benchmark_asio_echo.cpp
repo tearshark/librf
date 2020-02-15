@@ -41,7 +41,7 @@ union uarray
 
 std::atomic<intptr_t> g_echo_count = 0;
 
-future_vt RunEchoSession(tcp::socket socket)
+future_t<> RunEchoSession(tcp::socket socket)
 {
 	std::size_t bytes_transferred = 0;
 	std::array<char, BUF_SIZE> buffer;
@@ -73,7 +73,7 @@ void AcceptConnections(tcp::acceptor & acceptor, uarray<tcp::socket, _N> & socke
 	{
 		for (size_t idx = 0; idx < socketes.c.size(); ++idx)
 		{
-			go[&, idx]() -> future_vt
+			go[&, idx]() -> future_t<>
 			{
 				for (;;)
 				{
@@ -147,7 +147,7 @@ void resumable_main_benchmark_asio_server()
 
 //----------------------------------------------------------------------------------------------------------------------
 
-future_vt RunPipelineEchoClient(asio::io_service & ios, tcp::resolver::iterator ep)
+future_t<> RunPipelineEchoClient(asio::io_service & ios, tcp::resolver::iterator ep)
 {
 	std::shared_ptr<tcp::socket> sptr = std::make_shared<tcp::socket>(ios);
 
@@ -198,7 +198,7 @@ future_vt RunPipelineEchoClient(asio::io_service & ios, tcp::resolver::iterator 
 
 #if _HAS_CXX17
 
-future_vt RunPingPongEchoClient(asio::io_service & ios, tcp::resolver::iterator ep)
+future_t<> RunPingPongEchoClient(asio::io_service & ios, tcp::resolver::iterator ep)
 {
 	tcp::socket socket_{ ios };
 

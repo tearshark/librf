@@ -18,7 +18,7 @@ std::atomic<intptr_t> gcounter = 0;
 
 #define OUTPUT_DEBUG	0
 
-future_vt test_channel_consumer(const channel_t<std::string> & c, size_t cnt)
+future_t<> test_channel_consumer(const channel_t<std::string> & c, size_t cnt)
 {
 	for (size_t i = 0; i < cnt; ++i)
 	{
@@ -46,7 +46,7 @@ future_vt test_channel_consumer(const channel_t<std::string> & c, size_t cnt)
 	}
 }
 
-future_vt test_channel_producer(const channel_t<std::string> & c, size_t cnt)
+future_t<> test_channel_producer(const channel_t<std::string> & c, size_t cnt)
 {
 	for (size_t i = 0; i < cnt; ++i)
 	{
@@ -96,7 +96,7 @@ void resumable_main_channel_mult_thread()
 	
 #if !RESUMEF_ENABLE_MULT_SCHEDULER
 	std::this_thread::sleep_for(100ms);
-	scheduler::g_scheduler.run_until_notask();
+	scheduler_t::g_scheduler.run_until_notask();
 #endif
 	for(auto & th : read_th)
 		th.join();

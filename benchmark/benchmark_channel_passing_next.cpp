@@ -15,7 +15,7 @@ using namespace std::literals;
 const static auto MaxNum = 20000;
 using int_channel_ptr = std::shared_ptr<channel_t<intptr_t>>;
 
-static future_vt passing_next(int_channel_ptr rd, int_channel_ptr wr)
+static future_t<> passing_next(int_channel_ptr rd, int_channel_ptr wr)
 {
 	for (;;)
 	{

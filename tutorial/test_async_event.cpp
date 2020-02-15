@@ -20,7 +20,7 @@ std::thread async_set_event(const event_t & e, std::chrono::milliseconds dt)
 }
 
 
-future_vt resumable_wait_event(const event_t & e)
+future_t<> resumable_wait_event(const event_t & e)
 {
 	using namespace std::chrono;
 
@@ -44,12 +44,12 @@ void test_wait_one()
 	}
 	{
 		event_t evt2(1);
-		go[&]() -> future_vt
+		go[&]() -> future_t<>
 		{
 			(void)co_await evt2.wait();
 			std::cout << "event signal on 1!" << std::endl;
 		};
-		go[&]() -> future_vt
+		go[&]() -> future_t<>
 		{
 			(void)co_await evt2.wait();
 			std::cout << "event signal on 2!" << std::endl;
@@ -69,7 +69,7 @@ void test_wait_any()
 
 	event_t evts[8];
 
-	go[&]() -> future_vt
+	go[&]() -> future_t<>
 	{
 		for (int i = 0; i < _countof(evts); ++i)
 		{
@@ -98,7 +98,7 @@ void test_wait_all()
 
 	event_t evts[8];
 
-	go[&]() -> future_vt
+	go[&]() -> future_t<>
 	{
 		if (co_await event_t::wait_all(evts))
 			std::cout << "all event signal!" << std::endl;
@@ -126,7 +126,7 @@ void test_wait_all_timeout()
 
 	event_t evts[8];
 
-	go[&]() -> future_vt
+	go[&]() -> future_t<>
 	{
 		if (co_await event_t::wait_all_for(1000ms, evts))
 			std::cout << "all event signal!" << std::endl;

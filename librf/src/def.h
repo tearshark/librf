@@ -15,6 +15,7 @@
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
+#include <optional>
 
 #include <assert.h>
 
@@ -66,22 +67,6 @@ namespace resumef
 	template<typename _PromiseT = void>
 	using coroutine_handle = std::experimental::coroutine_handle<_PromiseT>;
 
-	template<typename _PromiseT = void>
-	inline void * _coro_function_ptr(coroutine_handle<> coro)
-	{
-		auto frame_prefix = (coroutine_handle<void>::_Resumable_frame_prefix*)coro.address();
-		return reinterpret_cast<void *>(frame_prefix->_Fn);
-	}
-
-	template<typename _PromiseT>
-	inline _PromiseT * _coro_promise_ptr__(void * _Ptr)
-	{
-		using coroutine_instance = coroutine_handle<_PromiseT>;
-		return reinterpret_cast<_PromiseT *>(reinterpret_cast<char *>(_Ptr) - coroutine_instance::_ALIGNED_SIZE);
-	}
-
-#define _coro_promise_ptr(T) _coro_promise_ptr__<resumef::promise_t<T> >(_coro_frame_ptr())
-
 	enum struct error_code
 	{
 		none,
@@ -95,7 +80,6 @@ namespace resumef
 	};
 
 	const char * get_error_string(error_code fe, const char * classname);
-	//const char * future_error_string[size_t(future_error::max__)];
 
 	struct future_exception : std::exception
 	{
@@ -137,11 +121,36 @@ namespace resumef
 		}
 	};
 
-	struct scheduler;
-	struct state_base;
+	struct scheduler_t;
+
+	struct state_base_t;
+
+	template<class _Ty = void>
+	struct future_t;
+	using future_vt = future_t<>;
+
+	template<class _Ty = void>
+	struct promise_t;
+
+	template<class _Ty = void>
+	struct awaitable_t;
+
+	template<class _PromiseT>
+	struct is_promise : std::false_type {};
+	template<class _Ty>
+	struct is_promise<promise_t<_Ty>> : std::true_type {};
+	template<class _Ty>
+	_INLINE_VAR constexpr bool is_promise_v = is_promise<std::remove_cvref_t<_Ty>>::value;
+
+	template<class _PromiseT>
+	struct is_future : std::false_type {};
+	template<class _Ty>
+	struct is_future<future_t<_Ty>> : std::true_type {};
+	template<class _Ty>
+	_INLINE_VAR constexpr bool is_future_v = is_future<std::remove_cvref_t<_Ty>>::value;
 
 	//获得当前线程下的调度器
-	scheduler * this_scheduler();
+	scheduler_t* this_scheduler();
 }
 
 #define co_yield_void co_yield nullptr

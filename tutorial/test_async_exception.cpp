@@ -49,7 +49,7 @@ auto async_signal_exception2(const intptr_t dividend)
 	return awaitable.get_future();
 }
 
-future_vt test_signal_exception()
+future_t<> test_signal_exception()
 {
 	for (intptr_t i = 10; i >= 0; --i)
 	{
@@ -69,7 +69,7 @@ future_vt test_signal_exception()
 	}
 }
 
-future_vt test_bomb_exception()
+future_t<> test_bomb_exception()
 {
 	for (intptr_t i = 10; i >= 0; --i)
 	{

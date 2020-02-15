@@ -4,7 +4,7 @@ namespace resumef
 {
 	struct task_list
 	{
-		using value_type = task_base;
+		using value_type = task_base_t;
 		using size_type = std::size_t;
 		using difference_type = std::ptrdiff_t;
 		using pointer = value_type *;
@@ -63,8 +63,8 @@ namespace resumef
 				pointer temp = header;
 				header = header->_next_node;
 
-				if (cancel_)
-					temp->cancel();
+				//if (cancel_)
+				//	temp->cancel();
 				delete temp;
 			}
 		}
@@ -93,8 +93,8 @@ namespace resumef
 			if (_M_last == node)
 				_M_last = prev;
 
-			if (cancel_)
-				node->cancel();
+			//if (cancel_)
+			//	node->cancel();
 			delete node;
 
 			return next;

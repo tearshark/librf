@@ -132,9 +132,6 @@
     <ClInclude Include="..\librf\src\future.h">
       <Filter>librf\src</Filter>
     </ClInclude>
-    <ClInclude Include="..\librf\src\generator.h">
-      <Filter>librf\src</Filter>
-    </ClInclude>
     <ClInclude Include="..\librf\src\mutex.h">
       <Filter>librf\src</Filter>
     </ClInclude>
@@ -171,12 +168,21 @@
     <ClInclude Include="..\librf\src\task_list.h">
       <Filter>librf\src</Filter>
     </ClInclude>
+    <ClInclude Include="..\librf\src\promise.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\awaitable.h">
+      <Filter>librf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\librf\src\asio_task_1.12.0.inl">
       <Filter>librf\src</Filter>
     </None>
     <None Include="..\librf\src\asio_task_1.10.0.inl">
+      <Filter>librf\src</Filter>
+    </None>
+    <None Include="..\librf\src\promise.inl">
       <Filter>librf\src</Filter>
     </None>
   </ItemGroup>

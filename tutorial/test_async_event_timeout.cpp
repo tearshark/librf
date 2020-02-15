@@ -9,7 +9,7 @@
 
 using namespace resumef;
 
-future_vt resumalbe_set_event(const event_t & e, std::chrono::milliseconds dt)
+future_t<> resumalbe_set_event(const event_t & e, std::chrono::milliseconds dt)
 {
 	co_await resumef::sleep_for(dt);
 	e.signal();
@@ -32,7 +32,7 @@ void test_wait_timeout_one()
 
 	event_t evt;
 
-	go [&evt]() -> future_vt
+	go [&evt]() -> future_t<>
 	{
 		intptr_t counter = 0;
 		for (;;)
@@ -59,7 +59,7 @@ void test_wait_timeout_any_invalid()
 	event_t evts[8];
 
 	//无效的等待
-	go[&]()-> future_vt
+	go[&]()-> future_t<>
 	{
 		intptr_t idx = co_await event_t::wait_any_for(500ms, std::begin(evts), std::end(evts));
 		assert(idx < 0);
@@ -77,7 +77,7 @@ void test_wait_timeout_any()
 
 	event_t evts[8];
 
-	go[&]() -> future_vt
+	go[&]() -> future_t<>
 	{
 		intptr_t counter = 0;
 		for (;;)
@@ -116,7 +116,7 @@ void test_wait_timeout_all_invalid()
 	event_t evts[8];
 
 	//无效的等待
-	go[&]()-> future_vt
+	go[&]()-> future_t<>
 	{
 		bool result = co_await event_t::wait_all_for(500ms, std::begin(evts), std::end(evts));
 		assert(!result);
@@ -134,7 +134,7 @@ void test_wait_timeout_all()
 
 	event_t evts[8];
 
-	go[&]() -> future_vt
+	go[&]() -> future_t<>
 	{
 		intptr_t counter = 0;
 		for (;;)

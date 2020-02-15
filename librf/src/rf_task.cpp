@@ -5,20 +5,13 @@
 
 namespace resumef
 {
-	task_base::task_base()
+	task_base_t::task_base_t()
 		: _next_node(nullptr)
 		, _prev_node(nullptr)
 	{
-#if RESUMEF_DEBUG_COUNTER
-		++g_resumef_task_count;
-#endif
 	}
 
-	task_base::~task_base()
+	task_base_t::~task_base_t()
 	{
-#if RESUMEF_DEBUG_COUNTER
-		--g_resumef_task_count;
-#endif
 	}
-
 }
