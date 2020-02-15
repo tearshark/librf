@@ -310,6 +310,12 @@ namespace resumef
 
 		//以上是与编译器生成的resumable function交互的接口
 		//------------------------------------------------------------------------------------------
+
+		//兼容std::promise<>用法
+		void set_value()
+		{
+			_state->set_value();
+		}
 	};
 
 	using promise_vt = promise_t<void>;

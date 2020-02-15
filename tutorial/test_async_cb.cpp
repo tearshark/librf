@@ -7,22 +7,29 @@
 
 #include "librf.h"
 
-
-auto async_get_long(int64_t val)
+template<class _Ctype>
+void callback_get_long(int64_t val, _Ctype&& cb)
 {
 	using namespace std::chrono;
+	std::thread([val, cb = std::forward<_Ctype>(cb)]
+		{
+			std::this_thread::sleep_for(500ms);
+			cb(val * val);
+		}).detach();
+}
 
+//这种情况下，没有生成 frame-context，因此，并没有promise_type被内嵌在frame-context里
+auto async_get_long(int64_t val)
+{
 	resumef::promise_t<int64_t> awaitable;
-
-	std::thread([val, st = awaitable._state]
+	callback_get_long(val, [st = awaitable._state](int64_t val)
 	{
-		std::this_thread::sleep_for(500ms);
-		st->set_value(val * val);
-	}).detach();
-
+		st->set_value(val);
+	});
 	return awaitable.get_future();
 }
 
+//这种情况下，会生成对应的 frame-context，一个promise_type被内嵌在frame-context里
 resumef::future_vt resumable_get_long(int64_t val)
 {
 	std::cout << val << std::endl;

@@ -49,7 +49,7 @@ namespace asio {
 
 			void operator()() const
 			{
-				state_->set_value();
+				this->state_->set_value();
 			}
 		};
 
@@ -61,9 +61,9 @@ namespace asio {
 			void operator()(const asio::error_code& ec) const
 			{
 				if (!ec)
-					state_->set_value();
+					this->state_->set_value();
 				else
-					state_->set_exception(std::make_exception_ptr(asio::system_error(ec)));
+					this->state_->set_exception(std::make_exception_ptr(asio::system_error(ec)));
 			}
 		};
 
@@ -75,9 +75,9 @@ namespace asio {
 			void operator()(std::exception_ptr ex) const
 			{
 				if (!ex)
-					state_->set_value();
+					this->state_->set_value();
 				else
-					state_->set_exception(ex);
+					this->state_->set_exception(ex);
 			}
 		};
 
@@ -91,7 +91,7 @@ namespace asio {
 			template <typename Arg>
 			void operator()(Arg&& arg) const
 			{
-				state_->set_value(std::forward<Arg>(arg));
+				this->state_->set_value(std::forward<Arg>(arg));
 			}
 		};
 
@@ -104,9 +104,9 @@ namespace asio {
 			void operator()(const asio::error_code& ec, Arg&& arg) const
 			{
 				if (!ec)
-					state_->set_value(std::forward<Arg>(arg));
+					this->state_->set_value(std::forward<Arg>(arg));
 				else
-					state_->set_exception(std::make_exception_ptr(asio::system_error(ec)));
+					this->state_->set_exception(std::make_exception_ptr(asio::system_error(ec)));
 			}
 		};
 
@@ -119,9 +119,9 @@ namespace asio {
 			void operator()(std::exception_ptr ex, Arg&& arg) const
 			{
 				if (!ex)
-					state_->set_value(std::forward<Arg>(arg));
+					this->state_->set_value(std::forward<Arg>(arg));
 				else
-					state_->set_exception(ex);
+					this->state_->set_exception(ex);
 			}
 		};
 
@@ -135,7 +135,7 @@ namespace asio {
 			template <typename... Args>
 			void operator()(Args&&... args) const
 			{
-				state_->set_value(std::make_tuple(std::forward<Args>(args)...));
+				this->state_->set_value(std::make_tuple(std::forward<Args>(args)...));
 			}
 		};
 
@@ -148,9 +148,9 @@ namespace asio {
 			void operator()(const asio::error_code& ec, Args&&... args) const
 			{
 				if (!ec)
-					state_->set_value(std::make_tuple(std::forward<Args>(args)...));
+					this->state_->set_value(std::make_tuple(std::forward<Args>(args)...));
 				else
-					state_->set_exception(std::make_exception_ptr(asio::system_error(ec)));
+					this->state_->set_exception(std::make_exception_ptr(asio::system_error(ec)));
 			}
 		};
 
@@ -163,9 +163,9 @@ namespace asio {
 			void operator()(std::exception_ptr ex, Args&&... args) const
 			{
 				if (!ex)
-					state_->set_value(std::make_tuple(std::forward<Args>(args)...));
+					this->state_->set_value(std::make_tuple(std::forward<Args>(args)...));
 				else
-					state_->set_exception(ex);
+					this->state_->set_exception(ex);
 			}
 		};
 
