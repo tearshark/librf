@@ -1,6 +1,8 @@
 ﻿#include "event.h"
 #include <assert.h>
 #include "scheduler.h"
+#include "awaitable.h"
+#include "state.inl"
 
 namespace resumef
 {
@@ -68,7 +70,7 @@ namespace resumef
 
 	future_t<bool> event_t::wait() const
 	{
-		promise_t<bool> awaitable;
+		awaitable_t<bool> awaitable;
 
 		auto awaker = std::make_shared<detail::event_awaker>(
 			[st = awaitable._state](detail::event_impl * e) -> bool
@@ -83,7 +85,7 @@ namespace resumef
 
 	future_t<bool> event_t::wait_until_(const clock_type::time_point & tp) const
 	{
-		promise_t<bool> awaitable;
+		awaitable_t<bool> awaitable;
 
 		auto awaker = std::make_shared<detail::event_awaker>(
 			[st = awaitable._state](detail::event_impl * e) -> bool
@@ -139,7 +141,7 @@ namespace resumef
 
 	future_t<intptr_t> event_t::wait_any_(std::vector<event_impl_ptr> && evts)
 	{
-		promise_t<intptr_t> awaitable;
+		awaitable_t<intptr_t> awaitable;
 
 		if (evts.size() <= 0)
 		{
@@ -179,7 +181,7 @@ namespace resumef
 	
 	future_t<intptr_t> event_t::wait_any_until_(const clock_type::time_point & tp, std::vector<event_impl_ptr> && evts)
 	{
-		promise_t<intptr_t> awaitable;
+		awaitable_t<intptr_t> awaitable;
 
 		auto awaker = std::make_shared<detail::event_awaker>(
 			[st = awaitable._state, evts](detail::event_impl * e) -> bool
@@ -219,7 +221,7 @@ namespace resumef
 
 	future_t<bool> event_t::wait_all_(std::vector<event_impl_ptr> && evts)
 	{
-		promise_t<bool> awaitable;
+		awaitable_t<bool> awaitable;
 		if (evts.size() <= 0)
 		{
 			awaitable._state->set_value(false);
@@ -321,7 +323,7 @@ namespace resumef
 	//则需要超时后，恢复已经等待的事件计数
 	future_t<bool> event_t::wait_all_until_(const clock_type::time_point & tp, std::vector<event_impl_ptr> && evts)
 	{
-		promise_t<bool> awaitable;
+		awaitable_t<bool> awaitable;
 		if (evts.size() <= 0)
 		{
 			(void)this_scheduler()->timer()->add_handler(tp,
