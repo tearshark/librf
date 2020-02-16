@@ -23,21 +23,22 @@ namespace resumef
 			RF_API mutex_impl();
 
 			//如果已经触发了awaker,则返回true
-			RF_API bool lock_(const mutex_awaker_ptr & awaker);
-			RF_API bool try_lock_(const mutex_awaker_ptr & awaker);
+			RF_API bool lock_(const mutex_awaker_ptr& awaker);
+			RF_API bool try_lock_(const mutex_awaker_ptr& awaker);
 			RF_API void unlock();
 
 			template<class callee_t, class dummy_t = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, mutex_awaker_ptr>::value>>
-			decltype(auto) lock(callee_t && awaker, dummy_t * dummy_ = nullptr)
+			decltype(auto) lock(callee_t&& awaker, dummy_t* dummy_ = nullptr)
 			{
+				(void)dummy_;
 				return lock_(std::make_shared<mutex_awaker>(std::forward<callee_t>(awaker)));
 			}
 
 		private:
-			mutex_impl(const mutex_impl &) = delete;
-			mutex_impl(mutex_impl &&) = delete;
-			mutex_impl & operator = (const mutex_impl &) = delete;
-			mutex_impl & operator = (mutex_impl &&) = delete;
+			mutex_impl(const mutex_impl&) = delete;
+			mutex_impl(mutex_impl&&) = delete;
+			mutex_impl& operator = (const mutex_impl&) = delete;
+			mutex_impl& operator = (mutex_impl&&) = delete;
 		};
 	}
 
@@ -62,32 +63,32 @@ namespace resumef
 		RF_API bool
 			try_lock() const;
 
-/*
-		template<class _Rep, class _Period> 
-		awaitable_t<bool> 
+		/*
+		template<class _Rep, class _Period>
+		awaitable_t<bool>
 			try_lock_for(const std::chrono::duration<_Rep, _Period> & dt) const
 		{
 			return try_lock_for_(std::chrono::duration_cast<clock_type::duration>(dt));
 		}
-		template<class _Clock, class _Duration> 
-		awaitable_t<bool> 
+		template<class _Clock, class _Duration>
+		awaitable_t<bool>
 			try_lock_until(const std::chrono::time_point<_Clock, _Duration> & tp) const
 		{
 			return try_lock_until_(std::chrono::time_point_cast<clock_type::duration>(tp));
 		}
-*/
+		*/
 
 
-		RF_API mutex_t(const mutex_t &) = default;
-		RF_API mutex_t(mutex_t &&) = default;
-		RF_API mutex_t & operator = (const mutex_t &) = default;
-		RF_API mutex_t & operator = (mutex_t &&) = default;
+		RF_API mutex_t(const mutex_t&) = default;
+		RF_API mutex_t(mutex_t&&) = default;
+		RF_API mutex_t& operator = (const mutex_t&) = default;
+		RF_API mutex_t& operator = (mutex_t&&) = default;
 	private:
-		inline future_t<bool> try_lock_for_(const clock_type::duration & dt) const
+		inline future_t<bool> try_lock_for_(const clock_type::duration& dt) const
 		{
 			return try_lock_until_(clock_type::now() + dt);
 		}
-		RF_API future_t<bool> try_lock_until_(const clock_type::time_point & tp) const;
+		RF_API future_t<bool> try_lock_until_(const clock_type::time_point& tp) const;
 	};
 
 #if _HAS_CXX17

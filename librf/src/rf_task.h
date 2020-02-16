@@ -34,7 +34,7 @@ namespace resumef
 		using state_type = state_t<value_type>;
 
 		task_t() = default;
-		task_t(future_type && f)
+		task_t(future_type&& f)
 		{
 			initialize(std::forward<future_type>(f));
 		}
@@ -70,7 +70,7 @@ namespace resumef
 	//这个'函数对象'被调用后，返回generator<_Ty>/future_t<_Ty>类型
 	//然后'函数对象'作为异步执行的上下文状态保存起来
 	template<class _Ctx>
-	struct ctx_task_t : public task_t<typename std::remove_cvref<decltype(std::declval<_Ctx>()())>::type>
+	struct ctx_task_t : public task_t<remove_cvref_t<decltype(std::declval<_Ctx>()())>>
 	{
 		using context_type = _Ctx;
 

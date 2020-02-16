@@ -21,7 +21,7 @@ namespace resumef
 		promise_impl_t(promise_impl_t&& _Right) noexcept = default;
 		promise_impl_t& operator = (promise_impl_t&& _Right) noexcept = default;
 		promise_impl_t(const promise_impl_t&) = delete;
-		promise_impl_t & operator = (const promise_impl_t&) = delete;
+		promise_impl_t& operator = (const promise_impl_t&) = delete;
 
 		suspend_on_initial initial_suspend() noexcept;
 		suspend_on_final final_suspend() noexcept;
@@ -29,10 +29,11 @@ namespace resumef
 		future_type get_return_object();
 		void cancellation_requested();
 	};
-		
+
 	template<class _Ty>
 	struct promise_t : public promise_impl_t<_Ty>
 	{
+		using typename promise_impl_t<_Ty>::value_type;
 		using promise_impl_t<_Ty>::_state;
 
 		void return_value(value_type val);

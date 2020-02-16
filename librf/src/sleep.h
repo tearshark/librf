@@ -12,7 +12,7 @@ namespace resumef
 
 	inline future_t<> sleep_for_(const std::chrono::system_clock::duration& dt_, scheduler_t& scheduler_)
 	{
-		return std::move(sleep_until_(std::chrono::system_clock::now() + dt_, scheduler_));
+		return sleep_until_(std::chrono::system_clock::now() + dt_, scheduler_);
 	}
 
 	template<class _Rep, class _Period>

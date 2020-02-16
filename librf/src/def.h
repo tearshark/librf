@@ -9,6 +9,7 @@
 #include <deque>
 #include <mutex>
 #include <map>
+#include <unordered_map>
 #include <optional>
 
 #include <assert.h>
@@ -45,13 +46,8 @@ namespace resumef
 
 	struct state_base_t;
 
-#if _HAS_CXX17
 	template<class... _Mutexes>
 	using scoped_lock = std::scoped_lock<_Mutexes...>;
-#else
-	template<class... _Mutexes>
-	using scoped_lock = std::lock_guard<_Mutexes...>;
-#endif
 }
 
 #if RESUMEF_DEBUG_COUNTER
@@ -62,19 +58,15 @@ extern std::atomic<intptr_t> g_resumef_evtctx_count;
 extern std::atomic<intptr_t> g_resumef_state_id;
 #endif
 
-namespace std
+namespace resumef
 {
-#if !_HAS_CXX20
 	template<class T>
 	struct remove_cvref
 	{
 		typedef std::remove_cv_t<std::remove_reference_t<T>> type;
 	};
-#if _HAS_CXX17
 	template<class T>
-	using remove_cvref_t = typename std::remove_cvref<T>::type;
-#endif
-#endif
+	using remove_cvref_t = typename remove_cvref<T>::type;
 }
 
 #if defined(RESUMEF_DLL_EXPORT)

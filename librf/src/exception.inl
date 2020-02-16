@@ -16,41 +16,41 @@ namespace resumef
 
 	const char* get_error_string(error_code fe, const char* classname);
 
-	struct future_exception : std::exception
+	struct future_exception : std::logic_error
 	{
 		error_code _error;
 		future_exception(error_code fe)
-			: exception(get_error_string(fe, "future_exception"))
+			: logic_error(get_error_string(fe, "future_exception"))
 			, _error(fe)
 		{
 		}
 	};
 
-	struct lock_exception : std::exception
+	struct lock_exception : std::logic_error
 	{
 		error_code _error;
 		lock_exception(error_code fe)
-			: exception(get_error_string(fe, "lock_exception"))
+			: logic_error(get_error_string(fe, "lock_exception"))
 			, _error(fe)
 		{
 		}
 	};
 
-	struct channel_exception : std::exception
+	struct channel_exception : std::logic_error
 	{
 		error_code _error;
 		channel_exception(error_code fe)
-			: exception(get_error_string(fe, "channel_exception"))
+			: logic_error(get_error_string(fe, "channel_exception"))
 			, _error(fe)
 		{
 		}
 	};
 
-	struct timer_canceled_exception : public std::exception
+	struct timer_canceled_exception : public std::logic_error
 	{
 		error_code _error;
 		timer_canceled_exception(error_code fe)
-			: exception(get_error_string(fe, "timer canceled"))
+			: logic_error(get_error_string(fe, "timer canceled"))
 			, _error(fe)
 		{
 		}

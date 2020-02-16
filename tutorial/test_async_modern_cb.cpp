@@ -82,7 +82,7 @@ __declspec(noinline)
 auto tostring_async(_Input_t&& value, _Callable_t&& token)
 {
 	//适配器类型
-	using _Adapter_t = modern_callback_adapter_t<typename std::remove_cvref<_Callable_t>::type, void(std::string)>;
+	using _Adapter_t = modern_callback_adapter_t<typename resumef::remove_cvref_t<_Callable_t>, void(std::string)>;
 	//通过适配器获得兼容_Signature_t类型的真正的回调，以及返回值_Return_t
 	auto adapter = typename _Adapter_t::traits(std::forward<_Callable_t>(token));
 
@@ -100,7 +100,7 @@ auto tostring_async(_Input_t&& value, _Callable_t&& token)
 
 //或者宏版本写法
 #define MODERN_CALLBACK_TRAITS(_Token_value, _Signature_t) \
-	using _Adapter_t = modern_callback_adapter_t<typename std::remove_cvref<_Callable_t>::type, _Signature_t>; \
+	using _Adapter_t = modern_callback_adapter_t<typename resumef::remove_cvref_t<_Callable_t>, _Signature_t>; \
 	auto _Adapter_value = typename _Adapter_t::traits(std::forward<_Callable_t>(_Token_value))
 #define MODERN_CALLBACK_CALL() std::move(std::get<0>(_Adapter_value))
 #define MODERN_CALLBACK_RETURN() return std::move(std::get<1>(_Adapter_value)).get()

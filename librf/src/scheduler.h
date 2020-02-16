@@ -30,7 +30,7 @@ namespace resumef
 
 		timer_mgr_ptr _timer;
 
-		RF_API void new_task(task_base_t * task);
+		RF_API void new_task(task_base_t* task);
 		//void cancel_all_task_();
 
 	public:
@@ -39,10 +39,10 @@ namespace resumef
 		RF_API void run();
 		//RF_API void break_all();
 
-		template<class _Ty, typename = std::enable_if_t<std::is_callable_v<_Ty> || is_future_v<_Ty> || is_generator_v<_Ty> >>
-		inline void operator + (_Ty && t_)
+		template<class _Ty, typename = std::enable_if_t<std::is_callable<_Ty>::value || is_future_v<_Ty> || is_generator_v<_Ty> >>
+		inline void operator + (_Ty&& t_)
 		{
-			if constexpr(std::is_callable_v<_Ty>)
+			if constexpr (std::is_callable<_Ty>::value)
 				new_task(new ctx_task_t<_Ty>(std::forward<_Ty>(t_)));
 			else
 				new_task(new task_t<_Ty>(std::forward<_Ty>(t_)));
@@ -54,7 +54,7 @@ namespace resumef
 			return _ready_task.empty() && _runing_states.empty() && _timer->empty();
 		}
 
-		inline timer_manager * timer() const
+		inline timer_manager* timer() const
 		{
 			return _timer.get();
 		}
@@ -85,16 +85,16 @@ namespace resumef
 		RF_API local_scheduler();
 		RF_API ~local_scheduler();
 
-		local_scheduler(local_scheduler && right_) = delete;
-		local_scheduler & operator = (local_scheduler && right_) = delete;
-		local_scheduler(const local_scheduler &) = delete;
-		local_scheduler & operator = (const local_scheduler &) = delete;
+		local_scheduler(local_scheduler&& right_) = delete;
+		local_scheduler& operator = (local_scheduler&& right_) = delete;
+		local_scheduler(const local_scheduler&) = delete;
+		local_scheduler& operator = (const local_scheduler&) = delete;
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 	private:
 		scheduler_t* _scheduler_ptr;
 #endif
 	};
-//--------------------------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------------------------------
 #if !RESUMEF_ENABLE_MULT_SCHEDULER
 	//获得当前线程下的调度器
 	inline scheduler_t* this_scheduler()
@@ -108,5 +108,5 @@ namespace resumef
 #define GO (*::resumef::this_scheduler()) + [=]()mutable->resumef::future_t<>
 #endif
 
-//--------------------------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------------------------------
 }

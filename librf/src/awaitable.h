@@ -19,8 +19,8 @@ namespace resumef
 
 		void set_exception(std::exception_ptr e) const
 		{
-			_state->set_exception(std::move(e));
-			_state = nullptr;
+			this->_state->set_exception(std::move(e));
+			this->_state = nullptr;
 		}
 
 		template<class _Exp>
@@ -31,7 +31,7 @@ namespace resumef
 
 		future_type get_future()
 		{
-			return future_type{ _state };
+			return future_type{ this->_state };
 		}
 
 		mutable counted_ptr<state_type> _state = make_counted<state_type>(true);
@@ -40,24 +40,25 @@ namespace resumef
 	template<class _Ty>
 	struct awaitable_t : public awaitable_impl_t<_Ty>
 	{
-		using awaitable_impl_t::awaitable_impl_t;
+		using typename awaitable_impl_t<_Ty>::value_type;
+		using awaitable_impl_t<_Ty>::awaitable_impl_t;
 
 		void set_value(value_type value) const
 		{
-			_state->set_value(std::move(value));
-			_state = nullptr;
+			this->_state->set_value(std::move(value));
+			this->_state = nullptr;
 		}
 	};
 
 	template<>
 	struct awaitable_t<void> : public awaitable_impl_t<void>
 	{
-		using awaitable_impl_t::awaitable_impl_t;
+		using awaitable_impl_t<void>::awaitable_impl_t;
 
 		void set_value() const
 		{
-			_state->set_value();
-			_state = nullptr;
+			this->_state->set_value();
+			this->_state = nullptr;
 		}
 	};
 }
