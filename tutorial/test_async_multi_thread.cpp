@@ -15,7 +15,7 @@ auto async_heavy_computing_tasks(int64_t val)
 {
 	using namespace std::chrono;
 
-	promise_t<int64_t> awaitable;
+	awaitable_t<int64_t> awaitable;
 
 	std::thread([val, st = awaitable._state]
 	{

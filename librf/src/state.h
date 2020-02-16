@@ -82,6 +82,12 @@ namespace resumef
 
 		void set_exception(std::exception_ptr e);
 
+		template<class _Exp>
+		void throw_exception(_Exp e) const
+		{
+			set_exception(std::make_exception_ptr(std::move(e)));
+		}
+
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void future_await_suspend(coroutine_handle<_PromiseT> handler);
 

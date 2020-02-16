@@ -33,7 +33,7 @@ namespace resumef
 		{
 			return future_type{ _state };
 		}
-	protected:
+
 		mutable counted_ptr<state_type> _state = make_counted<state_type>(true);
 	};
 
