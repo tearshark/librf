@@ -168,7 +168,7 @@ namespace resumef
 		template<class _Ty2>
 		future_t<bool> write(_Ty2&& val) const
 		{
-			promise_t<bool> awaitable;
+			awaitable_t<bool> awaitable;
 
 			auto awaker = std::make_shared<channel_write_awaker>(
 				[st = awaitable._state](channel_impl_type * chan) -> bool
@@ -183,7 +183,7 @@ namespace resumef
 
 		future_t<_Ty> read() const
 		{
-			promise_t<_Ty> awaitable;
+			awaitable_t<_Ty> awaitable;
 
 			auto awaker = std::make_shared<channel_read_awaker>(
 				[st = awaitable._state](channel_impl_type *, _Ty * val, error_code fe) -> bool

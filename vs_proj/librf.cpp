@@ -43,7 +43,9 @@ int main(int argc, const char* argv[])
 	//resumable_main_timer();
 	//resumable_main_benchmark_mem();
 	//resumable_main_mutex();
-	resumable_main_event();
+	//resumable_main_event();
+	//resumable_main_event_timeout();
+	resumable_main_channel();
 
 /*
 	resumable_main_benchmark_mem();
@@ -54,8 +56,6 @@ int main(int argc, const char* argv[])
 
 	resumable_main_when_all();
 	resumable_main_sleep();
-	resumable_main_event_timeout();
-	resumable_main_channel();
 */
 
 	return 0;
