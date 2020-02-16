@@ -20,8 +20,8 @@ namespace resumef
 		coroutine_handle<> _coro;
 	public:
 		virtual void resume() = 0;
-		virtual bool is_ready() const = 0;
 		virtual bool has_handler() const = 0;
+		virtual bool is_ready() const = 0;
 
 		void set_scheduler(scheduler_t* sch)
 		{
@@ -35,9 +35,15 @@ namespace resumef
 	
 	struct state_generator_t : public state_base_t
 	{
+	public:
+		state_generator_t(coroutine_handle<> handler)
+		{
+			_coro = handler;
+		}
+
 		virtual void resume() override;
-		virtual bool is_ready() const override;
 		virtual bool has_handler() const override;
+		virtual bool is_ready() const override;
 	};
 
 	struct state_future_t : public state_base_t

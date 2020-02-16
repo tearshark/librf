@@ -67,7 +67,7 @@ namespace resumef
 
 	template<typename _PromiseT = void>
 	using coroutine_handle = std::experimental::coroutine_handle<_PromiseT>;
-	template <typename _Ty, typename _Alloc = std::allocator<char>>
+	template <typename _Ty = std::nullptr_t, typename _Alloc = std::allocator<char>>
 	using generator_t = std::experimental::generator<_Ty, _Alloc>;
 
 	enum struct error_code

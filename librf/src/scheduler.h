@@ -40,13 +40,13 @@ namespace resumef
 		RF_API void run();
 		//RF_API void break_all();
 
-		template<class _Ty, typename = std::enable_if_t<std::is_callable_v<_Ty> || is_future_v<_Ty>>>
+		template<class _Ty, typename = std::enable_if_t<std::is_callable_v<_Ty> || is_future_v<_Ty> || is_generator_v<_Ty> >>
 		inline void operator + (_Ty && t_)
 		{
-			if constexpr(is_future_v<_Ty>)
-				new_task(new task_t<_Ty>(std::forward<_Ty>(t_)));
-			else
+			if constexpr(std::is_callable_v<_Ty>)
 				new_task(new ctx_task_t<_Ty>(std::forward<_Ty>(t_)));
+			else
+				new_task(new task_t<_Ty>(std::forward<_Ty>(t_)));
 		}
 
 		inline bool empty() const

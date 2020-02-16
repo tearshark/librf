@@ -166,13 +166,13 @@ namespace experimental {
 
 			void *operator new(size_t _Size)
 			{
-				_Alloc_of_char_type _Al;
+				_Alloc_char _Al;
 				return _Al.allocate(_Size);
 			}
 
 			void operator delete(void *_Ptr, size_t _Size)
 			{
-				_Alloc_of_char_type _Al;
+				_Alloc_char _Al;
 				return _Al.deallocate(static_cast<char *>(_Ptr), _Size);
 			}
 		};
@@ -226,6 +226,13 @@ namespace experimental {
 			if (_Coro) {
 				_Coro.destroy();
 			}
+		}
+
+		coroutine_handle<promise_type> detach()
+		{
+			auto t = _Coro;
+			_Coro = nullptr;
+			return t;
 		}
 
 	private:

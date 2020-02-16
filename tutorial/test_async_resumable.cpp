@@ -46,7 +46,7 @@ void resumable_switch(intptr_t coro, size_t idx)
 		{
 			for (intptr_t i = 0; i < N / coro; ++i)
 				co_yield i;
-			return N / coro;
+			co_return N / coro;
 		};
 	}
 	auto middle = std::chrono::steady_clock::now();

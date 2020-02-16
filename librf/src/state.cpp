@@ -15,9 +15,14 @@ namespace resumef
 		{
 			_coro.resume();
 			if (_coro.done())
+			{
 				_coro = nullptr;
+				_scheduler->del_final(this);
+			}
 			else
+			{
 				_scheduler->add_generator(this);
+			}
 		}
 	}
 
