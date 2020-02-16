@@ -1,6 +1,4 @@
 ﻿#pragma once
-
-#include "_awaker.h"
 #if RESUMEF_USE_BOOST_ANY
 #include <boost/any.hpp>
 namespace resumef
@@ -16,6 +14,11 @@ namespace resumef
 	using std::any_cast;
 }
 #endif
+
+#include "_awaker.h"
+#include "promise.h"
+#include "promise.inl"
+
 
 //纠结过when_any的返回值，是选用index + std::any，还是选用std::variant<>。最终选择了std::any。
 //std::variant<>存在第一个元素不能默认构造的问题，需要使用std::monostate来占位，导致下标不是从0开始。
@@ -193,7 +196,7 @@ namespace resumef
 		template<class _Tup, class _Iter>
 		future_t<_Tup> when_all_range(size_t count, const std::shared_ptr<_Tup> & vals, scheduler_t& s, _Iter begin, _Iter end)
 		{
-			promise_t<_Tup> awaitable;
+			awaitable_t<_Tup> awaitable;
 
 			when_impl_ptr _event = std::make_shared<when_impl>(count);
 			auto awaker = std::make_shared<when_awaker>(
@@ -314,7 +317,7 @@ namespace resumef
 		template<class... _Fty>
 		future_t<when_any_pair> when_any_count(size_t count, const when_any_result_ptr & val_ptr, scheduler_t & s, _Fty&&... f)
 		{
-			promise_t<when_any_pair> awaitable;
+			awaitable_t<when_any_pair> awaitable;
 
 			when_impl_ptr _event = std::make_shared<when_impl>(count);
 			auto awaker = std::make_shared<when_awaker>(
@@ -347,7 +350,7 @@ namespace resumef
 		template<class _Iter>
 		future_t<when_any_pair> when_any_range(size_t count, const when_any_result_ptr & val_ptr, scheduler_t & s, _Iter begin, _Iter end)
 		{
-			promise_t<when_any_pair> awaitable;
+			awaitable_t<when_any_pair> awaitable;
 
 			when_impl_ptr _event = std::make_shared<when_impl>(count);
 			auto awaker = std::make_shared<when_awaker>(

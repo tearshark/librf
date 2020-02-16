@@ -23,6 +23,7 @@ extern void resumable_main_channel_mult_thread();
 extern void resumable_main_when_all();
 
 extern void resumable_main_benchmark_mem();
+extern void benchmark_main_channel_passing_next();
 extern void resumable_main_benchmark_asio_server();
 extern void resumable_main_benchmark_asio_client(intptr_t nNum);
 
@@ -47,7 +48,9 @@ int main(int argc, const char* argv[])
 	//resumable_main_event_timeout();
 	//resumable_main_channel();
 	//resumable_main_channel_mult_thread();		//测试失败！
-	resumable_main_sleep();
+	//resumable_main_sleep();
+	//resumable_main_when_all();
+	benchmark_main_channel_passing_next();
 
 /*
 	if (argc > 1)
@@ -55,7 +58,6 @@ int main(int argc, const char* argv[])
 	else
 		resumable_main_benchmark_asio_server();
 
-	resumable_main_when_all();
 */
 
 	return 0;

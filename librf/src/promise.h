@@ -3,6 +3,9 @@
 
 namespace resumef
 {
+	struct suspend_on_initial;
+	struct suspend_on_final;
+
 	template <typename _Ty>
 	struct promise_impl_t
 	{
@@ -20,8 +23,8 @@ namespace resumef
 		promise_impl_t(const promise_impl_t&) = delete;
 		promise_impl_t & operator = (const promise_impl_t&) = delete;
 
-		auto initial_suspend() noexcept;
-		auto final_suspend() noexcept;
+		suspend_on_initial initial_suspend() noexcept;
+		suspend_on_final final_suspend() noexcept;
 		void set_exception(std::exception_ptr e);
 		future_type get_return_object();
 		void cancellation_requested();

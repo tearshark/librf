@@ -43,15 +43,15 @@ namespace resumef
 	};
 
 	template <typename _Ty>
-	inline auto promise_impl_t<_Ty>::initial_suspend() noexcept
+	inline suspend_on_initial promise_impl_t<_Ty>::initial_suspend() noexcept
 	{
-		return suspend_on_initial{ _state.get() };
+		return { _state.get() };
 	}
 
 	template <typename _Ty>
-	inline auto promise_impl_t<_Ty>::final_suspend() noexcept
+	inline suspend_on_final promise_impl_t<_Ty>::final_suspend() noexcept
 	{
-		return suspend_on_final{ _state.get() };
+		return { _state.get() };
 	}
 
 	template <typename _Ty>

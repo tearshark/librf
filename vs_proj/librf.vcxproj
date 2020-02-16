@@ -187,12 +187,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\benchmark\benchmark_async_mem.cpp" />
-    <ClCompile Include="..\benchmark\benchmark_channel_passing_next.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\benchmark\benchmark_channel_passing_next.cpp" />
     <ClCompile Include="..\librf\src\event.cpp" />
     <ClCompile Include="..\librf\src\mutex.cpp" />
     <ClCompile Include="..\librf\src\rf_task.cpp" />
@@ -200,12 +195,7 @@
     <ClCompile Include="..\librf\src\sleep.cpp" />
     <ClCompile Include="..\librf\src\state.cpp" />
     <ClCompile Include="..\librf\src\timer.cpp" />
-    <ClCompile Include="..\librf\src\when.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\librf\src\when.cpp" />
     <ClCompile Include="..\tutorial\test_async_cb.cpp" />
     <ClCompile Include="..\tutorial\test_async_channel.cpp" />
     <ClCompile Include="..\tutorial\test_async_channel_mult_thread.cpp" />
@@ -221,12 +211,7 @@
     <ClCompile Include="..\tutorial\test_async_sleep.cpp" />
     <ClCompile Include="..\tutorial\test_async_suspend_always.cpp" />
     <ClCompile Include="..\tutorial\test_async_timer.cpp" />
-    <ClCompile Include="..\tutorial\test_async_when_all.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_when_all.cpp" />
     <ClCompile Include="..\tutorial\test_async_yield_return.cpp" />
     <ClCompile Include="librf.cpp">
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
