@@ -10,7 +10,7 @@ namespace resumef
 
 	struct task_base_t
 	{
-		RF_API task_base_t();
+		task_base_t() = default;
 		RF_API virtual ~task_base_t();
 
 		state_base_t* get_state() const
@@ -19,9 +19,6 @@ namespace resumef
 		}
 	protected:
 		counted_ptr<state_base_t> _state;
-	public:
-		task_base_t* _next_node;
-		task_base_t* _prev_node;
 	};
 
 	//----------------------------------------------------------------------------------------------

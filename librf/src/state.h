@@ -114,6 +114,8 @@ namespace resumef
 		}
 
 		auto future_await_resume() -> value_type;
+		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+		void promise_yield_value(_PromiseT* promise, value_type val);
 
 		void set_value(value_type val);
 	};
@@ -134,6 +136,8 @@ namespace resumef
 		}
 
 		void future_await_resume();
+		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+		void promise_yield_value(_PromiseT* promise);
 
 		void set_value();
 	};

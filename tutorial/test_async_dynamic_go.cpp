@@ -18,7 +18,7 @@ void test_dynamic_go()
 	{
 		for (int i = 0; i < M; ++i)
 		{
-			go[=]() -> std::experimental::generator<int>
+			go[=]() -> resumef::generator_t<int>
 			{
 				for (int k = 0; k < M; ++k)
 				{

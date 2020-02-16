@@ -308,7 +308,7 @@ struct modern_callback_adapter_t<std_future_t, R(_Result_t...)> : public modern_
 struct use_librf_t
 {
 	template<typename _Result_t>
-	using promise_type = resumef::promise_t<_Result_t>;
+	using promise_type = resumef::awaitable_t<_Result_t>;
 
 	template<typename _Result_t>
 	using future_type = resumef::future_t<_Result_t>;
@@ -397,6 +397,7 @@ void resumable_main_modern_cb()
 		try
 		{
 			int val = co_await add_async(1, 2, use_librf);
+			std::cout << val << std::endl;
 
 			//muldiv_async函数可能会抛异常，取决于val是否是0
 			//异常将会带回到本协程里的代码，所以需要try-catch

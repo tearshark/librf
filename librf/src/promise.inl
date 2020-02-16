@@ -82,7 +82,7 @@ namespace resumef
 	template<class _Ty>
 	inline void promise_t<_Ty>::yield_value(value_type val)
 	{
-		_state->set_value(std::move(val));
+		_state->promise_yield_value(this, std::move(val));
 	}
 
 	inline void promise_t<void>::return_void()
@@ -92,7 +92,7 @@ namespace resumef
 
 	inline void promise_t<void>::yield_value()
 	{
-		_state->set_value();
+		_state->promise_yield_value(this);
 	}
 
 }
