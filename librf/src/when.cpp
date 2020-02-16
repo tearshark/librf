@@ -1,7 +1,5 @@
 ﻿#include "_awaker.h"
 
-#if _HAS_CXX17 || RESUMEF_USE_BOOST_ANY
-
 #include "when.h"
 #include <assert.h>
 
@@ -42,5 +40,3 @@ namespace resumef
 		}
 	}
 }
-
-#endif

@@ -1,5 +1,5 @@
 ﻿/*
- *Copyright 2017 lanzhengpeng
+ *Copyright 2017~2020 lanzhengpeng
  *
  *Licensed under the Apache License, Version 2.0 (the "License");
  *you may not use this file except in compliance with the License.
@@ -25,7 +25,5 @@
 #include "src/promise.inl"
 #include "src/state.inl"
 #include "src/sleep.h"
-
-#if _HAS_CXX17 || RESUMEF_USE_BOOST_ANY
 #include "src/when.h"
-#endif
+

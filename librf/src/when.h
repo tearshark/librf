@@ -18,6 +18,7 @@ namespace resumef
 #include "_awaker.h"
 #include "promise.h"
 #include "promise.inl"
+#include "awaitable.h"
 
 
 //纠结过when_any的返回值，是选用index + std::any，还是选用std::variant<>。最终选择了std::any。
@@ -51,9 +52,10 @@ namespace resumef
 			//如果已经触发了awaker,则返回true
 			RF_API bool wait_(const when_awaker_ptr & awaker);
 
-			template<class callee_t, class dummy_t = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, event_awaker_ptr>::value>>
+            template<class callee_t, class dummy_t = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, when_awaker_ptr>::value>>
 			auto wait(callee_t && awaker, dummy_t * dummy_ = nullptr)
 			{
+                (void)dummy_;
 				return wait_(std::make_shared<when_awaker>(std::forward<callee_t>(awaker)));
 			}
 
