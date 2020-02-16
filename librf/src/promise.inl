@@ -60,6 +60,14 @@ namespace resumef
 		_state->set_exception(std::move(e));
 	}
 
+#ifdef __clang__
+	template <typename _Ty>
+	inline void promise_impl_t<_Ty>::unhandled_exception()
+	{
+		std::terminate();
+	}
+#endif
+
 	template <typename _Ty>
 	inline future_t<_Ty> promise_impl_t<_Ty>::get_return_object()
 	{

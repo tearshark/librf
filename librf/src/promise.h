@@ -26,6 +26,9 @@ namespace resumef
 		suspend_on_initial initial_suspend() noexcept;
 		suspend_on_final final_suspend() noexcept;
 		void set_exception(std::exception_ptr e);
+#ifdef __clang__
+		void unhandled_exception();
+#endif
 		future_type get_return_object();
 		void cancellation_requested();
 	};

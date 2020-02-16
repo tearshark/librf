@@ -27,6 +27,9 @@ namespace resumef
 	{
 		if (classname)
 		{
+#if __clang__
+#define sprintf_s sprintf
+#endif
 			sprintf_s(sz_future_error_buffer, "%s, code=%s", classname, future_error_string[(size_t)(fe)]);
 			return sz_future_error_buffer;
 		}
