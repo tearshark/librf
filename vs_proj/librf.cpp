@@ -45,17 +45,17 @@ int main(int argc, const char* argv[])
 	//resumable_main_mutex();
 	//resumable_main_event();
 	//resumable_main_event_timeout();
-	resumable_main_channel();
+	//resumable_main_channel();
+	//resumable_main_channel_mult_thread();		//测试失败！
+	resumable_main_sleep();
 
 /*
-	resumable_main_benchmark_mem();
 	if (argc > 1)
 		resumable_main_benchmark_asio_client(atoi(argv[1]));
 	else
 		resumable_main_benchmark_asio_server();
 
 	resumable_main_when_all();
-	resumable_main_sleep();
 */
 
 	return 0;

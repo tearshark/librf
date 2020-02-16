@@ -16,7 +16,7 @@ using namespace std::chrono;
 static std::mutex cout_mutex;
 std::atomic<intptr_t> gcounter = 0;
 
-#define OUTPUT_DEBUG	0
+#define OUTPUT_DEBUG	1
 
 future_t<> test_channel_consumer(const channel_t<std::string> & c, size_t cnt)
 {
