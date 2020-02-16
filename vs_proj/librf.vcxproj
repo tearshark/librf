@@ -245,6 +245,7 @@
     <None Include="..\librf\src\promise.inl" />
     <None Include="..\librf\src\state.inl" />
     <None Include="..\librf\src\type_traits.inl" />
+    <None Include="..\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

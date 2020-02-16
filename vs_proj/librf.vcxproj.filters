@@ -197,5 +197,6 @@
     <None Include="..\librf\src\type_traits.inl">
       <Filter>librf\src</Filter>
     </None>
+    <None Include="..\README.md" />
   </ItemGroup>
 </Project>
