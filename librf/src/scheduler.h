@@ -49,11 +49,6 @@ namespace resumef
 				new_task(new ctx_task_t<_Ty>(std::forward<_Ty>(t_)));
 		}
 
-		inline void push_task_internal(task_base_t * t_)
-		{
-			new_task(t_);
-		}
-
 		inline bool empty() const
 		{
 			scoped_lock<spinlock, lock_type> __guard(_lock_ready, _lock_running);
@@ -68,6 +63,7 @@ namespace resumef
 		void add_initial(state_base_t* sptr);
 		void add_await(state_base_t* sptr);
 		void add_ready(state_base_t* sptr);
+		void add_generator(state_base_t* sptr);
 		void del_final(state_base_t* sptr);
 
 		friend struct task_base;

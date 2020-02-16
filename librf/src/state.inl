@@ -3,7 +3,7 @@
 namespace resumef
 {
 	template<class _PromiseT, typename _Enable>
-	inline void state_base_t::promise_initial_suspend(coroutine_handle<_PromiseT> handler)
+	inline void state_future_t::promise_initial_suspend(coroutine_handle<_PromiseT> handler)
 	{
 		_PromiseT& promise = handler.promise();
 
@@ -14,12 +14,12 @@ namespace resumef
 		this->_initor = handler;
 	}
 
-	inline void state_base_t::promise_await_resume()
+	inline void state_future_t::promise_await_resume()
 	{
 	}
 
 	template<class _PromiseT, typename _Enable>
-	inline void state_base_t::promise_final_suspend(coroutine_handle<_PromiseT> handler)
+	inline void state_future_t::promise_final_suspend(coroutine_handle<_PromiseT> handler)
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
 
@@ -34,13 +34,13 @@ namespace resumef
 	}
 
 	template<class _PromiseT, typename _Enable>
-	inline void state_base_t::future_await_suspend(coroutine_handle<_PromiseT> handler)
+	inline void state_future_t::future_await_suspend(coroutine_handle<_PromiseT> handler)
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
 
 		_PromiseT& promise = handler.promise();
 
-		state_base_t* parent_state = promise._state.get();
+		auto* parent_state = promise._state.get();
 		scheduler_t* sch = parent_state->get_scheduler();
 		if (this != parent_state)
 		{

@@ -67,6 +67,8 @@ namespace resumef
 
 	template<typename _PromiseT = void>
 	using coroutine_handle = std::experimental::coroutine_handle<_PromiseT>;
+	template <typename _Ty, typename _Alloc = std::allocator<char>>
+	using generator_t = std::experimental::generator<_Ty, _Alloc>;
 
 	enum struct error_code
 	{
@@ -150,6 +152,13 @@ namespace resumef
 	struct is_future<future_t<_Ty>> : std::true_type {};
 	template<class _Ty>
 	_INLINE_VAR constexpr bool is_future_v = is_future<std::remove_cvref_t<_Ty>>::value;
+
+	template<class _G>
+	struct is_generator : std::false_type {};
+	template <typename _Ty, typename _Alloc>
+	struct is_generator<generator_t<_Ty, _Alloc>> : std::true_type {};
+	template<class _Ty>
+	_INLINE_VAR constexpr bool is_generator_v = is_generator<std::remove_cvref_t<_Ty>>::value;
 
 	//获得当前线程下的调度器
 	scheduler_t* this_scheduler();

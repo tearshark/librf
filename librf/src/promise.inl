@@ -7,7 +7,7 @@ namespace resumef
 {
 	struct suspend_on_initial
 	{
-		state_base_t* _state;
+		state_future_t* _state;
 
 		inline bool await_ready() noexcept
 		{
@@ -25,7 +25,7 @@ namespace resumef
 	};
 	struct suspend_on_final
 	{
-		state_base_t* _state;
+		state_future_t* _state;
 
 		inline bool await_ready() noexcept
 		{

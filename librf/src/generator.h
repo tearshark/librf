@@ -20,7 +20,10 @@
 
 #include <experimental/resumable>
 
-#pragma pack(push, _CRT_PACKING)
+#pragma pack(push,_CRT_PACKING)
+#pragma warning(push,_STL_WARNING_LEVEL)
+#pragma warning(disable: _STL_DISABLED_WARNINGS)
+_STL_DISABLE_CLANG_WARNINGS
 #pragma push_macro("new")
 #undef new
 
@@ -49,23 +52,18 @@ namespace experimental {
 
 		generator_iterator &operator++()
 		{
+			_Coro.resume();
 			if (_Coro.done())
 				_Coro = nullptr;
-			else
-				_Coro.resume();
 			return *this;
 		}
 
-		generator_iterator operator++(int) = delete;
-		// generator iterator current_value
-		// is a reference to a temporary on the coroutine frame
-		// implementing postincrement will require storing a copy
-		// of the value in the iterator.
-		//{
-		//	auto _Result = *this;
-		//	++(*this);
-		//	return _Result;
-		//}
+		void operator++(int)
+		{
+			// This postincrement operator meets the requirements of the Ranges TS
+			// InputIterator concept, but not those of Standard C++ InputIterator.
+			++* this;
+		}
 
 		bool operator==(generator_iterator const &right_) const
 		{
@@ -92,6 +90,10 @@ namespace experimental {
 	template <typename _Ty, typename promise_type>
 	struct generator_iterator : public generator_iterator<void, promise_type>
 	{
+		using value_type = _Ty;
+		using reference = _Ty const&;
+		using pointer = _Ty const*;
+
 		generator_iterator(nullptr_t) : generator_iterator<void, promise_type>(nullptr)
 		{
 		}
@@ -99,14 +101,14 @@ namespace experimental {
 		{
 		}
 
-		_Ty const &operator*() const
+		reference operator*() const
 		{
-			return *this->_Coro.promise()._CurrentValue;
+			return *_Coro.promise()._CurrentValue;
 		}
 
-		_Ty const *operator->() const
+		pointer operator->() const
 		{
-			return _STD addressof(operator*());
+			return _Coro.promise()._CurrentValue;
 		}
 	};
 
@@ -156,9 +158,11 @@ namespace experimental {
 				return _STD forward<_Uty>(_Whatever);
 			}
 
-			using _Alloc_traits = allocator_traits<_Alloc>;
-			using _Alloc_of_char_type =
-				typename _Alloc_traits::template rebind_alloc<char>;
+			using _Alloc_char = _Rebind_alloc_t<_Alloc, char>;
+			static_assert(is_same_v<char*, typename allocator_traits<_Alloc_char>::pointer>,
+				"generator does not support allocators with fancy pointer types");
+			static_assert(allocator_traits<_Alloc_char>::is_always_equal::value,
+				"generator only supports stateless allocators");
 
 			void *operator new(size_t _Size)
 			{
@@ -179,10 +183,9 @@ namespace experimental {
 		{
 			if (_Coro)
 			{
+				_Coro.resume();
 				if (_Coro.done())
 					return{ nullptr };
-
-				_Coro.resume();
 			}
 			return { _Coro };
 		}
@@ -193,8 +196,7 @@ namespace experimental {
 		}
 
 		explicit generator(promise_type &_Prom)
-			: _Coro(coroutine_handle<promise_type>::from_promise(
-				_Prom))
+			: _Coro(coroutine_handle<promise_type>::from_promise(_Prom))
 		{
 		}
 
@@ -212,7 +214,7 @@ namespace experimental {
 
 		generator &operator=(generator &&right_) noexcept
 		{
-			if (&right_ != this) {
+			if (this != _STD addressof(right_)) {
 				_Coro = right_._Coro;
 				right_._Coro = nullptr;
 			}

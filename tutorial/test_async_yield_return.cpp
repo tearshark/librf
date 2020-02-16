@@ -19,7 +19,7 @@ auto test_yield_int() -> std::experimental::generator<int>
 	std::cout << "3 will yield return" << std::endl;
 	co_yield 3;
 	std::cout << "4 will return" << std::endl;
-	return 4;
+	co_return 4;
 
 	std::cout << "5 will never yield return" << std::endl;
 	co_yield 5;

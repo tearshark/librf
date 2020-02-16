@@ -113,7 +113,6 @@ namespace resumef
 
 	void scheduler_t::add_ready(state_base_t* sptr)
 	{
-		assert(sptr->get_scheduler() == this);
 		assert(sptr->is_ready());
 
 		if (sptr->has_handler())
@@ -123,10 +122,14 @@ namespace resumef
 		}
 	}
 
+	void scheduler_t::add_generator(state_base_t* sptr)
+	{
+		scoped_lock<lock_type> __guard(_lock_running);
+		_runing_states.emplace_back(sptr);
+	}
+
 	void scheduler_t::del_final(state_base_t* sptr)
 	{
-		assert(sptr->get_scheduler() == this);
-
 		{
 			scoped_lock<spinlock> __guard(_lock_ready);
 			this->_ready_task.erase(sptr);

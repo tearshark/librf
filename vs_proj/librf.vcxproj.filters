@@ -174,6 +174,9 @@
     <ClInclude Include="..\librf\src\awaitable.h">
       <Filter>librf\src</Filter>
     </ClInclude>
+    <ClInclude Include="..\librf\src\generator.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\librf\src\asio_task_1.12.0.inl">
