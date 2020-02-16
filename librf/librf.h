@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "src/future.h"
+#include "src/awaitable.h"
 #include "src/event.h"
 #include "src/mutex.h"
 #include "src/channel.h"
@@ -23,7 +25,6 @@
 #include "src/promise.inl"
 #include "src/state.inl"
 #include "src/sleep.h"
-#include "src/awaitable.h"
 
 #if _HAS_CXX17 || RESUMEF_USE_BOOST_ANY
 #include "src/when.h"

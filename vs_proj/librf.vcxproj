@@ -241,8 +241,10 @@
   <ItemGroup>
     <None Include="..\librf\src\asio_task_1.10.0.inl" />
     <None Include="..\librf\src\asio_task_1.12.0.inl" />
+    <None Include="..\librf\src\exception.inl" />
     <None Include="..\librf\src\promise.inl" />
     <None Include="..\librf\src\state.inl" />
+    <None Include="..\librf\src\type_traits.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
