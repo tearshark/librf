@@ -59,6 +59,13 @@ namespace resumef
 #endif
 		bool _is_awaitor;
 	public:
+		state_future_t()
+		{
+#if RESUMEF_DEBUG_COUNTER
+			_id = ++g_resumef_state_id;
+#endif
+			_is_awaitor = false;
+		}
 		state_future_t(bool awaitor)
 		{
 #if RESUMEF_DEBUG_COUNTER
@@ -83,7 +90,7 @@ namespace resumef
 		void set_exception(std::exception_ptr e);
 
 		template<class _Exp>
-		void throw_exception(_Exp e) const
+		void throw_exception(_Exp e)
 		{
 			set_exception(std::make_exception_ptr(std::move(e)));
 		}

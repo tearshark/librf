@@ -171,7 +171,7 @@ namespace resumef
 		template<class _Tup, class... _Fty>
 		future_t<_Tup> when_all_count(size_t count, const std::shared_ptr<_Tup> & vals, scheduler_t & s, _Fty&&... f)
 		{
-			promise_t<_Tup> awaitable;
+			awaitable_t<_Tup> awaitable;
 
 			when_impl_ptr _event = std::make_shared<when_impl>(count);
 			auto awaker = std::make_shared<when_awaker>(

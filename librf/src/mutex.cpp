@@ -1,6 +1,8 @@
 ﻿#include "mutex.h"
 #include <assert.h>
 #include "scheduler.h"
+#include "awaitable.h"
+#include "state.inl"
 
 namespace resumef
 {
@@ -80,7 +82,7 @@ namespace resumef
 
 	future_t<bool> mutex_t::lock() const
 	{
-		promise_t<bool> awaitable;
+		awaitable_t<bool> awaitable;
 
 		auto awaker = std::make_shared<detail::mutex_awaker>(
 			[st = awaitable._state](detail::mutex_impl * e) -> bool
@@ -105,7 +107,7 @@ namespace resumef
 
 	future_t<bool> mutex_t::try_lock_until_(const clock_type::time_point & tp) const
 	{
-		promise_t<bool> awaitable;
+		awaitable_t<bool> awaitable;
 
 		auto awaker = std::make_shared<detail::mutex_awaker>(
 			[st = awaitable._state](detail::mutex_impl * e) -> bool
