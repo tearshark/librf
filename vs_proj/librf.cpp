@@ -32,6 +32,11 @@ int main(int argc, const char* argv[])
 	(void)argc;
 	(void)argv;
 
+	if (argc > 1)
+		resumable_main_benchmark_asio_client(atoi(argv[1]));
+	else
+		resumable_main_benchmark_asio_server();
+
 	//resumable_main_cb();
 	//resumable_main_modern_cb();
 	//resumable_main_suspend_always();
@@ -50,15 +55,7 @@ int main(int argc, const char* argv[])
 	//resumable_main_channel_mult_thread();		//测试失败！
 	//resumable_main_sleep();
 	//resumable_main_when_all();
-	benchmark_main_channel_passing_next();
-
-/*
-	if (argc > 1)
-		resumable_main_benchmark_asio_client(atoi(argv[1]));
-	else
-		resumable_main_benchmark_asio_server();
-
-*/
+	//benchmark_main_channel_passing_next();
 
 	return 0;
 }
