@@ -18,6 +18,8 @@
 //替代<experimental/generator>，因为VS2015/VS2017的generator<>未实现return_value，导致yield后不能return
 #include "generator.h"		
 
+#define LIB_RESUMEF_VERSION 200000 // 2.0.0
+
 namespace resumef
 {
 	struct scheduler_t;
