@@ -46,7 +46,7 @@ namespace resumef
 		void* operator new(size_t _Size)
 		{
 			size_t _State_size = _Align_size<state_type>();
-			assert(_Size >= sizeof(uint32_t) && _Size < std::numeric_limits<uint32_t>::max() - sizeof(_State_size));
+			assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
 #if RESUMEF_DEBUG_COUNTER
 			std::cout << "future_promise::new, size=" << (_Size + _State_size) << std::endl;
 #endif
@@ -59,7 +59,7 @@ namespace resumef
 		void operator delete(void* _Ptr, size_t _Size)
 		{
 			size_t _State_size = _Align_size<state_type>();
-			assert(_Size >= sizeof(uint32_t) && _Size < std::numeric_limits<uint32_t>::max() - sizeof(_State_size));
+			assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
 
 			_Alloc_char _Al;
 			state_type* st = reinterpret_cast<state_type*>(static_cast<char*>(_Ptr) - _State_size);
