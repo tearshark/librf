@@ -16,7 +16,7 @@ future_t<> test_routine_use_timer()
 	void* frame_ptr = _coro_frame_ptr();
 	size_t frame_size = _coro_frame_size();
 	std::cout << "test_routine_use_timer" << std::endl;
-	std::cout << "frame point=" << frame_ptr << ", size=" << frame_size << ", promise_size=" << promise_align_size<>() << std::endl;
+	std::cout << "frame point=" << frame_ptr << ", size=" << frame_size << ", promise_size=" << _Align_size<promise_t<>>() << std::endl;
 
 	auto handler = coroutine_handle<promise_t<>>::from_address(frame_ptr);
 	auto st = handler.promise()._state;

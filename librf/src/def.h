@@ -68,6 +68,15 @@ namespace resumef
 	};
 	template<class T>
 	using remove_cvref_t = typename remove_cvref<T>::type;
+
+
+	template<class _Ty>
+	constexpr size_t _Align_size()
+	{
+		const size_t _ALIGN_REQ = sizeof(void*) * 2;
+		return std::is_empty_v<_Ty> ? 0 :
+			(sizeof(_Ty) + _ALIGN_REQ - 1) & ~(_ALIGN_REQ - 1);
+	}
 }
 
 #if defined(RESUMEF_DLL_EXPORT)

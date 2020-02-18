@@ -32,17 +32,15 @@ namespace resumef
 		future_type get_return_object();
 		void cancellation_requested();
 
-		static const size_t _ALIGN_REQ = sizeof(void*) * 2;
-
 		using _Alloc_char = std::allocator<char>;
 		void* operator new(size_t _Size)
 		{
 			std::cout << "promise::new, size=" << _Size << std::endl;
 
 			_Alloc_char _Al;
-			size_t _State_size = ((sizeof(state_type) + _ALIGN_REQ - 1) & ~(_ALIGN_REQ - 1));
+			size_t _State_size = _Align_size<state_type>();
 			char* ptr = _Al.allocate(_Size + _State_size);
-			return ptr + _State_size;
+			return ptr;
 		}
 
 		void operator delete(void* _Ptr, size_t _Size)
@@ -71,10 +69,5 @@ namespace resumef
 		void yield_value();
 	};
 
-	template<class _Ty = void>
-	constexpr size_t promise_align_size()
-	{
-		return (sizeof(promise_t<_Ty>) + promise_t<_Ty>::_ALIGN_REQ - 1) & ~(promise_t<_Ty>::_ALIGN_REQ - 1);
-	}
 }
 
