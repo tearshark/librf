@@ -10,9 +10,11 @@ namespace resumef
 {
 	struct state_base_t
 	{
+		using _Alloc_char = std::allocator<char>;
+
 		RF_API virtual ~state_base_t();
 	private:
-		std::atomic<intptr_t> _count{ 0 };
+		std::atomic<intptr_t> _count{0};
 	public:
 		void lock()
 		{
@@ -21,7 +23,9 @@ namespace resumef
 		void unlock()
 		{
 			if (--_count == 0)
-				delete this;
+			{
+				destroy_deallocate();
+			}
 		}
 	protected:
 		scheduler_t* _scheduler = nullptr;
@@ -30,6 +34,8 @@ namespace resumef
 		//		一、经过co_await操作后，_coro在初始时不会为nullptr。
 		//		二、没有co_await操作，直接加入到了调度器里，则_coro在初始时为nullptr。调度器需要特殊处理此种情况。
 		coroutine_handle<> _coro;
+	private:
+		virtual void destroy_deallocate() = 0;
 	public:
 		virtual void resume() = 0;
 		virtual bool has_handler() const = 0;
@@ -53,6 +59,7 @@ namespace resumef
 			_coro = handler;
 		}
 
+		virtual void destroy_deallocate() override;
 		virtual void resume() override;
 		virtual bool has_handler() const override;
 		virtual bool is_ready() const override;
@@ -69,8 +76,10 @@ namespace resumef
 		intptr_t _id;
 #endif
 		std::exception_ptr _exception;
+		uint32_t _Alloc_size;
 		bool _has_value = false;
 		bool _is_awaitor;
+		bool _is_initor = false;
 	public:
 		state_future_t()
 		{
@@ -79,7 +88,7 @@ namespace resumef
 #endif
 			_is_awaitor = false;
 		}
-		state_future_t(bool awaitor)
+		explicit state_future_t(bool awaitor)
 		{
 #if RESUMEF_DEBUG_COUNTER
 			_id = ++g_resumef_state_id;
@@ -87,6 +96,7 @@ namespace resumef
 			_is_awaitor = awaitor;
 		}
 
+		virtual void destroy_deallocate() override;
 		virtual void resume() override;
 		virtual bool has_handler() const override;
 		virtual bool is_ready() const override;
@@ -99,6 +109,10 @@ namespace resumef
 		state_base_t * get_parent() const
 		{
 			return _parent;
+		}
+		void set_alloc_size(uint32_t val)
+		{
+			_Alloc_size = val;
 		}
 
 		void set_exception(std::exception_ptr e);
@@ -125,11 +139,19 @@ namespace resumef
 	};
 
 	template <typename _Ty>
-	struct state_t : public state_future_t
+	struct state_t sealed : public state_future_t
 	{
-		using state_future_t::state_future_t;
 		using state_future_t::lock_type;
 		using value_type = _Ty;
+
+		state_t() :state_future_t()
+		{
+			_Alloc_size = sizeof(*this);
+		}
+		explicit state_t(bool awaitor) :state_future_t(awaitor)
+		{
+			_Alloc_size = sizeof(*this);
+		}
 	private:
 		union union_value_type
 		{
@@ -154,10 +176,18 @@ namespace resumef
 	};
 
 	template<>
-	struct state_t<void> : public state_future_t
+	struct state_t<void> sealed : public state_future_t
 	{
-		using state_future_t::state_future_t;
 		using state_future_t::lock_type;
+
+		state_t() :state_future_t()
+		{
+			_Alloc_size = sizeof(*this);
+		}
+		explicit state_t(bool awaitor) :state_future_t(awaitor)
+		{
+			_Alloc_size = sizeof(*this);
+		}
 	public:
 		void future_await_resume();
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>

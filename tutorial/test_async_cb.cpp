@@ -23,18 +23,6 @@ void callback_get_long(int64_t val, _Ctype&& cb)
 //这种情况下，没有生成 frame-context，因此，并没有promise_type被内嵌在frame-context里
 future_t<int64_t> async_get_long(int64_t val)
 {
-/*
-	void* frame_ptr = _coro_frame_ptr();
-	size_t frame_size = _coro_frame_size();
-	std::cout << "test_routine_use_timer" << std::endl;
-	std::cout << "frame point=" << frame_ptr << ", size=" << frame_size << ", promise_size=" << _Align_size<promise_t<>>() << std::endl;
-
-	auto handler = coroutine_handle<promise_t<>>::from_address(frame_ptr);
-	auto st = handler.promise()._state;
-	scheduler_t* sch = st->get_scheduler();
-	auto parent = st->get_parent();
-	std::cout << "st=" << st.get() << ", scheduler=" << sch << ", parent=" << parent << std::endl;
-*/
 	resumef::awaitable_t<int64_t> awaitable;
 	callback_get_long(val, [awaitable](int64_t val)
 	{
@@ -81,6 +69,6 @@ void resumable_main_cb()
 		std::cout << "GO:" << val << std::endl;
 	};
 
-	go resumable_get_long(3);
+	go loop_get_long(3);
 	resumef::this_scheduler()->run_until_notask();
 }

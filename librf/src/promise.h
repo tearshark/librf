@@ -14,14 +14,24 @@ namespace resumef
 		using promise_type = promise_t<value_type>;
 		using future_type = future_t<value_type>;
 
-		counted_ptr<state_type> _state = make_counted<state_type>(false);
-		char __xxx[16];
+		promise_impl_t() 
+		{
+			state_type* st = get_state();
+			new(st) state_type();
+			st->lock();
+		}
 
-		promise_impl_t() {}
 		promise_impl_t(promise_impl_t&& _Right) noexcept = default;
 		promise_impl_t& operator = (promise_impl_t&& _Right) noexcept = default;
 		promise_impl_t(const promise_impl_t&) = delete;
 		promise_impl_t& operator = (const promise_impl_t&) = delete;
+
+		state_type* get_state()
+		{
+			size_t _State_size = _Align_size<state_type>();
+			char* ptr = reinterpret_cast<char*>(this) - _State_size;
+			return reinterpret_cast<state_type*>(ptr);
+		}
 
 		suspend_on_initial initial_suspend() noexcept;
 		suspend_on_final final_suspend() noexcept;
@@ -35,36 +45,41 @@ namespace resumef
 		using _Alloc_char = std::allocator<char>;
 		void* operator new(size_t _Size)
 		{
-			std::cout << "promise::new, size=" << _Size << std::endl;
+			size_t _State_size = _Align_size<state_type>();
+			assert(_Size >= sizeof(uint32_t) && _Size < std::numeric_limits<uint32_t>::max() - sizeof(_State_size));
+#if RESUMEF_DEBUG_COUNTER
+			std::cout << "promise::new, size=" << (_Size + _State_size) << std::endl;
+#endif
 
 			_Alloc_char _Al;
-			size_t _State_size = _Align_size<state_type>();
 			char* ptr = _Al.allocate(_Size + _State_size);
-			return ptr;
+			return ptr + _State_size;
 		}
 
 		void operator delete(void* _Ptr, size_t _Size)
 		{
+			size_t _State_size = _Align_size<state_type>();
+			assert(_Size >= sizeof(uint32_t) && _Size < std::numeric_limits<uint32_t>::max() - sizeof(_State_size));
+
 			_Alloc_char _Al;
-			return _Al.deallocate(static_cast<char*>(_Ptr), _Size);
+			state_type* st = reinterpret_cast<state_type*>(static_cast<char*>(_Ptr) - _State_size);
+			st->set_alloc_size(static_cast<uint32_t>(_Size + _State_size));
+			st->unlock();
 		}
 	};
 
 	template<class _Ty>
-	struct promise_t : public promise_impl_t<_Ty>
+	struct promise_t sealed : public promise_impl_t<_Ty>
 	{
 		using typename promise_impl_t<_Ty>::value_type;
-		using promise_impl_t<_Ty>::_state;
 
 		void return_value(value_type val);
 		void yield_value(value_type val);
 	};
 
 	template<>
-	struct promise_t<void> : public promise_impl_t<void>
+	struct promise_t<void> sealed : public promise_impl_t<void>
 	{
-		using promise_impl_t<void>::_state;
-
 		void return_void();
 		void yield_value();
 	};

@@ -9,6 +9,23 @@ namespace resumef
 	{
 	}
 
+	void state_future_t::destroy_deallocate()
+	{
+		size_t _Size = this->_Alloc_size;
+#if RESUMEF_DEBUG_COUNTER
+		std::cout << "destroy_deallocate, size=" << _Size << std::endl;
+#endif
+		this->~state_future_t();
+
+		_Alloc_char _Al;
+		return _Al.deallocate(reinterpret_cast<char*>(this), _Size);
+	}
+	
+	void state_generator_t::destroy_deallocate()
+	{
+		delete this;
+	}
+
 	void state_generator_t::resume()
 	{
 		if (_coro != nullptr)
@@ -38,19 +55,36 @@ namespace resumef
 
 	void state_future_t::resume()
 	{
-		scoped_lock<lock_type> __guard(_mtx);
+		std::unique_lock<lock_type> __guard(_mtx);
 
-		if (_initor != nullptr)
+		if (_initor != nullptr && _is_initor)
 		{
 			coroutine_handle<> handler = _initor;
 			_initor = nullptr;
+			__guard.unlock();
+
 			handler.resume();
+			return;
 		}
-		else if (_coro != nullptr)
+		
+		if (_coro != nullptr)
 		{
 			coroutine_handle<> handler = _coro;
 			_coro = nullptr;
+			__guard.unlock();
+
 			handler.resume();
+			return;
+		}
+
+		if (_initor != nullptr && !_is_initor)
+		{
+			coroutine_handle<> handler = _initor;
+			_initor = nullptr;
+			__guard.unlock();
+
+			handler.destroy();
+			return;
 		}
 	}
 

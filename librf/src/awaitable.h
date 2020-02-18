@@ -9,6 +9,7 @@ namespace resumef
 		using state_type = state_t<value_type>;
 		using future_type = future_t<value_type>;
 		using lock_type = typename state_type::lock_type;
+		using _Alloc_char = typename state_type::_Alloc_char;
 
 		awaitable_impl_t() {}
 		awaitable_impl_t(const awaitable_impl_t&) = default;
@@ -34,7 +35,18 @@ namespace resumef
 			return future_type{ this->_state };
 		}
 
-		mutable counted_ptr<state_type> _state = make_counted<state_type>(true);
+		mutable counted_ptr<state_type> _state = _Alloc_state();
+	private:
+		static state_type* _Alloc_state()
+		{
+			_Alloc_char _Al;
+			size_t _Size = sizeof(state_type);
+#if RESUMEF_DEBUG_COUNTER
+			std::cout << "awaitable_t::alloc, size=" << _Size << std::endl;
+#endif
+			char * _Ptr = _Al.allocate(_Size);
+			return new(_Ptr) state_type(true);
+		}
 	};
 
 	template<class _Ty>

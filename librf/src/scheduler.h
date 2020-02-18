@@ -19,7 +19,7 @@ namespace resumef
 		using state_vector = std::vector<state_sptr>;
 	private:
 		using lock_type = std::recursive_mutex;
-		using task_dictionary_type = std::unordered_map<state_base_t*, task_base_t*>;
+		using task_dictionary_type = std::unordered_map<state_base_t*, std::unique_ptr<task_base_t>>;
 
 		mutable lock_type _lock_running;
 		state_vector _runing_states;

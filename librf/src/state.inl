@@ -7,12 +7,13 @@ namespace resumef
 	{
 		_PromiseT& promise = handler.promise();
 
-		state_base_t* parent_state = promise._state.get();
+		state_base_t* parent_state = promise.get_state();
 		(void)parent_state;
 		assert(this == parent_state);
 		assert(this->_scheduler == nullptr);
 		assert(this->_coro == nullptr);
 		this->_initor = handler;
+		this->_is_initor = true;
 	}
 
 	inline void state_future_t::promise_await_resume()
@@ -26,9 +27,11 @@ namespace resumef
 
 		_PromiseT& promise = handler.promise();
 
-		state_base_t* parent_state = promise._state.get();
+		state_base_t* parent_state = promise.get_state();
 		(void)parent_state;
 		assert(this == parent_state);
+		this->_initor = handler;
+		this->_is_initor = false;
 
 		scheduler_t* sch = this->get_scheduler();
 		assert(sch != nullptr);
@@ -42,7 +45,7 @@ namespace resumef
 
 		_PromiseT& promise = handler.promise();
 
-		auto* parent_state = promise._state.get();
+		auto* parent_state = promise.get_state();
 		scheduler_t* sch = parent_state->get_scheduler();
 		if (this != parent_state)
 		{

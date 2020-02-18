@@ -19,10 +19,10 @@ future_t<> test_routine_use_timer()
 	std::cout << "frame point=" << frame_ptr << ", size=" << frame_size << ", promise_size=" << _Align_size<promise_t<>>() << std::endl;
 
 	auto handler = coroutine_handle<promise_t<>>::from_address(frame_ptr);
-	auto st = handler.promise()._state;
+	auto st = handler.promise().get_state();
 	scheduler_t* sch = st->get_scheduler();
 	auto parent = st->get_parent();
-	std::cout << "st=" << st.get() << ", scheduler=" << sch << ", parent=" << parent << std::endl;
+	std::cout << "st=" << st << ", scheduler=" << sch << ", parent=" << parent << std::endl;
 
 	for (size_t i = 0; i < 3; ++i)
 	{
