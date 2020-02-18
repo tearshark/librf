@@ -31,13 +31,14 @@ int main(int argc, const char* argv[])
 {
 	(void)argc;
 	(void)argv;
+	//resumable_main_routine();
 
-	if (argc > 1)
-		resumable_main_benchmark_asio_client(atoi(argv[1]));
-	else
-		resumable_main_benchmark_asio_server();
+	//if (argc > 1)
+	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
+	//else
+	//	resumable_main_benchmark_asio_server();
 
-	//resumable_main_cb();
+	resumable_main_cb();
 	//resumable_main_modern_cb();
 	//resumable_main_suspend_always();
 	//resumable_main_yield_return();

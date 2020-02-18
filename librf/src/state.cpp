@@ -38,26 +38,32 @@ namespace resumef
 
 	void state_future_t::resume()
 	{
-		coroutine_handle<> handler;
-
 		scoped_lock<lock_type> __guard(_mtx);
+
 		if (_initor != nullptr)
 		{
-			handler = _initor;
+			coroutine_handle<> handler = _initor;
 			_initor = nullptr;
-			handler();
+			handler.resume();
 		}
 		else if (_coro != nullptr)
 		{
-			handler = _coro;
+			coroutine_handle<> handler = _coro;
 			_coro = nullptr;
-			handler();
+			handler.resume();
 		}
 	}
 
 	bool state_future_t::has_handler() const
 	{
-		return _initor != nullptr || _coro != nullptr;
+		scoped_lock<lock_type> __guard(_mtx);
+		return _coro != nullptr || _initor != nullptr;
+	}
+
+	bool state_future_t::is_ready() const
+	{
+		scoped_lock<lock_type> __guard(this->_mtx);
+		return _exception != nullptr || _has_value || !_is_awaitor;
 	}
 
 	void state_future_t::set_exception(std::exception_ptr e)
@@ -69,18 +75,14 @@ namespace resumef
 		if (sch != nullptr)
 			sch->add_ready(this);
 	}
-	
-	bool state_t<void>::is_ready() const
-	{
-		scoped_lock<lock_type> __guard(this->_mtx);
-		return _is_awaitor == false || _has_value || _exception != nullptr;
-	}
 
 	void state_t<void>::future_await_resume()
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
 		if (this->_exception)
 			std::rethrow_exception(std::move(this->_exception));
+		if (!this->_has_value)
+			std::rethrow_exception(std::make_exception_ptr(future_exception{error_code::not_ready}));
 	}
 
 	void state_t<void>::set_value()

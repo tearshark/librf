@@ -3,23 +3,6 @@
 
 namespace resumef
 {
-	template<class _Derived>
-	struct counted_t
-	{
-		std::atomic<intptr_t> _count{ 0 };
-
-		void lock()
-		{
-			++_count;
-		}
-
-		void unlock()
-		{
-			if (--_count == 0)
-				delete static_cast<_Derived*>(this);
-		}
-	};
-
 	template <typename T>
 	struct counted_ptr
 	{

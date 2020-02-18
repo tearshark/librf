@@ -26,7 +26,7 @@ void dump(size_t idx, std::string name, T start, T end, intptr_t count)
 static const intptr_t N = 3000000;
 //static const int N = 10;
 
-auto yield_switch(intptr_t coro) -> std::experimental::generator<intptr_t>
+auto yield_switch(intptr_t coro) -> resumef::generator_t<intptr_t>
 {
 	for (intptr_t i = 0; i < N / coro; ++i)
 		co_yield i;
@@ -42,7 +42,7 @@ void resumable_switch(intptr_t coro, size_t idx)
 	for (intptr_t i = 0; i < coro; ++i)
 	{
 		//go yield_switch(coro);
-		go [=] ()->std::experimental::generator<intptr_t>
+		go [=] ()->resumef::generator_t<intptr_t>
 		{
 			for (intptr_t i = 0; i < N / coro; ++i)
 				co_yield i;

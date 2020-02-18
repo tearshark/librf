@@ -24,6 +24,7 @@
 #include "src/scheduler.h"
 #include "src/promise.inl"
 #include "src/state.inl"
+#include "src/generator.h"
 #include "src/sleep.h"
 #include "src/when.h"
 

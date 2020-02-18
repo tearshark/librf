@@ -49,9 +49,9 @@ namespace resumef
 			this->_parent = parent_state;
 			this->_scheduler = sch;
 		}
-
-		if (this->_coro == nullptr)
+		if (_coro == nullptr)
 			this->_coro = handler;
+
 		if (sch != nullptr)
 			sch->add_await(this);
 	}
@@ -80,7 +80,15 @@ namespace resumef
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
 
-		this->_value = std::move(val);
+		if (this->_has_value)
+		{
+			this->uv._value = std::move(val);
+		}
+		else
+		{
+			this->_has_value = true;
+			new(&this->uv._value) value_type(std::move(val));
+		}
 
 		coroutine_handle<_PromiseT> handler = coroutine_handle<_PromiseT>::from_promise(*promise);
 		if (!handler.done())
@@ -99,7 +107,10 @@ namespace resumef
 		scoped_lock<lock_type> __guard(this->_mtx);
 		if (this->_exception)
 			std::rethrow_exception(std::move(this->_exception));
-		return std::move(this->_value.value());
+		if (!this->_has_value)
+			std::rethrow_exception(std::make_exception_ptr(future_exception{error_code::not_ready}));
+
+		return std::move(this->uv._value);
 	}
 
 	template<typename _Ty>
@@ -107,7 +118,16 @@ namespace resumef
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
 
-		this->_value = std::move(val);
+		if (this->_has_value)
+		{
+			this->uv._value = std::move(val);
+		}
+		else
+		{
+			this->_has_value = true;
+			new(&this->uv._value) value_type(std::move(val));
+		}
+
 		scheduler_t* sch = this->get_scheduler();
 		if (sch != nullptr)
 			sch->add_ready(this);

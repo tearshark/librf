@@ -19,8 +19,6 @@
 
 #include <experimental/coroutine>
 //#include <experimental/generator>
-//替代<experimental/generator>，因为VS2015/VS2017的generator<>未实现return_value，导致yield后不能return
-#include "generator.h"		
 
 #define LIB_RESUMEF_VERSION 200000 // 2.0.0
 
@@ -32,6 +30,9 @@ namespace resumef
 	struct future_t;
 	using future_vt [[deprecated]] = future_t<>;
 
+	template <typename _Ty = std::nullptr_t, typename _Alloc = std::allocator<char>>
+	struct generator_t;
+
 	template<class _Ty = void>
 	struct promise_t;
 
@@ -40,9 +41,6 @@ namespace resumef
 
 	//获得当前线程下的调度器
 	scheduler_t* this_scheduler();
-
-	template <typename _Ty = std::nullptr_t, typename _Alloc = std::allocator<char>>
-	using generator_t = std::experimental::generator<_Ty, _Alloc>;
 
 	template<typename _PromiseT = void>
 	using coroutine_handle = std::experimental::coroutine_handle<_PromiseT>;

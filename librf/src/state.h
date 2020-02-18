@@ -8,9 +8,21 @@
 
 namespace resumef
 {
-	struct state_base_t : public counted_t<state_base_t>
+	struct state_base_t
 	{
 		RF_API virtual ~state_base_t();
+	private:
+		std::atomic<intptr_t> _count{ 0 };
+	public:
+		void lock()
+		{
+			++_count;
+		}
+		void unlock()
+		{
+			if (--_count == 0)
+				delete this;
+		}
 	protected:
 		scheduler_t* _scheduler = nullptr;
 		//可能来自协程里的promise产生的，则经过co_await操作后，_coro在初始时不会为nullptr。
@@ -52,11 +64,12 @@ namespace resumef
 	protected:
 		mutable lock_type _mtx;
 		coroutine_handle<> _initor;
-		std::exception_ptr _exception;
 		state_future_t* _parent = nullptr;
 #if RESUMEF_DEBUG_COUNTER
 		intptr_t _id;
 #endif
+		std::exception_ptr _exception;
+		bool _has_value = false;
 		bool _is_awaitor;
 	public:
 		state_future_t()
@@ -76,6 +89,7 @@ namespace resumef
 
 		virtual void resume() override;
 		virtual bool has_handler() const override;
+		virtual bool is_ready() const override;
 
 		scheduler_t* get_scheduler() const
 		{
@@ -97,6 +111,11 @@ namespace resumef
 
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void future_await_suspend(coroutine_handle<_PromiseT> handler);
+		bool future_await_ready()
+		{
+			scoped_lock<lock_type> __guard(this->_mtx);
+			return _has_value;
+		}
 
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void promise_initial_suspend(coroutine_handle<_PromiseT> handler);
@@ -111,21 +130,22 @@ namespace resumef
 		using state_future_t::state_future_t;
 		using state_future_t::lock_type;
 		using value_type = _Ty;
-	protected:
-		std::optional<value_type> _value;
+	private:
+		union union_value_type
+		{
+			value_type _value;
+			char _[1];
+
+			union_value_type() {}
+			~union_value_type() {}
+		};
+		union_value_type uv;
 	public:
-		virtual bool is_ready() const override
+		~state_t()
 		{
-			scoped_lock<lock_type> __guard(this->_mtx);
-			return _is_awaitor == false || _value.has_value() || _exception != nullptr;
+			if (_has_value)
+				uv._value.~value_type();
 		}
-
-		bool future_await_ready()
-		{
-			scoped_lock<lock_type> __guard(this->_mtx);
-			return _value.has_value();
-		}
-
 		auto future_await_resume() -> value_type;
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void promise_yield_value(_PromiseT* promise, value_type val);
@@ -138,16 +158,7 @@ namespace resumef
 	{
 		using state_future_t::state_future_t;
 		using state_future_t::lock_type;
-	protected:
-		std::atomic<bool> _has_value{ false };
 	public:
-		virtual bool is_ready() const override;
-
-		bool future_await_ready()
-		{
-			return _has_value;
-		}
-
 		void future_await_resume();
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void promise_yield_value(_PromiseT* promise);
