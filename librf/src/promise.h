@@ -48,7 +48,7 @@ namespace resumef
 			size_t _State_size = _Align_size<state_type>();
 			assert(_Size >= sizeof(uint32_t) && _Size < std::numeric_limits<uint32_t>::max() - sizeof(_State_size));
 #if RESUMEF_DEBUG_COUNTER
-			std::cout << "promise::new, size=" << (_Size + _State_size) << std::endl;
+			std::cout << "future_promise::new, size=" << (_Size + _State_size) << std::endl;
 #endif
 
 			_Alloc_char _Al;

@@ -11,7 +11,7 @@ namespace resumef
 
 	void state_future_t::destroy_deallocate()
 	{
-		size_t _Size = this->_Alloc_size;
+		size_t _Size = this->_alloc_size;
 #if RESUMEF_DEBUG_COUNTER
 		std::cout << "destroy_deallocate, size=" << _Size << std::endl;
 #endif
@@ -23,7 +23,16 @@ namespace resumef
 	
 	void state_generator_t::destroy_deallocate()
 	{
-		delete this;
+		size_t _Size = _Align_size<state_generator_t>();
+		char* _Ptr = reinterpret_cast<char*>(this) + _Size;
+		_Size = *reinterpret_cast<uint32_t*>(_Ptr);
+#if RESUMEF_DEBUG_COUNTER
+		std::cout << "destroy_deallocate, size=" << _Size << std::endl;
+#endif
+		this->~state_generator_t();
+
+		_Alloc_char _Al;
+		return _Al.deallocate(reinterpret_cast<char*>(this), _Size);
 	}
 
 	void state_generator_t::resume()
@@ -33,8 +42,11 @@ namespace resumef
 			_coro.resume();
 			if (_coro.done())
 			{
+				coroutine_handle<> handler = _coro;
 				_coro = nullptr;
 				_scheduler->del_final(this);
+
+				handler.destroy();
 			}
 			else
 			{

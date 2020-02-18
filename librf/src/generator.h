@@ -32,9 +32,10 @@ namespace resumef
 
 		generator_iterator& operator++()
 		{
-			_Coro.resume();
 			if (_Coro.done())
 				_Coro = nullptr;
+			else
+				_Coro.resume();
 			return *this;
 		}
 
@@ -106,6 +107,17 @@ namespace resumef
 
 			_Ty const* _CurrentValue;
 
+			promise_type()
+			{
+				state_type* st = get_state();
+				new(st) state_type(coroutine_handle<promise_type>::from_promise(*this));
+				st->lock();
+			}
+			promise_type(promise_type&& _Right) noexcept = default;
+			promise_type& operator = (promise_type&& _Right) noexcept = default;
+			promise_type(const promise_type&) = delete;
+			promise_type& operator = (const promise_type&) = delete;
+
 			promise_type& get_return_object()
 			{
 				return *this;
@@ -145,6 +157,13 @@ namespace resumef
 				return std::forward<_Uty>(_Whatever);
 			}
 
+			state_type* get_state()
+			{
+				size_t _State_size = _Align_size<state_type>();
+				char* ptr = reinterpret_cast<char*>(this) - _State_size;
+				return reinterpret_cast<state_type*>(ptr);
+			}
+
 			using _Alloc_char = typename std::allocator_traits<_Alloc>::template rebind_alloc<char>;
 			static_assert(std::is_same_v<char*, typename std::allocator_traits<_Alloc_char>::pointer>,
 				"generator_t does not support allocators with fancy pointer types");
@@ -153,15 +172,27 @@ namespace resumef
 
 			void* operator new(size_t _Size)
 			{
+				size_t _State_size = _Align_size<state_type>();
+				assert(_Size >= sizeof(uint32_t) && _Size < std::numeric_limits<uint32_t>::max() - sizeof(_State_size));
+#if RESUMEF_DEBUG_COUNTER
+				std::cout << "generator_promise::new, size=" << (_Size + _State_size) << std::endl;
+#endif
+
 				_Alloc_char _Al;
-				void* ptr = _Al.allocate(_Size);
-				return ptr;
+				char* ptr = _Al.allocate(_Size + _State_size);
+				return ptr + _State_size;
 			}
 
 			void operator delete(void* _Ptr, size_t _Size)
 			{
+				size_t _State_size = _Align_size<state_type>();
+				assert(_Size >= sizeof(uint32_t) && _Size < std::numeric_limits<uint32_t>::max() - sizeof(_State_size));
+
+				*reinterpret_cast<uint32_t*>(_Ptr) = static_cast<uint32_t>(_Size + _State_size);
+
 				_Alloc_char _Al;
-				return _Al.deallocate(static_cast<char*>(_Ptr), _Size);
+				state_type* st = reinterpret_cast<state_type*>(static_cast<char*>(_Ptr) - _State_size);
+				st->unlock();
 			}
 		};
 
@@ -216,11 +247,11 @@ namespace resumef
 			}
 		}
 
-		coroutine_handle<promise_type> detach()
+		state_type* detach_state()
 		{
 			auto t = _Coro;
 			_Coro = nullptr;
-			return t;
+			return t.promise().get_state();
 		}
 
 	private:

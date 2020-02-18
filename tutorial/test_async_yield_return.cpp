@@ -59,6 +59,11 @@ auto test_yield_void() -> generator_t<>
 
 void resumable_main_yield_return()
 {
+	for (int i : test_yield_int())
+	{
+		std::cout << i << " had return" << std::endl;
+	}
+
 	go test_yield_int();
 	this_scheduler()->run_until_notask();
 

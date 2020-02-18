@@ -60,7 +60,7 @@ namespace resumef
 	protected:
 		void initialize(future_type&& f)
 		{
-			_state = new state_type(f.detach());
+			_state = f.detach_state();
 		}
 	};
 

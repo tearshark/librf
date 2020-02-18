@@ -11,8 +11,6 @@ namespace resumef
 	struct state_base_t
 	{
 		using _Alloc_char = std::allocator<char>;
-
-		RF_API virtual ~state_base_t();
 	private:
 		std::atomic<intptr_t> _count{0};
 	public:
@@ -34,6 +32,8 @@ namespace resumef
 		//		一、经过co_await操作后，_coro在初始时不会为nullptr。
 		//		二、没有co_await操作，直接加入到了调度器里，则_coro在初始时为nullptr。调度器需要特殊处理此种情况。
 		coroutine_handle<> _coro;
+
+		virtual ~state_base_t();
 	private:
 		virtual void destroy_deallocate() = 0;
 	public:
@@ -53,16 +53,24 @@ namespace resumef
 	
 	struct state_generator_t : public state_base_t
 	{
-	public:
 		state_generator_t(coroutine_handle<> handler)
 		{
 			_coro = handler;
 		}
-
+	private:
 		virtual void destroy_deallocate() override;
+	public:
 		virtual void resume() override;
 		virtual bool has_handler() const override;
 		virtual bool is_ready() const override;
+
+		static state_generator_t * _Alloc_state(coroutine_handle<> handler)
+		{
+#if RESUMEF_DEBUG_COUNTER
+			std::cout << "state_generator_t::alloc, size=" << sizeof(state_generator_t) << std::endl;
+#endif
+			return new state_generator_t(handler);
+		}
 	};
 
 	struct state_future_t : public state_base_t
@@ -76,7 +84,7 @@ namespace resumef
 		intptr_t _id;
 #endif
 		std::exception_ptr _exception;
-		uint32_t _Alloc_size;
+		uint32_t _alloc_size;
 		bool _has_value = false;
 		bool _is_awaitor;
 		bool _is_initor = false;
@@ -112,7 +120,7 @@ namespace resumef
 		}
 		void set_alloc_size(uint32_t val)
 		{
-			_Alloc_size = val;
+			_alloc_size = val;
 		}
 
 		void set_exception(std::exception_ptr e);
@@ -146,11 +154,11 @@ namespace resumef
 
 		state_t() :state_future_t()
 		{
-			_Alloc_size = sizeof(*this);
+			_alloc_size = sizeof(*this);
 		}
 		explicit state_t(bool awaitor) :state_future_t(awaitor)
 		{
-			_Alloc_size = sizeof(*this);
+			_alloc_size = sizeof(*this);
 		}
 	private:
 		union union_value_type
@@ -162,12 +170,13 @@ namespace resumef
 			~union_value_type() {}
 		};
 		union_value_type uv;
-	public:
+
 		~state_t()
 		{
 			if (_has_value)
 				uv._value.~value_type();
 		}
+	public:
 		auto future_await_resume() -> value_type;
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void promise_yield_value(_PromiseT* promise, value_type val);
@@ -182,11 +191,11 @@ namespace resumef
 
 		state_t() :state_future_t()
 		{
-			_Alloc_size = sizeof(*this);
+			_alloc_size = sizeof(*this);
 		}
 		explicit state_t(bool awaitor) :state_future_t(awaitor)
 		{
-			_Alloc_size = sizeof(*this);
+			_alloc_size = sizeof(*this);
 		}
 	public:
 		void future_await_resume();
