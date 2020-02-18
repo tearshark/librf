@@ -20,7 +20,7 @@
 #include <experimental/coroutine>
 //#include <experimental/generator>
 
-#define LIB_RESUMEF_VERSION 200000 // 2.0.0
+#define LIB_RESUMEF_VERSION 200100 // 2.1.0
 
 namespace resumef
 {
