@@ -69,7 +69,7 @@ namespace resumef
 	};
 
 	template<class _Ty>
-	struct promise_t sealed : public promise_impl_t<_Ty>
+	struct promise_t final : public promise_impl_t<_Ty>
 	{
 		using typename promise_impl_t<_Ty>::value_type;
 
@@ -78,7 +78,7 @@ namespace resumef
 	};
 
 	template<>
-	struct promise_t<void> sealed : public promise_impl_t<void>
+	struct promise_t<void> final : public promise_impl_t<void>
 	{
 		void return_void();
 		void yield_value();

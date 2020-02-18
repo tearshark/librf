@@ -139,7 +139,7 @@ namespace resumef
 	};
 
 	template <typename _Ty>
-	struct state_t sealed : public state_future_t
+	struct state_t final : public state_future_t
 	{
 		using state_future_t::lock_type;
 		using value_type = _Ty;
@@ -176,7 +176,7 @@ namespace resumef
 	};
 
 	template<>
-	struct state_t<void> sealed : public state_future_t
+	struct state_t<void> final : public state_future_t
 	{
 		using state_future_t::lock_type;
 

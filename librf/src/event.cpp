@@ -338,11 +338,11 @@ namespace resumef
 		ctx->st = awaitable._state;
 		ctx->evts_waited.reserve(evts.size());
 		ctx->evts = std::move(evts);
-		ctx->th = std::move(this_scheduler()->timer()->add_handler(tp,
+        ctx->th = this_scheduler()->timer()->add_handler(tp,
 			[ctx](bool )
 			{
 				ctx->awake(nullptr);
-			}));
+            });
 
 		for (auto e : ctx->evts)
 		{
