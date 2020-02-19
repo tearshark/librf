@@ -11,12 +11,7 @@ namespace asio {
 	{
 		ASIO_CONSTEXPR rf_task_t() {}
 	};
-
-#if defined(ASIO_HAS_CONSTEXPR) || defined(GENERATING_DOCUMENTATION)
 	constexpr rf_task_t<> rf_task;
-#elif defined(ASIO_MSVC)
-	__declspec(selectany) rf_task_t<> rf_task;
-#endif
 
 	namespace librf {
 

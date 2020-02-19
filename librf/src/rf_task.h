@@ -11,7 +11,7 @@ namespace resumef
 	struct task_base_t
 	{
 		task_base_t() = default;
-		RF_API virtual ~task_base_t();
+		virtual ~task_base_t();
 
 		state_base_t* get_state() const
 		{

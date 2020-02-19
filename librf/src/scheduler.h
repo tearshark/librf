@@ -30,16 +30,16 @@ namespace resumef
 
 		timer_mgr_ptr _timer;
 
-		RF_API void new_task(task_base_t* task);
+		void new_task(task_base_t* task);
 		//void cancel_all_task_();
 
 	public:
-		RF_API void run_one_batch();
-		RF_API void run_until_notask();
-		RF_API void run();
-		//RF_API void break_all();
+		void run_one_batch();
+		void run_until_notask();
+		void run();
+		//void break_all();
 
-		template<class _Ty, typename = std::enable_if_t<std::is_callable<_Ty>::value || is_future_v<_Ty> || is_generator_v<_Ty> >>
+		template<class _Ty, typename = std::enable_if_t<std::is_callable_v<_Ty> || is_future_v<_Ty> || is_generator_v<_Ty> >>
 		inline void operator + (_Ty&& t_)
 		{
 			if constexpr (std::is_callable<_Ty>::value)
@@ -68,9 +68,9 @@ namespace resumef
 		friend struct task_base;
 		friend struct local_scheduler;
 	protected:
-		RF_API scheduler_t();
+		scheduler_t();
 	public:
-		RF_API ~scheduler_t();
+		~scheduler_t();
 
 		scheduler_t(scheduler_t&& right_) = delete;
 		scheduler_t& operator = (scheduler_t&& right_) = delete;
@@ -82,8 +82,8 @@ namespace resumef
 
 	struct local_scheduler
 	{
-		RF_API local_scheduler();
-		RF_API ~local_scheduler();
+		local_scheduler();
+		~local_scheduler();
 
 		local_scheduler(local_scheduler&& right_) = delete;
 		local_scheduler& operator = (local_scheduler&& right_) = delete;
@@ -101,11 +101,6 @@ namespace resumef
 	{
 		return &scheduler_t::g_scheduler;
 	}
-#endif
-
-#if !defined(_DISABLE_RESUMEF_GO_MACRO)
-#define go (*::resumef::this_scheduler()) + 
-#define GO (*::resumef::this_scheduler()) + [=]()mutable->resumef::future_t<>
 #endif
 
 	//--------------------------------------------------------------------------------------------------

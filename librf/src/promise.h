@@ -1,6 +1,9 @@
 ﻿#pragma once
 #include "state.h"
 
+#pragma push_macro("new")
+#undef new
+
 namespace resumef
 {
 	struct suspend_on_initial;
@@ -88,3 +91,4 @@ namespace resumef
 
 }
 
+#pragma pop_macro("new")

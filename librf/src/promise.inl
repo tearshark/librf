@@ -1,7 +1,4 @@
-﻿
-#pragma once
-
-#pragma once
+﻿#pragma once
 
 namespace resumef
 {

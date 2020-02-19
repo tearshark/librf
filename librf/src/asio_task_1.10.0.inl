@@ -25,12 +25,7 @@ namespace asio {
 	private:
 		Allocator allocator_;
 	};
-
-	//constexpr rf_task_t<> rf_task;
-#pragma warning(push)
-#pragma warning(disable : 4592)
-	__declspec(selectany) rf_task_t<> rf_task;
-#pragma warning(pop)
+	constexpr rf_task_t<> rf_task;
 
 	namespace detail {
 

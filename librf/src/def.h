@@ -1,8 +1,5 @@
 ﻿#pragma once
 
-#define RESUMEF_LIB_INCLUDE	1
-
-//#include <yvals.h>
 #include <atomic>
 #include <chrono>
 #include <vector>
@@ -14,13 +11,10 @@
 #include <functional>
 #include <optional>
 #include <thread>
-
 #include <assert.h>
-
 #include <experimental/coroutine>
-//#include <experimental/generator>
 
-#define LIB_RESUMEF_VERSION 200101 // 2.1.1
+#define LIB_RESUMEF_VERSION 200102 // 2.1.2
 
 namespace resumef
 {
@@ -49,6 +43,8 @@ namespace resumef
 
 	template<class... _Mutexes>
 	using scoped_lock = std::scoped_lock<_Mutexes...>;
+
+	constexpr size_t _Version = LIB_RESUMEF_VERSION;
 }
 
 #if RESUMEF_DEBUG_COUNTER
@@ -79,16 +75,6 @@ namespace resumef
 	}
 }
 
-#if defined(RESUMEF_DLL_EXPORT)
-#	define RF_API __declspec(dllexport)
-#elif defined(RESUMEF_DLL_IMPORT)
-#	define RF_API __declspec(dllimport)
-#else
-#	define RF_API
-#endif
-
 #include "exception.inl"
 #include "type_traits.inl"
-
-#define co_yield_void co_yield nullptr
-#define co_return_void co_return nullptr
+#include "macro_def.inl"

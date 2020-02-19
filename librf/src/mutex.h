@@ -20,12 +20,12 @@ namespace resumef
 			mutex_awaker_ptr _owner;
 			lock_type _lock;
 		public:
-			RF_API mutex_impl();
+			mutex_impl();
 
 			//如果已经触发了awaker,则返回true
-			RF_API bool lock_(const mutex_awaker_ptr& awaker);
-			RF_API bool try_lock_(const mutex_awaker_ptr& awaker);
-			RF_API void unlock();
+			bool lock_(const mutex_awaker_ptr& awaker);
+			bool try_lock_(const mutex_awaker_ptr& awaker);
+			void unlock();
 
 			template<class callee_t, class dummy_t = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, mutex_awaker_ptr>::value>>
 			decltype(auto) lock(callee_t&& awaker, dummy_t* dummy_ = nullptr)
@@ -50,7 +50,7 @@ namespace resumef
 	private:
 		lock_impl_ptr _locker;
 	public:
-		RF_API mutex_t();
+		mutex_t();
 
 		void unlock() const
 		{
@@ -58,10 +58,8 @@ namespace resumef
 		}
 
 
-		RF_API future_t<bool>
-			lock() const;
-		RF_API bool
-			try_lock() const;
+		future_t<bool> lock() const;
+		bool try_lock() const;
 
 		/*
 		template<class _Rep, class _Period>
@@ -79,22 +77,15 @@ namespace resumef
 		*/
 
 
-		RF_API mutex_t(const mutex_t&) = default;
-		RF_API mutex_t(mutex_t&&) = default;
-		RF_API mutex_t& operator = (const mutex_t&) = default;
-		RF_API mutex_t& operator = (mutex_t&&) = default;
+		mutex_t(const mutex_t&) = default;
+		mutex_t(mutex_t&&) = default;
+		mutex_t& operator = (const mutex_t&) = default;
+		mutex_t& operator = (mutex_t&&) = default;
 	private:
 		inline future_t<bool> try_lock_for_(const clock_type::duration& dt) const
 		{
 			return try_lock_until_(clock_type::now() + dt);
 		}
-		RF_API future_t<bool> try_lock_until_(const clock_type::time_point& tp) const;
+		future_t<bool> try_lock_until_(const clock_type::time_point& tp) const;
 	};
-
-#if _HAS_CXX17
-#define resumf_guard_lock(lker) (lker).lock(); resumef::scoped_lock<resumef::mutex_t> __resumf_guard##lker##__(std::adopt_lock, (lker))
-#else
-#define resumf_guard_lock(lker) (lker).lock(); resumef::scoped_lock<resumef::mutex_t> __resumf_guard##lker##__((lker), std::adopt_lock)
-#endif
-
 }

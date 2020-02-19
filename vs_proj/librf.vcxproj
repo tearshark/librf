@@ -213,6 +213,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\librf\librf.h" />
+    <ClInclude Include="..\librf\librf_macro.h" />
     <ClInclude Include="..\librf\src\asio_task.h" />
     <ClInclude Include="..\librf\src\awaitable.h" />
     <ClInclude Include="..\librf\src\channel.h" />
@@ -238,6 +239,7 @@
     <None Include="..\librf\src\asio_task_1.10.0.inl" />
     <None Include="..\librf\src\asio_task_1.12.0.inl" />
     <None Include="..\librf\src\exception.inl" />
+    <None Include="..\librf\src\macro_def.inl" />
     <None Include="..\librf\src\promise.inl" />
     <None Include="..\librf\src\state.inl" />
     <None Include="..\librf\src\type_traits.inl" />

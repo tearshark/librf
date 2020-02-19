@@ -177,6 +177,9 @@
     <ClInclude Include="..\librf\src\generator.h">
       <Filter>librf\src</Filter>
     </ClInclude>
+    <ClInclude Include="..\librf\librf_macro.h">
+      <Filter>librf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\librf\src\asio_task_1.12.0.inl">
@@ -198,5 +201,8 @@
       <Filter>librf\src</Filter>
     </None>
     <None Include="..\README.md" />
+    <None Include="..\librf\src\macro_def.inl">
+      <Filter>librf\src</Filter>
+    </None>
   </ItemGroup>
 </Project>

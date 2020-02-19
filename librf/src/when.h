@@ -1,19 +1,11 @@
 ﻿#pragma once
-#if RESUMEF_USE_BOOST_ANY
-#include <boost/any.hpp>
-namespace resumef
-{
-	using any_t = boost::any;
-	using boost::any_cast;
-}
-#else
+
 #include <any>
 namespace resumef
 {
 	using any_t = std::any;
 	using std::any_cast;
 }
-#endif
 
 #include "_awaker.h"
 #include "promise.h"
@@ -45,12 +37,12 @@ namespace resumef
 			intptr_t _counter;
 			lock_type _lock;
 		public:
-			RF_API when_impl(intptr_t initial_counter_);
+			when_impl(intptr_t initial_counter_);
 
-			RF_API void signal();
+			void signal();
 
 			//如果已经触发了awaker,则返回true
-			RF_API bool wait_(const when_awaker_ptr & awaker);
+			bool wait_(const when_awaker_ptr & awaker);
 
             template<class callee_t, class dummy_t = std::enable_if<!std::is_same<std::remove_cv_t<callee_t>, when_awaker_ptr>::value>>
 			auto wait(callee_t && awaker, dummy_t * dummy_ = nullptr)

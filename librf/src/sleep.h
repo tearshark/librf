@@ -8,7 +8,7 @@ namespace resumef
 {
 	struct scheduler_t;
 
-	RF_API future_t<> sleep_until_(const std::chrono::system_clock::time_point& tp_, scheduler_t& scheduler_);
+	future_t<> sleep_until_(const std::chrono::system_clock::time_point& tp_, scheduler_t& scheduler_);
 
 	inline future_t<> sleep_for_(const std::chrono::system_clock::duration& dt_, scheduler_t& scheduler_)
 	{

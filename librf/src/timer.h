@@ -87,8 +87,8 @@ namespace resumef
 	public:
 		timer_map_type		_runing_timers;
 
-		RF_API timer_manager();
-		RF_API ~timer_manager();
+		timer_manager();
+		~timer_manager();
 
 		template<class _Rep, class _Period, class _Cb>
 		timer_target_ptr add(const std::chrono::duration<_Rep, _Period> & dt_, _Cb && cb_)
@@ -111,14 +111,14 @@ namespace resumef
 			return{ this, add(tp_, std::forward<_Cb>(cb_)) };
 		}
 
-		RF_API bool stop(const timer_target_ptr & sptr);
+		bool stop(const timer_target_ptr & sptr);
 
 		inline bool empty() const
 		{
 			return _added_timers.empty() && _runing_timers.empty();
 		}
-		RF_API void clear();
-		RF_API void update();
+		void clear();
+		void update();
 
 		template<class _Cb>
 		timer_target_ptr add_(const duration_type & dt_, _Cb && cb_)
@@ -131,7 +131,7 @@ namespace resumef
 			return add_(std::make_shared<timer_target>(tp_, std::forward<_Cb>(cb_)));
 		}
 	private:
-		RF_API timer_target_ptr add_(const timer_target_ptr & sptr);
+		timer_target_ptr add_(const timer_target_ptr & sptr);
 		static void call_target_(const timer_target_ptr & sptr, bool canceld);
 	};
 
