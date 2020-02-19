@@ -62,8 +62,9 @@ namespace resumef
 			return ptr + _State_size;
 		}
 
-		void operator delete(void* _Ptr, size_t)
+		void operator delete(void* _Ptr, size_t _Size)
 		{
+			(void)_Size;
 			size_t _State_size = _Align_size<state_type>();
 			assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
 

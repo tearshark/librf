@@ -54,7 +54,7 @@ future_t<int64_t> resumeable_get_long(int64_t x, int64_t y)
 	using state_type = typename future_type::state_type;
 
 	void* frame_ptr = _coro_frame_ptr();
-	auto handler = coroutine_handle<promise_t<int64_t>>::from_address(frame_ptr);
+	auto handler = coroutine_handle<promise_type>::from_address(frame_ptr);
 	promise_type* promise = &handler.promise();
 	state_type* state = handler.promise().get_state();
 
@@ -88,12 +88,12 @@ future_t<> resumable_get_long_2(int64_t a, int64_t b, int64_t c)
 
 	std::cout << std::endl << __FUNCTION__ << " - begin" << std::endl;
 
-	using future_type = future_t<int64_t>;
+	using future_type = future_t<>;
 	using promise_type = typename future_type::promise_type;
 	using state_type = typename future_type::state_type;
 
 	void* frame_ptr = _coro_frame_ptr();
-	auto handler = coroutine_handle<promise_t<int64_t>>::from_address(frame_ptr);
+	auto handler = coroutine_handle<promise_type>::from_address(frame_ptr);
 	promise_type * promise = &handler.promise();
 	state_type * state = handler.promise().get_state();
 

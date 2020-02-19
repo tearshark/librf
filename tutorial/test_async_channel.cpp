@@ -26,8 +26,8 @@ future_t<> test_channel_read(const channel_t<std::string> & c)
 
 			std::cout << val << ":";
 #if _DEBUG
-			for (auto val : c.debug_queue())
-				std::cout << val << ",";
+			for (auto v2 : c.debug_queue())
+				std::cout << v2 << ",";
 #endif
 			std::cout << std::endl;
 		}
