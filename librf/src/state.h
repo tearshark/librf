@@ -118,9 +118,9 @@ namespace resumef
 		{
 			return _parent;
 		}
-		void set_alloc_size(uint32_t val)
+		uint32_t get_alloc_size() const
 		{
-			_alloc_size = val;
+			return _alloc_size;
 		}
 
 		void set_exception(std::exception_ptr e);
@@ -152,9 +152,9 @@ namespace resumef
 		using state_future_t::lock_type;
 		using value_type = _Ty;
 
-		state_t() :state_future_t()
+		explicit state_t(size_t alloc_size) :state_future_t()
 		{
-			_alloc_size = sizeof(*this);
+			_alloc_size = static_cast<uint32_t>(alloc_size);
 		}
 		explicit state_t(bool awaitor) :state_future_t(awaitor)
 		{
@@ -189,9 +189,9 @@ namespace resumef
 	{
 		using state_future_t::lock_type;
 
-		state_t() :state_future_t()
+		explicit state_t(size_t alloc_size) :state_future_t()
 		{
-			_alloc_size = sizeof(*this);
+			_alloc_size = static_cast<uint32_t>(alloc_size);
 		}
 		explicit state_t(bool awaitor) :state_future_t(awaitor)
 		{

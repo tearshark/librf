@@ -109,6 +109,9 @@
     <ClCompile Include="..\benchmark\benchmark_channel_passing_next.cpp">
       <Filter>benchmark</Filter>
     </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_memory_layout.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\librf\librf.h">
@@ -163,9 +166,6 @@
       <Filter>librf\src</Filter>
     </ClInclude>
     <ClInclude Include="..\librf\src\when.h">
-      <Filter>librf\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\librf\src\task_list.h">
       <Filter>librf\src</Filter>
     </ClInclude>
     <ClInclude Include="..\librf\src\promise.h">

@@ -180,6 +180,14 @@ namespace resumef
 
 				_Alloc_char _Al;
 				char* ptr = _Al.allocate(_Size + _State_size);
+
+				//在初始地址上构造state
+				{
+					state_type* st = new(ptr) state_type(coroutine_handle<promise_type>::from_promise(*(promise_type *)ptr));
+					st->lock();
+					*reinterpret_cast<uint32_t*>(ptr + _State_size) = static_cast<uint32_t>(_Size + _State_size);
+				}
+
 				return ptr + _State_size;
 			}
 

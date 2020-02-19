@@ -15,9 +15,6 @@ void resumable_main_benchmark_mem()
 {
 	using namespace std::chrono;
 	
-	resumef::state_t<void> st;
-	std::cout << sizeof(st) << " " << sizeof(resumef::promise_t<>) << std::endl;
-
 	for (size_t i = 0; i < N; ++i)
 	{
 		go[=]()->resumef::future_t<size_t>

@@ -14,13 +14,7 @@ namespace resumef
 		using promise_type = promise_t<value_type>;
 		using future_type = future_t<value_type>;
 
-		promise_impl_t() 
-		{
-			state_type* st = get_state();
-			new(st) state_type();
-			st->lock();
-		}
-
+		promise_impl_t(){}
 		promise_impl_t(promise_impl_t&& _Right) noexcept = default;
 		promise_impl_t& operator = (promise_impl_t&& _Right) noexcept = default;
 		promise_impl_t(const promise_impl_t&) = delete;
@@ -47,23 +41,31 @@ namespace resumef
 		{
 			size_t _State_size = _Align_size<state_type>();
 			assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
-#if RESUMEF_DEBUG_COUNTER
-			std::cout << "future_promise::new, size=" << (_Size + _State_size) << std::endl;
-#endif
 
 			_Alloc_char _Al;
 			char* ptr = _Al.allocate(_Size + _State_size);
+#if RESUMEF_DEBUG_COUNTER
+			std::cout << "  future_promise::new, alloc size=" << (_Size + _State_size) << std::endl;
+			std::cout << "  future_promise::new, alloc ptr=" << (void*)ptr << std::endl;
+			std::cout << "  future_promise::new, return ptr=" << (void*)(ptr + _State_size) << std::endl;
+#endif
+
+			//在初始地址上构造state
+			{
+				state_type* st = new(ptr) state_type(_Size + _State_size);
+				st->lock();
+			}
+
 			return ptr + _State_size;
 		}
 
-		void operator delete(void* _Ptr, size_t _Size)
+		void operator delete(void* _Ptr, size_t)
 		{
 			size_t _State_size = _Align_size<state_type>();
 			assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
 
 			_Alloc_char _Al;
 			state_type* st = reinterpret_cast<state_type*>(static_cast<char*>(_Ptr) - _State_size);
-			st->set_alloc_size(static_cast<uint32_t>(_Size + _State_size));
 			st->unlock();
 		}
 	};

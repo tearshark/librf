@@ -42,13 +42,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -104,16 +104,17 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;ASIO_STANDALONE;RESUMEF_DEBUG_COUNTER=1;RESUMEF_ENABLE_MULT_SCHEDULER=1;RESUMEF_USE_BOOST_ANY=0;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1;ASIO_DISABLE_CONCEPTS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;ASIO_STANDALONE;RESUMEF_DEBUG_COUNTER=0;RESUMEF_ENABLE_MULT_SCHEDULER=1;RESUMEF_USE_BOOST_ANY=0;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1;ASIO_DISABLE_CONCEPTS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\librf;..\..\asio\asio\include;..\..\asio-1.10.6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/await</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <MinimalRebuild />
       <CLanguageStandard>c11</CLanguageStandard>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
       <DisableSpecificWarnings>4834</DisableSpecificWarnings>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,20 +151,15 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <Optimization>Full</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;ASIO_STANDALONE;RESUMEF_ENABLE_MULT_SCHEDULER=1;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1;ASIO_DISABLE_CONCEPTS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\librf;..\..\asio\asio\include;..\..\asio-1.10.6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/await</AdditionalOptions>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <OmitFramePointers>true</OmitFramePointers>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <StringPooling>true</StringPooling>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <SDLCheck>
       </SDLCheck>
@@ -198,6 +194,7 @@
     <ClCompile Include="..\tutorial\test_async_event.cpp" />
     <ClCompile Include="..\tutorial\test_async_event_timeout.cpp" />
     <ClCompile Include="..\tutorial\test_async_exception.cpp" />
+    <ClCompile Include="..\tutorial\test_async_memory_layout.cpp" />
     <ClCompile Include="..\tutorial\test_async_modern_cb.cpp" />
     <ClCompile Include="..\tutorial\test_async_multi_thread.cpp" />
     <ClCompile Include="..\tutorial\test_async_mutex.cpp" />
@@ -225,7 +222,6 @@
     <ClInclude Include="..\librf\src\future.h" />
     <ClInclude Include="..\librf\src\generator.h" />
     <ClInclude Include="..\librf\src\promise.h" />
-    <ClInclude Include="..\librf\src\task_list.h" />
     <ClInclude Include="..\librf\src\mutex.h" />
     <ClInclude Include="..\librf\src\rf_task.h" />
     <ClInclude Include="..\librf\src\scheduler.h" />

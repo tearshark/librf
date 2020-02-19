@@ -10,7 +10,7 @@
 using namespace resumef;
 
 template<class _Ctype>
-void callback_get_long(int64_t val, _Ctype&& cb)
+static void callback_get_long(int64_t val, _Ctype&& cb)
 {
 	using namespace std::chrono;
 	std::thread([val, cb = std::forward<_Ctype>(cb)]
