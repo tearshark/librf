@@ -1,7 +1,7 @@
 ﻿
 #pragma once
 
-namespace resumef
+RESUMEF_NS
 {
 	template <typename T>
 	struct counted_ptr

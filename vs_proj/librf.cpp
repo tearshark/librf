@@ -3,6 +3,7 @@
 #include <experimental/resumable>
 #include <experimental/generator>
 #include <optional>
+#include "async_wrapper.hpp"
 
 extern void resumable_main_yield_return();
 extern void resumable_main_timer();

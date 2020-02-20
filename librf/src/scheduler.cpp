@@ -9,9 +9,9 @@ std::atomic<intptr_t> g_resumef_evtctx_count = 0;
 std::atomic<intptr_t> g_resumef_state_id = 0;
 #endif
 
-namespace resumef
+RESUMEF_NS
 {
-	static const char * future_error_string[(size_t)error_code::max__]
+	const char * future_error_string[(size_t)error_code::max__]
 	{
 		"none",
 		"not_ready",
@@ -21,7 +21,7 @@ namespace resumef
 		"timer_canceled",
 	};
 
-	static char sz_future_error_buffer[256];
+	char sz_future_error_buffer[256];
 
 	const char * get_error_string(error_code fe, const char * classname)
 	{

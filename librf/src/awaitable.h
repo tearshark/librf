@@ -1,6 +1,6 @@
 #pragma once
 
-namespace resumef
+RESUMEF_NS
 {
 	template<class _Ty>
 	struct awaitable_impl_t

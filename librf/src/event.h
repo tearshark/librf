@@ -2,7 +2,7 @@
 
 #include "_awaker.h"
 
-namespace resumef
+RESUMEF_NS
 {
 	namespace detail
 	{

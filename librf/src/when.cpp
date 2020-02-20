@@ -3,7 +3,7 @@
 #include "when.h"
 #include <assert.h>
 
-namespace resumef
+RESUMEF_NS
 {
 	namespace detail
 	{

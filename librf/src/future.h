@@ -3,7 +3,7 @@
 
 #include "state.h"
 
-namespace resumef
+RESUMEF_NS
 {
 	template<class _Ty>
 	struct future_t

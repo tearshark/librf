@@ -4,7 +4,7 @@
 #include "awaitable.h"
 #include "state.inl"
 
-namespace resumef
+RESUMEF_NS
 {
 	namespace detail
 	{

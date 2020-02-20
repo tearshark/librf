@@ -14,9 +14,15 @@
 #include <assert.h>
 #include <experimental/coroutine>
 
-#define LIB_RESUMEF_VERSION 200102 // 2.1.2
+#define LIB_RESUMEF_VERSION 200103 // 2.1.3
 
-namespace resumef
+#if defined(RESUMEF_MODULE_EXPORT)
+#define RESUMEF_NS export namespace resumef
+#else
+#define RESUMEF_NS namespace resumef
+#endif
+
+RESUMEF_NS
 {
 	struct scheduler_t;
 
@@ -55,7 +61,7 @@ extern std::atomic<intptr_t> g_resumef_evtctx_count;
 extern std::atomic<intptr_t> g_resumef_state_id;
 #endif
 
-namespace resumef
+RESUMEF_NS
 {
 	template<class T>
 	struct remove_cvref

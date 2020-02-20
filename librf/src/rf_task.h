@@ -4,7 +4,7 @@
 #include "future.h"
 #include "promise.h"
 
-namespace resumef
+RESUMEF_NS
 {
 	struct task_base_t;
 

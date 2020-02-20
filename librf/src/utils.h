@@ -1,17 +1,17 @@
 ﻿#pragma once
 
-namespace std
+RESUMEF_NS
 {
 	template<typename _Function>
-	inline auto _IsCallable(_Function && _Func, int) -> decltype(_Func(), true_type())
+	inline auto _IsCallable(_Function && _Func, int) -> decltype(_Func(), std::true_type())
 	{
 		(_Func);
-		return true_type();
+		return std::true_type();
 	}
 	template<typename _Function>
-	inline false_type _IsCallable(_Function &&, ...)
+	inline std::false_type _IsCallable(_Function &&, ...)
 	{
-		return false_type();
+		return std::false_type();
 	}
 
 	template<typename _Function>

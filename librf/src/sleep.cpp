@@ -3,7 +3,7 @@
 #include "awaitable.h"
 #include "sleep.h"
 
-namespace resumef
+RESUMEF_NS
 {
 	future_t<> sleep_until_(const std::chrono::system_clock::time_point& tp_, scheduler_t& scheduler_)
 	{

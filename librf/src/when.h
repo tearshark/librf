@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <any>
-namespace resumef
+RESUMEF_NS
 {
 	using any_t = std::any;
 	using std::any_cast;
@@ -19,7 +19,7 @@ namespace resumef
 //最最重要的，要统一ranged when_any的返回值，还得做一个运行时通过下标设置std::variant<>的东西
 //std::any除了内存布局不太理想，其他方面几乎没缺点（在此应用下）
 
-namespace resumef
+RESUMEF_NS
 {
 	namespace detail
 	{

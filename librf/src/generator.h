@@ -9,7 +9,7 @@
 #pragma push_macro("new")
 #undef new
 
-namespace resumef
+RESUMEF_NS
 {
 	template <typename _Ty, typename promise_type>
 	struct generator_iterator;

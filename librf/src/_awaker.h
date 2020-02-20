@@ -3,7 +3,7 @@
 #include "spinlock.h"
 #include "future.h"
 
-namespace resumef
+RESUMEF_NS
 {
 	namespace detail
 	{

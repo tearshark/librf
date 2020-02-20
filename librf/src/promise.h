@@ -4,7 +4,7 @@
 #pragma push_macro("new")
 #undef new
 
-namespace resumef
+RESUMEF_NS
 {
 	struct suspend_on_initial;
 	struct suspend_on_final;

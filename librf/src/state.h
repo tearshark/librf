@@ -6,7 +6,7 @@
 #include "counted_ptr.h"
 #include <iostream>
 
-namespace resumef
+RESUMEF_NS
 {
 	struct state_base_t
 	{

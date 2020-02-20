@@ -1,6 +1,6 @@
 #pragma once
 
-namespace resumef
+RESUMEF_NS
 {
 	template<class _PromiseT>
 	struct is_promise : std::false_type {};

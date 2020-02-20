@@ -1,6 +1,6 @@
 #pragma once
 
-namespace resumef
+RESUMEF_NS
 {
 	enum struct error_code
 	{

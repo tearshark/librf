@@ -5,7 +5,7 @@
 
 #include "def.h"
 
-namespace resumef
+RESUMEF_NS
 {
 	struct spinlock
 	{

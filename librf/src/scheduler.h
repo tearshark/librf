@@ -9,7 +9,7 @@
 #include "utils.h"
 #include "timer.h"
 
-namespace resumef
+RESUMEF_NS
 {
 	struct local_scheduler;
 
@@ -39,10 +39,10 @@ namespace resumef
 		void run();
 		//void break_all();
 
-		template<class _Ty, typename = std::enable_if_t<std::is_callable_v<_Ty> || is_future_v<_Ty> || is_generator_v<_Ty> >>
+		template<class _Ty, typename = std::enable_if_t<is_callable_v<_Ty> || is_future_v<_Ty> || is_generator_v<_Ty> >>
 		inline void operator + (_Ty&& t_)
 		{
-			if constexpr (std::is_callable<_Ty>::value)
+			if constexpr (is_callable_v<_Ty>)
 				new_task(new ctx_task_t<_Ty>(std::forward<_Ty>(t_)));
 			else
 				new_task(new task_t<_Ty>(std::forward<_Ty>(t_)));

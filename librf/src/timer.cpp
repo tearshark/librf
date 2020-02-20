@@ -1,7 +1,7 @@
 
 #include "timer.h"
 
-namespace resumef
+RESUMEF_NS
 {
 
 	timer_manager::timer_manager()

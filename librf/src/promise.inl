@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-namespace resumef
+RESUMEF_NS
 {
 	struct suspend_on_initial
 	{

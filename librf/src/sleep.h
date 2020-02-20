@@ -4,7 +4,7 @@
 //
 #pragma once
 
-namespace resumef
+RESUMEF_NS
 {
 	struct scheduler_t;
 

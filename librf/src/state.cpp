@@ -3,7 +3,7 @@
 #include "scheduler.h"
 #include <assert.h>
 
-namespace resumef
+RESUMEF_NS
 {
 	state_base_t::~state_base_t()
 	{

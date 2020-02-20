@@ -3,7 +3,7 @@
 
 #include "def.h"
 
-namespace resumef
+RESUMEF_NS
 {
 	struct timer_manager;
 	typedef std::shared_ptr<timer_manager> timer_mgr_ptr;
