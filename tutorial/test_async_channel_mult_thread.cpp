@@ -16,7 +16,7 @@ using namespace std::chrono;
 static std::mutex cout_mutex;
 std::atomic<intptr_t> gcounter = 0;
 
-#define OUTPUT_DEBUG	1
+#define OUTPUT_DEBUG	0
 
 future_t<> test_channel_consumer(const channel_t<std::string> & c, size_t cnt)
 {
@@ -60,9 +60,9 @@ future_t<> test_channel_producer(const channel_t<std::string> & c, size_t cnt)
 	}
 }
 
-const size_t N = 8;
-const size_t BATCH = 1000000;
-const size_t MAX_CHANNEL_QUEUE = N + 1;		//0, 1, 5, 10, -1
+const size_t THREAD = 12;
+const size_t BATCH = 10000;
+const size_t MAX_CHANNEL_QUEUE = THREAD + 1;		//0, 1, 5, 10, -1
 
 void resumable_main_channel_mult_thread()
 {
@@ -71,17 +71,20 @@ void resumable_main_channel_mult_thread()
 	std::thread write_th([&]
 	{
 		local_scheduler my_scheduler;		//2017/12/14日，仍然存在BUG。真多线程下调度，存在有协程无法被调度完成的BUG
-		go test_channel_producer(c, BATCH * N);
+		go test_channel_producer(c, BATCH * THREAD);
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 		this_scheduler()->run_until_notask();
 #endif
-		std::cout << "Write OK\r\n";
+		{
+			scoped_lock<std::mutex> __lock(cout_mutex);
+			std::cout << "Write OK\r\n";
+		}
 	});
 
-	//std::this_thread::sleep_for(100ms);
+	std::this_thread::sleep_for(100ms);
 
-	std::thread read_th[N];
-	for (size_t i = 0; i < N; ++i)
+	std::thread read_th[THREAD];
+	for (size_t i = 0; i < THREAD; ++i)
 	{
 		read_th[i] = std::thread([&]
 		{
@@ -90,7 +93,10 @@ void resumable_main_channel_mult_thread()
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 			this_scheduler()->run_until_notask();
 #endif
-			std::cout << "Read OK\r\n";
+			{
+				scoped_lock<std::mutex> __lock(cout_mutex);
+				std::cout << "Read OK\r\n";
+			}
 		});
 	}
 	

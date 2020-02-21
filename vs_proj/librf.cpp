@@ -33,7 +33,7 @@ int main(int argc, const char* argv[])
 {
 	(void)argc;
 	(void)argv;
-	resumable_main_layout();
+	benchmark_main_channel_passing_next();
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
@@ -56,7 +56,7 @@ int main(int argc, const char* argv[])
 	//resumable_main_event();
 	//resumable_main_event_timeout();
 	//resumable_main_channel();
-	//resumable_main_channel_mult_thread();		//测试失败！
+	//resumable_main_channel_mult_thread();
 	//resumable_main_sleep();
 	//resumable_main_when_all();
 	//benchmark_main_channel_passing_next();
