@@ -1,10 +1,4 @@
-﻿
-#pragma once
-
-#include "def.h"
-#include "spinlock.h"
-#include "counted_ptr.h"
-#include <iostream>
+﻿#pragma once
 
 RESUMEF_NS
 {

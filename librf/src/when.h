@@ -1,17 +1,10 @@
 ﻿#pragma once
 
-#include <any>
 RESUMEF_NS
 {
 	using any_t = std::any;
 	using std::any_cast;
 }
-
-#include "_awaker.h"
-#include "promise.h"
-#include "promise.inl"
-#include "awaitable.h"
-
 
 //纠结过when_any的返回值，是选用index + std::any，还是选用std::variant<>。最终选择了std::any。
 //std::variant<>存在第一个元素不能默认构造的问题，需要使用std::monostate来占位，导致下标不是从0开始。

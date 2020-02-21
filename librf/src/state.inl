@@ -1,5 +1,4 @@
-﻿#pragma once
-
+﻿
 RESUMEF_NS
 {
 	template<class _PromiseT, typename _Enable>

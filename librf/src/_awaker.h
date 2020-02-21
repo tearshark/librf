@@ -1,8 +1,5 @@
 ﻿#pragma once
 
-#include "spinlock.h"
-#include "future.h"
-
 RESUMEF_NS
 {
 	namespace detail

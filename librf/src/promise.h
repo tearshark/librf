@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "state.h"
 
 #pragma push_macro("new")
 #undef new
@@ -78,6 +77,7 @@ RESUMEF_NS
 	struct promise_t final : public promise_impl_t<_Ty>
 	{
 		using typename promise_impl_t<_Ty>::value_type;
+		using promise_impl_t<_Ty>::get_return_object;
 
 		void return_value(value_type val);
 		void yield_value(value_type val);
@@ -86,6 +86,8 @@ RESUMEF_NS
 	template<>
 	struct promise_t<void> final : public promise_impl_t<void>
 	{
+		using promise_impl_t<void>::get_return_object;
+
 		void return_void();
 		void yield_value();
 	};

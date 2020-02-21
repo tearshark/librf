@@ -1,19 +1,5 @@
 ﻿#pragma once
 
-#include <atomic>
-#include <chrono>
-#include <vector>
-#include <deque>
-#include <mutex>
-#include <map>
-#include <list>
-#include <unordered_map>
-#include <functional>
-#include <optional>
-#include <thread>
-#include <assert.h>
-#include <experimental/coroutine>
-
 #define LIB_RESUMEF_VERSION 200103 // 2.1.3
 
 #if defined(RESUMEF_MODULE_EXPORT)

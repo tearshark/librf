@@ -1,9 +1,6 @@
-﻿
-//用于内部实现的循环锁
+﻿//用于内部实现的循环锁
 
 #pragma once
-
-#include "def.h"
 
 RESUMEF_NS
 {

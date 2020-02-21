@@ -1,5 +1,4 @@
-﻿#pragma once
-
+﻿
 RESUMEF_NS
 {
 	struct suspend_on_initial
@@ -79,7 +78,7 @@ RESUMEF_NS
 
 
 	template<class _Ty>
-	inline void promise_t<_Ty>::return_value(value_type val)
+	inline void promise_t<_Ty>::return_value(_Ty val)
 	{
         this->get_state()->set_value(std::move(val));
 	}

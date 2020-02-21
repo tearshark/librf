@@ -1,8 +1,6 @@
 ﻿
 #pragma once
 
-#include "state.h"
-
 RESUMEF_NS
 {
 	template<class _Ty>

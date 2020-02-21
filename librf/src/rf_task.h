@@ -1,9 +1,5 @@
 ﻿#pragma once
 
-#include "def.h"
-#include "future.h"
-#include "promise.h"
-
 RESUMEF_NS
 {
 	struct task_base_t;

@@ -1,7 +1,4 @@
-
 #pragma once
-
-#include "def.h"
 
 RESUMEF_NS
 {

@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "_awaker.h"
-
 RESUMEF_NS
 {
 	namespace detail
