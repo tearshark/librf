@@ -64,7 +64,23 @@ RESUMEF_NS
 	
 	bool state_generator_t::switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<>)
 	{
-		_scheduler = sch;
+		assert(sch != nullptr);
+
+		if (_scheduler != nullptr)
+		{
+			auto task_ptr = _scheduler->del_switch(this);
+			
+			_scheduler = sch;
+			if (task_ptr != nullptr)
+				sch->add_switch(std::move(task_ptr));
+		}
+		else
+		{
+			_scheduler = sch;
+		}
+
+		sch->add_generator(this);
+
 		return true;
 	}
 
@@ -127,16 +143,29 @@ RESUMEF_NS
 
 	bool state_future_t::switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler)
 	{
+		assert(sch != nullptr);
 		scoped_lock<lock_type> __guard(this->_mtx);
 
-		_scheduler = sch;
+		if (_scheduler != nullptr)
+		{
+			auto task_ptr = _scheduler->del_switch(this);
+
+			_scheduler = sch;
+			if (task_ptr != nullptr)
+				sch->add_switch(std::move(task_ptr));
+		}
+		else
+		{
+			_scheduler = sch;
+		}
+
 		if (_parent != nullptr)
 			_parent->switch_scheduler_await_suspend(sch, nullptr);
 
 		if (handler != nullptr)
 		{
 			_coro = handler;
-			_scheduler->add_generator(this);
+			sch->add_generator(this);
 		}
 
 		return true;

@@ -10,18 +10,26 @@
 using namespace resumef;
 
 static scheduler_t* sch_in_main = nullptr;
-static scheduler_t* sch_in_thread = nullptr;
+static std::atomic<scheduler_t*> sch_in_thread = nullptr;
 
 void run_in_thread(channel_t<bool>& c_done)
 {
 	std::cout << "other thread = " << std::this_thread::get_id() << std::endl;
 
-	local_scheduler my_scheduler;
-	sch_in_thread = this_scheduler();
+	local_scheduler my_scheduler;			//产生本线程唯一的调度器
+	sch_in_thread = this_scheduler();		//本线程唯一的调度器赋值给sch_in_thread，以便于后续测试直接访问此线程的调度器
 
-	c_done << true;
+	c_done << true;							//数据都准备好了，通过channel通知其他协程可以启动后续依赖sch_in_thread变量的协程了
 
-	sch_in_thread->run();
+	//循环直到sch_in_thread为nullptr
+	for (;;)
+	{
+		auto sch = sch_in_thread.load(std::memory_order::acquire);
+		if (sch == nullptr)
+			break;
+		sch->run_one_batch();
+		std::this_thread::yield();
+	}
 }
 
 template<class _Ctype>
@@ -72,14 +80,19 @@ void resumable_main_switch_scheduler()
 	channel_t<bool> c_done{ 1 };
 
 	std::cout << "main thread = " << std::this_thread::get_id() << std::endl;
-	std::thread(&run_in_thread, std::ref(c_done)).detach();
+	std::thread other(&run_in_thread, std::ref(c_done));
 
 	GO
 	{
-		co_await c_done;
-		go resumable_get_long(3, c_done);
-		co_await c_done;
+		co_await c_done;		//第一次等待，等待run_in_thread准备好了
+		go resumable_get_long(3, c_done);	//开启另外一个协程
+		//co_await resumable_get_long(3, c_done);
+		co_await c_done;		//等待新的协程运行完毕，从而保证主线程的协程不会提早退出
 	};
 
 	sch_in_main->run_until_notask();
+
+	//通知另外一个线程退出
+	sch_in_thread.store(nullptr, std::memory_order_release);
+	other.join();
 }

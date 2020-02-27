@@ -55,6 +55,8 @@ RESUMEF_NS
 		void add_ready(state_base_t* sptr);
 		void add_generator(state_base_t* sptr);
 		void del_final(state_base_t* sptr);
+		std::unique_ptr<task_base_t> del_switch(state_base_t* sptr);
+		void add_switch(std::unique_ptr<task_base_t> task);
 
 		switch_scheduler_t operator co_await()
 		{

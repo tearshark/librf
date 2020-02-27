@@ -143,6 +143,30 @@ RESUMEF_NS
 		}
 	}
 
+	std::unique_ptr<task_base_t> scheduler_t::del_switch(state_base_t* sptr)
+	{
+		scoped_lock<spinlock> __guard(_lock_ready);
+	
+		std::unique_ptr<task_base_t> task_ptr;
+
+		auto iter = this->_ready_task.find(sptr);
+		if (iter != this->_ready_task.end())
+		{
+			task_ptr = std::move(iter->second);
+			this->_ready_task.erase(iter);
+		}
+
+		return task_ptr;
+	}
+
+	void scheduler_t::add_switch(std::unique_ptr<task_base_t> task)
+	{
+		state_base_t* sptr = task->get_state();
+
+		scoped_lock<spinlock> __guard(_lock_ready);
+		this->_ready_task.emplace(sptr, std::move(task));
+	}
+
 /*
 	void scheduler_t::cancel_all_task_()
 	{
@@ -169,6 +193,9 @@ RESUMEF_NS
 
 		{
 			scoped_lock<lock_type> __guard(_lock_running);
+			if (_runing_states.empty())
+				return;
+
 			std::swap(_cached_states, _runing_states);
 		}
 
@@ -181,13 +208,19 @@ RESUMEF_NS
 	void scheduler_t::run_until_notask()
 	{
 		while (!this->empty())
+		{
 			this->run_one_batch();
+			std::this_thread::yield();
+		}
 	}
 
 	void scheduler_t::run()
 	{
 		for (;;)
+		{
 			this->run_one_batch();
+			std::this_thread::yield();
+		}
 	}
 
 	scheduler_t scheduler_t::g_scheduler;
