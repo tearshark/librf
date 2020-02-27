@@ -56,6 +56,11 @@ RESUMEF_NS
 		void add_generator(state_base_t* sptr);
 		void del_final(state_base_t* sptr);
 
+		switch_scheduler_t operator co_await()
+		{
+			return { this };
+		}
+
 		friend struct task_base;
 		friend struct local_scheduler;
 	protected:

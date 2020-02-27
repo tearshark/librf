@@ -112,6 +112,9 @@
     <ClCompile Include="..\tutorial\test_async_memory_layout.cpp">
       <Filter>tutorial</Filter>
     </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_switch_scheduler.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\librf\librf.h">
@@ -179,6 +182,9 @@
     </ClInclude>
     <ClInclude Include="..\librf\librf_macro.h">
       <Filter>librf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\switch_scheduler.h">
+      <Filter>librf\src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

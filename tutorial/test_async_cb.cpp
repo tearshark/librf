@@ -21,7 +21,7 @@ static void callback_get_long(int64_t val, _Ctype&& cb)
 }
 
 //这种情况下，没有生成 frame-context，因此，并没有promise_type被内嵌在frame-context里
-future_t<int64_t> async_get_long(int64_t val)
+static future_t<int64_t> async_get_long(int64_t val)
 {
 	resumef::awaitable_t<int64_t> awaitable;
 	callback_get_long(val, [awaitable](int64_t val)
@@ -31,24 +31,25 @@ future_t<int64_t> async_get_long(int64_t val)
 	return awaitable.get_future();
 }
 
-future_t<> wait_get_long(int64_t val)
+static future_t<int64_t> wait_get_long(int64_t val)
 {
-	co_await async_get_long(val);
+	co_return co_await async_get_long(val);
 }
 
 //这种情况下，会生成对应的 frame-context，一个promise_type被内嵌在frame-context里
-future_t<> resumable_get_long(int64_t val)
+static future_t<int64_t> resumable_get_long(int64_t val)
 {
 	std::cout << val << std::endl;
-	val = co_await async_get_long(val);
+	val = co_await wait_get_long(val);
 	std::cout << val << std::endl;
-	val = co_await async_get_long(val);
+	val = co_await wait_get_long(val);
 	std::cout << val << std::endl;
-	val = co_await async_get_long(val);
+	val = co_await wait_get_long(val);
 	std::cout << val << std::endl;
+	co_return val;
 }
 
-future_t<int64_t> loop_get_long(int64_t val)
+static future_t<int64_t> loop_get_long(int64_t val)
 {
 	std::cout << val << std::endl;
 	for (int i = 0; i < 5; ++i)
@@ -65,7 +66,7 @@ void resumable_main_cb()
 
 	GO
 	{
-		auto val = co_await loop_get_long(2);
+		auto val = co_await resumable_get_long(2);
 		std::cout << "GO:" << val << std::endl;
 	};
 

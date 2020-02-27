@@ -61,6 +61,12 @@ RESUMEF_NS
 	{
 		return _coro != nullptr;
 	}
+	
+	bool state_generator_t::switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<>)
+	{
+		_scheduler = sch;
+		return true;
+	}
 
 	void state_future_t::resume()
 	{
@@ -117,6 +123,23 @@ RESUMEF_NS
 		scheduler_t* sch = this->get_scheduler();
 		if (sch != nullptr)
 			sch->add_ready(this);
+	}
+
+	bool state_future_t::switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler)
+	{
+		scoped_lock<lock_type> __guard(this->_mtx);
+
+		_scheduler = sch;
+		if (_parent != nullptr)
+			_parent->switch_scheduler_await_suspend(sch, nullptr);
+
+		if (handler != nullptr)
+		{
+			_coro = handler;
+			_scheduler->add_generator(this);
+		}
+
+		return true;
 	}
 
 	void state_t<void>::future_await_resume()

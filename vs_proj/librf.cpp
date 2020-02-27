@@ -23,6 +23,7 @@ extern void resumable_main_multi_thread();
 extern void resumable_main_channel_mult_thread();
 extern void resumable_main_when_all();
 extern void resumable_main_layout();
+extern void resumable_main_switch_scheduler();
 
 extern void resumable_main_benchmark_mem();
 extern void benchmark_main_channel_passing_next();
@@ -33,7 +34,7 @@ int main(int argc, const char* argv[])
 {
 	(void)argc;
 	(void)argv;
-	benchmark_main_channel_passing_next();
+	resumable_main_switch_scheduler();
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
@@ -59,6 +60,7 @@ int main(int argc, const char* argv[])
 	//resumable_main_channel_mult_thread();
 	//resumable_main_sleep();
 	//resumable_main_when_all();
+	//resumable_main_switch_scheduler();
 	//benchmark_main_channel_passing_next();
 
 	return 0;

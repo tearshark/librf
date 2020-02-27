@@ -196,6 +196,7 @@
     <ClCompile Include="..\tutorial\test_async_routine.cpp" />
     <ClCompile Include="..\tutorial\test_async_sleep.cpp" />
     <ClCompile Include="..\tutorial\test_async_suspend_always.cpp" />
+    <ClCompile Include="..\tutorial\test_async_switch_scheduler.cpp" />
     <ClCompile Include="..\tutorial\test_async_timer.cpp" />
     <ClCompile Include="..\tutorial\test_async_when_all.cpp" />
     <ClCompile Include="..\tutorial\test_async_yield_return.cpp" />
@@ -223,6 +224,7 @@
     <ClInclude Include="..\librf\src\sleep.h" />
     <ClInclude Include="..\librf\src\spinlock.h" />
     <ClInclude Include="..\librf\src\state.h" />
+    <ClInclude Include="..\librf\src\switch_scheduler.h" />
     <ClInclude Include="..\librf\src\timer.h" />
     <ClInclude Include="..\librf\src\unix\coroutine.h" />
     <ClInclude Include="..\librf\src\utils.h" />

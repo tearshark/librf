@@ -34,6 +34,7 @@ RESUMEF_NS
 		virtual void resume() = 0;
 		virtual bool has_handler() const = 0;
 		virtual bool is_ready() const = 0;
+		virtual bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler) = 0;
 
 		void set_scheduler(scheduler_t* sch)
 		{
@@ -57,6 +58,7 @@ RESUMEF_NS
 		virtual void resume() override;
 		virtual bool has_handler() const override;
 		virtual bool is_ready() const override;
+		virtual bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler) override;
 
 		static state_generator_t * _Alloc_state(coroutine_handle<> handler)
 		{
@@ -102,6 +104,7 @@ RESUMEF_NS
 		virtual void resume() override;
 		virtual bool has_handler() const override;
 		virtual bool is_ready() const override;
+		virtual bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler) override;
 
 		scheduler_t* get_scheduler() const
 		{
