@@ -33,7 +33,7 @@ RESUMEF_NS
 		suspend_on_final final_suspend() noexcept;
 		void set_exception(std::exception_ptr e);
 #ifdef __clang__
-		void unhandled_exception();
+		void unhandled_exception();		//If the coroutine ends with an uncaught exception, it performs the following: 
 #endif
 		future_type get_return_object();
 		void cancellation_requested();
@@ -45,6 +45,11 @@ RESUMEF_NS
 			assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
 
 			_Alloc_char _Al;
+			/*If allocation fails, the coroutine throws std::bad_alloc, 
+			unless the Promise type defines the member function Promise::get_return_object_on_allocation_failure(). 
+			If that member function is defined, allocation uses the nothrow form of operator new and on allocation failure, 
+			the coroutine immediately returns the object obtained from Promise::get_return_object_on_allocation_failure() to the caller. 
+			*/
 			char* ptr = _Al.allocate(_Size + _State_size);
 #if RESUMEF_DEBUG_COUNTER
 			std::cout << "  future_promise::new, alloc size=" << (_Size + _State_size) << std::endl;
@@ -67,7 +72,6 @@ RESUMEF_NS
 			size_t _State_size = _Align_size<state_type>();
 			assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
 
-			_Alloc_char _Al;
 			state_type* st = reinterpret_cast<state_type*>(static_cast<char*>(_Ptr) - _State_size);
 			st->unlock();
 		}
@@ -79,8 +83,10 @@ RESUMEF_NS
 		using typename promise_impl_t<_Ty>::value_type;
 		using promise_impl_t<_Ty>::get_return_object;
 
-		void return_value(value_type val);
-		void yield_value(value_type val);
+		template<class U>
+		void return_value(U&& val);	//co_return val
+		template<class U>
+		void yield_value(U&& val);
 	};
 
 	template<>
@@ -88,7 +94,7 @@ RESUMEF_NS
 	{
 		using promise_impl_t<void>::get_return_object;
 
-		void return_void();
+		void return_void();			//co_return;
 		void yield_value();
 	};
 

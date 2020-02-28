@@ -31,7 +31,7 @@ future_t<> test_channel_read(const channel_t<std::string> & c)
 #endif
 			std::cout << std::endl;
 		}
-		catch (channel_exception e)
+		catch (resumef::channel_exception& e)
 		{
 			//MAX_CHANNEL_QUEUE=0,并且先读后写，会触发read_before_write异常
 			std::cout << e.what() << std::endl;

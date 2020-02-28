@@ -24,7 +24,7 @@ void run_in_thread(channel_t<bool>& c_done)
 	//循环直到sch_in_thread为nullptr
 	for (;;)
 	{
-		auto sch = sch_in_thread.load(std::memory_order::acquire);
+		auto sch = sch_in_thread.load(std::memory_order_acquire);
 		if (sch == nullptr)
 			break;
 		sch->run_one_batch();
@@ -46,7 +46,7 @@ static void callback_get_long(int64_t val, _Ctype&& cb)
 //这种情况下，没有生成 frame-context，因此，并没有promise_type被内嵌在frame-context里
 static future_t<int64_t> async_get_long(int64_t val)
 {
-	resumef::awaitable_t<int64_t> awaitable;
+	awaitable_t<int64_t> awaitable;
 	callback_get_long(val, [awaitable](int64_t val)
 	{
 		awaitable.set_value(val);

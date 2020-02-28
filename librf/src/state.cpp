@@ -88,13 +88,14 @@ RESUMEF_NS
 	{
 		std::unique_lock<lock_type> __guard(_mtx);
 
-		if (_initor != nullptr && _is_initor)
+		if (_is_initor == initor_type::Initial)
 		{
-			coroutine_handle<> handler = _initor;
-			_initor = nullptr;
+			assert(_initor != nullptr);
+
+			_is_initor = initor_type::None;
 			__guard.unlock();
 
-			handler.resume();
+			_initor.resume();
 			return;
 		}
 		
@@ -108,13 +109,12 @@ RESUMEF_NS
 			return;
 		}
 
-		if (_initor != nullptr && !_is_initor)
+		if (_is_initor == initor_type::Final)
 		{
-			coroutine_handle<> handler = _initor;
-			_initor = nullptr;
+			_is_initor = initor_type::None;
 			__guard.unlock();
 
-			handler.destroy();
+			_initor.destroy();
 			return;
 		}
 	}
@@ -122,7 +122,7 @@ RESUMEF_NS
 	bool state_future_t::has_handler() const
 	{
 		scoped_lock<lock_type> __guard(_mtx);
-		return _coro != nullptr || _initor != nullptr;
+		return _coro != nullptr || _is_initor != initor_type::None;
 	}
 
 	bool state_future_t::is_ready() const

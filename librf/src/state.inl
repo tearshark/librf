@@ -4,19 +4,11 @@ RESUMEF_NS
 	template<class _PromiseT, typename _Enable>
 	void state_future_t::promise_initial_suspend(coroutine_handle<_PromiseT> handler)
 	{
-		_PromiseT& promise = handler.promise();
-
-		state_base_t* parent_state = promise.get_state();
-		(void)parent_state;
-		assert(this == parent_state);
 		assert(this->_scheduler == nullptr);
 		assert(this->_coro == nullptr);
-		this->_initor = handler;
-		this->_is_initor = true;
-	}
 
-	inline void state_future_t::promise_await_resume()
-	{
+		this->_initor = handler;
+		this->_is_initor = initor_type::Initial;
 	}
 
 	template<class _PromiseT, typename _Enable>
@@ -24,13 +16,8 @@ RESUMEF_NS
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
 
-		_PromiseT& promise = handler.promise();
-
-		state_base_t* parent_state = promise.get_state();
-		(void)parent_state;
-		assert(this == parent_state);
 		this->_initor = handler;
-		this->_is_initor = false;
+		this->_is_initor = initor_type::Final;
 
 		scheduler_t* sch = this->get_scheduler();
 		assert(sch != nullptr);
@@ -77,19 +64,19 @@ RESUMEF_NS
 	}
 
 	template<typename _Ty>
-	template<class _PromiseT, typename _Enable >
-	void state_t<_Ty>::promise_yield_value(_PromiseT* promise, _Ty val)
+	template<class _PromiseT, typename U, typename _Enable >
+	void state_t<_Ty>::promise_yield_value(_PromiseT* promise, U&& val)
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
 
 		if (this->_has_value)
 		{
-			this->uv._value = std::move(val);
+			*this->cast_value_ptr() = std::forward<U>(val);
 		}
 		else
 		{
+			new (this->cast_value_ptr()) value_type(std::forward<U>(val));
 			this->_has_value = true;
-			new(&this->uv._value) value_type(std::move(val));
 		}
 
 		coroutine_handle<_PromiseT> handler = coroutine_handle<_PromiseT>::from_promise(*promise);
@@ -112,22 +99,23 @@ RESUMEF_NS
 		if (!this->_has_value)
 			std::rethrow_exception(std::make_exception_ptr(future_exception{error_code::not_ready}));
 
-		return std::move(this->uv._value);
+		return std::move(*this->cast_value_ptr());
 	}
 
 	template<typename _Ty>
-	void state_t<_Ty>::set_value(value_type val)
+	template<typename U>
+	void state_t<_Ty>::set_value(U&& val)
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
 
 		if (this->_has_value)
 		{
-			this->uv._value = std::move(val);
+			*this->cast_value_ptr() = std::forward<U>(val);
 		}
 		else
 		{
+			new (this->cast_value_ptr()) value_type(std::forward<U>(val));
 			this->_has_value = true;
-			new(&this->uv._value) value_type(std::move(val));
 		}
 
 		scheduler_t* sch = this->get_scheduler();

@@ -55,9 +55,10 @@ RESUMEF_NS
 		using typename awaitable_impl_t<_Ty>::value_type;
 		using awaitable_impl_t<_Ty>::awaitable_impl_t;
 
-		void set_value(value_type value) const
+		template<class U>
+		void set_value(U&& value) const
 		{
-			this->_state->set_value(std::move(value));
+			this->_state->set_value(std::forward<U>(value));
 			this->_state = nullptr;
 		}
 	};

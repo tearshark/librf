@@ -9,7 +9,7 @@
 
 using namespace resumef;
 
-future_t<> test_loop_sleep(size_t _N, char * ch)
+future_t<> test_loop_sleep(size_t _N, const char * ch)
 {
 	using namespace std::chrono;
 

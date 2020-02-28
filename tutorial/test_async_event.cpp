@@ -71,7 +71,7 @@ void test_wait_any()
 
 	go[&]() -> future_t<>
 	{
-		for (int i = 0; i < _countof(evts); ++i)
+		for (size_t i = 0; i < _countof(evts); ++i)
 		{
 			intptr_t idx = co_await event_t::wait_any(evts);
 			std::cout << "event " << idx << " signal!" << std::endl;

@@ -275,7 +275,7 @@ private:
 	{
 		auto self = this->shared_from_this();
 		asio::async_connect(socket_, endpoint_,
-			[this, self](std::error_code ec, tcp::resolver::iterator iter)
+			[this, self](std::error_code ec, tcp::resolver::iterator )
 			{
 				if (!ec)
 				{

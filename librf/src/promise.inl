@@ -1,10 +1,14 @@
 ﻿
 RESUMEF_NS
 {
+	/*
+	Note: the awaiter object is part of coroutine state (as a temporary whose lifetime crosses a suspension point) 
+	and is destroyed before the co_await expression finishes. 
+	It can be used to maintain per-operation state as required by some async I/O APIs without resorting to additional heap allocations. 
+	*/
+
 	struct suspend_on_initial
 	{
-		state_future_t* _state;
-
 		inline bool await_ready() noexcept
 		{
 			return false;
@@ -12,17 +16,16 @@ RESUMEF_NS
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		inline void await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 		{
+			_PromiseT& promise = handler.promise();
+			auto* _state = promise.get_state();
 			_state->promise_initial_suspend(handler);
 		}
 		inline void await_resume() noexcept
 		{
-			_state->promise_await_resume();
 		}
 	};
 	struct suspend_on_final
 	{
-		state_future_t* _state;
-
 		inline bool await_ready() noexcept
 		{
 			return false;
@@ -30,24 +33,25 @@ RESUMEF_NS
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		inline void await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 		{
+			_PromiseT& promise = handler.promise();
+			auto* _state = promise.get_state();
 			_state->promise_final_suspend(handler);
 		}
 		inline void await_resume() noexcept
 		{
-			_state->promise_await_resume();
 		}
 	};
 
 	template <typename _Ty>
 	inline suspend_on_initial promise_impl_t<_Ty>::initial_suspend() noexcept
 	{
-        return { this->get_state() };
+        return {};
 	}
 
 	template <typename _Ty>
 	inline suspend_on_final promise_impl_t<_Ty>::final_suspend() noexcept
 	{
-        return { this->get_state() };
+        return {};
 	}
 
 	template <typename _Ty>
@@ -60,7 +64,7 @@ RESUMEF_NS
 	template <typename _Ty>
 	inline void promise_impl_t<_Ty>::unhandled_exception()
 	{
-		std::terminate();
+		this->get_state()->set_exception(std::current_exception());
 	}
 #endif
 
@@ -78,15 +82,17 @@ RESUMEF_NS
 
 
 	template<class _Ty>
-    inline void promise_t<_Ty>::return_value(value_type val)
+	template<class U>
+	inline void promise_t<_Ty>::return_value(U&& val)
 	{
-        this->get_state()->set_value(std::move(val));
+        this->get_state()->set_value(std::forward<U>(val));
 	}
 
 	template<class _Ty>
-	inline void promise_t<_Ty>::yield_value(value_type val)
+	template<class U>
+	inline void promise_t<_Ty>::yield_value(U&& val)
 	{
-        this->get_state()->promise_yield_value(this, std::move(val));
+        this->get_state()->promise_yield_value(this, std::forward<U>(val));
 	}
 
 	inline void promise_t<void>::return_void()

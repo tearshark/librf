@@ -115,22 +115,22 @@ RESUMEF_NS
 			}
 			promise_type(promise_type&& _Right) noexcept = default;
 			promise_type& operator = (promise_type&& _Right) noexcept = default;
-			promise_type(const promise_type&) = delete;
-			promise_type& operator = (const promise_type&) = delete;
+			promise_type(const promise_type&) = default;
+			promise_type& operator = (const promise_type&) = default;
 
-			promise_type& get_return_object()
+			generator_t get_return_object()
 			{
-				return *this;
+				return generator_t{ *this };
 			}
 
 			bool initial_suspend()
 			{
-				return (true);
+				return true;
 			}
 
 			bool final_suspend()
 			{
-				return (true);
+				return true;
 			}
 
 			void yield_value(_Ty const& _Value)
@@ -138,16 +138,27 @@ RESUMEF_NS
 				_CurrentValue = std::addressof(_Value);
 			}
 
-			template<class = std::enable_if_t<!std::is_same_v<_Ty, void>, _Ty>>
+			//template<class = std::enable_if_t<!std::is_same_v<_Ty, void>, _Ty>>
 			void return_value(_Ty const& _Value)
 			{
 				_CurrentValue = std::addressof(_Value);
 			}
-			template<class = std::enable_if_t<std::is_same_v<_Ty, void>, _Ty>>
+			//template<class = std::enable_if_t<std::is_same_v<_Ty, void>, _Ty>>
 			void return_value()
 			{
 				_CurrentValue = nullptr;
 			}
+
+			void set_exception(std::exception_ptr e)
+			{
+				std::terminate();
+			}
+#ifdef __clang__
+			void unhandled_exception()
+			{
+				std::terminate();
+			}
+#endif
 
 			template <typename _Uty>
 			_Uty&& await_transform(_Uty&& _Whatever)
@@ -198,7 +209,6 @@ RESUMEF_NS
 
 				*reinterpret_cast<uint32_t*>(_Ptr) = static_cast<uint32_t>(_Size + _State_size);
 
-				_Alloc_char _Al;
 				state_type* st = reinterpret_cast<state_type*>(static_cast<char*>(_Ptr) - _State_size);
 				st->unlock();
 			}
@@ -230,7 +240,6 @@ RESUMEF_NS
 		generator_t() = default;
 
 		generator_t(generator_t const&) = delete;
-
 		generator_t& operator=(generator_t const&) = delete;
 
 		generator_t(generator_t&& right_) noexcept
@@ -270,3 +279,14 @@ RESUMEF_NS
 
 #pragma pop_macro("new")
 #pragma pack(pop)
+
+namespace std {
+	namespace experimental {
+		
+		template <typename _Ty, typename _Alloc, typename... Args>
+		struct coroutine_traits<resumef::generator_t<_Ty, _Alloc>, Args...>
+		{
+			typedef typename resumef::generator_t<_Ty, _Alloc>::promise_type promise_type;
+		};
+	}
+} // namespace std::experimental

@@ -71,6 +71,12 @@ RESUMEF_NS
 
 	struct state_future_t : public state_base_t
 	{
+		enum struct initor_type : uint8_t
+		{
+			None,
+			Initial,
+			Final
+		};
 		typedef std::recursive_mutex lock_type;
 	protected:
 		mutable lock_type _mtx;
@@ -83,7 +89,7 @@ RESUMEF_NS
 		uint32_t _alloc_size;
 		bool _has_value = false;
 		bool _is_awaitor;
-		bool _is_initor = false;
+		initor_type _is_initor = initor_type::None;
 	public:
 		state_future_t()
 		{
@@ -138,7 +144,6 @@ RESUMEF_NS
 
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void promise_initial_suspend(coroutine_handle<_PromiseT> handler);
-		void promise_await_resume();
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void promise_final_suspend(coroutine_handle<_PromiseT> handler);
 	};
@@ -157,28 +162,26 @@ RESUMEF_NS
 		{
 			_alloc_size = sizeof(*this);
 		}
-	private:
-		union union_value_type
-		{
-			value_type _value;
-			char _[1];
-
-			union_value_type() {}
-			~union_value_type() {}
-		};
-		union_value_type uv;
 
 		~state_t()
 		{
 			if (_has_value)
-				uv._value.~value_type();
+				cast_value_ptr()->~value_type();
 		}
-	public:
-		auto future_await_resume() -> value_type;
-		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
-		void promise_yield_value(_PromiseT* promise, value_type val);
 
-		void set_value(value_type val);
+		auto future_await_resume() -> value_type;
+		template<class _PromiseT, typename U, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+		void promise_yield_value(_PromiseT* promise, U&& val);
+
+		template<typename U>
+		void set_value(U&& val);
+	private:
+		value_type * cast_value_ptr()
+		{
+			return static_cast<value_type*>(static_cast<void*>(_value));
+		}
+
+		alignas(value_type) unsigned char _value[sizeof(value_type)];
 	};
 
 	template<>

@@ -3,7 +3,6 @@
 #include <experimental/resumable>
 #include <experimental/generator>
 #include <optional>
-#include "async_wrapper.hpp"
 
 extern void resumable_main_yield_return();
 extern void resumable_main_timer();
@@ -34,7 +33,7 @@ int main(int argc, const char* argv[])
 {
 	(void)argc;
 	(void)argv;
-	resumable_main_switch_scheduler();
+	resumable_main_layout();
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));

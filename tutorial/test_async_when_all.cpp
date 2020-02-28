@@ -27,7 +27,7 @@ void test_when_any()
 				co_await sleep_for(1ms * dt);
 				std::cout << dt << "@a" << std::endl;
 
-				return dt;
+				co_return dt;
 			}(),
 			[]() ->future_t<>
 			{
@@ -56,7 +56,7 @@ void test_when_any()
 			co_await sleep_for(1ms * dt);
 			std::cout << dt << "@" << name << std::endl;
 
-			return dt;
+			co_return dt;
 		};
 
 		std::vector<future_t<int> > v{ my_sleep("g"), my_sleep("h"), my_sleep("i") };
@@ -76,7 +76,7 @@ void test_when_all()
 		co_await sleep_for(1ms * dt);
 		std::cout << dt << "@" << name << std::endl;
 
-		return dt;
+		co_return dt;
 	};
 
 	auto my_sleep_v = [](const char * name) -> future_t<>

@@ -84,7 +84,7 @@ auto tostring_async(_Input_t&& value, _Callable_t&& token)
 	//适配器类型
 	using _Adapter_t = modern_callback_adapter_t<typename resumef::remove_cvref_t<_Callable_t>, void(std::string)>;
 	//通过适配器获得兼容_Signature_t类型的真正的回调，以及返回值_Return_t
-	auto adapter = typename _Adapter_t::traits(std::forward<_Callable_t>(token));
+	auto adapter = _Adapter_t::traits(std::forward<_Callable_t>(token));
 
 	//callback与token未必是同一个变量，甚至未必是同一个类型
 	std::thread([callback = std::move(std::get<0>(adapter)), value = std::forward<_Input_t>(value)]
@@ -101,7 +101,7 @@ auto tostring_async(_Input_t&& value, _Callable_t&& token)
 //或者宏版本写法
 #define MODERN_CALLBACK_TRAITS(_Token_value, _Signature_t) \
 	using _Adapter_t = modern_callback_adapter_t<typename resumef::remove_cvref_t<_Callable_t>, _Signature_t>; \
-	auto _Adapter_value = typename _Adapter_t::traits(std::forward<_Callable_t>(_Token_value))
+	auto _Adapter_value = _Adapter_t::traits(std::forward<_Callable_t>(_Token_value))
 #define MODERN_CALLBACK_CALL() std::move(std::get<0>(_Adapter_value))
 #define MODERN_CALLBACK_RETURN() return std::move(std::get<1>(_Adapter_value)).get()
 
@@ -139,7 +139,7 @@ struct use_future_callback_base_t
 
 	auto get_future() const
 	{
-		return _promise.get_future();
+		return this->_promise.get_future();
 	}
 };
 
@@ -157,7 +157,7 @@ struct use_future_callback_t<_Promise_traits> : public use_future_callback_base_
 
 	void operator()() const
 	{
-		_promise.set_value();
+		this->_promise.set_value();
 	}
 };
 
@@ -170,9 +170,9 @@ struct use_future_callback_t<_Promise_traits, std::exception_ptr> : public use_f
 	void operator()(std::exception_ptr eptr) const
 	{
 		if (!eptr)
-			_promise.set_value();
+			this->_promise.set_value();
 		else
-			_promise.set_exception(std::move(eptr));
+			this->_promise.set_exception(std::move(eptr));
 	}
 };
 
@@ -185,7 +185,7 @@ struct use_future_callback_t<_Promise_traits, _Result_t> : public use_future_cal
 	template<typename Arg>
 	void operator()(Arg && arg) const
 	{
-		_promise.set_value(std::forward<Arg>(arg));
+		this->_promise.set_value(std::forward<Arg>(arg));
 	}
 };
 
@@ -199,9 +199,9 @@ struct use_future_callback_t<_Promise_traits, std::exception_ptr, _Result_t> : p
 	void operator()(std::exception_ptr eptr, Arg && arg) const
 	{
 		if (!eptr)
-			_promise.set_value(std::forward<Arg>(arg));
+			this->_promise.set_value(std::forward<Arg>(arg));
 		else
-			_promise.set_exception(std::move(eptr));
+			this->_promise.set_exception(std::move(eptr));
 	}
 };
 
@@ -215,7 +215,7 @@ struct use_future_callback_t<_Promise_traits, _Result_t...> : public use_future_
 	void operator()(Args&&... args) const
 	{
 		static_assert(sizeof...(Args) == sizeof...(_Result_t), "");
-		_promise.set_value(std::make_tuple(std::forward<Args>(args)...));
+		this->_promise.set_value(std::make_tuple(std::forward<Args>(args)...));
 	}
 };
 
@@ -230,9 +230,9 @@ struct use_future_callback_t<_Promise_traits, std::exception_ptr, _Result_t...> 
 	{
 		static_assert(sizeof...(Args) == sizeof...(_Result_t), "");
 		if (!eptr)
-			_promise.set_value(std::make_tuple(std::forward<Args>(args)...));
+			this->_promise.set_value(std::make_tuple(std::forward<Args>(args)...));
 		else
-			_promise.set_exception(std::move(eptr));
+			this->_promise.set_exception(std::move(eptr));
 	}
 };
 

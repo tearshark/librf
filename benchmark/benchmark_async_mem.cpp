@@ -17,7 +17,7 @@ void resumable_main_benchmark_mem()
 	
 	for (size_t i = 0; i < N; ++i)
 	{
-		go[=]()->resumef::future_t<size_t>
+		go[=]()->resumef::generator_t<size_t>
 		{
 			for (size_t k = 0; k < 10; ++k)
 			{

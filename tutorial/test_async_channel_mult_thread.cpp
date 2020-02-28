@@ -33,7 +33,7 @@ future_t<> test_channel_consumer(const channel_t<std::string> & c, size_t cnt)
 			}
 #endif
 		}
-		catch (channel_exception e)
+		catch (channel_exception& e)
 		{
 			//MAX_CHANNEL_QUEUE=0,并且先读后写，会触发read_before_write异常
 			scoped_lock<std::mutex> __lock(cout_mutex);
