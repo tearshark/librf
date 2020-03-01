@@ -134,7 +134,7 @@ RESUMEF_NS
 	bool state_future_t::is_ready() const
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
-		return _exception != nullptr || _has_value || !_is_awaitor;
+		return _exception != nullptr || _has_value.load(std::memory_order_acquire) || !_is_awaitor;
 	}
 
 	void state_future_t::set_exception(std::exception_ptr e)
@@ -185,7 +185,7 @@ RESUMEF_NS
 
 		if (this->_exception)
 			std::rethrow_exception(std::move(this->_exception));
-		if (!this->_has_value)
+		if (!this->_has_value.load(std::memory_order_acquire))
 			std::rethrow_exception(std::make_exception_ptr(future_exception{error_code::not_ready}));
 	}
 
@@ -193,7 +193,7 @@ RESUMEF_NS
 	{
 		{
 			scoped_lock<lock_type> __guard(this->_mtx);
-			this->_has_value = true;
+			this->_has_value.store(true, std::memory_order_release);
 		}
 
 		scheduler_t* sch = this->get_scheduler();

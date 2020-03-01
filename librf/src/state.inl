@@ -64,7 +64,7 @@ RESUMEF_NS
 					this->_coro = handler;
 			}
 
-			this->_has_value = true;
+			this->_has_value.store(true, std::memory_order_release);
 		}
 
 		if (!handler.done())
@@ -90,14 +90,14 @@ RESUMEF_NS
 					this->_coro = handler;
 			}
 
-			if (this->_has_value)
+			if (this->_has_value.load(std::memory_order_acquire))
 			{
 				*this->cast_value_ptr() = std::forward<U>(val);
 			}
 			else
 			{
 				new (this->cast_value_ptr()) value_type(std::forward<U>(val));
-				this->_has_value = true;
+				this->_has_value.store(true, std::memory_order_release);
 			}
 		}
 
@@ -115,7 +115,7 @@ RESUMEF_NS
 		scoped_lock<lock_type> __guard(this->_mtx);
 		if (this->_exception)
 			std::rethrow_exception(std::move(this->_exception));
-		if (!this->_has_value)
+		if (!this->_has_value.load(std::memory_order_acquire))
 			std::rethrow_exception(std::make_exception_ptr(future_exception{error_code::not_ready}));
 
 		return std::move(*this->cast_value_ptr());
@@ -128,14 +128,14 @@ RESUMEF_NS
 		{
 			scoped_lock<lock_type> __guard(this->_mtx);
 
-			if (this->_has_value)
+			if (this->_has_value.load(std::memory_order_acquire))
 			{
 				*this->cast_value_ptr() = std::forward<U>(val);
 			}
 			else
 			{
 				new (this->cast_value_ptr()) value_type(std::forward<U>(val));
-				this->_has_value = true;
+				this->_has_value.store(true, std::memory_order_release);
 			}
 		}
 

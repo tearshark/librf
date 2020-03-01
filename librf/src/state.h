@@ -92,7 +92,7 @@ RESUMEF_NS
 #endif
 		std::exception_ptr _exception;
 		uint32_t _alloc_size;
-		bool _has_value = false;
+		std::atomic<bool> _has_value{ false };
 		bool _is_awaitor;
 		initor_type _is_initor = initor_type::None;
 	public:
@@ -143,8 +143,8 @@ RESUMEF_NS
 		void future_await_suspend(coroutine_handle<_PromiseT> handler);
 		bool future_await_ready()
 		{
-			scoped_lock<lock_type> __guard(this->_mtx);
-			return _has_value;
+			//scoped_lock<lock_type> __guard(this->_mtx);
+			return _has_value.load(std::memory_order_acquire);
 		}
 
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
@@ -184,7 +184,7 @@ RESUMEF_NS
 	public:
 		~state_t()
 		{
-			if (_has_value)
+			if (_has_value.load(std::memory_order_acquire))
 				cast_value_ptr()->~value_type();
 		}
 
