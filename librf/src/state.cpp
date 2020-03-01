@@ -94,10 +94,11 @@ RESUMEF_NS
 		{
 			assert((bool)_initor);
 
+			coroutine_handle<> handler = _initor;
 			_is_initor = initor_type::None;
 			__guard.unlock();
 
-			_initor.resume();
+			handler.resume();
 			return;
 		}
 		
@@ -115,10 +116,11 @@ RESUMEF_NS
 		{
 			assert((bool)_initor);
 
+			coroutine_handle<> handler = _initor;
 			_is_initor = initor_type::None;
 			__guard.unlock();
 
-			_initor.destroy();
+			handler.destroy();
 			return;
 		}
 	}
@@ -137,9 +139,11 @@ RESUMEF_NS
 
 	void state_future_t::set_exception(std::exception_ptr e)
 	{
-		scoped_lock<lock_type> __guard(this->_mtx);
+		{
+			scoped_lock<lock_type> __guard(this->_mtx);
+			this->_exception = std::move(e);
+		}
 
-		this->_exception = std::move(e);
 		scheduler_t* sch = this->get_scheduler();
 		if (sch != nullptr)
 			sch->add_ready(this);
@@ -178,6 +182,7 @@ RESUMEF_NS
 	void state_t<void>::future_await_resume()
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
+
 		if (this->_exception)
 			std::rethrow_exception(std::move(this->_exception));
 		if (!this->_has_value)
@@ -186,9 +191,11 @@ RESUMEF_NS
 
 	void state_t<void>::set_value()
 	{
-		scoped_lock<lock_type> __guard(this->_mtx);
+		{
+			scoped_lock<lock_type> __guard(this->_mtx);
+			this->_has_value = true;
+		}
 
-		this->_has_value = true;
 		scheduler_t* sch = this->get_scheduler();
 		if (sch != nullptr)
 			sch->add_ready(this);

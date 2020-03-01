@@ -31,7 +31,7 @@ int main(int argc, const char* argv[])
 {
 	(void)argc;
 	(void)argv;
-	//resumable_main_resumable();
+	//resumable_main_layout();
 	//return 0;
 
 	//if (argc > 1)

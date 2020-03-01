@@ -11,6 +11,9 @@ RESUMEF_NS
 		static const int LOCKED_VALUE = 1;
 
 		volatile std::atomic<int> lck;
+#if _DEBUG
+		std::thread::id owner_thread_id;
+#endif
 
 		spinlock()
 		{
@@ -24,6 +27,10 @@ RESUMEF_NS
 			int val = FREE_VALUE;
 			if (!lck.compare_exchange_weak(val, LOCKED_VALUE, std::memory_order_acquire))
 			{
+#if _DEBUG
+				assert(owner_thread_id != std::this_thread::get_id());
+#endif
+
 				size_t spinCount = 0;
 				auto dt = 1ms;
 				do
@@ -42,17 +49,29 @@ RESUMEF_NS
 					val = FREE_VALUE;
 				} while (!lck.compare_exchange_weak(val, LOCKED_VALUE, std::memory_order_acquire));
 			}
+
+#if _DEBUG
+			owner_thread_id = std::this_thread::get_id();
+#endif
 		}
 
 		bool try_lock()
 		{
 			int val = FREE_VALUE;
 			bool ret = lck.compare_exchange_weak(val, LOCKED_VALUE, std::memory_order_acquire);
+
+#if _DEBUG
+			if (ret) owner_thread_id = std::this_thread::get_id();
+#endif
+
 			return ret;
 		}
 
 		void unlock()
 		{
+#if _DEBUG
+			owner_thread_id = std::thread::id();
+#endif
 			lck.store(FREE_VALUE, std::memory_order_release);
 		}
 	};

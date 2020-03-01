@@ -81,7 +81,8 @@ RESUMEF_NS
 			Initial,
 			Final
 		};
-		typedef std::recursive_mutex lock_type;
+		//typedef std::recursive_mutex lock_type;
+		typedef spinlock lock_type;
 	protected:
 		mutable lock_type _mtx;
 		coroutine_handle<> _initor;
