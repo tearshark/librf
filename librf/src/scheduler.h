@@ -12,7 +12,7 @@ RESUMEF_NS
 		using lock_type = std::recursive_mutex;
 		using task_dictionary_type = std::unordered_map<state_base_t*, std::unique_ptr<task_base_t>>;
 
-		mutable lock_type _lock_running;
+		mutable spinlock _lock_running;
 		state_vector _runing_states;
 		state_vector _cached_states;
 
@@ -41,7 +41,7 @@ RESUMEF_NS
 
 		inline bool empty() const
 		{
-			scoped_lock<spinlock, lock_type> __guard(_lock_ready, _lock_running);
+			scoped_lock<spinlock, spinlock> __guard(_lock_ready, _lock_running);
 			return _ready_task.empty() && _runing_states.empty() && _timer->empty();
 		}
 

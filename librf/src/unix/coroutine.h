@@ -9,6 +9,8 @@
 #ifndef _LIBCPP_EXPERIMENTAL_COROUTINE
 #define _LIBCPP_EXPERIMENTAL_COROUTINE
 
+#define _EXPERIMENTAL_COROUTINE_
+
 /**
 	experimental/coroutine synopsis
 

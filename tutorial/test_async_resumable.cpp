@@ -61,9 +61,10 @@ void resumable_switch(intptr_t coro, size_t idx)
 void resumable_main_resumable()
 {
 	resumable_switch(1, 0);
-	//resumable_switch(10, 0);
-	//resumable_switch(100, 0);
+	resumable_switch(10, 0);
+	resumable_switch(100, 0);
 	resumable_switch(1000, 0);
+	resumable_switch(10000, 0);
 	resumable_switch(30000, 0);
 
 /*

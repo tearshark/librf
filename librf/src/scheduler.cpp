@@ -53,6 +53,10 @@ RESUMEF_NS
 			_scheduler_ptr = new scheduler_t;
 			th_scheduler_ptr = _scheduler_ptr;
 		}
+		else
+		{
+			_scheduler_ptr = nullptr;
+		}
 #endif
 	}
 
@@ -70,6 +74,11 @@ RESUMEF_NS
 	{
 		_runing_states.reserve(1024);
 		_cached_states.reserve(1024);
+
+#if RESUMEF_ENABLE_MULT_SCHEDULER
+		if (th_scheduler_ptr == nullptr)
+			th_scheduler_ptr = this;
+#endif
 	}
 
 	scheduler_t::~scheduler_t()
@@ -98,17 +107,17 @@ RESUMEF_NS
 
 	void scheduler_t::add_initial(state_base_t* sptr)
 	{
-		scoped_lock<spinlock, lock_type> __guard(_lock_ready, _lock_running);
+		scoped_lock<spinlock, spinlock> __guard(_lock_ready, _lock_running);
 
-		_runing_states.emplace_back(sptr);
 		_ready_task.try_emplace(sptr, nullptr);
+		_runing_states.emplace_back(sptr);
 	}
 
 	void scheduler_t::add_await(state_base_t* sptr)
 	{
 		if (sptr->is_ready())
 		{
-			scoped_lock<lock_type> __guard(_lock_running);
+			scoped_lock<spinlock> __guard(_lock_running);
 			_runing_states.emplace_back(sptr);
 		}
 	}
@@ -119,14 +128,14 @@ RESUMEF_NS
 
 		if (sptr->has_handler())
 		{
-			scoped_lock<lock_type> __guard(_lock_running);
+			scoped_lock<spinlock> __guard(_lock_running);
 			_runing_states.emplace_back(sptr);
 		}
 	}
 
 	void scheduler_t::add_generator(state_base_t* sptr)
 	{
-		scoped_lock<lock_type> __guard(_lock_running);
+		scoped_lock<spinlock> __guard(_lock_running);
 		_runing_states.emplace_back(sptr);
 	}
 
@@ -138,7 +147,7 @@ RESUMEF_NS
 		}
 		if (sptr->has_handler())
 		{
-			scoped_lock<lock_type> __guard(_lock_running);
+			scoped_lock<spinlock> __guard(_lock_running);
 			_runing_states.emplace_back(sptr);
 		}
 	}
@@ -170,7 +179,7 @@ RESUMEF_NS
 /*
 	void scheduler_t::cancel_all_task_()
 	{
-		scoped_lock<spinlock, lock_type> __guard(_lock_ready, _lock_running);
+		scoped_lock<spinlock, spinlock> __guard(_lock_ready, _lock_running);
 		
 		this->_ready_task.clear();
 		this->_runing_states.clear();
@@ -185,14 +194,10 @@ RESUMEF_NS
 
 	void scheduler_t::run_one_batch()
 	{
-#if RESUMEF_ENABLE_MULT_SCHEDULER
-		if (th_scheduler_ptr == nullptr)
-			th_scheduler_ptr = this;
-#endif
 		this->_timer->update();
 
 		{
-			scoped_lock<lock_type> __guard(_lock_running);
+			scoped_lock<spinlock> __guard(_lock_running);
 			if (_runing_states.empty())
 				return;
 
