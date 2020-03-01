@@ -33,3 +33,6 @@ void resumable_main_benchmark_mem()
 	std::cout << "press any key to continue." << std::endl;
 	(void)_getch();
 }
+
+//clang : 平均 210字节
+//msvc : 平均600字节

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#define LIB_RESUMEF_VERSION 20301 // 2.3.1
+#define LIB_RESUMEF_VERSION 20302 // 2.3.2
 
 #if defined(RESUMEF_MODULE_EXPORT)
 #define RESUMEF_NS export namespace resumef
