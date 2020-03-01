@@ -33,8 +33,8 @@ RESUMEF_NS
 		scheduler_t* _scheduler;
 	};
 
-	inline switch_scheduler_t via(scheduler_t* sch)
+	inline switch_scheduler_t operator co_await(scheduler_t& sch)
 	{
-		return { sch };
+		return { &sch };
 	}
 }

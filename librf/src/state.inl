@@ -5,7 +5,7 @@ RESUMEF_NS
 	void state_future_t::promise_initial_suspend(coroutine_handle<_PromiseT> handler)
 	{
 		assert(this->_scheduler == nullptr);
-		assert(this->_coro == nullptr);
+		assert(!this->_coro);
 
 		this->_initor = handler;
 		this->_is_initor = initor_type::Initial;
@@ -38,7 +38,7 @@ RESUMEF_NS
 			this->_parent = parent_state;
 			this->_scheduler = sch;
 		}
-		if (_coro == nullptr)
+		if (!_coro)
 			this->_coro = handler;
 
 		if (sch != nullptr)
@@ -55,7 +55,7 @@ RESUMEF_NS
 		coroutine_handle<_PromiseT> handler = coroutine_handle<_PromiseT>::from_promise(*promise);
 		if (!handler.done())
 		{
-			if (this->_coro == nullptr)
+			if (!this->_coro)
 				this->_coro = handler;
 			scheduler_t* sch = this->get_scheduler();
 			if (sch != nullptr)

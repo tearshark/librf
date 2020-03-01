@@ -22,13 +22,7 @@ RESUMEF_NS
 		promise_impl_t(const promise_impl_t&) = delete;
 		promise_impl_t& operator = (const promise_impl_t&) = delete;
 
-		state_type* get_state()
-		{
-			size_t _State_size = _Align_size<state_type>();
-			char* ptr = reinterpret_cast<char*>(this) - _State_size;
-			return reinterpret_cast<state_type*>(ptr);
-		}
-
+		auto get_state()->state_type*;
 		suspend_on_initial initial_suspend() noexcept;
 		suspend_on_final final_suspend() noexcept;
 		void set_exception(std::exception_ptr e);
@@ -39,42 +33,12 @@ RESUMEF_NS
 		void cancellation_requested();
 
 		using _Alloc_char = std::allocator<char>;
-		void* operator new(size_t _Size)
-		{
-			size_t _State_size = _Align_size<state_type>();
-			assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
-
-			_Alloc_char _Al;
-			/*If allocation fails, the coroutine throws std::bad_alloc, 
-			unless the Promise type defines the member function Promise::get_return_object_on_allocation_failure(). 
-			If that member function is defined, allocation uses the nothrow form of operator new and on allocation failure, 
-			the coroutine immediately returns the object obtained from Promise::get_return_object_on_allocation_failure() to the caller. 
-			*/
-			char* ptr = _Al.allocate(_Size + _State_size);
-#if RESUMEF_DEBUG_COUNTER
-			std::cout << "  future_promise::new, alloc size=" << (_Size + _State_size) << std::endl;
-			std::cout << "  future_promise::new, alloc ptr=" << (void*)ptr << std::endl;
-			std::cout << "  future_promise::new, return ptr=" << (void*)(ptr + _State_size) << std::endl;
+		void* operator new(size_t _Size);
+		void operator delete(void* _Ptr, size_t _Size);
+#if !RESUMEF_INLINE_STATE
+	private:
+		counted_ptr<state_type> _state = state_future_t::_Alloc_state<state_type>(false);
 #endif
-
-			//在初始地址上构造state
-			{
-				state_type* st = new(ptr) state_type(_Size + _State_size);
-				st->lock();
-			}
-
-			return ptr + _State_size;
-		}
-
-		void operator delete(void* _Ptr, size_t _Size)
-		{
-			(void)_Size;
-			size_t _State_size = _Align_size<state_type>();
-			assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
-
-			state_type* st = reinterpret_cast<state_type*>(static_cast<char*>(_Ptr) - _State_size);
-			st->unlock();
-		}
 	};
 
 	template<class _Ty>
@@ -86,7 +50,7 @@ RESUMEF_NS
 		template<class U>
 		void return_value(U&& val);	//co_return val
 		template<class U>
-		void yield_value(U&& val);
+		std::experimental::suspend_always yield_value(U&& val);
 	};
 
 	template<>
@@ -95,7 +59,7 @@ RESUMEF_NS
 		using promise_impl_t<void>::get_return_object;
 
 		void return_void();			//co_return;
-		void yield_value();
+		std::experimental::suspend_always yield_value();
 	};
 
 }

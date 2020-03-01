@@ -58,12 +58,6 @@ RESUMEF_NS
 		std::unique_ptr<task_base_t> del_switch(state_base_t* sptr);
 		void add_switch(std::unique_ptr<task_base_t> task);
 
-		switch_scheduler_t operator co_await()
-		{
-			return { this };
-		}
-
-		friend struct task_base;
 		friend struct local_scheduler;
 	protected:
 		scheduler_t();

@@ -22,7 +22,9 @@ future_t<> test_channel_consumer(const channel_t<std::string> & c, size_t cnt)
 {
 	for (size_t i = 0; i < cnt; ++i)
 	{
+#ifndef __clang__
 		try
+#endif
 		{
 			auto val = co_await c.read();
 			++gcounter;
@@ -33,12 +35,14 @@ future_t<> test_channel_consumer(const channel_t<std::string> & c, size_t cnt)
 			}
 #endif
 		}
+#ifndef __clang__
 		catch (channel_exception& e)
 		{
 			//MAX_CHANNEL_QUEUE=0,并且先读后写，会触发read_before_write异常
 			scoped_lock<std::mutex> __lock(cout_mutex);
 			std::cout << e.what() << std::endl;
 		}
+#endif
 
 #if OUTPUT_DEBUG
 		co_await sleep_for(50ms);
@@ -109,5 +113,4 @@ void resumable_main_channel_mult_thread()
 	write_th.join();
 
 	std::cout << "OK: counter = " << gcounter.load() << std::endl;
-	(void)_getch();
 }

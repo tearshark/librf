@@ -22,4 +22,18 @@ RESUMEF_NS
 	struct is_generator<generator_t<_Ty, _Alloc>> : std::true_type {};
 	template<class _Ty>
 	constexpr bool is_generator_v = is_generator<remove_cvref_t<_Ty>>::value;
+
+	template<class _PromiseT>
+	struct is_awaitable : std::false_type {};
+	template<class _Ty>
+	struct is_awaitable<awaitable_t<_Ty>> : std::true_type {};
+	template<class _Ty>
+	constexpr bool is_awaitable_v = is_awaitable<remove_cvref_t<_Ty>>::value;
+
+	template<class _Ty>
+	constexpr bool is_await_suspend_v = is_future_v<_Ty> 
+									|| is_generator_v<_Ty> 
+									|| is_awaitable_v<_Ty> 
+									|| std::is_same_v<remove_cvref_t<_Ty>, switch_scheduler_t>
+		;
 }

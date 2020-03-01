@@ -21,8 +21,10 @@ RESUMEF_NS
 	void state_generator_t::destroy_deallocate()
 	{
 		size_t _Size = _Align_size<state_generator_t>();
+#if RESUMEF_INLINE_STATE
 		char* _Ptr = reinterpret_cast<char*>(this) + _Size;
 		_Size = *reinterpret_cast<uint32_t*>(_Ptr);
+#endif
 #if RESUMEF_DEBUG_COUNTER
 		std::cout << "destroy_deallocate, size=" << _Size << std::endl;
 #endif
@@ -34,7 +36,7 @@ RESUMEF_NS
 
 	void state_generator_t::resume()
 	{
-		if (_coro != nullptr)
+		if (_coro)
 		{
 			_coro.resume();
 			if (_coro.done())
@@ -54,12 +56,12 @@ RESUMEF_NS
 
 	bool state_generator_t::is_ready() const
 	{
-		return _coro != nullptr && !_coro.done();
+		return (bool)_coro && !_coro.done();
 	}
 
 	bool state_generator_t::has_handler() const
 	{
-		return _coro != nullptr;
+		return (bool)_coro;
 	}
 	
 	bool state_generator_t::switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<>)
@@ -90,7 +92,7 @@ RESUMEF_NS
 
 		if (_is_initor == initor_type::Initial)
 		{
-			assert(_initor != nullptr);
+			assert((bool)_initor);
 
 			_is_initor = initor_type::None;
 			__guard.unlock();
@@ -99,7 +101,7 @@ RESUMEF_NS
 			return;
 		}
 		
-		if (_coro != nullptr)
+		if (_coro)
 		{
 			coroutine_handle<> handler = _coro;
 			_coro = nullptr;
@@ -111,6 +113,8 @@ RESUMEF_NS
 
 		if (_is_initor == initor_type::Final)
 		{
+			assert((bool)_initor);
+
 			_is_initor = initor_type::None;
 			__guard.unlock();
 
@@ -122,7 +126,7 @@ RESUMEF_NS
 	bool state_future_t::has_handler() const
 	{
 		scoped_lock<lock_type> __guard(_mtx);
-		return _coro != nullptr || _is_initor != initor_type::None;
+		return (bool)_coro || _is_initor != initor_type::None;
 	}
 
 	bool state_future_t::is_ready() const
@@ -162,7 +166,7 @@ RESUMEF_NS
 		if (_parent != nullptr)
 			_parent->switch_scheduler_await_suspend(sch, nullptr);
 
-		if (handler != nullptr)
+		if (handler)
 		{
 			_coro = handler;
 			sch->add_generator(this);

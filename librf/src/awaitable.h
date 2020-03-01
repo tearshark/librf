@@ -35,18 +35,7 @@ RESUMEF_NS
 			return future_type{ this->_state };
 		}
 
-		mutable counted_ptr<state_type> _state = _Alloc_state();
-	private:
-		static state_type* _Alloc_state()
-		{
-			_Alloc_char _Al;
-			size_t _Size = sizeof(state_type);
-#if RESUMEF_DEBUG_COUNTER
-			std::cout << "awaitable_t::alloc, size=" << _Size << std::endl;
-#endif
-			char * _Ptr = _Al.allocate(_Size);
-			return new(_Ptr) state_type(true);
-		}
+		mutable counted_ptr<state_type> _state = state_future_t::_Alloc_state<state_type>(true);
 	};
 
 	template<class _Ty>

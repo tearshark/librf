@@ -9,7 +9,7 @@
 
 using namespace resumef;
 
-auto test_yield_int() -> generator_t<int>
+generator_t<int> test_yield_int()
 {
 	std::cout << "1 will yield return" << std::endl;
 	co_yield 1;

@@ -394,7 +394,9 @@ void resumable_main_modern_cb()
 	//支持librf的用法
 	GO
 	{
+#ifndef __clang__
 		try
+#endif
 		{
 			int val = co_await add_async(1, 2, use_librf);
 			std::cout << val << std::endl;
@@ -409,6 +411,7 @@ void resumable_main_modern_cb()
 
 			std::cout << result << std::endl;
 		}
+#ifndef __clang__
 		catch (const std::exception& e)
 		{
 			std::cout << "exception signal : " << e.what() << std::endl;
@@ -417,6 +420,7 @@ void resumable_main_modern_cb()
 		{
 			std::cout << "exception signal : who knows?" << std::endl;
 		}
+#endif
 	};
 
 	resumef::this_scheduler()->run_until_notask();

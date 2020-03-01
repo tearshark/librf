@@ -31,7 +31,11 @@
 #include <thread>
 #include <iostream>
 #include <assert.h>
+#if defined(__clang__) && _WIN32
+#include "src/unix/coroutine.h"     //编译器内建的协程函数，MSVC和clang不一样
+#else
 #include <experimental/coroutine>
+#endif
 
 #include "src/def.h"
 #include "src/spinlock.h"
@@ -40,7 +44,6 @@
 #include "src/future.h"
 #include "src/promise.h"
 #include "src/awaitable.h"
-#include "src/switch_scheduler.h"
 
 #include "src/rf_task.h"
 #include "src/utils.h"
@@ -50,6 +53,7 @@
 #include "src/promise.inl"
 #include "src/state.inl"
 
+#include "src/switch_scheduler.h"
 #include "src/_awaker.h"
 #include "src/event.h"
 #include "src/mutex.h"

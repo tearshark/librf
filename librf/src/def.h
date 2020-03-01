@@ -1,11 +1,18 @@
 ﻿#pragma once
 
-#define LIB_RESUMEF_VERSION 20201 // 2.2.1
+#define LIB_RESUMEF_VERSION 20300 // 2.3.0
 
 #if defined(RESUMEF_MODULE_EXPORT)
 #define RESUMEF_NS export namespace resumef
 #else
 #define RESUMEF_NS namespace resumef
+#endif
+
+//如果不清楚context frame的内存布局的情况下，该值设置为0
+#if defined(__clang__) || defined(_MSC_VER)
+#define RESUMEF_INLINE_STATE	1
+#else
+#define RESUMEF_INLINE_STATE	0
 #endif
 
 RESUMEF_NS
@@ -14,6 +21,7 @@ RESUMEF_NS
 
 	template<class _Ty = void>
 	struct future_t;
+
 	using future_vt [[deprecated]] = future_t<>;
 
 	template <typename _Ty = std::nullptr_t, typename _Alloc = std::allocator<char>>
@@ -32,6 +40,8 @@ RESUMEF_NS
 	using coroutine_handle = std::experimental::coroutine_handle<_PromiseT>;
 
 	struct state_base_t;
+
+	struct switch_scheduler_t;
 
 	template<class... _Mutexes>
 	using scoped_lock = std::scoped_lock<_Mutexes...>;

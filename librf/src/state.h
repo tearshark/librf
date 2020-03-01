@@ -48,10 +48,6 @@ RESUMEF_NS
 	
 	struct state_generator_t : public state_base_t
 	{
-		state_generator_t(coroutine_handle<> handler)
-		{
-			_coro = handler;
-		}
 	private:
 		virtual void destroy_deallocate() override;
 	public:
@@ -60,12 +56,20 @@ RESUMEF_NS
 		virtual bool is_ready() const override;
 		virtual bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler) override;
 
-		static state_generator_t * _Alloc_state(coroutine_handle<> handler)
+		void set_initial_suspend(coroutine_handle<> handler)
 		{
+			_coro = handler;
+		}
+
+		static state_generator_t * _Alloc_state()
+		{
+			_Alloc_char _Al;
+			size_t _Size = sizeof(state_generator_t);
 #if RESUMEF_DEBUG_COUNTER
 			std::cout << "state_generator_t::alloc, size=" << sizeof(state_generator_t) << std::endl;
 #endif
-			return new state_generator_t(handler);
+			char* _Ptr = _Al.allocate(_Size);
+			return new(_Ptr) state_generator_t();
 		}
 	};
 
@@ -146,11 +150,25 @@ RESUMEF_NS
 		void promise_initial_suspend(coroutine_handle<_PromiseT> handler);
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void promise_final_suspend(coroutine_handle<_PromiseT> handler);
+
+		template<class _Sty>
+		static _Sty* _Alloc_state(bool awaitor)
+		{
+			_Alloc_char _Al;
+			size_t _Size = sizeof(_Sty);
+#if RESUMEF_DEBUG_COUNTER
+			std::cout << "state_future_t::alloc, size=" << _Size << std::endl;
+#endif
+			char* _Ptr = _Al.allocate(_Size);
+			return new(_Ptr) _Sty(awaitor);
+		}
 	};
 
 	template <typename _Ty>
 	struct state_t final : public state_future_t
 	{
+		friend state_future_t;
+
 		using state_future_t::lock_type;
 		using value_type = _Ty;
 
@@ -162,7 +180,7 @@ RESUMEF_NS
 		{
 			_alloc_size = sizeof(*this);
 		}
-
+	public:
 		~state_t()
 		{
 			if (_has_value)
@@ -187,6 +205,7 @@ RESUMEF_NS
 	template<>
 	struct state_t<void> final : public state_future_t
 	{
+		friend state_future_t;
 		using state_future_t::lock_type;
 
 		explicit state_t(size_t alloc_size) :state_future_t()

@@ -59,7 +59,7 @@ static future_t<> resumable_get_long(int64_t val, channel_t<bool> & c_done)
 {
 	std::cout << "thread = " << std::this_thread::get_id() << ", value = " << val << std::endl;
 
-	co_await via(sch_in_thread);
+	co_await *sch_in_thread;
 	val = co_await async_get_long(val);
 	std::cout << "thread = " << std::this_thread::get_id() << ", value = " << val << std::endl;
 

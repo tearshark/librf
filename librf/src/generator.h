@@ -109,9 +109,7 @@ RESUMEF_NS
 
 			promise_type()
 			{
-				state_type* st = get_state();
-				new(st) state_type(coroutine_handle<promise_type>::from_promise(*this));
-				st->lock();
+				get_state()->set_initial_suspend(coroutine_handle<promise_type>::from_promise(*this));
 			}
 			promise_type(promise_type&& _Right) noexcept = default;
 			promise_type& operator = (promise_type&& _Right) noexcept = default;
@@ -123,19 +121,20 @@ RESUMEF_NS
 				return generator_t{ *this };
 			}
 
-			bool initial_suspend()
+			std::experimental::suspend_always initial_suspend()
 			{
-				return true;
+				return {};
 			}
 
-			bool final_suspend()
+			std::experimental::suspend_always final_suspend()
 			{
-				return true;
+				return {};
 			}
 
-			void yield_value(_Ty const& _Value)
+			std::experimental::suspend_always yield_value(_Ty const& _Value)
 			{
 				_CurrentValue = std::addressof(_Value);
+				return {};
 			}
 
 			//template<class = std::enable_if_t<!std::is_same_v<_Ty, void>, _Ty>>
@@ -170,9 +169,21 @@ RESUMEF_NS
 
 			state_type* get_state()
 			{
+#if RESUMEF_INLINE_STATE
 				size_t _State_size = _Align_size<state_type>();
+#if defined(__clang__)
+				auto h = coroutine_handle<promise_type>::from_promise(*this);
+				char* ptr = reinterpret_cast<char*>(h.address()) - _State_size;
+				return reinterpret_cast<state_type*>(ptr);
+#elif defined(_MSC_VER)
 				char* ptr = reinterpret_cast<char*>(this) - _State_size;
 				return reinterpret_cast<state_type*>(ptr);
+#else
+#error "Unknown compiler"
+#endif
+#else
+				return _state.get();
+#endif
 			}
 
 			using _Alloc_char = typename std::allocator_traits<_Alloc>::template rebind_alloc<char>;
@@ -183,27 +194,41 @@ RESUMEF_NS
 
 			void* operator new(size_t _Size)
 			{
+				_Alloc_char _Al;
+#if RESUMEF_INLINE_STATE
 				size_t _State_size = _Align_size<state_type>();
 				assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
-#if RESUMEF_DEBUG_COUNTER
-				std::cout << "generator_promise::new, size=" << (_Size + _State_size) << std::endl;
-#endif
 
-				_Alloc_char _Al;
 				char* ptr = _Al.allocate(_Size + _State_size);
+				char* _Rptr = ptr + _State_size;
+#if RESUMEF_DEBUG_COUNTER
+				std::cout << "  generator_promise::new, alloc size=" << (_Size + _State_size) << std::endl;
+				std::cout << "  generator_promise::new, alloc ptr=" << (void*)ptr << std::endl;
+				std::cout << "  generator_promise::new, return ptr=" << (void*)_Rptr << std::endl;
+#endif
 
 				//在初始地址上构造state
 				{
-					state_type* st = new(ptr) state_type(coroutine_handle<promise_type>::from_promise(*(promise_type *)ptr));
+					state_type* st = new(ptr) state_type();
 					st->lock();
-					*reinterpret_cast<uint32_t*>(ptr + _State_size) = static_cast<uint32_t>(_Size + _State_size);
 				}
 
-				return ptr + _State_size;
+				return _Rptr;
+#else
+				char* ptr = _Al.allocate(_Size);
+#if RESUMEF_DEBUG_COUNTER
+				std::cout << "  generator_promise::new, alloc size=" << _Size << std::endl;
+				std::cout << "  generator_promise::new, alloc ptr=" << (void*)ptr << std::endl;
+				std::cout << "  generator_promise::new, return ptr=" << (void*)ptr << std::endl;
+#endif
+
+				return ptr;
+#endif
 			}
 
 			void operator delete(void* _Ptr, size_t _Size)
 			{
+#if RESUMEF_INLINE_STATE
 				size_t _State_size = _Align_size<state_type>();
 				assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
 
@@ -211,7 +236,15 @@ RESUMEF_NS
 
 				state_type* st = reinterpret_cast<state_type*>(static_cast<char*>(_Ptr) - _State_size);
 				st->unlock();
+#else
+				_Alloc_char _Al;
+				return _Al.deallocate(reinterpret_cast<char *>(_Ptr), _Size);
+#endif
 			}
+#if !RESUMEF_INLINE_STATE
+		private:
+			counted_ptr<state_type> _state = state_generator_t::_Alloc_state();
+#endif
 		};
 
 		typedef generator_iterator<_Ty, promise_type> iterator;

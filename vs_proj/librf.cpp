@@ -1,7 +1,5 @@
 ﻿
 #include "librf.h"
-#include <experimental/resumable>
-#include <experimental/generator>
 #include <optional>
 
 extern void resumable_main_yield_return();
@@ -34,33 +32,36 @@ int main(int argc, const char* argv[])
 	(void)argc;
 	(void)argv;
 	resumable_main_layout();
+	return 0;
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
 	//else
 	//	resumable_main_benchmark_asio_server();
 
-	//resumable_main_cb();
-	//resumable_main_layout();
-	//resumable_main_modern_cb();
-	//resumable_main_suspend_always();
-	//resumable_main_yield_return();
+	resumable_main_cb();
+	resumable_main_layout();
+	resumable_main_modern_cb();
+	resumable_main_suspend_always();
+	resumable_main_yield_return();
 	//resumable_main_resumable();
-	//resumable_main_routine();
-	//resumable_main_exception();
-	//resumable_main_dynamic_go();
+	resumable_main_routine();
+	resumable_main_exception();
+	resumable_main_dynamic_go();
 	//resumable_main_multi_thread();
-	//resumable_main_timer();
+	resumable_main_timer();
 	//resumable_main_benchmark_mem();
-	//resumable_main_mutex();
-	//resumable_main_event();
-	//resumable_main_event_timeout();
-	//resumable_main_channel();
-	//resumable_main_channel_mult_thread();
-	//resumable_main_sleep();
-	//resumable_main_when_all();
-	//resumable_main_switch_scheduler();
+	resumable_main_mutex();
+	resumable_main_event();
+	resumable_main_event_timeout();
+	resumable_main_channel();
+	resumable_main_channel_mult_thread();
+	resumable_main_sleep();
+	resumable_main_when_all();
+	resumable_main_switch_scheduler();
 	//benchmark_main_channel_passing_next();
+
+	std::cout << "ALL OK!" << std::endl;
 
 	return 0;
 }
