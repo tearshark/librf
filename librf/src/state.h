@@ -96,8 +96,9 @@ RESUMEF_NS
 		intptr_t _id;
 #endif
 		uint32_t _alloc_size = 0;
+		//注意：_has_value对齐到 4 Byte上，后面必须紧跟 _is_future变量。两者能组合成一个uint16_t数据。
 		std::atomic<result_type> _has_value{ result_type::None };
-		bool _is_awaitor;
+		bool _is_future;
 		initor_type _is_initor = initor_type::None;
 	public:
 		state_future_t()
@@ -105,14 +106,14 @@ RESUMEF_NS
 #if RESUMEF_DEBUG_COUNTER
 			_id = ++g_resumef_state_id;
 #endif
-			_is_awaitor = false;
+			_is_future = true;
 		}
 		explicit state_future_t(bool awaitor)
 		{
 #if RESUMEF_DEBUG_COUNTER
 			_id = ++g_resumef_state_id;
 #endif
-			_is_awaitor = awaitor;
+			_is_future = !awaitor;
 		}
 
 		virtual void destroy_deallocate() override;
@@ -121,7 +122,8 @@ RESUMEF_NS
 	
 		inline bool is_ready() const
 		{
-			return _has_value.load(std::memory_order_acquire) != result_type::None || !_is_awaitor;
+			return 0 != reinterpret_cast<const std::atomic<uint16_t> &>(_has_value).load(std::memory_order_acquire);
+			//return _has_value.load(std::memory_order_acquire) != result_type::None || _is_future;
 		}
 		inline bool has_handler_skip_lock() const
 		{
