@@ -11,7 +11,8 @@
 
 目前仅支持:
 
-    Windows (使用VS2017/VS2019编译)
+    Windows (使用VS2017/VS2019/clang编译)
+    Android (使用NDK 20.1 自带的clang编译)
 
 
 librf有以下特点：

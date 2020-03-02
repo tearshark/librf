@@ -50,9 +50,6 @@ RESUMEF_NS
 			return _timer.get();
 		}
 
-		void add_initial(state_base_t* sptr);
-		void add_await(state_base_t* sptr);
-		void add_ready(state_base_t* sptr);
 		void add_generator(state_base_t* sptr);
 		void del_final(state_base_t* sptr);
 		std::unique_ptr<task_base_t> del_switch(state_base_t* sptr);

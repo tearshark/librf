@@ -10,6 +10,7 @@
 #include "librf.h"
 
 using namespace resumef;
+using namespace std::chrono;
 
 const size_t MAX_CHANNEL_QUEUE = 5;		//0, 1, 5, 10, -1
 
@@ -84,10 +85,43 @@ void test_channel_write_first()
 	this_scheduler()->run_until_notask();
 }
 
+static const int N = 1000000;
+
+void test_channel_performance()
+{
+	channel_t<int> c{1};
+
+	go[&]() -> future_t<>
+	{
+		for (int i = N - 1; i >= 0; --i)
+		{
+			co_await(c << i);
+		}
+	};
+	go[&]() -> future_t<>
+	{
+		auto tstart = high_resolution_clock::now();
+
+		int i;
+		do
+		{
+			i = co_await c;
+		} while (i > 0);
+
+		auto dt = duration_cast<duration<double>>(high_resolution_clock::now() - tstart).count();
+		std::cout << "channel w/r " << N << " times, cost time " << dt << "s" << std::endl;
+	};
+
+	this_scheduler()->run_until_notask();
+}
+
 void resumable_main_channel()
 {
 	test_channel_read_first();
 	std::cout << std::endl;
 
 	test_channel_write_first();
+	std::cout << std::endl;
+
+	test_channel_performance();
 }

@@ -32,7 +32,6 @@ RESUMEF_NS
 
 	template<class _Ty>
 	constexpr bool is_await_suspend_v = is_future_v<_Ty> 
-									|| is_generator_v<_Ty> 
 									|| is_awaitable_v<_Ty> 
 									|| std::is_same_v<remove_cvref_t<_Ty>, switch_scheduler_t>
 		;

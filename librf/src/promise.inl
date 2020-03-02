@@ -56,6 +56,17 @@ RESUMEF_NS
 	}
 
 	template <typename _Ty>
+	template <typename _Uty>
+	_Uty&& promise_impl_t<_Ty>::await_transform(_Uty&& _Whatever)
+	{
+		if constexpr (is_future_v<_Uty> || is_awaitable_v<_Uty>)
+		{
+			_Whatever._state->set_scheduler(get_state()->get_scheduler());
+		}
+		return std::forward<_Uty>(_Whatever);
+	}
+
+	template <typename _Ty>
 	inline void promise_impl_t<_Ty>::set_exception(std::exception_ptr e)
 	{
         this->get_state()->set_exception(std::move(e));

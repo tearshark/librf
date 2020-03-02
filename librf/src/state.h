@@ -33,7 +33,6 @@ RESUMEF_NS
 	public:
 		virtual void resume() = 0;
 		virtual bool has_handler() const = 0;
-		virtual bool is_ready() const = 0;
 		virtual bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler) = 0;
 
 		void set_scheduler(scheduler_t* sch)
@@ -53,7 +52,6 @@ RESUMEF_NS
 	public:
 		virtual void resume() override;
 		virtual bool has_handler() const override;
-		virtual bool is_ready() const override;
 		virtual bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler) override;
 
 		void set_initial_suspend(coroutine_handle<> handler)
@@ -114,19 +112,27 @@ RESUMEF_NS
 		virtual void destroy_deallocate() override;
 		virtual void resume() override;
 		virtual bool has_handler() const override;
-		virtual bool is_ready() const override;
 		virtual bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler) override;
+	
+		inline bool is_ready() const
+		{
+			return _exception != nullptr || _has_value.load(std::memory_order_acquire) || !_is_awaitor;
+		}
+		inline bool has_handler_skip_lock() const
+		{
+			return (bool)_coro || _is_initor != initor_type::None;
+		}
 
-		scheduler_t* get_scheduler() const
+		inline scheduler_t* get_scheduler() const
 		{
 			return _parent ? _parent->get_scheduler() : _scheduler;
 		}
 
-		state_base_t * get_parent() const
+		inline state_base_t * get_parent() const
 		{
 			return _parent;
 		}
-		uint32_t get_alloc_size() const
+		inline uint32_t get_alloc_size() const
 		{
 			return _alloc_size;
 		}
@@ -134,14 +140,14 @@ RESUMEF_NS
 		void set_exception(std::exception_ptr e);
 
 		template<class _Exp>
-		void throw_exception(_Exp e)
+		inline void throw_exception(_Exp e)
 		{
 			set_exception(std::make_exception_ptr(std::move(e)));
 		}
 
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void future_await_suspend(coroutine_handle<_PromiseT> handler);
-		bool future_await_ready()
+		inline bool future_await_ready()
 		{
 			//scoped_lock<lock_type> __guard(this->_mtx);
 			return _has_value.load(std::memory_order_acquire);
@@ -153,7 +159,7 @@ RESUMEF_NS
 		void promise_final_suspend(coroutine_handle<_PromiseT> handler);
 
 		template<class _Sty>
-		static _Sty* _Alloc_state(bool awaitor)
+		static inline _Sty* _Alloc_state(bool awaitor)
 		{
 			_Alloc_char _Al;
 			size_t _Size = sizeof(_Sty);

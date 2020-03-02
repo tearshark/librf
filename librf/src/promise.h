@@ -23,8 +23,11 @@ RESUMEF_NS
 		promise_impl_t& operator = (const promise_impl_t&) = delete;
 
 		auto get_state()->state_type*;
+
 		suspend_on_initial initial_suspend() noexcept;
 		suspend_on_final final_suspend() noexcept;
+		template <typename _Uty>
+		_Uty&& await_transform(_Uty&& _Whatever);
 		void set_exception(std::exception_ptr e);
 #ifdef __clang__
 		void unhandled_exception();		//If the coroutine ends with an uncaught exception, it performs the following: 

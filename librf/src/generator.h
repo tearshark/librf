@@ -150,6 +150,7 @@ RESUMEF_NS
 
 			void set_exception(std::exception_ptr e)
 			{
+				(void)e;
 				std::terminate();
 			}
 #ifdef __clang__

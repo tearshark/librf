@@ -93,43 +93,17 @@ RESUMEF_NS
 	void scheduler_t::new_task(task_base_t * task)
 	{
 		state_base_t* sptr = task->get_state();
+		sptr->set_scheduler(this);
 
 		{
-			scoped_lock<spinlock> __guard(_lock_ready);
-			this->_ready_task.emplace(sptr, task);
+			scoped_lock<spinlock, spinlock> __guard(_lock_ready, _lock_running);
+			_ready_task.emplace(sptr, task);
 		}
 
 		//如果是单独的future，没有被co_await过，则handler是nullptr。
-		sptr->set_scheduler(this);
-		if (sptr->has_handler())
-			this->add_initial(sptr);
-	}
-
-	void scheduler_t::add_initial(state_base_t* sptr)
-	{
-		scoped_lock<spinlock, spinlock> __guard(_lock_ready, _lock_running);
-
-		_ready_task.try_emplace(sptr, nullptr);
-		_runing_states.emplace_back(sptr);
-	}
-
-	void scheduler_t::add_await(state_base_t* sptr)
-	{
-		if (sptr->is_ready())
-		{
-			scoped_lock<spinlock> __guard(_lock_running);
-			_runing_states.emplace_back(sptr);
-		}
-	}
-
-	void scheduler_t::add_ready(state_base_t* sptr)
-	{
-		assert(sptr->is_ready());
-
 		if (sptr->has_handler())
 		{
-			scoped_lock<spinlock> __guard(_lock_running);
-			_runing_states.emplace_back(sptr);
+			add_generator(sptr);
 		}
 	}
 
@@ -141,15 +115,8 @@ RESUMEF_NS
 
 	void scheduler_t::del_final(state_base_t* sptr)
 	{
-		{
-			scoped_lock<spinlock> __guard(_lock_ready);
-			this->_ready_task.erase(sptr);
-		}
-		if (sptr->has_handler())
-		{
-			scoped_lock<spinlock> __guard(_lock_running);
-			_runing_states.emplace_back(sptr);
-		}
+		scoped_lock<spinlock> __guard(_lock_ready);
+		this->_ready_task.erase(sptr);
 	}
 
 	std::unique_ptr<task_base_t> scheduler_t::del_switch(state_base_t* sptr)

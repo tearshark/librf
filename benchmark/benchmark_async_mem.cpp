@@ -12,7 +12,7 @@ const size_t LOOP_COUNT = 100;
 
 volatile size_t globalValue = 0;
 
-void resumable_main_benchmark_mem()
+void resumable_main_benchmark_mem(bool wait_key)
 {
 	using namespace std::chrono;
 	
@@ -30,8 +30,11 @@ void resumable_main_benchmark_mem()
 	}
 
 	resumef::this_scheduler()->run_until_notask();
-	std::cout << "press any key to continue." << std::endl;
-	(void)_getch();
+	if (wait_key)
+	{
+		std::cout << "press any key to continue." << std::endl;
+		(void)_getch();
+	}
 }
 
 //clang : 平均 210字节
