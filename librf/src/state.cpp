@@ -126,21 +126,6 @@ RESUMEF_NS
 		return has_handler_skip_lock();
 	}
 
-	void state_future_t::set_exception(std::exception_ptr e)
-	{
-		scoped_lock<lock_type> __guard(this->_mtx);
-		this->_exception = std::move(e);
-
-		scheduler_t* sch = this->get_scheduler();
-		if (sch != nullptr)
-		{
-			if (this->has_handler_skip_lock())
-				sch->add_generator(this);
-			else
-				sch->del_final(this);
-		}
-	}
-
 	bool state_future_t::switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler)
 	{
 		assert(sch != nullptr);
@@ -177,14 +162,29 @@ RESUMEF_NS
 
 		if (this->_exception)
 			std::rethrow_exception(std::move(this->_exception));
-		if (!this->_has_value.load(std::memory_order_acquire))
+		if (this->_has_value.load(std::memory_order_acquire) == result_type::None)
 			std::rethrow_exception(std::make_exception_ptr(future_exception{error_code::not_ready}));
 	}
 
 	void state_t<void>::set_value()
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
-		this->_has_value.store(true, std::memory_order_release);
+		this->_has_value.store(result_type::Value, std::memory_order_release);
+
+		scheduler_t* sch = this->get_scheduler();
+		if (sch != nullptr)
+		{
+			if (this->has_handler_skip_lock())
+				sch->add_generator(this);
+			else
+				sch->del_final(this);
+		}
+	}
+
+	void state_t<void>::set_exception(std::exception_ptr e)
+	{
+		scoped_lock<lock_type> __guard(this->_mtx);
+		this->_exception = std::move(e);
 
 		scheduler_t* sch = this->get_scheduler();
 		if (sch != nullptr)

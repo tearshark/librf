@@ -31,7 +31,7 @@ int main(int argc, const char* argv[])
 {
 	(void)argc;
 	(void)argv;
-	//resumable_main_resumable();
+	//resumable_main_layout();
 	//return 0;
 
 	//if (argc > 1)
@@ -61,7 +61,9 @@ int main(int argc, const char* argv[])
 	resumable_main_switch_scheduler();
 	std::cout << "ALL OK!" << std::endl;
 
+#if !defined(__clang__) || defined(_WIN64)
 	benchmark_main_channel_passing_next();	//这是一个死循环测试
+#endif
 
 	return 0;
 }

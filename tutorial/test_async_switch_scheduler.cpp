@@ -19,7 +19,7 @@ void run_in_thread(channel_t<bool>& c_done)
 	local_scheduler my_scheduler;			//产生本线程唯一的调度器
 	sch_in_thread = this_scheduler();		//本线程唯一的调度器赋值给sch_in_thread，以便于后续测试直接访问此线程的调度器
 
-	c_done << true;							//数据都准备好了，通过channel通知其他协程可以启动后续依赖sch_in_thread变量的协程了
+	(void)c_done.write(true);				//数据都准备好了，通过channel通知其他协程可以启动后续依赖sch_in_thread变量的协程了
 
 	//循环直到sch_in_thread为nullptr
 	for (;;)
@@ -71,7 +71,7 @@ static future_t<> resumable_get_long(int64_t val, channel_t<bool> & c_done)
 	val = co_await async_get_long(val);
 	std::cout << "thread = " << std::this_thread::get_id() << ", value = " << val << std::endl;
 
-	c_done << true;
+	(void)c_done.write(true);
 }
 
 void resumable_main_switch_scheduler()

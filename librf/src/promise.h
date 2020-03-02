@@ -56,6 +56,16 @@ RESUMEF_NS
 		std::experimental::suspend_always yield_value(U&& val);
 	};
 
+	template<class _Ty>
+	struct promise_t<_Ty&> final : public promise_impl_t<_Ty&>
+	{
+		using typename promise_impl_t<_Ty&>::value_type;
+		using promise_impl_t<_Ty&>::get_return_object;
+
+		void return_value(_Ty& val);	//co_return val
+		std::experimental::suspend_always yield_value(_Ty& val);
+	};
+
 	template<>
 	struct promise_t<void> final : public promise_impl_t<void>
 	{

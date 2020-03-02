@@ -208,4 +208,63 @@ RESUMEF_NS
 		static future_t<bool> wait_all_until_(const clock_type::time_point& tp, std::vector<event_impl_ptr>&& evts);
 	};
 
+	class async_manual_reset_event
+	{
+	public:
+		async_manual_reset_event(bool initiallySet = false) noexcept
+			: m_state(initiallySet ? this : nullptr)
+		{}
+
+		// No copying/moving
+		async_manual_reset_event(const async_manual_reset_event&) = delete;
+		async_manual_reset_event(async_manual_reset_event&&) = delete;
+		async_manual_reset_event& operator=(const async_manual_reset_event&) = delete;
+		async_manual_reset_event& operator=(async_manual_reset_event&&) = delete;
+
+		bool is_set() const noexcept
+		{
+			return m_state.load(std::memory_order_acquire) == this;
+		}
+
+		struct awaiter;
+		awaiter operator co_await() const noexcept;
+
+		void set() noexcept;
+		void reset() noexcept
+		{
+			void* oldValue = this;
+			m_state.compare_exchange_strong(oldValue, nullptr, std::memory_order_acquire);
+		}
+	private:
+		friend struct awaiter;
+
+		// - 'this' => set state
+		// - otherwise => not set, head of linked list of awaiter*.
+		mutable std::atomic<void*> m_state;
+	};
+
+	struct async_manual_reset_event::awaiter
+	{
+		awaiter(const async_manual_reset_event& event) noexcept
+			: m_event(event)
+		{}
+
+		bool await_ready() const noexcept
+		{
+			return m_event.is_set();
+		}
+		bool await_suspend(coroutine_handle<> awaitingCoroutine) noexcept;
+		void await_resume() noexcept {}
+	private:
+		friend class async_manual_reset_event;
+
+		const async_manual_reset_event& m_event;
+		coroutine_handle<> m_awaitingCoroutine;
+		awaiter* m_next;
+	};
+
+	inline async_manual_reset_event::awaiter async_manual_reset_event::operator co_await() const noexcept
+	{
+		return awaiter{ *this };
+	}
 }

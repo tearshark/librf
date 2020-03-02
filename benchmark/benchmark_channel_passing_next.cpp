@@ -20,7 +20,7 @@ static future_t<> passing_next(int_channel_ptr rd, int_channel_ptr wr)
 	for (;;)
 	{
 		intptr_t value = co_await *rd;
-		co_await (*wr << (value + 1));
+		co_await wr->write(value + 1);
 	}
 }
 

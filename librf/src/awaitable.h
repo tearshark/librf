@@ -39,7 +39,7 @@ RESUMEF_NS
 	};
 
 	template<class _Ty>
-	struct awaitable_t : public awaitable_impl_t<_Ty>
+	struct [[nodiscard]] awaitable_t : public awaitable_impl_t<_Ty>
 	{
 		using typename awaitable_impl_t<_Ty>::value_type;
 		using awaitable_impl_t<_Ty>::awaitable_impl_t;
@@ -52,8 +52,21 @@ RESUMEF_NS
 		}
 	};
 
+	template<class _Ty>
+	struct [[nodiscard]] awaitable_t<_Ty&> : public awaitable_impl_t<_Ty&>
+	{
+		using typename awaitable_impl_t<_Ty&>::value_type;
+		using awaitable_impl_t<_Ty&>::awaitable_impl_t;
+
+		void set_value(_Ty& value) const
+		{
+			this->_state->set_value(value);
+			this->_state = nullptr;
+		}
+	};
+
 	template<>
-	struct awaitable_t<void> : public awaitable_impl_t<void>
+	struct [[nodiscard]] awaitable_t<void> : public awaitable_impl_t<void>
 	{
 		using awaitable_impl_t<void>::awaitable_impl_t;
 

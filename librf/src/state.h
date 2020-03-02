@@ -79,6 +79,13 @@ RESUMEF_NS
 			Initial,
 			Final
 		};
+		enum struct result_type : uint8_t
+		{
+			None,
+			Value,
+			Exception,
+		};
+
 		//typedef std::recursive_mutex lock_type;
 		typedef spinlock lock_type;
 	protected:
@@ -88,9 +95,8 @@ RESUMEF_NS
 #if RESUMEF_DEBUG_COUNTER
 		intptr_t _id;
 #endif
-		std::exception_ptr _exception;
 		uint32_t _alloc_size = 0;
-		std::atomic<bool> _has_value{ false };
+		std::atomic<result_type> _has_value{ result_type::None };
 		bool _is_awaitor;
 		initor_type _is_initor = initor_type::None;
 	public:
@@ -115,7 +121,7 @@ RESUMEF_NS
 	
 		inline bool is_ready() const
 		{
-			return _exception != nullptr || _has_value.load(std::memory_order_acquire) || !_is_awaitor;
+			return _has_value.load(std::memory_order_acquire) != result_type::None || !_is_awaitor;
 		}
 		inline bool has_handler_skip_lock() const
 		{
@@ -136,18 +142,10 @@ RESUMEF_NS
 			return _alloc_size;
 		}
 
-		void set_exception(std::exception_ptr e);
-
-		template<class _Exp>
-		inline void throw_exception(_Exp e)
-		{
-			set_exception(std::make_exception_ptr(std::move(e)));
-		}
-
 		inline bool future_await_ready()
 		{
 			//scoped_lock<lock_type> __guard(this->_mtx);
-			return _has_value.load(std::memory_order_acquire);
+			return _has_value.load(std::memory_order_acquire) != result_type::None;
 		}
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void future_await_suspend(coroutine_handle<_PromiseT> handler);
@@ -191,23 +189,89 @@ RESUMEF_NS
 	public:
 		~state_t()
 		{
-			if (_has_value.load(std::memory_order_acquire))
-				cast_value_ptr()->~value_type();
+			switch (_has_value.load(std::memory_order_acquire))
+			{
+			case result_type::Value:
+				_value.~value_type();
+				break;
+			case result_type::Exception:
+				_exception.~exception_ptr();
+				break;
+			default:
+				break;
+			}
 		}
 
 		auto future_await_resume() -> value_type;
 		template<class _PromiseT, typename U, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void promise_yield_value(_PromiseT* promise, U&& val);
 
+		void set_exception(std::exception_ptr e);
 		template<typename U>
 		void set_value(U&& val);
-	private:
-		value_type * cast_value_ptr()
+
+		template<class _Exp>
+		inline void throw_exception(_Exp e)
 		{
-			return static_cast<value_type*>(static_cast<void*>(_value));
+			set_exception(std::make_exception_ptr(std::move(e)));
+		}
+	private:
+		union
+		{
+			std::exception_ptr _exception;
+			value_type _value;
+		};
+
+		template<typename U>
+		void set_value_internal(U&& val);
+		void set_exception_internal(std::exception_ptr e);
+	};
+
+	template <typename _Ty>
+	struct state_t<_Ty&> final : public state_future_t
+	{
+		friend state_future_t;
+
+		using state_future_t::lock_type;
+		using value_type = _Ty;
+		using reference_type = _Ty&;
+
+		explicit state_t(size_t alloc_size) :state_future_t()
+		{
+			_alloc_size = static_cast<uint32_t>(alloc_size);
+		}
+		explicit state_t(bool awaitor) :state_future_t(awaitor)
+		{
+			_alloc_size = sizeof(*this);
+		}
+	public:
+		~state_t()
+		{
+			if (_has_value.load(std::memory_order_acquire) == result_type::Exception)
+				_exception.~exception_ptr();
 		}
 
-		alignas(value_type) unsigned char _value[sizeof(value_type)] = {0};
+		auto future_await_resume()->reference_type;
+		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+		void promise_yield_value(_PromiseT* promise, reference_type val);
+
+		void set_exception(std::exception_ptr e);
+		void set_value(reference_type val);
+
+		template<class _Exp>
+		inline void throw_exception(_Exp e)
+		{
+			set_exception(std::make_exception_ptr(std::move(e)));
+		}
+	private:
+		union
+		{
+			std::exception_ptr _exception;
+			value_type* _value;
+		};
+
+		void set_value_internal(reference_type val);
+		void set_exception_internal(std::exception_ptr e);
 	};
 
 	template<>
@@ -229,7 +293,16 @@ RESUMEF_NS
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void promise_yield_value(_PromiseT* promise);
 
+		void set_exception(std::exception_ptr e);
 		void set_value();
+
+		template<class _Exp>
+		inline void throw_exception(_Exp e)
+		{
+			set_exception(std::make_exception_ptr(std::move(e)));
+		}
+	private:
+		std::exception_ptr _exception;
 	};
 }
 

@@ -353,4 +353,61 @@ RESUMEF_NS
 
 		return awaitable.get_future();
 	}
+	
+
+	void async_manual_reset_event::set() noexcept
+	{
+		// Needs to be 'release' so that subsequent 'co_await' has
+		// visibility of our prior writes.
+		// Needs to be 'acquire' so that we have visibility of prior
+		// writes by awaiting coroutines.
+		void* oldValue = m_state.exchange(this, std::memory_order_acq_rel);
+		if (oldValue != this)
+		{
+			// Wasn't already in 'set' state.
+			// Treat old value as head of a linked-list of waiters
+			// which we have now acquired and need to resume.
+			auto* waiters = static_cast<awaiter*>(oldValue);
+			while (waiters != nullptr)
+			{
+				// Read m_next before resuming the coroutine as resuming
+				// the coroutine will likely destroy the awaiter object.
+				auto* next = waiters->m_next;
+				waiters->m_awaitingCoroutine.resume();
+				waiters = next;
+			}
+		}
+	}
+
+	bool async_manual_reset_event::awaiter::await_suspend(
+		coroutine_handle<> awaitingCoroutine) noexcept
+	{
+		// Special m_state value that indicates the event is in the 'set' state.
+		const void* const setState = &m_event;
+
+		// Remember the handle of the awaiting coroutine.
+		m_awaitingCoroutine = awaitingCoroutine;
+
+		// Try to atomically push this awaiter onto the front of the list.
+		void* oldValue = m_event.m_state.load(std::memory_order_acquire);
+		do
+		{
+			// Resume immediately if already in 'set' state.
+			if (oldValue == setState) return false;
+
+			// Update linked list to point at current head.
+			m_next = static_cast<awaiter*>(oldValue);
+
+			// Finally, try to swap the old list head, inserting this awaiter
+			// as the new list head.
+		} while (!m_event.m_state.compare_exchange_weak(
+			oldValue,
+			this,
+			std::memory_order_release,
+			std::memory_order_acquire));
+
+		// Successfully enqueued. Remain suspended.
+		return true;
+	}
+
 }

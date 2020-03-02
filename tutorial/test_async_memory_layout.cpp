@@ -58,9 +58,9 @@ future_t<int64_t> resumeable_get_long(int64_t x, int64_t y)
 	promise_type* promise = &handler.promise();
 	state_type* state = handler.promise().get_state();
 
-	std::cout << "  future size=" << _Align_size<future_type>() << std::endl;
-	std::cout << "  promise size=" << _Align_size<promise_type>() << std::endl;
-	std::cout << "  state size=" << _Align_size<state_type>() << std::endl;
+	std::cout << "  future size=" << sizeof(future_type) << " / " << _Align_size<future_type>() << std::endl;
+	std::cout << "  promise size=" << sizeof(promise_type) << " / " << _Align_size<promise_type>() << std::endl;
+	std::cout << "  state size=" << sizeof(state_type) << " / "<< _Align_size<state_type>() << std::endl;
 	std::cout << "  frame size=" << _coro_frame_size() << ", alloc size=" << state->get_alloc_size() << std::endl;
 
 	std::cout << "  frame ptr=" << frame_ptr << "," << (void*)&frame_ptr << std::endl;
@@ -97,9 +97,9 @@ future_t<> resumable_get_long_2(int64_t a, int64_t b, int64_t c)
 	promise_type * promise = &handler.promise();
 	state_type * state = handler.promise().get_state();
 
-	std::cout << "  future size=" << _Align_size<future_type>() << std::endl;
-	std::cout << "  promise size=" << _Align_size<promise_type>() << std::endl;
-	std::cout << "  state size=" << _Align_size<state_type>() << std::endl;
+	std::cout << "  future size=" << sizeof(future_type) << " / " << _Align_size<future_type>() << std::endl;
+	std::cout << "  promise size=" << sizeof(promise_type) << " / " << _Align_size<promise_type>() << std::endl;
+	std::cout << "  state size=" << sizeof(state_type) << " / "<< _Align_size<state_type>() << std::endl;
 	std::cout << "  frame size=" << _coro_frame_size() << ", alloc size=" << state->get_alloc_size() << std::endl;
 
 	std::cout << "  frame ptr=" << frame_ptr << ","<< (void*)&frame_ptr << std::endl;

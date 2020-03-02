@@ -13,7 +13,7 @@ future_t<> test_sleep_use_timer()
 {
 	using namespace std::chrono;
 
-	resumef::sleep_for(100ms);		//incorrect!!!
+	(void)resumef::sleep_for(100ms);		//incorrect!!!
 
 	co_await resumef::sleep_for(100ms);
 	std::cout << "sleep_for 100ms." << std::endl;

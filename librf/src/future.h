@@ -4,7 +4,7 @@
 RESUMEF_NS
 {
 	template<class _Ty>
-	struct future_t
+	struct [[nodiscard]] future_t
 	{
 		using value_type = _Ty;
 		using state_type = state_t<value_type>;

@@ -182,6 +182,19 @@ RESUMEF_NS
 		return {};
 	}
 
+	template<class _Ty>
+	inline void promise_t<_Ty&>::return_value(_Ty& val)
+	{
+		this->get_state()->set_value(val);
+	}
+
+	template<class _Ty>
+	inline std::experimental::suspend_always promise_t<_Ty&>::yield_value(_Ty& val)
+	{
+		this->get_state()->promise_yield_value(this, val);
+		return {};
+	}
+
 	inline void promise_t<void>::return_void()
 	{
         this->get_state()->set_value();
