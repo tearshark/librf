@@ -33,7 +33,6 @@ RESUMEF_NS
 	public:
 		virtual void resume() = 0;
 		virtual bool has_handler() const = 0;
-		virtual bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler) = 0;
 
 		void set_scheduler(scheduler_t* sch)
 		{
@@ -52,7 +51,8 @@ RESUMEF_NS
 	public:
 		virtual void resume() override;
 		virtual bool has_handler() const override;
-		virtual bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler) override;
+
+		bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler);
 
 		void set_initial_suspend(coroutine_handle<> handler)
 		{
@@ -89,7 +89,7 @@ RESUMEF_NS
 		intptr_t _id;
 #endif
 		std::exception_ptr _exception;
-		uint32_t _alloc_size;
+		uint32_t _alloc_size = 0;
 		std::atomic<bool> _has_value{ false };
 		bool _is_awaitor;
 		initor_type _is_initor = initor_type::None;
@@ -112,7 +112,6 @@ RESUMEF_NS
 		virtual void destroy_deallocate() override;
 		virtual void resume() override;
 		virtual bool has_handler() const override;
-		virtual bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler) override;
 	
 		inline bool is_ready() const
 		{
@@ -145,13 +144,15 @@ RESUMEF_NS
 			set_exception(std::make_exception_ptr(std::move(e)));
 		}
 
-		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
-		void future_await_suspend(coroutine_handle<_PromiseT> handler);
 		inline bool future_await_ready()
 		{
 			//scoped_lock<lock_type> __guard(this->_mtx);
 			return _has_value.load(std::memory_order_acquire);
 		}
+		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+		void future_await_suspend(coroutine_handle<_PromiseT> handler);
+
+		bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler);
 
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 		void promise_initial_suspend(coroutine_handle<_PromiseT> handler);
@@ -206,7 +207,7 @@ RESUMEF_NS
 			return static_cast<value_type*>(static_cast<void*>(_value));
 		}
 
-		alignas(value_type) unsigned char _value[sizeof(value_type)];
+		alignas(value_type) unsigned char _value[sizeof(value_type)] = {0};
 	};
 
 	template<>
