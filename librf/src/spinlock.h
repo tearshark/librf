@@ -15,12 +15,12 @@ RESUMEF_NS
 		std::thread::id owner_thread_id;
 #endif
 
-		spinlock()
+		spinlock() noexcept
 		{
 			lck = FREE_VALUE;
 		}
 
-		void lock()
+		void lock() noexcept
 		{
 			using namespace std::chrono;
 
@@ -55,7 +55,7 @@ RESUMEF_NS
 #endif
 		}
 
-		bool try_lock()
+		bool try_lock() noexcept
 		{
 			int val = FREE_VALUE;
 			bool ret = lck.compare_exchange_weak(val, LOCKED_VALUE, std::memory_order_acquire);
@@ -67,7 +67,7 @@ RESUMEF_NS
 			return ret;
 		}
 
-		void unlock()
+		void unlock() noexcept
 		{
 #if _DEBUG
 			owner_thread_id = std::thread::id();

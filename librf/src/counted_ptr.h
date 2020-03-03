@@ -6,13 +6,13 @@ RESUMEF_NS
 	template <typename T>
 	struct counted_ptr
 	{
-		counted_ptr() = default;
-		counted_ptr(const counted_ptr& cp) : _p(cp._p)
+		counted_ptr() noexcept = default;
+		counted_ptr(const counted_ptr& cp) : _p(cp._p) 
 		{
 			_lock();
 		}
 
-		counted_ptr(T* p) : _p(p)
+		counted_ptr(T* p) : _p(p) 
 		{
 			_lock();
 		}
@@ -22,7 +22,7 @@ RESUMEF_NS
 			std::swap(_p, cp._p);
 		}
 
-		counted_ptr& operator=(const counted_ptr& cp)
+		counted_ptr& operator=(const counted_ptr& cp) 
 		{
 			if (&cp != this)
 			{
@@ -44,12 +44,12 @@ RESUMEF_NS
 			_unlock();
 		}
 
-		T* operator->() const
+		T* operator->() const noexcept
 		{
 			return _p;
 		}
 
-		T* get() const
+		T* get() const noexcept
 		{
 			return _p;
 		}

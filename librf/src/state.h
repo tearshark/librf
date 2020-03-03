@@ -32,7 +32,7 @@ RESUMEF_NS
 		virtual void destroy_deallocate() = 0;
 	public:
 		virtual void resume() = 0;
-		virtual bool has_handler() const = 0;
+		virtual bool has_handler() const  noexcept = 0;
 
 		void set_scheduler(scheduler_t* sch)
 		{
@@ -50,7 +50,7 @@ RESUMEF_NS
 		virtual void destroy_deallocate() override;
 	public:
 		virtual void resume() override;
-		virtual bool has_handler() const override;
+		virtual bool has_handler() const  noexcept override;
 
 		bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler);
 
@@ -100,6 +100,12 @@ RESUMEF_NS
 		std::atomic<result_type> _has_value{ result_type::None };
 		bool _is_future;
 		initor_type _is_initor = initor_type::None;
+		static_assert(sizeof(std::atomic<result_type>) == 1);
+		static_assert(alignof(std::atomic<result_type>) == 1);
+		static_assert(sizeof(bool) == 1);
+		static_assert(alignof(bool) == 1);
+		static_assert(sizeof(std::atomic<initor_type>) == 1);
+		static_assert(alignof(std::atomic<initor_type>) == 1);
 	public:
 		state_future_t()
 		{
@@ -118,14 +124,22 @@ RESUMEF_NS
 
 		virtual void destroy_deallocate() override;
 		virtual void resume() override;
-		virtual bool has_handler() const override;
+		virtual bool has_handler() const  noexcept override;
 	
-		inline bool is_ready() const
+		inline bool is_ready() const noexcept
 		{
-			return 0 != reinterpret_cast<const std::atomic<uint16_t> &>(_has_value).load(std::memory_order_acquire);
-			//return _has_value.load(std::memory_order_acquire) != result_type::None || _is_future;
+			//msvc认为是constexpr表达式(不写还给警告)，然而，clang不这么认为。
+			//放弃constexpr，反正合格的编译器都会优化掉这个if判断的。
+			if 
+#ifndef __clang__
+				constexpr
+#endif
+				(_offset_of(state_future_t, _is_future) - _offset_of(state_future_t, _has_value) == 1)
+				return 0 != reinterpret_cast<const std::atomic<uint16_t> &>(_has_value).load(std::memory_order_acquire);
+			else
+				return _has_value.load(std::memory_order_acquire) != result_type::None || _is_future;
 		}
-		inline bool has_handler_skip_lock() const
+		inline bool has_handler_skip_lock() const noexcept
 		{
 			return (bool)_coro || _is_initor != initor_type::None;
 		}
@@ -135,16 +149,16 @@ RESUMEF_NS
 			return _parent ? _parent->get_scheduler() : _scheduler;
 		}
 
-		inline state_base_t * get_parent() const
+		inline state_base_t * get_parent() const noexcept
 		{
 			return _parent;
 		}
-		inline uint32_t get_alloc_size() const
+		inline uint32_t get_alloc_size() const noexcept
 		{
 			return _alloc_size;
 		}
 
-		inline bool future_await_ready()
+		inline bool future_await_ready() noexcept
 		{
 			//scoped_lock<lock_type> __guard(this->_mtx);
 			return _has_value.load(std::memory_order_acquire) != result_type::None;

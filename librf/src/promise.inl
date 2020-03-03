@@ -57,7 +57,7 @@ RESUMEF_NS
 
 	template <typename _Ty>
 	template <typename _Uty>
-	_Uty&& promise_impl_t<_Ty>::await_transform(_Uty&& _Whatever)
+	_Uty&& promise_impl_t<_Ty>::await_transform(_Uty&& _Whatever) noexcept
 	{
 		if constexpr (is_future_v<_Uty> || is_awaitable_v<_Uty>)
 		{
@@ -81,19 +81,19 @@ RESUMEF_NS
 #endif
 
 	template <typename _Ty>
-	inline future_t<_Ty> promise_impl_t<_Ty>::get_return_object()
+	inline future_t<_Ty> promise_impl_t<_Ty>::get_return_object() noexcept
 	{
         return { this->get_state() };
 	}
 
 	template <typename _Ty>
-	inline void promise_impl_t<_Ty>::cancellation_requested()
+	inline void promise_impl_t<_Ty>::cancellation_requested() noexcept
 	{
 
 	}
 
 	template <typename _Ty>
-	auto promise_impl_t<_Ty>::get_state() -> state_type*
+	auto promise_impl_t<_Ty>::get_state() noexcept -> state_type*
 	{
 #if RESUMEF_INLINE_STATE
 		size_t _State_size = _Align_size<state_type>();

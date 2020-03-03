@@ -12,7 +12,7 @@ RESUMEF_NS
 		switch_scheduler_t& operator = (const switch_scheduler_t&) = default;
 		switch_scheduler_t& operator = (switch_scheduler_t&&) = default;
 
-		bool await_ready()
+		bool await_ready() noexcept
 		{
 			return false;
 		}
@@ -26,7 +26,7 @@ RESUMEF_NS
 			sptr->switch_scheduler_await_suspend(_scheduler, handler);
 		}
 
-		void await_resume()
+		void await_resume() noexcept
 		{
 		}
 	private:

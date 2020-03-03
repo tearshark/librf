@@ -30,7 +30,7 @@ RESUMEF_NS
 			set_exception(std::make_exception_ptr(std::move(e)));
 		}
 
-		future_type get_future()
+		future_type get_future() noexcept
 		{
 			return future_type{ this->_state };
 		}

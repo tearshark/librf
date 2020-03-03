@@ -121,29 +121,29 @@ RESUMEF_NS
 				return generator_t{ *this };
 			}
 
-			std::experimental::suspend_always initial_suspend()
+			std::experimental::suspend_always initial_suspend() noexcept
 			{
 				return {};
 			}
 
-			std::experimental::suspend_always final_suspend()
+			std::experimental::suspend_always final_suspend() noexcept
 			{
 				return {};
 			}
 
-			std::experimental::suspend_always yield_value(_Ty const& _Value)
+			std::experimental::suspend_always yield_value(_Ty const& _Value) noexcept
 			{
 				_CurrentValue = std::addressof(_Value);
 				return {};
 			}
 
 			//template<class = std::enable_if_t<!std::is_same_v<_Ty, void>, _Ty>>
-			void return_value(_Ty const& _Value)
+			void return_value(_Ty const& _Value) noexcept
 			{
 				_CurrentValue = std::addressof(_Value);
 			}
 			//template<class = std::enable_if_t<std::is_same_v<_Ty, void>, _Ty>>
-			void return_value()
+			void return_value() noexcept
 			{
 				_CurrentValue = nullptr;
 			}
@@ -161,14 +161,14 @@ RESUMEF_NS
 #endif
 
 			template <typename _Uty>
-			_Uty&& await_transform(_Uty&& _Whatever)
+			_Uty&& await_transform(_Uty&& _Whatever) noexcept
 			{
 				static_assert(std::is_same_v<_Uty, void>,
 					"co_await is not supported in coroutines of type std::experiemental::generator_t");
 				return std::forward<_Uty>(_Whatever);
 			}
 
-			state_type* get_state()
+			state_type* get_state() noexcept
 			{
 #if RESUMEF_INLINE_STATE
 				size_t _State_size = _Align_size<state_type>();

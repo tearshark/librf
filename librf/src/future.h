@@ -14,7 +14,7 @@ RESUMEF_NS
 
 		counted_ptr<state_type> _state;
 
-		future_t(counted_ptr<state_type> _st)
+		future_t(counted_ptr<state_type> _st) noexcept
 			:_state(std::move(_st)) {}
 		future_t(const future_t&) = default;
 		future_t(future_t&&) = default;
@@ -22,7 +22,7 @@ RESUMEF_NS
 		future_t& operator = (const future_t&) = default;
 		future_t& operator = (future_t&&) = default;
 
-		bool await_ready()
+		bool await_ready() noexcept
 		{
 			return _state->future_await_ready();
 		}

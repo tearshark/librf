@@ -45,7 +45,7 @@ RESUMEF_NS
 			return _ready_task.empty() && _runing_states.empty() && _timer->empty();
 		}
 
-		inline timer_manager* timer() const
+		inline timer_manager* timer() const noexcept
 		{
 			return _timer.get();
 		}

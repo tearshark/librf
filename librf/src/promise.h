@@ -16,24 +16,24 @@ RESUMEF_NS
 		using promise_type = promise_t<value_type>;
 		using future_type = future_t<value_type>;
 
-		promise_impl_t(){}
+		promise_impl_t() noexcept {}
 		promise_impl_t(promise_impl_t&& _Right) noexcept = default;
 		promise_impl_t& operator = (promise_impl_t&& _Right) noexcept = default;
 		promise_impl_t(const promise_impl_t&) = delete;
 		promise_impl_t& operator = (const promise_impl_t&) = delete;
 
-		auto get_state()->state_type*;
+		auto get_state() noexcept->state_type*;
 
 		suspend_on_initial initial_suspend() noexcept;
 		suspend_on_final final_suspend() noexcept;
 		template <typename _Uty>
-		_Uty&& await_transform(_Uty&& _Whatever);
+		_Uty&& await_transform(_Uty&& _Whatever) noexcept;
 		void set_exception(std::exception_ptr e);
 #ifdef __clang__
 		void unhandled_exception();		//If the coroutine ends with an uncaught exception, it performs the following: 
 #endif
-		future_type get_return_object();
-		void cancellation_requested();
+		future_type get_return_object() noexcept;
+		void cancellation_requested() noexcept;
 
 		using _Alloc_char = std::allocator<char>;
 		void* operator new(size_t _Size);

@@ -9,7 +9,7 @@ RESUMEF_NS
 		task_base_t() = default;
 		virtual ~task_base_t();
 
-		state_base_t* get_state() const
+		state_base_t* get_state() const noexcept
 		{
 			return _state.get();
 		}
