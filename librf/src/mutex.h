@@ -5,7 +5,7 @@ RESUMEF_NS
 	namespace detail
 	{
 		struct mutex_impl;
-		typedef _awaker<mutex_impl> mutex_awaker;
+		typedef ::resumef::detail::_awaker<mutex_impl> mutex_awaker;
 		typedef std::shared_ptr<mutex_awaker> mutex_awaker_ptr;
 
 		struct mutex_impl : public std::enable_shared_from_this<mutex_impl>

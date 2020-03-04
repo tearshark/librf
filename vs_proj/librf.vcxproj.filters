@@ -25,9 +25,6 @@
     <ClCompile Include="librf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\librf\src\event.cpp">
-      <Filter>librf\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\librf\src\mutex.cpp">
       <Filter>librf\src</Filter>
     </ClCompile>
@@ -115,6 +112,15 @@
     <ClCompile Include="..\tutorial\test_async_switch_scheduler.cpp">
       <Filter>tutorial</Filter>
     </ClCompile>
+    <ClCompile Include="..\librf\src\event_v2.cpp">
+      <Filter>librf\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\librf\src\event_v1.cpp">
+      <Filter>librf\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_event_v2.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\librf\librf.h">
@@ -188,6 +194,12 @@
     </ClInclude>
     <ClInclude Include="..\librf\src\unix\clang_builtin.h">
       <Filter>librf\src\unix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\event_v1.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\event_v2.h">
+      <Filter>librf\src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

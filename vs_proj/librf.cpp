@@ -11,6 +11,7 @@ extern void resumable_main_resumable();
 extern void resumable_main_mutex();
 extern void resumable_main_exception();
 extern void resumable_main_event();
+extern void resumable_main_event_v2();
 extern void resumable_main_event_timeout();
 extern void resumable_main_dynamic_go();
 extern void resumable_main_channel();
@@ -31,8 +32,8 @@ int main(int argc, const char* argv[])
 {
 	(void)argc;
 	(void)argv;
-	//resumable_main_layout();
-	//return 0;
+	resumable_main_event_v2();
+	return 0;
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
@@ -53,6 +54,7 @@ int main(int argc, const char* argv[])
 	resumable_main_benchmark_mem(false);
 	resumable_main_mutex();
 	resumable_main_event();
+	resumable_main_event_v2();
 	resumable_main_event_timeout();
 	resumable_main_channel();
 	resumable_main_channel_mult_thread();

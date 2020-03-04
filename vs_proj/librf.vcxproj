@@ -40,7 +40,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>ClangCL</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -180,7 +180,8 @@
     <ClCompile Include="..\benchmark\benchmark_channel_passing_next.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\librf\src\event.cpp" />
+    <ClCompile Include="..\librf\src\event_v1.cpp" />
+    <ClCompile Include="..\librf\src\event_v2.cpp" />
     <ClCompile Include="..\librf\src\mutex.cpp" />
     <ClCompile Include="..\librf\src\rf_task.cpp" />
     <ClCompile Include="..\librf\src\scheduler.cpp" />
@@ -194,6 +195,7 @@
     <ClCompile Include="..\tutorial\test_async_dynamic_go.cpp" />
     <ClCompile Include="..\tutorial\test_async_event.cpp" />
     <ClCompile Include="..\tutorial\test_async_event_timeout.cpp" />
+    <ClCompile Include="..\tutorial\test_async_event_v2.cpp" />
     <ClCompile Include="..\tutorial\test_async_exception.cpp" />
     <ClCompile Include="..\tutorial\test_async_memory_layout.cpp" />
     <ClCompile Include="..\tutorial\test_async_modern_cb.cpp" />
@@ -222,6 +224,8 @@
     <ClInclude Include="..\librf\src\counted_ptr.h" />
     <ClInclude Include="..\librf\src\def.h" />
     <ClInclude Include="..\librf\src\event.h" />
+    <ClInclude Include="..\librf\src\event_v1.h" />
+    <ClInclude Include="..\librf\src\event_v2.h" />
     <ClInclude Include="..\librf\src\future.h" />
     <ClInclude Include="..\librf\src\generator.h" />
     <ClInclude Include="..\librf\src\promise.h" />
