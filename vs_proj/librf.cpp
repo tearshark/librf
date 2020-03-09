@@ -43,11 +43,13 @@ int main(int argc, const char* argv[])
 	//test_ring_queue<resumef::ring_queue_spinlock<int, false, uint32_t>>();
 	//test_ring_queue<resumef::ring_queue_lockfree<int, uint64_t>>();
 
+/*
 	resumable_main_channel();
 	resumable_main_channel_mult_thread();
 	resumable_main_switch_scheduler();
 	benchmark_main_channel_passing_next();
 	return 0;
+*/
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
@@ -77,9 +79,7 @@ int main(int argc, const char* argv[])
 	resumable_main_switch_scheduler();
 	std::cout << "ALL OK!" << std::endl;
 
-#if !defined(__clang__) || defined(_WIN64)
 	benchmark_main_channel_passing_next();	//这是一个死循环测试
-#endif
 
 	return 0;
 }

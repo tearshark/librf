@@ -12,7 +12,7 @@
 using namespace resumef;
 using namespace std::chrono;
 
-const size_t MAX_CHANNEL_QUEUE = 5;		//0, 1, 5, 10, -1
+const size_t MAX_CHANNEL_QUEUE = 1;		//0, 1, 5, 10, -1
 
 //如果使用move_only_type来操作channel失败，说明中间过程发生了拷贝操作----这不是设计目标。
 template<class _Ty>
@@ -99,7 +99,7 @@ void test_channel_write_first()
 
 static const int N = 1000000;
 
-void test_channel_performance(size_t buff_size)
+void test_channel_performance_single_thread(size_t buff_size)
 {
 	//1的话，效率跟golang比，有点惨不忍睹。
 	//1000的话，由于几乎不需要调度器接入，效率就很高了，随便过千万数量级。
@@ -129,6 +129,46 @@ void test_channel_performance(size_t buff_size)
 	this_scheduler()->run_until_notask();
 }
 
+void test_channel_performance_double_thread(size_t buff_size)
+{
+	//1的话，效率跟golang比，有点惨不忍睹。
+	//1000的话，由于几乎不需要调度器接入，效率就很高了，随便过千万数量级。
+	channel_t<int, false, true> c{ buff_size };
+
+	std::thread wr_th([c]
+	{
+		local_scheduler ls;
+
+		GO
+		{
+			for (int i = N - 1; i >= 0; --i)
+			{
+				co_await(c << i);
+			}
+		};
+
+		this_scheduler()->run_until_notask();
+	});
+
+	go[&]() -> future_t<>
+	{
+		auto tstart = high_resolution_clock::now();
+
+		int i;
+		do
+		{
+			i = co_await c;
+		} while (i > 0);
+
+		auto dt = duration_cast<duration<double>>(high_resolution_clock::now() - tstart).count();
+		std::cout << "channel buff=" << c.capacity() << ", w/r " << N << " times, cost time " << dt << "s" << std::endl;
+	};
+
+	this_scheduler()->run_until_notask();
+
+	wr_th.join();
+}
+
 void resumable_main_channel()
 {
 	test_channel_read_first();
@@ -137,9 +177,13 @@ void resumable_main_channel()
 	test_channel_write_first();
 	std::cout << std::endl;
 
-	test_channel_performance(1);
-	test_channel_performance(10);
-	test_channel_performance(100);
-	test_channel_performance(1000);
-	test_channel_performance(10000);
+	test_channel_performance_single_thread(1);
+	test_channel_performance_single_thread(10);
+	test_channel_performance_single_thread(100);
+	test_channel_performance_single_thread(1000);
+
+	test_channel_performance_double_thread(1);
+	test_channel_performance_double_thread(10);
+	test_channel_performance_double_thread(100);
+	test_channel_performance_double_thread(1000);
 }
