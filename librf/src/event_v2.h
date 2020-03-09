@@ -40,6 +40,12 @@ RESUMEF_NS
 
 		struct state_event_t : public state_base_t
 		{
+			state_event_t(event_v2_impl* e) noexcept
+			{
+				if (e != nullptr)
+					m_event = e->shared_from_this();
+			}
+
 			virtual void resume() override;
 			virtual bool has_handler() const  noexcept override;
 
@@ -48,6 +54,11 @@ RESUMEF_NS
 				assert(this->_scheduler != nullptr);
 				if (this->_coro)
 					this->_scheduler->add_generator(this);
+			}
+
+			void cancel_timeout()
+			{
+				this->_coro = nullptr;
 			}
 
 			//将自己加入到通知链表里
@@ -64,32 +75,15 @@ RESUMEF_NS
 				return m_event->add_notify_list(this);
 			}
 
-			static state_event_t* _Alloc_state(event_v2_impl * e)
-			{
-				_Alloc_char _Al;
-				size_t _Size = sizeof(state_event_t);
-#if RESUMEF_DEBUG_COUNTER
-				std::cout << "state_event_t::alloc, size=" << sizeof(state_event_t) << std::endl;
-#endif
-				char* _Ptr = _Al.allocate(_Size);
-				return new(_Ptr) state_event_t(e);
-			}
 		private:
 			friend struct event_v2_impl;
 
-			state_event_t(event_v2_impl * e) noexcept
-			{
-				if (e != nullptr)
-					m_event = e->shared_from_this();
-			}
 			std::shared_ptr<event_v2_impl> m_event;
 			state_event_t* m_next = nullptr;
-
-			virtual void destroy_deallocate() override;
 		};
 	}
 
-	namespace v2
+	namespace event_v2
 	{
 		struct event_t
 		{
@@ -125,7 +119,7 @@ RESUMEF_NS
 				template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
 				bool await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 				{
-					_state = detail::state_event_t::_Alloc_state(_event);
+					_state = new detail::state_event_t(_event);
 					return _state->event_await_suspend(handler);
 				}
 				void await_resume() noexcept

@@ -109,6 +109,8 @@ RESUMEF_NS
 
 	void scheduler_t::add_generator(state_base_t* sptr)
 	{
+		assert(sptr != nullptr);
+
 		scoped_lock<spinlock> __guard(_lock_running);
 		_runing_states.emplace_back(sptr);
 	}

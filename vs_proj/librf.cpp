@@ -2,6 +2,12 @@
 #include "librf.h"
 #include <optional>
 
+//#define _WITH_LOCK_FREE_Q_KEEP_REAL_SIZE	1
+#include "src/ring_queue.h"
+#include "src/ring_queue_spinlock.h"
+#include "src/ring_queue_lockfree.h"
+#include "../tutorial/test_ring_queue.h"
+
 extern void resumable_main_yield_return();
 extern void resumable_main_timer();
 extern void resumable_main_suspend_always();
@@ -32,7 +38,15 @@ int main(int argc, const char* argv[])
 {
 	(void)argc;
 	(void)argv;
-	resumable_main_event_v2();
+
+	//test_ring_queue_simple<ring_queue_single_thread<int>>();
+	//test_ring_queue<ring_queue_spinlock<int, false, uint32_t>>();
+	//test_ring_queue<ring_queue_lockfree<int, uint64_t>>();
+
+	resumable_main_channel();
+	resumable_main_channel_mult_thread();
+	resumable_main_switch_scheduler();
+	benchmark_main_channel_passing_next();
 	return 0;
 
 	//if (argc > 1)
@@ -54,7 +68,7 @@ int main(int argc, const char* argv[])
 	resumable_main_benchmark_mem(false);
 	resumable_main_mutex();
 	resumable_main_event();
-	resumable_main_event_v2();
+	//resumable_main_event_v2();
 	resumable_main_event_timeout();
 	resumable_main_channel();
 	resumable_main_channel_mult_thread();

@@ -5,6 +5,11 @@ RESUMEF_NS
 	state_base_t::~state_base_t()
 	{
 	}
+	
+	void state_base_t::destroy_deallocate()
+	{
+		delete this;
+	}
 
 	void state_future_t::destroy_deallocate()
 	{

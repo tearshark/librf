@@ -29,7 +29,7 @@ RESUMEF_NS
 
 		virtual ~state_base_t();
 	private:
-		virtual void destroy_deallocate() = 0;
+		virtual void destroy_deallocate();
 	public:
 		virtual void resume() = 0;
 		virtual bool has_handler() const  noexcept = 0;

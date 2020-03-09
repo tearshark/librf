@@ -59,7 +59,7 @@ RESUMEF_NS
 
 	}
 
-inline namespace v1
+inline namespace event_v1
 {
 	event_t::event_t(intptr_t initial_counter_)
 		: _event(std::make_shared<detail::event_impl>(initial_counter_))

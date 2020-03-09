@@ -10,7 +10,7 @@
 using namespace resumef;
 
 //非协程的逻辑线程，或异步代码，可以通过event_t通知到协程，并且不会阻塞协程所在的线程。
-std::thread async_set_event_all(const v2::event_t & e, std::chrono::milliseconds dt)
+std::thread async_set_event_all(const event_v2::event_t & e, std::chrono::milliseconds dt)
 {
 	return std::thread([=]
 	{
@@ -19,7 +19,7 @@ std::thread async_set_event_all(const v2::event_t & e, std::chrono::milliseconds
 	});
 }
 
-std::thread async_set_event_one(const v2::event_t& e, std::chrono::milliseconds dt)
+std::thread async_set_event_one(const event_v2::event_t& e, std::chrono::milliseconds dt)
 {
 	return std::thread([=]
 	{
@@ -29,7 +29,7 @@ std::thread async_set_event_one(const v2::event_t& e, std::chrono::milliseconds 
 }
 
 
-future_t<> resumable_wait_event(const v2::event_t & e, int idx)
+future_t<> resumable_wait_event(const event_v2::event_t & e, int idx)
 {
 	co_await e;
 	std::cout << "[" << idx << "]event signal!" << std::endl;
@@ -40,7 +40,7 @@ void test_notify_all()
 	using namespace std::chrono;
 
 	{
-		v2::event_t evt;
+		event_v2::event_t evt;
 		go resumable_wait_event(evt, 0);
 		go resumable_wait_event(evt, 1);
 		go resumable_wait_event(evt, 2);
@@ -58,7 +58,7 @@ void test_notify_one()
 	using namespace std::chrono;
 
 	{
-		v2::event_t evt;
+		event_v2::event_t evt;
 		go resumable_wait_event(evt, 10);
 		go resumable_wait_event(evt, 11);
 		go resumable_wait_event(evt, 12);

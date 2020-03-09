@@ -24,14 +24,10 @@ future_t<> test_channel_read(const channel_t<std::string> & c)
 		try
 #endif
 		{
-			auto val = co_await c.read();
-			//auto val = co_await c;		//第二种从channel读出数据的方法。利用重载operator co_await()，而不是c是一个awaitable_t。
+			//auto val = co_await c.read();
+			auto val = co_await c;		//第二种从channel读出数据的方法。利用重载operator co_await()，而不是c是一个awaitable_t。
 
 			std::cout << val << ":";
-#if _DEBUG
-			for (auto v2 : c.debug_queue())
-				std::cout << v2 << ",";
-#endif
 			std::cout << std::endl;
 		}
 #ifndef __clang__
@@ -52,18 +48,13 @@ future_t<> test_channel_write(const channel_t<std::string> & c)
 
 	for (size_t i = 0; i < 10; ++i)
 	{
-		co_await c.write(std::to_string(i));
-		//co_await (c << std::to_string(i));				//第二种写入数据到channel的方法。因为优先级关系，需要将'c << i'括起来
+		//co_await c.write(std::to_string(i));
+		co_await (c << std::to_string(i));				//第二种写入数据到channel的方法。因为优先级关系，需要将'c << i'括起来
 		std::cout << "<" << i << ">:";
 		
-#if _DEBUG
-		for (auto val : c.debug_queue())
-			std::cout << val << ",";
-#endif
 		std::cout << std::endl;
 	}
 }
-
 
 void test_channel_read_first()
 {
@@ -87,9 +78,11 @@ void test_channel_write_first()
 
 static const int N = 1000000;
 
-void test_channel_performance()
+void test_channel_performance(size_t buff_size)
 {
-	channel_t<int> c{1};
+	//1的话，效率跟golang比，有点惨不忍睹。
+	//1000的话，由于几乎不需要调度器接入，效率就很高了，随便过千万数量级。
+	channel_t<int> c{ buff_size };
 
 	go[&]() -> future_t<>
 	{
@@ -109,7 +102,7 @@ void test_channel_performance()
 		} while (i > 0);
 
 		auto dt = duration_cast<duration<double>>(high_resolution_clock::now() - tstart).count();
-		std::cout << "channel w/r " << N << " times, cost time " << dt << "s" << std::endl;
+		std::cout << "channel buff=" << c.capacity() << ", w/r " << N << " times, cost time " << dt << "s" << std::endl;
 	};
 
 	this_scheduler()->run_until_notask();
@@ -123,5 +116,9 @@ void resumable_main_channel()
 	test_channel_write_first();
 	std::cout << std::endl;
 
-	test_channel_performance();
+	test_channel_performance(1);
+	test_channel_performance(10);
+	test_channel_performance(100);
+	test_channel_performance(1000);
+	test_channel_performance(10000);
 }

@@ -16,8 +16,8 @@ RESUMEF_NS
 			//		返回false表示此事件已经无效，event内部只删除此awaker
 			typedef std::function<bool(_Ety * e, _Types...)> callee_type;
 		private:
-			//typedef spinlock lock_type;
-			typedef std::recursive_mutex lock_type;
+			typedef spinlock lock_type;
+			//typedef std::recursive_mutex lock_type;
 
 			lock_type _lock;
 			callee_type _callee;

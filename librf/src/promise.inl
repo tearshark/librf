@@ -63,6 +63,7 @@ RESUMEF_NS
 		{
 			_Whatever._state->set_scheduler(get_state()->get_scheduler());
 		}
+
 		return std::forward<_Uty>(_Whatever);
 	}
 

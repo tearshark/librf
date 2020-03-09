@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <type_traits>
 #include <atomic>
 #include <chrono>
 #include <array>
@@ -57,6 +58,8 @@
 #include "src/_awaker.h"
 #include "src/event.h"
 #include "src/mutex.h"
+#include "src/ring_queue.h"
+#include "src/ring_queue_spinlock.h"
 #include "src/channel.h"
 
 #include "src/generator.h"

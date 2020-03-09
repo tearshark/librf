@@ -77,18 +77,6 @@ RESUMEF_NS
 			return true;
 		}
 
-		void state_event_t::destroy_deallocate()
-		{
-			size_t _Size = sizeof(state_event_t);
-#if RESUMEF_DEBUG_COUNTER
-			std::cout << "destroy_deallocate, size=" << _Size << std::endl;
-#endif
-			this->~state_event_t();
-
-			_Alloc_char _Al;
-			return _Al.deallocate(reinterpret_cast<char*>(this), _Size);
-		}
-
 		void state_event_t::resume()
 		{
 			coroutine_handle<> handler = _coro;
@@ -106,7 +94,7 @@ RESUMEF_NS
 		}
 	}
 
-	namespace v2
+	namespace event_v2
 	{
 		event_t::event_t(bool initially)
 			:_event(std::make_shared<detail::event_v2_impl>(initially))

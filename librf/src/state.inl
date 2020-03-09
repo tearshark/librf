@@ -242,7 +242,7 @@ RESUMEF_NS
 		case result_type::Exception:
 			_exception.~exception_ptr();
 		default:
-			this->_value = &val;
+			this->_value = std::addressof(val);
 			this->_has_value.store(result_type::Value, std::memory_order_release);
 			break;
 		}
