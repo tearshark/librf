@@ -28,9 +28,10 @@ RESUMEF_NS
 		bool full() const noexcept;
 		template<class U>
 		bool try_push(U&& value) noexcept(std::is_nothrow_move_assignable_v<U>);
-		bool try_pop(value_type& value) noexcept(std::is_nothrow_move_assignable_v<value_type>);
+		template<class U>
+		bool try_pop(U& value) noexcept(std::is_nothrow_move_assignable_v<value_type>);
 	private:
-		using container_type = std::conditional_t<std::is_same_v<value_type, bool>, std::unique_ptr<optional_type[]>, std::vector<optional_type>>;
+		using container_type = std::unique_ptr<optional_type[]>;
 		container_type m_bufferPtr;
 		size_type m_bufferSize;
 
@@ -45,18 +46,14 @@ RESUMEF_NS
 
 	template<class _Ty, bool _Option, class _Sty>
 	ring_queue<_Ty, _Option, _Sty>::ring_queue(size_t sz)
-		: m_bufferSize(static_cast<size_type>(sz + 1))
+		: m_bufferPtr(new optional_type[sz + 1])
+		, m_bufferSize(static_cast<size_type>(sz + 1))
 		, m_writeIndex(0)
 		, m_readIndex(0)
 	#ifdef _WITH_LOCK_FREE_Q_KEEP_REAL_SIZE
 		, m_count(0)
 	#endif
 	{
-		if constexpr (std::is_same_v<value_type, bool>)
-			m_bufferPtr = container_type{ new optional_type[sz + 1] };
-		else
-			m_bufferPtr.resize(sz + 1);
-
 		assert(sz < (std::numeric_limits<size_type>::max)());
 	}
 
@@ -125,7 +122,8 @@ RESUMEF_NS
 	}
 
 	template<class _Ty, bool _Option, class _Sty>
-	bool ring_queue<_Ty, _Option, _Sty>::try_pop(value_type& value) noexcept(std::is_nothrow_move_assignable_v<value_type>)
+	template<class U>
+	bool ring_queue<_Ty, _Option, _Sty>::try_pop(U& value) noexcept(std::is_nothrow_move_assignable_v<value_type>)
 	{
 		if (m_readIndex == m_writeIndex)
 			return false;
@@ -133,7 +131,7 @@ RESUMEF_NS
 		optional_type& ov = m_bufferPtr[m_readIndex];
 		if constexpr (use_option)
 		{
-			value = std::move(ov.value());
+			value = std::move(ov).value();
 			ov = std::nullopt;
 		}
 		else

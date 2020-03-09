@@ -5,35 +5,16 @@ RESUMEF_NS
 {
 namespace detail
 {
-	template<class _Ty>
-	struct channel_impl_v2 : public std::enable_shared_from_this<channel_impl_v2<_Ty>>
+	template<class _Ty, class _Opty>
+	struct channel_impl_v2 : public std::enable_shared_from_this<channel_impl_v2<_Ty, _Opty>>
 	{
 		using value_type = _Ty;
-
-		struct state_channel_t;
-		using state_read_t = state_channel_t;
-		using state_write_t = state_channel_t;
-
-		channel_impl_v2(size_t max_counter_);
-
-		bool try_read(value_type& val);
-		bool try_read_nolock(value_type& val);
-		void add_read_list_nolock(state_read_t* state);
-
-		bool try_write(value_type& val);
-		bool try_write_nolock(value_type& val);
-		void add_write_list_nolock(state_write_t* state);
-
-		size_t capacity() const noexcept
-		{
-			return _max_counter;
-		}
+		using optional_type = _Opty;
 
 		struct state_channel_t : public state_base_t
 		{
-			state_channel_t(channel_impl_v2* ch, value_type& val) noexcept
+			state_channel_t(channel_impl_v2* ch) noexcept
 				: _channel(ch->shared_from_this())
-				, _value(&val)
 			{
 			}
 
@@ -84,15 +65,52 @@ namespace detail
 				}
 			}
 
+			friend channel_impl_v2;
 		public:
 			state_channel_t* _next = nullptr;
 		protected:
-			friend channel_impl_v2;
-
 			std::shared_ptr<channel_impl_v2> _channel;
-			value_type* _value;
 			error_code _error = error_code::none;
 		};
+
+		struct state_read_t : public state_channel_t
+		{
+			state_read_t(channel_impl_v2* ch, optional_type& val) noexcept
+				: state_channel_t(ch)
+				, _value(&val)
+			{
+			}
+		protected:
+			friend channel_impl_v2;
+			optional_type* _value;
+		};
+
+		struct state_write_t : public state_channel_t
+		{
+			state_write_t(channel_impl_v2* ch, value_type& val) noexcept
+				: state_channel_t(ch)
+				, _value(&val)
+			{
+			}
+		protected:
+			friend channel_impl_v2;
+			value_type* _value;
+		};
+
+		channel_impl_v2(size_t max_counter_);
+
+		bool try_read(optional_type& val);
+		bool try_read_nolock(optional_type& val);
+		void add_read_list_nolock(state_read_t* state);
+
+		bool try_write(value_type& val);
+		bool try_write_nolock(value_type& val);
+		void add_write_list_nolock(state_write_t* state);
+
+		size_t capacity() const noexcept
+		{
+			return _max_counter;
+		}
 	private:
 		auto try_pop_reader_()->state_read_t*;
 		auto try_pop_writer_()->state_write_t*;
@@ -100,7 +118,7 @@ namespace detail
 		bool awake_one_reader_(value_type& val);
 
 		void awake_one_writer_();
-		bool awake_one_writer_(value_type & val);
+		bool awake_one_writer_(optional_type& val);
 
 		channel_impl_v2(const channel_impl_v2&) = delete;
 		channel_impl_v2(channel_impl_v2&&) = delete;
@@ -127,22 +145,22 @@ namespace detail
 		write_queue_type _write_awakes;						//写队列
 	};
 
-	template<class _Ty>
-	channel_impl_v2<_Ty>::channel_impl_v2(size_t max_counter_)
+	template<class _Ty, class _Opty>
+	channel_impl_v2<_Ty, _Opty>::channel_impl_v2(size_t max_counter_)
 		: _max_counter(max_counter_)
 		, _values(USE_RING_QUEUE ? max_counter_ : 0)
 	{
 	}
 
-	template<class _Ty>
-	inline bool channel_impl_v2<_Ty>::try_read(value_type& val)
+	template<class _Ty, class _Opty>
+	inline bool channel_impl_v2<_Ty, _Opty>::try_read(optional_type& val)
 	{
 		scoped_lock<lock_type> lock_(this->_lock);
 		return try_read_nolock(val);
 	}
 
-	template<class _Ty>
-	bool channel_impl_v2<_Ty>::try_read_nolock(value_type& val)
+	template<class _Ty, class _Opty>
+	bool channel_impl_v2<_Ty, _Opty>::try_read_nolock(optional_type& val)
 	{
 		if constexpr (USE_RING_QUEUE)
 		{
@@ -167,22 +185,22 @@ namespace detail
 		return awake_one_writer_(val);
 	}
 
-	template<class _Ty>
-	inline void channel_impl_v2<_Ty>::add_read_list_nolock(state_read_t* state)
+	template<class _Ty, class _Opty>
+	inline void channel_impl_v2<_Ty, _Opty>::add_read_list_nolock(state_read_t* state)
 	{
 		assert(state != nullptr);
 		_read_awakes.push_back(state);
 	}
 
-	template<class _Ty>
-	inline bool channel_impl_v2<_Ty>::try_write(value_type& val)
+	template<class _Ty, class _Opty>
+	inline bool channel_impl_v2<_Ty, _Opty>::try_write(value_type& val)
 	{
 		scoped_lock<lock_type> lock_(this->_lock);
 		return try_write_nolock(val);
 	}
 
-	template<class _Ty>
-	bool channel_impl_v2<_Ty>::try_write_nolock(value_type& val)
+	template<class _Ty, class _Opty>
+	bool channel_impl_v2<_Ty, _Opty>::try_write_nolock(value_type& val)
 	{
 		if constexpr (USE_RING_QUEUE)
 		{
@@ -206,15 +224,15 @@ namespace detail
 		return awake_one_reader_(val);
 	}
 
-	template<class _Ty>
-	inline void channel_impl_v2<_Ty>::add_write_list_nolock(state_write_t* state)
+	template<class _Ty, class _Opty>
+	inline void channel_impl_v2<_Ty, _Opty>::add_write_list_nolock(state_write_t* state)
 	{
 		assert(state != nullptr);
 		_write_awakes.push_back(state);
 	}
 
-	template<class _Ty>
-	auto channel_impl_v2<_Ty>::try_pop_reader_()->state_read_t*
+	template<class _Ty, class _Opty>
+	auto channel_impl_v2<_Ty, _Opty>::try_pop_reader_()->state_read_t*
 	{
 		if constexpr (USE_LINK_QUEUE)
 		{
@@ -232,8 +250,8 @@ namespace detail
 		}
 	}
 
-	template<class _Ty>
-	auto channel_impl_v2<_Ty>::try_pop_writer_()->state_write_t*
+	template<class _Ty, class _Opty>
+	auto channel_impl_v2<_Ty, _Opty>::try_pop_writer_()->state_write_t*
 	{
 		if constexpr (USE_LINK_QUEUE)
 		{
@@ -251,8 +269,8 @@ namespace detail
 		}
 	}
 
-	template<class _Ty>
-	void channel_impl_v2<_Ty>::awake_one_reader_()
+	template<class _Ty, class _Opty>
+	void channel_impl_v2<_Ty, _Opty>::awake_one_reader_()
 	{
 		state_read_t* state = try_pop_reader_();
 		if (state != nullptr)
@@ -279,8 +297,8 @@ namespace detail
 		}
 	}
 
-	template<class _Ty>
-	bool channel_impl_v2<_Ty>::awake_one_reader_(value_type& val)
+	template<class _Ty, class _Opty>
+	bool channel_impl_v2<_Ty, _Opty>::awake_one_reader_(value_type& val)
 	{
 		state_read_t* state = try_pop_reader_();
 		if (state != nullptr)
@@ -293,8 +311,8 @@ namespace detail
 		return false;
 	}
 
-	template<class _Ty>
-	void channel_impl_v2<_Ty>::awake_one_writer_()
+	template<class _Ty, class _Opty>
+	void channel_impl_v2<_Ty, _Opty>::awake_one_writer_()
 	{
 		state_write_t* state = try_pop_writer_();
 		if (state != nullptr)
@@ -315,8 +333,8 @@ namespace detail
 		}
 	}
 
-	template<class _Ty>
-	bool channel_impl_v2<_Ty>::awake_one_writer_(value_type& val)
+	template<class _Ty, class _Opty>
+	bool channel_impl_v2<_Ty, _Opty>::awake_one_writer_(optional_type& val)
 	{
 		state_write_t* writer = try_pop_writer_();
 		if (writer != nullptr)
@@ -333,11 +351,15 @@ namespace detail
 
 inline namespace channel_v2
 {
-	template<class _Ty = bool>
+	//如果channel缓存的元素不能凭空产生，或者产生代价较大，则推荐第二个模板参数使用true。从而减小不必要的开销。
+	template<class _Ty = bool, bool _Option = false>
 	struct channel_t
 	{
 		using value_type = _Ty;
-		using channel_type = detail::channel_impl_v2<value_type>;
+
+		static constexpr bool use_option = _Option;
+		using optional_type = std::conditional_t<use_option, std::optional<value_type>, value_type>;
+		using channel_type = detail::channel_impl_v2<value_type, optional_type>;
 		using lock_type = typename channel_type::lock_type;
 
 		channel_t(size_t max_counter = 0)
@@ -380,7 +402,7 @@ inline namespace channel_v2
 					return false;
 				}
 
-				_state = new state_type(_channel, static_cast<value_type&>(_value));
+				_state = new state_type(_channel, _value);
 				_state->on_await_suspend(handler);
 				_channel->add_read_list_nolock(_state.get());
 				_channel = nullptr;
@@ -391,12 +413,16 @@ inline namespace channel_v2
 			{
 				if (_state.get() != nullptr)
 					_state->on_await_resume();
-				return std::move(_value);
+
+				if constexpr(use_option)
+					return std::move(_value).value();
+				else
+					return std::move(_value);
 			}
 		private:
 			channel_type* _channel;
 			counted_ptr<state_type> _state;
-			mutable value_type _value;
+			mutable optional_type _value;
 		};
 
 		read_awaiter operator co_await() const noexcept
@@ -477,8 +503,8 @@ inline namespace channel_v2
 	};
 
 	//不支持channel_t<void>
-	template<>
-	struct channel_t<void>
+	template<bool _Option>
+	struct channel_t<void, _Option>
 	{
 	};
 

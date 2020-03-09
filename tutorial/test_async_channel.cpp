@@ -14,7 +14,28 @@ using namespace std::chrono;
 
 const size_t MAX_CHANNEL_QUEUE = 5;		//0, 1, 5, 10, -1
 
-future_t<> test_channel_read(const channel_t<std::string> & c)
+//如果使用move_only_type来操作channel失败，说明中间过程发生了拷贝操作----这不是设计目标。
+template<class _Ty>
+struct move_only_type
+{
+	_Ty value;
+
+	move_only_type() = default;
+	move_only_type(const _Ty& val) : value(val) {}
+	move_only_type(_Ty&& val) : value(std::forward<_Ty>(val)) {}
+
+	move_only_type(const move_only_type&) = delete;
+	move_only_type& operator =(const move_only_type&) = delete;
+
+	move_only_type(move_only_type&&) = default;
+	move_only_type& operator =(move_only_type&&) = default;
+};
+
+//如果channel缓存的元素不能凭空产生，或者产生代价较大，则推荐第二个模板参数使用true。从而减小不必要的开销。
+using string_channel_t = channel_t<move_only_type<std::string>, true>;
+
+//channel其实内部引用了一个channel实现体，故可以支持复制拷贝操作
+future_t<> test_channel_read(string_channel_t c)
 {
 	using namespace std::chrono;
 
@@ -27,7 +48,7 @@ future_t<> test_channel_read(const channel_t<std::string> & c)
 			//auto val = co_await c.read();
 			auto val = co_await c;		//第二种从channel读出数据的方法。利用重载operator co_await()，而不是c是一个awaitable_t。
 
-			std::cout << val << ":";
+			std::cout << val.value << ":";
 			std::cout << std::endl;
 		}
 #ifndef __clang__
@@ -42,14 +63,14 @@ future_t<> test_channel_read(const channel_t<std::string> & c)
 	}
 }
 
-future_t<> test_channel_write(const channel_t<std::string> & c)
+future_t<> test_channel_write(string_channel_t c)
 {
 	using namespace std::chrono;
 
 	for (size_t i = 0; i < 10; ++i)
 	{
 		//co_await c.write(std::to_string(i));
-		co_await (c << std::to_string(i));				//第二种写入数据到channel的方法。因为优先级关系，需要将'c << i'括起来
+		co_await(c << std::to_string(i));				//第二种写入数据到channel的方法。因为优先级关系，需要将'c << i'括起来
 		std::cout << "<" << i << ">:";
 		
 		std::cout << std::endl;
@@ -58,7 +79,7 @@ future_t<> test_channel_write(const channel_t<std::string> & c)
 
 void test_channel_read_first()
 {
-	channel_t<std::string> c(MAX_CHANNEL_QUEUE);
+	string_channel_t c(MAX_CHANNEL_QUEUE);
 
 	go test_channel_read(c);
 	go test_channel_write(c);
@@ -68,7 +89,7 @@ void test_channel_read_first()
 
 void test_channel_write_first()
 {
-	channel_t<std::string> c(MAX_CHANNEL_QUEUE);
+	string_channel_t c(MAX_CHANNEL_QUEUE);
 
 	go test_channel_write(c);
 	go test_channel_read(c);
