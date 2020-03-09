@@ -40,13 +40,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>ClangCL</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>ClangCL</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -231,6 +231,7 @@
     <ClInclude Include="..\librf\src\event_v2.h" />
     <ClInclude Include="..\librf\src\future.h" />
     <ClInclude Include="..\librf\src\generator.h" />
+    <ClInclude Include="..\librf\src\intrusive_link_queue.h" />
     <ClInclude Include="..\librf\src\promise.h" />
     <ClInclude Include="..\librf\src\mutex.h" />
     <ClInclude Include="..\librf\src\rf_task.h" />

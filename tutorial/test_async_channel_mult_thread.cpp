@@ -64,36 +64,41 @@ future_t<> test_channel_producer(const channel_t<std::string> & c, size_t cnt)
 	}
 }
 
-const size_t THREAD = 12;
-const size_t BATCH = 10000;
-const size_t MAX_CHANNEL_QUEUE = THREAD + 1;		//0, 1, 5, 10, -1
+const size_t WRITE_THREAD = 6;
+const size_t READ_THREAD = 6;
+const size_t READ_BATCH = 1000000;
+const size_t MAX_CHANNEL_QUEUE = 5;		//0, 1, 5, 10, -1
 
 void resumable_main_channel_mult_thread()
 {
 	channel_t<std::string> c(MAX_CHANNEL_QUEUE);
 
-	std::thread write_th([&]
+	std::thread write_th[WRITE_THREAD];
+	for (size_t i = 0; i < WRITE_THREAD; ++i)
 	{
-		local_scheduler my_scheduler;		//2017/12/14日，仍然存在BUG。真多线程下调度，存在有协程无法被调度完成的BUG
-		go test_channel_producer(c, BATCH * THREAD);
-#if RESUMEF_ENABLE_MULT_SCHEDULER
-		this_scheduler()->run_until_notask();
-#endif
+		write_th[i] = std::thread([&]
 		{
-			scoped_lock<std::mutex> __lock(cout_mutex);
-			std::cout << "Write OK\r\n";
-		}
-	});
+			local_scheduler my_scheduler;
+			go test_channel_producer(c, READ_BATCH * READ_THREAD / WRITE_THREAD);
+#if RESUMEF_ENABLE_MULT_SCHEDULER
+			this_scheduler()->run_until_notask();
+#endif
+			{
+				scoped_lock<std::mutex> __lock(cout_mutex);
+				std::cout << "Write OK\r\n";
+			}
+		});
+	}
 
 	std::this_thread::sleep_for(100ms);
 
-	std::thread read_th[THREAD];
-	for (size_t i = 0; i < THREAD; ++i)
+	std::thread read_th[READ_THREAD];
+	for (size_t i = 0; i < READ_THREAD; ++i)
 	{
 		read_th[i] = std::thread([&]
 		{
-			local_scheduler my_scheduler;		//2017/12/14日，仍然存在BUG。真多线程下调度，存在有协程无法被调度完成的BUG
-			go test_channel_consumer(c, BATCH);
+			local_scheduler my_scheduler;
+			go test_channel_consumer(c, READ_BATCH);
 #if RESUMEF_ENABLE_MULT_SCHEDULER
 			this_scheduler()->run_until_notask();
 #endif
@@ -108,9 +113,11 @@ void resumable_main_channel_mult_thread()
 	std::this_thread::sleep_for(100ms);
 	scheduler_t::g_scheduler.run_until_notask();
 #endif
+
 	for(auto & th : read_th)
 		th.join();
-	write_th.join();
+	for (auto& th : write_th)
+		th.join();
 
 	std::cout << "OK: counter = " << gcounter.load() << std::endl;
 }

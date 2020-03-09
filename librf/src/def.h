@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#define LIB_RESUMEF_VERSION 20304 // 2.3.4
+#define LIB_RESUMEF_VERSION 20400 // 2.4.0
 
 #if defined(RESUMEF_MODULE_EXPORT)
 #define RESUMEF_NS export namespace resumef
@@ -20,7 +20,7 @@ RESUMEF_NS
 	struct scheduler_t;
 
 	template<class _Ty = void>
-	struct future_t;
+	struct [[nodiscard]] future_t;
 
 	using future_vt [[deprecated]] = future_t<>;
 

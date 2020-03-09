@@ -39,9 +39,9 @@ int main(int argc, const char* argv[])
 	(void)argc;
 	(void)argv;
 
-	//test_ring_queue_simple<ring_queue_single_thread<int>>();
-	//test_ring_queue<ring_queue_spinlock<int, false, uint32_t>>();
-	//test_ring_queue<ring_queue_lockfree<int, uint64_t>>();
+	//test_ring_queue_simple<resumef::ring_queue<int>>();
+	//test_ring_queue<resumef::ring_queue_spinlock<int, false, uint32_t>>();
+	//test_ring_queue<resumef::ring_queue_lockfree<int, uint64_t>>();
 
 	resumable_main_channel();
 	resumable_main_channel_mult_thread();
