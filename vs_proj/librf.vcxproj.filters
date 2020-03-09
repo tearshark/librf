@@ -249,5 +249,8 @@
     <None Include="..\librf\src\macro_def.inl">
       <Filter>librf\src</Filter>
     </None>
+    <None Include="..\librf\src\channel_v2.inl">
+      <Filter>librf\src</Filter>
+    </None>
   </ItemGroup>
 </Project>

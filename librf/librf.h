@@ -59,7 +59,7 @@
 #include "src/event.h"
 #include "src/mutex.h"
 #include "src/ring_queue.h"
-#include "src/ring_queue_spinlock.h"
+#include "src/intrusive_link_queue.h"
 #include "src/channel.h"
 
 #include "src/generator.h"
