@@ -4,6 +4,10 @@
 
 RESUMEF_NS
 {
+#if defined(RESUMEF_USE_CUSTOM_SPINLOCK)
+	using spinlock = RESUMEF_USE_CUSTOM_SPINLOCK;
+#else
+
 	struct spinlock
 	{
 		static const size_t MAX_ACTIVE_SPIN = 1000;
@@ -82,4 +86,6 @@ RESUMEF_NS
 			lck.store(FREE_VALUE, std::memory_order_release);
 		}
 	};
+
+#endif
 }
