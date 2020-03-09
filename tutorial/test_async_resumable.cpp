@@ -28,9 +28,9 @@ static const intptr_t N = 3000000;
 
 auto yield_switch(intptr_t coro) -> resumef::generator_t<intptr_t>
 {
-	for (intptr_t i = 0; i < N / coro; ++i)
+	for (intptr_t i = N / coro; i > 0; --i)
 		co_yield i;
-	co_return N / coro;
+	co_return 0;
 }
 
 void resumable_switch(intptr_t coro, size_t idx)
@@ -41,13 +41,7 @@ void resumable_switch(intptr_t coro, size_t idx)
 	
 	for (intptr_t i = 0; i < coro; ++i)
 	{
-		//go yield_switch(coro);
-		go [=] ()->resumef::generator_t<intptr_t>
-		{
-			for (intptr_t i = 0; i < N / coro; ++i)
-				co_yield i;
-			co_return N / coro;
-		};
+		go yield_switch(coro);
 	}
 	auto middle = std::chrono::steady_clock::now();
 	dump(idx, "BenchmarkCreate_" + std::to_string(coro), start, middle, coro);

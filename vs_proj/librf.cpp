@@ -43,6 +43,7 @@ int main(int argc, const char* argv[])
 	//test_ring_queue<resumef::ring_queue_spinlock<int, false, uint32_t>>();
 	//test_ring_queue<resumef::ring_queue_lockfree<int, uint64_t>>();
 
+	resumable_main_resumable();
 /*
 	resumable_main_channel();
 	resumable_main_channel_mult_thread();
