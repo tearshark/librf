@@ -11,7 +11,7 @@ namespace detail
 
 		state_channel_t(_Chty* ch, value_type& val) noexcept
 			: _channel(ch->shared_from_this())
-			, _value(&val)
+			, _value(std::addressof(val))
 		{
 		}
 
@@ -322,7 +322,7 @@ namespace detail
 			else
 			{
 				assert(_values.size() < _max_counter);
-				_values.push_back(*state->_value);
+				_values.push_back(std::move(*state->_value));
 			}
 
 			state->on_notify();
@@ -351,8 +351,8 @@ namespace detail
 
 inline namespace channel_v2
 {
-	template<class _Ty, bool _Option>
-	struct [[nodiscard]] channel_t<_Ty, _Option>::read_awaiter
+	template<class _Ty, bool _Optional, bool _OptimizationThread>
+	struct [[nodiscard]] channel_t<_Ty, _Optional, _OptimizationThread>::read_awaiter
 	{
 		using state_type = typename channel_type::state_read_t;
 
@@ -366,8 +366,19 @@ inline namespace channel_v2
 				_channel->try_read(_value);
 		}
 
-		bool await_ready() const noexcept
+		bool await_ready()
 		{
+			//在多线程竞争较为多的时候，先检查是否可用，可以稍微提高点效率
+			if constexpr (optimization_for_multithreading)
+			{
+				scoped_lock<lock_type> lock_(_channel->_lock);
+
+				if (_channel->try_read_nolock(_value))
+				{
+					_channel = nullptr;
+					return true;
+				}
+			}
 			return false;
 		}
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
@@ -393,35 +404,47 @@ inline namespace channel_v2
 			if (_state.get() != nullptr)
 				_state->on_await_resume();
 
-			if constexpr (use_option)
+			if constexpr (use_optional)
 				return std::move(_value).value();
 			else
 				return std::move(_value);
 		}
 	private:
 		channel_type* _channel;
-		counted_ptr<state_type> _state;
+		counted_ptr<state_type> _state;	//延迟到await_suspend()里创建，减小不必要的内存申请
 		mutable optional_type _value;
 	};
 
-	template<class _Ty, bool _Option>
-	struct [[nodiscard]] channel_t<_Ty, _Option>::write_awaiter
+	template<class _Ty, bool _Optional, bool _OptimizationThread>
+	struct [[nodiscard]] channel_t<_Ty, _Optional, _OptimizationThread>::write_awaiter
 	{
 		using state_type = typename channel_type::state_write_t;
 
-		write_awaiter(channel_type* ch, value_type val) noexcept(std::is_move_constructible_v<value_type>)
+		template<class U>
+		write_awaiter(channel_type* ch, U&& val) noexcept(std::is_move_constructible_v<value_type>)
 			: _channel(ch)
-			, _value(std::move(val))
+			, _value(std::forward<U>(val))
 		{}
 
 		~write_awaiter()
 		{//为了不在协程中也能正常使用
 			if (_channel != nullptr)
-				_channel->try_write(static_cast<value_type&>(_value));
+				_channel->try_write(_value);
 		}
 
-		bool await_ready() const noexcept
+		bool await_ready()
 		{
+			//在多线程竞争较为多的时候，先检查是否可用，可以稍微提高点效率
+			if constexpr (optimization_for_multithreading)
+			{
+				scoped_lock<lock_type> lock_(_channel->_lock);
+
+				if (_channel->try_write_nolock(_value))
+				{
+					_channel = nullptr;
+					return true;
+				}
+			}
 			return false;
 		}
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
@@ -429,13 +452,13 @@ inline namespace channel_v2
 		{
 			scoped_lock<lock_type> lock_(_channel->_lock);
 
-			if (_channel->try_write_nolock(static_cast<value_type&>(_value)))
+			if (_channel->try_write_nolock(_value))
 			{
 				_channel = nullptr;
 				return false;
 			}
 
-			_state = new state_type(_channel, static_cast<value_type&>(_value));
+			_state = new state_type(_channel, _value);
 			_state->on_await_suspend(handler);
 			_channel->add_write_list_nolock(_state.get());
 			_channel = nullptr;
@@ -449,51 +472,51 @@ inline namespace channel_v2
 		}
 	private:
 		channel_type* _channel;
-		counted_ptr<state_type> _state;
+		counted_ptr<state_type> _state;	//延迟到await_suspend()里创建，减小不必要的内存申请
 		mutable value_type _value;
 	};
 
-	template<class _Ty, bool _Option>
-	channel_t<_Ty, _Option>::channel_t(size_t max_counter)
+	template<class _Ty, bool _Optional, bool _OptimizationThread>
+	channel_t<_Ty, _Optional, _OptimizationThread>::channel_t(size_t max_counter)
 		:_chan(std::make_shared<channel_type>(max_counter))
 	{
 
 	}
 
-	template<class _Ty, bool _Option>
-	size_t channel_t<_Ty, _Option>::capacity() const noexcept
+	template<class _Ty, bool _Optional, bool _OptimizationThread>
+	size_t channel_t<_Ty, _Optional, _OptimizationThread>::capacity() const noexcept
 	{
 		return _chan->capacity();
 	}
 
-	template<class _Ty, bool _Option>
-	typename channel_t<_Ty, _Option>::read_awaiter
-		channel_t<_Ty, _Option>::operator co_await() const noexcept
+	template<class _Ty, bool _Optional, bool _OptimizationThread>
+	typename channel_t<_Ty, _Optional, _OptimizationThread>::read_awaiter
+		channel_t<_Ty, _Optional, _OptimizationThread>::operator co_await() const noexcept
 	{
 		return { _chan.get() };
 	}
 
-	template<class _Ty, bool _Option>
-	typename channel_t<_Ty, _Option>::read_awaiter
-		channel_t<_Ty, _Option>::read() const noexcept
+	template<class _Ty, bool _Optional, bool _OptimizationThread>
+	typename channel_t<_Ty, _Optional, _OptimizationThread>::read_awaiter
+		channel_t<_Ty, _Optional, _OptimizationThread>::read() const noexcept
 	{
 		return { _chan.get() };
 	}
 
-	template<class _Ty, bool _Option>
+	template<class _Ty, bool _Optional, bool _OptimizationThread>
 	template<class U>
-	typename channel_t<_Ty, _Option>::write_awaiter
-		channel_t<_Ty, _Option>::write(U&& val) const noexcept(std::is_move_constructible_v<U>)
+	typename channel_t<_Ty, _Optional, _OptimizationThread>::write_awaiter
+		channel_t<_Ty, _Optional, _OptimizationThread>::write(U&& val) const noexcept(std::is_move_constructible_v<U>)
 	{
-		return write_awaiter{ _chan.get(), std::move(val) };
+		return write_awaiter{ _chan.get(), std::forward<U>(val) };
 	}
 
-	template<class _Ty, bool _Option>
+	template<class _Ty, bool _Optional, bool _OptimizationThread>
 	template<class U>
-	typename channel_t<_Ty, _Option>::write_awaiter
-		channel_t<_Ty, _Option>::operator << (U&& val) const noexcept(std::is_move_constructible_v<U>)
+	typename channel_t<_Ty, _Optional, _OptimizationThread>::write_awaiter
+		channel_t<_Ty, _Optional, _OptimizationThread>::operator << (U&& val) const noexcept(std::is_move_constructible_v<U>)
 	{
-		return write_awaiter{ _chan.get(), std::move(val) };
+		return write_awaiter{ _chan.get(), std::forward<U>(val) };
 	}
 
 }	//namespace channel_v2

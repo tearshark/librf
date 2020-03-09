@@ -32,7 +32,7 @@ struct move_only_type
 };
 
 //如果channel缓存的元素不能凭空产生，或者产生代价较大，则推荐第二个模板参数使用true。从而减小不必要的开销。
-using string_channel_t = channel_t<move_only_type<std::string>, true>;
+using string_channel_t = channel_t<move_only_type<std::string>, false, true>;
 
 //channel其实内部引用了一个channel实现体，故可以支持复制拷贝操作
 future_t<> test_channel_read(string_channel_t c)
@@ -103,7 +103,7 @@ void test_channel_performance(size_t buff_size)
 {
 	//1的话，效率跟golang比，有点惨不忍睹。
 	//1000的话，由于几乎不需要调度器接入，效率就很高了，随便过千万数量级。
-	channel_t<int> c{ buff_size };
+	channel_t<int, false, true> c{ buff_size };
 
 	go[&]() -> future_t<>
 	{
