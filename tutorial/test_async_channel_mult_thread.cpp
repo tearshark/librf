@@ -18,7 +18,7 @@ std::atomic<intptr_t> gcounter = 0;
 
 #define OUTPUT_DEBUG	0
 
-future_t<> test_channel_consumer(const channel_t<std::string> & c, size_t cnt)
+future_t<> test_channel_consumer(channel_t<std::string> c, size_t cnt)
 {
 	for (size_t i = 0; i < cnt; ++i)
 	{
@@ -50,7 +50,7 @@ future_t<> test_channel_consumer(const channel_t<std::string> & c, size_t cnt)
 	}
 }
 
-future_t<> test_channel_producer(const channel_t<std::string> & c, size_t cnt)
+future_t<> test_channel_producer(channel_t<std::string> c, size_t cnt)
 {
 	for (size_t i = 0; i < cnt; ++i)
 	{

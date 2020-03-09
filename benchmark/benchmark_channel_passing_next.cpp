@@ -12,15 +12,17 @@ using namespace resumef;
 using namespace std::chrono;
 using namespace std::literals;
 
-const static auto MaxNum = 20000;
+const static auto MaxNum = 100000;
+const static auto LoopCount = 100;
+
 using int_channel_ptr = std::shared_ptr<channel_t<intptr_t>>;
 
-static future_t<> passing_next(int_channel_ptr rd, int_channel_ptr wr)
+static future_t<> passing_next(channel_t<intptr_t> rd, channel_t<intptr_t> wr)
 {
-	for (;;)
+	for (int i = 0; i < LoopCount; ++i)
 	{
-		intptr_t value = co_await *rd;
-		co_await wr->write(value + 1);
+		intptr_t value = co_await rd;
+		co_await wr.write(value + 1);
 	}
 }
 
@@ -33,13 +35,13 @@ void benchmark_main_channel_passing_next()
 	for (int i = 0; i < MaxNum; ++i)
 	{
 		tail = std::make_shared<channel_t<intptr_t>>(1);
-		go passing_next(in, tail);
+		go passing_next(*in, *tail);
 		in = tail;
 	}
 
 	GO
 	{
-		for (;;)
+		for (int i = 0; i < LoopCount; ++i)
 		{
 			auto tstart = high_resolution_clock::now();
 

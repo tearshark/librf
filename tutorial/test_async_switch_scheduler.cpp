@@ -12,7 +12,7 @@ using namespace resumef;
 static scheduler_t* sch_in_main = nullptr;
 static std::atomic<scheduler_t*> sch_in_thread = nullptr;
 
-void run_in_thread(channel_t<bool>& c_done)
+void run_in_thread(channel_t<bool> c_done)
 {
 	std::cout << "other thread = " << std::this_thread::get_id() << std::endl;
 
@@ -55,7 +55,7 @@ static future_t<int64_t> async_get_long(int64_t val)
 }
 
 //这种情况下，会生成对应的 frame-context，一个promise_type被内嵌在frame-context里
-static future_t<> resumable_get_long(int64_t val, channel_t<bool> & c_done)
+static future_t<> resumable_get_long(int64_t val, channel_t<bool> c_done)
 {
 	std::cout << "thread = " << std::this_thread::get_id() << ", value = " << val << std::endl;
 

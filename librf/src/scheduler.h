@@ -72,6 +72,7 @@ RESUMEF_NS
 	struct local_scheduler
 	{
 		local_scheduler();
+		local_scheduler(scheduler_t & sch);
 		~local_scheduler();
 
 		local_scheduler(local_scheduler&& right_) = delete;

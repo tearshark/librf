@@ -60,6 +60,18 @@ RESUMEF_NS
 #endif
 	}
 
+	local_scheduler::local_scheduler(scheduler_t& sch)
+	{
+#if RESUMEF_ENABLE_MULT_SCHEDULER
+		if (th_scheduler_ptr == nullptr)
+		{
+			th_scheduler_ptr = &sch;
+		}
+
+		_scheduler_ptr = nullptr;
+#endif
+	}
+
 	local_scheduler::~local_scheduler()
 	{
 #if RESUMEF_ENABLE_MULT_SCHEDULER
