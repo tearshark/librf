@@ -43,14 +43,8 @@ int main(int argc, const char* argv[])
 	//test_ring_queue<resumef::ring_queue_spinlock<int, false, uint32_t>>();
 	//test_ring_queue<resumef::ring_queue_lockfree<int, uint64_t>>();
 
-	resumable_main_resumable();
-/*
-	resumable_main_channel();
-	resumable_main_channel_mult_thread();
-	resumable_main_switch_scheduler();
-	benchmark_main_channel_passing_next();
+	resumable_main_event_v2();
 	return 0;
-*/
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
@@ -71,7 +65,7 @@ int main(int argc, const char* argv[])
 	resumable_main_benchmark_mem(false);
 	resumable_main_mutex();
 	resumable_main_event();
-	//resumable_main_event_v2();
+	resumable_main_event_v2();
 	resumable_main_event_timeout();
 	resumable_main_channel();
 	resumable_main_channel_mult_thread();

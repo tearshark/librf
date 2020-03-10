@@ -10,7 +10,7 @@
 using namespace resumef;
 
 //非协程的逻辑线程，或异步代码，可以通过event_t通知到协程，并且不会阻塞协程所在的线程。
-std::thread async_set_event(const event_t & e, std::chrono::milliseconds dt)
+static std::thread async_set_event(const event_t & e, std::chrono::milliseconds dt)
 {
 	return std::thread([=]
 	{
@@ -20,7 +20,7 @@ std::thread async_set_event(const event_t & e, std::chrono::milliseconds dt)
 }
 
 
-future_t<> resumable_wait_event(const event_t & e)
+static future_t<> resumable_wait_event(const event_t & e)
 {
 	using namespace std::chrono;
 
@@ -30,7 +30,7 @@ future_t<> resumable_wait_event(const event_t & e)
 		std::cout << "event signal!" << std::endl;
 }
 
-void test_wait_one()
+static void test_wait_one()
 {
 	using namespace std::chrono;
 
@@ -63,7 +63,7 @@ void test_wait_one()
 	}
 }
 
-void test_wait_any()
+static void test_wait_any()
 {
 	using namespace std::chrono;
 
@@ -92,7 +92,7 @@ void test_wait_any()
 		tt.join();
 }
 
-void test_wait_all()
+static void test_wait_all()
 {
 	using namespace std::chrono;
 
@@ -120,7 +120,7 @@ void test_wait_all()
 		tt.join();
 }
 
-void test_wait_all_timeout()
+static void test_wait_all_timeout()
 {
 	using namespace std::chrono;
 

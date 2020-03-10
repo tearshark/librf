@@ -10,32 +10,34 @@
 using namespace resumef;
 
 //非协程的逻辑线程，或异步代码，可以通过event_t通知到协程，并且不会阻塞协程所在的线程。
-std::thread async_set_event_all(const event_v2::event_t & e, std::chrono::milliseconds dt)
+static std::thread async_set_event_all(const event_v2::event_t & e, std::chrono::milliseconds dt)
 {
 	return std::thread([=]
 	{
 		std::this_thread::sleep_for(dt);
-		e.notify_all();
+		e.signal_all();
 	});
 }
 
-std::thread async_set_event_one(const event_v2::event_t& e, std::chrono::milliseconds dt)
+static std::thread async_set_event_one(event_v2::event_t e, std::chrono::milliseconds dt)
 {
 	return std::thread([=]
 	{
 		std::this_thread::sleep_for(dt);
-		e.notify_one();
+		e.signal();
 	});
 }
 
 
-future_t<> resumable_wait_event(const event_v2::event_t & e, int idx)
+static future_t<> resumable_wait_event(event_v2::event_t e, int idx)
 {
-	co_await e;
-	std::cout << "[" << idx << "]event signal!" << std::endl;
+	if (co_await e)
+		std::cout << "[" << idx << "]event signal!" << std::endl;
+	else
+		std::cout << "time out!" << std::endl;
 }
 
-void test_notify_all()
+static void test_notify_all()
 {
 	using namespace std::chrono;
 
@@ -53,7 +55,7 @@ void test_notify_all()
 }
 
 //目前还没法测试在多线程调度下，是否线程安全
-void test_notify_one()
+static void test_notify_one()
 {
 	using namespace std::chrono;
 

@@ -56,11 +56,11 @@
 
 #include "src/switch_scheduler.h"
 #include "src/_awaker.h"
-#include "src/event.h"
 #include "src/mutex.h"
 #include "src/ring_queue.h"
 #include "src/intrusive_link_queue.h"
 #include "src/channel.h"
+#include "src/event.h"
 
 #include "src/generator.h"
 #include "src/sleep.h"
