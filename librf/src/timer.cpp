@@ -26,8 +26,11 @@ RESUMEF_NS
 
 	void timer_manager::clear()
 	{
+		std::unique_lock<spinlock> __lock(_added_mtx);
 		auto _atimer = std::move(_added_timers);
-		for (auto & sptr : _atimer)
+		__lock.unlock();
+
+		for (auto& sptr : _atimer)
 			call_target_(sptr, true);
 
 		auto _rtimer = std::move(_runing_timers);
@@ -39,6 +42,8 @@ RESUMEF_NS
 	{
 		assert(sptr);
 		assert(sptr->st == timer_target::State::Invalid);
+
+		scoped_lock<spinlock> __lock(_added_mtx);
 #if _DEBUG
 		assert(sptr->_manager == nullptr);
 		sptr->_manager = this;
@@ -64,32 +69,37 @@ RESUMEF_NS
 
 	void timer_manager::update()
 	{
-		if (_added_timers.size() > 0)
 		{
-			for (auto & sptr : _added_timers)
+			std::unique_lock<spinlock> __lock(_added_mtx);
+
+			if (_added_timers.size() > 0)
 			{
-				if (sptr->st == timer_target::State::Added)
+				auto _atimer = std::move(_added_timers);
+				_added_timers.reserve(128);
+				__lock.unlock();
+
+				for (auto& sptr : _atimer)
 				{
-					sptr->st = timer_target::State::Runing;
-					_runing_timers.insert({ sptr->tp, sptr });
-				}
-				else
-				{
-					assert(sptr->st == timer_target::State::Invalid);
-					call_target_(sptr, true);
+					if (sptr->st == timer_target::State::Added)
+					{
+						sptr->st = timer_target::State::Runing;
+						_runing_timers.insert({ sptr->tp, sptr });
+					}
+					else
+					{
+						assert(sptr->st == timer_target::State::Invalid);
+						call_target_(sptr, true);
+					}
 				}
 			}
-
-			_added_timers.clear();
 		}
 
 		if (_runing_timers.size() > 0)
 		{
 			auto now_ = clock_type::now();
-			timer_map_type _timers = std::move(_runing_timers);
 
-			auto iter = _timers.begin();
-			for (; iter != _timers.end(); ++iter)
+			auto iter = _runing_timers.begin();
+			for (; iter != _runing_timers.end(); ++iter)
 			{
 				auto & kv = *iter;
 				if (kv.first > now_)
@@ -97,9 +107,8 @@ RESUMEF_NS
 
 				call_target_(kv.second, kv.second->st == timer_target::State::Invalid);
 			}
-			_timers.erase(_timers.begin(), iter);
 
-			_runing_timers = std::move(_timers);
+			_runing_timers.erase(_runing_timers.begin(), iter);
 		}
 	}
 }

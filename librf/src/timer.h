@@ -80,6 +80,7 @@ RESUMEF_NS
 		typedef std::vector<timer_target_ptr> timer_vector_type;
 		typedef std::multimap<clock_type::time_point, timer_target_ptr> timer_map_type;
 	protected:
+		spinlock _added_mtx;
 		timer_vector_type	_added_timers;
 	public:
 		timer_map_type		_runing_timers;
@@ -112,7 +113,7 @@ RESUMEF_NS
 
 		inline bool empty() const
 		{
-			return _added_timers.empty() && _runing_timers.empty();
+			return _runing_timers.empty() && _added_timers.empty();
 		}
 		void clear();
 		void update();

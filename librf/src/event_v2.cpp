@@ -26,6 +26,8 @@ RESUMEF_NS
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
 			{
 				*oldValue = false;
+				_thandler.stop();
+
 				this->_coro = nullptr;
 			}
 		}
@@ -36,6 +38,7 @@ RESUMEF_NS
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
 			{
 				*oldValue = true;
+				_thandler.stop();
 
 				assert(this->_scheduler != nullptr);
 				if (this->_coro)
@@ -52,6 +55,7 @@ RESUMEF_NS
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
 			{
 				*oldValue = false;
+				_thandler.reset();
 
 				assert(this->_scheduler != nullptr);
 				if (this->_coro)

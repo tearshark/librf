@@ -37,4 +37,18 @@ RESUMEF_NS
 			timeout_awaiter wait_until_(const clock_type::time_point& tp) const noexcept;
 		};
 	}
+
+	template<class _Rep, class _Period>
+	auto wait_for(event_v2::event_t& e, const std::chrono::duration<_Rep, _Period>& dt)
+	{
+		return e.wait_for(dt);
+	}
+			template<class _Clock, class _Duration>
+	auto wait_until(event_v2::event_t& e, const std::chrono::time_point<_Clock, _Duration>& tp)
+	{
+		return e.wait_until(tp);
+	}
+
+	//when_all_for(dt, args...) -> when_all(wait_for(args, dt)...)
+	//就不再单独为每个支持超时的类提供when_all_for实现了。借助when_all和非成员的wait_for实现
 }

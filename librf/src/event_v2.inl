@@ -91,6 +91,7 @@ RESUMEF_NS
 
 			//为浸入式单向链表提供的next指针
 			counted_ptr<state_event_t> _next = nullptr;
+			timer_handler _thandler;
 		private:
 			//_value引用awaitor保存的值，这样可以尽可能减少创建state的可能。而不必进入没有state就没有value实体被用于返回。
 			//在调用on_notify()或on_timeout()任意之一后，置为nullptr。
@@ -191,7 +192,7 @@ RESUMEF_NS
 
 				_event->add_wait_list(_state.get());
 
-				(void)sch->timer()->add(_tp, [_state=_state](bool canceld)
+				_state->_thandler = sch->timer()->add_handler(_tp, [_state=_state](bool canceld)
 					{
 						if (!canceld)
 							_state->on_timeout();
