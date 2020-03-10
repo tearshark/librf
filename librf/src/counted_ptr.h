@@ -87,5 +87,31 @@ RESUMEF_NS
 	{
 		return new T{std::forward<Args>(args)...};
 	}
+
+	template <typename T, typename U>
+	inline bool operator == (const counted_ptr<T>& _Left, const counted_ptr<U>& _Right)
+	{
+		return _Left.get() == _Right.get();
+	}
+	template <typename T>
+	inline bool operator == (const counted_ptr<T>& _Left, std::nullptr_t)
+	{
+		return _Left.get() == nullptr;
+	}
+	template <typename T>
+	inline bool operator == (std::nullptr_t, const counted_ptr<T>& _Left)
+	{
+		return _Left.get() == nullptr;
+	}
+	template <typename T>
+	inline bool operator != (const counted_ptr<T>& _Left, std::nullptr_t)
+	{
+		return _Left.get() != nullptr;
+	}
+	template <typename T>
+	inline bool operator != (std::nullptr_t, const counted_ptr<T>& _Left)
+	{
+		return _Left.get() != nullptr;
+	}
 }
 

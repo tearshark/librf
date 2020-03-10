@@ -10,8 +10,8 @@ RESUMEF_NS
 
 	struct spinlock
 	{
-		static const size_t MAX_ACTIVE_SPIN = 1000;
-		static const size_t MAX_YIELD_SPIN = 4000;
+		static const size_t MAX_ACTIVE_SPIN = 4000;
+		static const size_t MAX_YIELD_SPIN = 8000;
 		static const int FREE_VALUE = 0;
 		static const int LOCKED_VALUE = 1;
 
@@ -53,7 +53,7 @@ RESUMEF_NS
 						else
 						{
 							std::this_thread::sleep_for(dt);
-							dt *= 2;
+							dt = (std::min)(std::chrono::milliseconds{ 128 }, dt * 2);
 						}
 					}
 

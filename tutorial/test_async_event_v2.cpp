@@ -8,6 +8,7 @@
 #include "librf.h"
 
 using namespace resumef;
+using namespace std::chrono;
 
 //非协程的逻辑线程，或异步代码，可以通过event_t通知到协程，并且不会阻塞协程所在的线程。
 static std::thread async_set_event_all(const event_v2::event_t & e, std::chrono::milliseconds dt)
@@ -28,30 +29,33 @@ static std::thread async_set_event_one(event_v2::event_t e, std::chrono::millise
 	});
 }
 
-
 static future_t<> resumable_wait_event(event_v2::event_t e, int idx)
 {
 	if (co_await e)
 		std::cout << "[" << idx << "]event signal!" << std::endl;
 	else
-		std::cout << "time out!" << std::endl;
+		std::cout << "[" << idx << "]time out!" << std::endl;
+}
+
+static future_t<> resumable_wait_timeout(event_v2::event_t e, milliseconds dt, int idx)
+{
+	if (co_await e.wait_for(dt))
+		std::cout << "[" << idx << "]event signal!" << std::endl;
+	else
+		std::cout << "[" << idx << "]time out!" << std::endl;
 }
 
 static void test_notify_all()
 {
-	using namespace std::chrono;
+	event_v2::event_t evt;
+	go resumable_wait_event(evt, 0);
+	go resumable_wait_event(evt, 1);
+	go resumable_wait_event(evt, 2);
 
-	{
-		event_v2::event_t evt;
-		go resumable_wait_event(evt, 0);
-		go resumable_wait_event(evt, 1);
-		go resumable_wait_event(evt, 2);
+	auto tt = async_set_event_all(evt, 100ms);
+	this_scheduler()->run_until_notask();
 
-		auto tt = async_set_event_all(evt, 100ms);
-		this_scheduler()->run_until_notask();
-
-		tt.join();
-	}
+	tt.join();
 }
 
 //目前还没法测试在多线程调度下，是否线程安全
@@ -76,11 +80,35 @@ static void test_notify_one()
 	}
 }
 
+static void test_wait_all_timeout()
+{
+	using namespace std::chrono;
+
+	srand((int)time(nullptr));
+
+	event_v2::event_t evts[10];
+
+	std::vector<std::thread> vtt;
+	for(size_t i = 0; i < _countof(evts); ++i)
+	{
+		go resumable_wait_timeout(evts[i], 100ms, (int)i);
+		vtt.emplace_back(async_set_event_one(evts[i], 1ms * (50 + i * 10)));
+	}
+
+	this_scheduler()->run_until_notask();
+
+	for (auto& tt : vtt)
+		tt.join();
+}
+
 void resumable_main_event_v2()
 {
 	test_notify_all();
 	std::cout << std::endl;
 
 	test_notify_one();
+	std::cout << std::endl;
+
+	test_wait_all_timeout();
 	std::cout << std::endl;
 }

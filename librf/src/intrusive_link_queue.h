@@ -2,10 +2,11 @@
 
 RESUMEF_NS
 {
-	template<class _Node, class _Sty = uint32_t>
+	template<class _Node, class _Nodeptr = _Node*, class _Sty = uint32_t>
 	struct intrusive_link_queue
 	{
 		using node_type = _Node;
+		using node_ptr_type = _Nodeptr;
 		using size_type = _Sty;
 	public:
 		intrusive_link_queue();
@@ -17,19 +18,19 @@ RESUMEF_NS
 
 		auto size() const noexcept->size_type;
 		bool empty() const noexcept;
-		void push_back(node_type* node) noexcept;
-		auto try_pop() noexcept->node_type*;
+		void push_back(node_ptr_type node) noexcept;
+		auto try_pop() noexcept->node_ptr_type;
 	private:
-		node_type* _head;
-		node_type* _tail;
+		node_ptr_type _head;
+		node_ptr_type _tail;
 
 	#ifdef _WITH_LOCK_FREE_Q_KEEP_REAL_SIZE
 		std::atomic<size_type> m_count;
 	#endif
 	};
 
-	template<class _Node, class _Sty>
-	intrusive_link_queue<_Node, _Sty>::intrusive_link_queue()
+	template<class _Node, class _Nodeptr, class _Sty>
+	intrusive_link_queue<_Node, _Nodeptr, _Sty>::intrusive_link_queue()
 		: _head(nullptr)
 		, _tail(nullptr)
 	#ifdef _WITH_LOCK_FREE_Q_KEEP_REAL_SIZE
@@ -38,8 +39,8 @@ RESUMEF_NS
 	{
 	}
 
-	template<class _Node, class _Sty>
-	auto intrusive_link_queue<_Node, _Sty>::size() const noexcept->size_type
+	template<class _Node, class _Nodeptr, class _Sty>
+	auto intrusive_link_queue<_Node, _Nodeptr, _Sty>::size() const noexcept->size_type
 	{
 	#ifdef _WITH_LOCK_FREE_Q_KEEP_REAL_SIZE
 		return m_count.load(std::memory_order_acquire);
@@ -51,14 +52,14 @@ RESUMEF_NS
 	#endif // _WITH_LOCK_FREE_Q_KEEP_REAL_SIZE
 	}
 
-	template<class _Node, class _Sty>
-	bool intrusive_link_queue<_Node, _Sty>::empty() const noexcept
+	template<class _Node, class _Nodeptr, class _Sty>
+	bool intrusive_link_queue<_Node, _Nodeptr, _Sty>::empty() const noexcept
 	{
 		return _head == nullptr;
 	}
 
-	template<class _Node, class _Sty>
-	void intrusive_link_queue<_Node, _Sty>::push_back(node_type* node) noexcept
+	template<class _Node, class _Nodeptr, class _Sty>
+	void intrusive_link_queue<_Node, _Nodeptr, _Sty>::push_back(node_ptr_type node) noexcept
 	{
 		assert(node != nullptr);
 
@@ -78,13 +79,13 @@ RESUMEF_NS
 	#endif
 	}
 
-	template<class _Node, class _Sty>
-	auto intrusive_link_queue<_Node, _Sty>::try_pop() noexcept->node_type*
+	template<class _Node, class _Nodeptr, class _Sty>
+	auto intrusive_link_queue<_Node, _Nodeptr, _Sty>::try_pop() noexcept->node_ptr_type
 	{
 		if (_head == nullptr)
 			return nullptr;
 
-		node_type* node = _head;
+		node_ptr_type node = _head;
 		_head = node->_next;
 		node->_next = nullptr;
 
