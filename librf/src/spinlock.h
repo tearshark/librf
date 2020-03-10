@@ -69,7 +69,7 @@ RESUMEF_NS
 		bool try_lock() noexcept
 		{
 			int val = FREE_VALUE;
-			bool ret = lck.compare_exchange_weak(val, LOCKED_VALUE, std::memory_order_acq_rel);
+			bool ret = lck.compare_exchange_strong(val, LOCKED_VALUE, std::memory_order_acq_rel);
 
 #if _DEBUG
 			if (ret) owner_thread_id = std::this_thread::get_id();

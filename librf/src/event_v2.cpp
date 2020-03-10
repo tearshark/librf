@@ -23,7 +23,7 @@ RESUMEF_NS
 		void state_event_t::on_cancel() noexcept
 		{
 			bool* oldValue = _value.load(std::memory_order_acquire);
-			if (oldValue != nullptr && _value.compare_exchange_weak(oldValue, nullptr, std::memory_order_acq_rel))
+			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
 			{
 				*oldValue = false;
 				this->_coro = nullptr;
@@ -33,7 +33,7 @@ RESUMEF_NS
 		bool state_event_t::on_notify()
 		{
 			bool* oldValue = _value.load(std::memory_order_acquire);
-			if (oldValue != nullptr && _value.compare_exchange_weak(oldValue, nullptr, std::memory_order_acq_rel))
+			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
 			{
 				*oldValue = true;
 
@@ -49,7 +49,7 @@ RESUMEF_NS
 		bool state_event_t::on_timeout()
 		{
 			bool* oldValue = _value.load(std::memory_order_acquire);
-			if (oldValue != nullptr && _value.compare_exchange_weak(oldValue, nullptr, std::memory_order_acq_rel))
+			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
 			{
 				*oldValue = false;
 
