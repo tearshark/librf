@@ -22,24 +22,20 @@ RESUMEF_NS
 
 		void state_event_t::on_cancel() noexcept
 		{
-			scoped_lock<lock_type> lock_(_mtx);
-
-			if (_value != nullptr)
+			bool* oldValue = _value.load(std::memory_order_acquire);
+			if (oldValue != nullptr && _value.compare_exchange_weak(oldValue, nullptr, std::memory_order_acq_rel))
 			{
-				*_value = false;
-				_value = nullptr;
+				*oldValue = false;
+				this->_coro = nullptr;
 			}
-			this->_coro = nullptr;
 		}
 
 		bool state_event_t::on_notify()
 		{
-			scoped_lock<lock_type> lock_(_mtx);
-
-			if (_value != nullptr)
+			bool* oldValue = _value.load(std::memory_order_acquire);
+			if (oldValue != nullptr && _value.compare_exchange_weak(oldValue, nullptr, std::memory_order_acq_rel))
 			{
-				*_value = true;
-				_value = nullptr;
+				*oldValue = true;
 
 				assert(this->_scheduler != nullptr);
 				if (this->_coro)
@@ -52,12 +48,10 @@ RESUMEF_NS
 
 		bool state_event_t::on_timeout()
 		{
-			scoped_lock<lock_type> lock_(_mtx);
-
-			if (_value != nullptr)
+			bool* oldValue = _value.load(std::memory_order_acquire);
+			if (oldValue != nullptr && _value.compare_exchange_weak(oldValue, nullptr, std::memory_order_acq_rel))
 			{
-				*_value = false;
-				_value = nullptr;
+				*oldValue = false;
 
 				assert(this->_scheduler != nullptr);
 				if (this->_coro)

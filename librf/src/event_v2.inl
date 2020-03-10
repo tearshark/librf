@@ -92,9 +92,11 @@ RESUMEF_NS
 			//为浸入式单向链表提供的next指针
 			counted_ptr<state_event_t> _next = nullptr;
 		private:
-			//std::atomic<bool*> _value;
-			bool* _value;
-			mutable lock_type _mtx;
+			//_value引用awaitor保存的值，这样可以尽可能减少创建state的可能。而不必进入没有state就没有value实体被用于返回。
+			//在调用on_notify()或on_timeout()任意之一后，置为nullptr。
+			//这样来保证要么超时了，要么响应了signal的通知了。
+			//这个指针在on_notify()和on_timeout()里，当作一个互斥的锁来防止同时进入两个函数
+			std::atomic<bool*> _value;
 		};
 	}
 
