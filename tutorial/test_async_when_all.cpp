@@ -12,6 +12,14 @@
 
 using namespace resumef;
 
+template<class... _Fty>
+auto when_all2(_Fty&&... f) -> future_t<std::tuple<detail::remove_future_vt<_Fty>...>>
+{
+	using tuple_type = std::tuple<detail::remove_future_vt<_Fty>...>;
+
+	co_return co_await when_all(*current_scheduler(), std::forward<_Fty>(f)...);
+}
+
 void test_when_any()
 {
 	using namespace std::chrono;
@@ -92,7 +100,7 @@ void test_when_all()
 		co_await when_all();
 		std::cout << "when all: zero!" << std::endl << std::endl;
 
-		auto ab = co_await when_all(my_sleep("a"), my_sleep_v("b"));
+		auto ab = co_await when_all2(my_sleep("a"), my_sleep_v("b"));
 		//ab.1 is std::ignore
 		std::cout << "when all:" << std::get<0>(ab) << std::endl << std::endl;
 

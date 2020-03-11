@@ -55,6 +55,8 @@
 #include "src/state.inl"
 
 #include "src/switch_scheduler.h"
+#include "src/current_scheduler.h"
+
 #include "src/_awaker.h"
 #include "src/mutex.h"
 #include "src/ring_queue.h"

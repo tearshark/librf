@@ -12,3 +12,5 @@
 #define go (*::resumef::this_scheduler()) + 
 #define GO (*::resumef::this_scheduler()) + [=]()mutable->resumef::future_t<>
 #endif
+
+#define current_scheduler() (co_await ::resumef::get_current_scheduler())

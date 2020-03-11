@@ -18,12 +18,12 @@ RESUMEF_NS
 		}
 
 		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
-		void await_suspend(coroutine_handle<_PromiseT> handler)
+		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			_PromiseT& promise = handler.promise();
 
 			auto* sptr = promise.get_state();
-			sptr->switch_scheduler_await_suspend(_scheduler, handler);
+			return sptr->switch_scheduler_await_suspend(_scheduler, handler);
 		}
 
 		void await_resume() noexcept

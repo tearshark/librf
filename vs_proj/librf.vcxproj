@@ -225,6 +225,7 @@
     <ClInclude Include="..\librf\src\channel_v1.h" />
     <ClInclude Include="..\librf\src\channel_v2.h" />
     <ClInclude Include="..\librf\src\counted_ptr.h" />
+    <ClInclude Include="..\librf\src\current_scheduler.h" />
     <ClInclude Include="..\librf\src\def.h" />
     <ClInclude Include="..\librf\src\event.h" />
     <ClInclude Include="..\librf\src\event_v1.h" />

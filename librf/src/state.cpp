@@ -70,6 +70,8 @@ RESUMEF_NS
 
 		if (_scheduler != nullptr)
 		{
+			if (_scheduler == sch) return false;
+
 			auto task_ptr = _scheduler->del_switch(this);
 			
 			_scheduler = sch;
@@ -138,6 +140,8 @@ RESUMEF_NS
 
 		if (_scheduler != nullptr)
 		{
+			if (_scheduler == sch) return false;
+
 			auto task_ptr = _scheduler->del_switch(this);
 
 			_scheduler = sch;
