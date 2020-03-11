@@ -35,9 +35,12 @@ RESUMEF_NS
 
 			bool try_wait_one() noexcept
 			{
-				if (_counter.fetch_add(-1, std::memory_order_acq_rel) > 0)
-					return true;
-				_counter.fetch_add(1);
+				if (_counter.load(std::memory_order_acquire) > 0)
+				{
+					if (_counter.fetch_add(-1, std::memory_order_acq_rel) > 0)
+						return true;
+					_counter.fetch_add(1);
+				}
 				return false;
 			}
 
