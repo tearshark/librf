@@ -43,8 +43,8 @@ int main(int argc, const char* argv[])
 	//test_ring_queue<resumef::ring_queue_spinlock<int, false, uint32_t>>();
 	//test_ring_queue<resumef::ring_queue_lockfree<int, uint64_t>>();
 
-	resumable_main_switch_scheduler();
-	//resumable_main_when_all();
+	//resumable_main_switch_scheduler();
+	resumable_main_when_all();
 	//resumable_main_event_v2();
 	return 0;
 

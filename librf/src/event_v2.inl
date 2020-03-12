@@ -6,9 +6,6 @@ RESUMEF_NS
 	{
 		struct state_event_t;
 
-		//仿照cppcoro的event是行不通的。
-		//虽然cppcoro的event的触发和等待之间是线程安全的，但是并不能实现只触发指定数量。并且多线程触发之间是不安全的。
-		//所以，还得用锁结构来实现(等待实现，今日不空)。
 		struct event_v2_impl : public std::enable_shared_from_this<event_v2_impl>
 		{
 			event_v2_impl(bool initially) noexcept;
@@ -138,7 +135,7 @@ RESUMEF_NS
 			{
 				scoped_lock<detail::event_v2_impl::lock_type> lock_(_event->_lock);
 
-				if (_event->try_wait_one())
+				if ((_value = _event->try_wait_one()) != false)
 					return false;
 
 				_state = new detail::state_event_t(_value);
@@ -187,7 +184,7 @@ RESUMEF_NS
 			{
 				scoped_lock<detail::event_v2_impl::lock_type> lock_(_event->_lock);
 
-				if (_event->try_wait_one())
+				if ((_value = _event->try_wait_one()) != false)
 					return false;
 
 				_state = new detail::state_event_t(_value);

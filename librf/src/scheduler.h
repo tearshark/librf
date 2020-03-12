@@ -34,9 +34,9 @@ RESUMEF_NS
 		inline void operator + (_Ty&& t_)
 		{
 			if constexpr (is_callable_v<_Ty>)
-				new_task(new ctx_task_t<_Ty>(std::forward<_Ty>(t_)));
+				new_task(new ctx_task_t<_Ty>(t_));
 			else
-				new_task(new task_t<_Ty>(std::forward<_Ty>(t_)));
+				new_task(new task_t<_Ty>(t_));
 		}
 
 		inline bool empty() const

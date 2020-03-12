@@ -45,6 +45,7 @@
 #include "src/future.h"
 #include "src/promise.h"
 #include "src/awaitable.h"
+#include "src/generator.h"
 
 #include "src/rf_task.h"
 #include "src/utils.h"
@@ -64,6 +65,5 @@
 #include "src/channel.h"
 #include "src/event.h"
 
-#include "src/generator.h"
 #include "src/sleep.h"
 #include "src/when.h"

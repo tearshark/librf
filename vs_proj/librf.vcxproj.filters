@@ -94,9 +94,6 @@
     <ClCompile Include="..\tutorial\test_async_when_all.cpp">
       <Filter>tutorial</Filter>
     </ClCompile>
-    <ClCompile Include="..\librf\src\when.cpp">
-      <Filter>librf\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\benchmark\benchmark_asio_echo.cpp">
       <Filter>benchmark</Filter>
     </ClCompile>
@@ -120,6 +117,9 @@
     </ClCompile>
     <ClCompile Include="..\tutorial\test_async_event_v2.cpp">
       <Filter>tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\librf\src\when_v2.cpp">
+      <Filter>librf\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -226,6 +226,9 @@
       <Filter>librf\src</Filter>
     </ClInclude>
     <ClInclude Include="..\librf\src\current_scheduler.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\when_v2.h">
       <Filter>librf\src</Filter>
     </ClInclude>
   </ItemGroup>

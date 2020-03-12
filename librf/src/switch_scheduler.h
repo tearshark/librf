@@ -2,15 +2,15 @@
 
 RESUMEF_NS
 {
-	struct switch_scheduler_t
+	struct switch_scheduler_awaitor
 	{
-		switch_scheduler_t(scheduler_t* sch)
+		switch_scheduler_awaitor(scheduler_t* sch)
 			:_scheduler(sch) {}
-		switch_scheduler_t(const switch_scheduler_t&) = default;
-		switch_scheduler_t(switch_scheduler_t&&) = default;
+		switch_scheduler_awaitor(const switch_scheduler_awaitor&) = default;
+		switch_scheduler_awaitor(switch_scheduler_awaitor&&) = default;
 
-		switch_scheduler_t& operator = (const switch_scheduler_t&) = default;
-		switch_scheduler_t& operator = (switch_scheduler_t&&) = default;
+		switch_scheduler_awaitor& operator = (const switch_scheduler_awaitor&) = default;
+		switch_scheduler_awaitor& operator = (switch_scheduler_awaitor&&) = default;
 
 		bool await_ready() noexcept
 		{
@@ -33,7 +33,7 @@ RESUMEF_NS
 		scheduler_t* _scheduler;
 	};
 
-	inline switch_scheduler_t operator co_await(scheduler_t& sch)
+	inline switch_scheduler_awaitor operator co_await(scheduler_t& sch)
 	{
 		return { &sch };
 	}

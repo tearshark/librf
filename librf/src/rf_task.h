@@ -19,23 +19,23 @@ RESUMEF_NS
 
 	//----------------------------------------------------------------------------------------------
 
-	template<class _Ty>
+	template<class _Ty, class = std::void_t<>>
 	struct task_t;
 
 	template<class _Ty>
-	struct task_t<future_t<_Ty>> : public task_base_t
+	struct task_t<_Ty, std::void_t<is_future<std::remove_reference_t<_Ty>>>> : public task_base_t
 	{
-		using value_type = _Ty;
-		using future_type = future_t<value_type>;
+		using future_type = std::remove_reference_t<_Ty>;
+		using value_type = typename future_type::value_type;
 		using state_type = state_t<value_type>;
 
 		task_t() = default;
-		task_t(future_type&& f)
+		task_t(future_type& f)
 		{
-			initialize(std::forward<future_type>(f));
+			initialize(f);
 		}
 	protected:
-		void initialize(future_type&& f)
+		void initialize(future_type& f)
 		{
 			_state = f._state.get();
 		}
@@ -49,12 +49,12 @@ RESUMEF_NS
 		using state_type = state_generator_t;
 
 		task_t() = default;
-		task_t(future_type&& f)
+		task_t(future_type& f)
 		{
-			initialize(std::forward<future_type>(f));
+			initialize(f);
 		}
 	protected:
-		void initialize(future_type&& f)
+		void initialize(future_type& f)
 		{
 			_state = f.detach_state();
 		}
@@ -75,7 +75,8 @@ RESUMEF_NS
 		ctx_task_t(context_type ctx)
 			: _context(std::move(ctx))
 		{
-			this->initialize(_context());
+			decltype(auto) f = _context();
+			this->initialize(f);
 		}
 	};
 }
