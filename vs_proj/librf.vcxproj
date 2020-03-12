@@ -247,7 +247,6 @@
     <ClInclude Include="..\librf\src\timer.h" />
     <ClInclude Include="..\librf\src\unix\clang_builtin.h" />
     <ClInclude Include="..\librf\src\unix\coroutine.h" />
-    <ClInclude Include="..\librf\src\utils.h" />
     <ClInclude Include="..\librf\src\when.h" />
     <ClInclude Include="..\librf\src\when_v2.h" />
     <ClInclude Include="..\librf\src\_awaker.h" />

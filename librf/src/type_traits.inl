@@ -4,10 +4,56 @@ RESUMEF_NS
 {
 	namespace traits
 	{
+		//is_coroutine_handle<T>
+		//is_coroutine_handle_v<T>
+		//判断是不是coroutine_handle<>类型
+		//
+		//is_valid_await_suspend_return_v<T>
+		//判断是不是awaitor的await_suspend()函数的有效返回值
+		//
+		//is_awaitor<T>
+		//is_awaitor_v<T>
+		//判断是不是一个awaitor规范。
+		//一个awaitor可以被co_await操作，要求满足coroutine的awaitor的三个函数接口规范
+		//
+		//is_future<T>
+		//is_future_v<T>
+		//判断是不是一个librf的future规范。
+		//future除了要求是一个awaitor外，还要求定义了value_type/state_type/promise_type三个类型，
+		//并且具备counted_ptr<state_type>类型的_state变量。
+		//
+		//is_promise<T>
+		//is_promise_v<T>
+		//判断是不是一个librf的promise_t类
+		//
+		//is_generator<T>
+		//is_generator_v<T>
+		//判断是不是一个librf的generator_t类
+		//
+		//has_state<T>
+		//has_state_v<T>
+		//判断是否具有_state的成员变量
+		//
+		//get_awaitor<T>(T&&t)
+		//通过T获得其被co_await后的awaitor
+		//
+		//awaitor_traits<T>
+		//获得一个awaitor的特征。
+		//	type:awaitor的类型
+		//	value_type:awaitor::await_resume()的返回值类型
+		//
+		//is_callable<T>
+		//is_callable_v<T>
+		//判断是不是一个可被调用的类型，如函数，仿函数，lambda等
+		//
+		//is_scheduler_task<T>
+		//is_scheduler_task_v<T>
+		//判断是不是可以被调度器调度的任务。调度器支持future和callable
+
 		template<class _Ty>
 		struct is_coroutine_handle : std::false_type {};
 		template<class _PromiseT>
-		struct is_coroutine_handle<std::experimental::coroutine_handle<_PromiseT>> : std::true_type {};
+		struct is_coroutine_handle<coroutine_handle<_PromiseT>> : std::true_type {};
 		template<class _Ty>
 		constexpr bool is_coroutine_handle_v = is_coroutine_handle<remove_cvref_t<_Ty>>::value;
 
@@ -116,5 +162,22 @@ RESUMEF_NS
 			using type = decltype(get_awaitor(std::declval<_Ty>()));
 			using value_type = decltype(std::declval<type>().await_resume());
 		};
+
+		template<typename _Function>
+		inline auto _IsCallable(_Function&& _Func, int) -> decltype(_Func(), std::true_type())
+		{
+			(_Func);
+			return std::true_type();
+		}
+		template<typename _Function>
+		inline std::false_type _IsCallable(_Function&&, ...)
+		{
+			return std::false_type();
+		}
+		template<typename _Function>
+		using is_callable = decltype(_IsCallable(std::declval<_Function>(), 0));
+		template<typename _Function>
+		constexpr bool is_callable_v = is_callable<_Function>::value;
+
 	}
 }

@@ -165,9 +165,6 @@
     <ClInclude Include="..\librf\src\timer.h">
       <Filter>librf\src</Filter>
     </ClInclude>
-    <ClInclude Include="..\librf\src\utils.h">
-      <Filter>librf\src</Filter>
-    </ClInclude>
     <ClInclude Include="..\librf\src\unix\coroutine.h">
       <Filter>librf\src\unix</Filter>
     </ClInclude>

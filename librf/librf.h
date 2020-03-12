@@ -48,7 +48,6 @@
 #include "src/generator.h"
 
 #include "src/rf_task.h"
-#include "src/utils.h"
 #include "src/timer.h"
 #include "src/scheduler.h"
 

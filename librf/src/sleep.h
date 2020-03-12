@@ -20,27 +20,28 @@ RESUMEF_NS
 	{
 		return sleep_for_(std::chrono::duration_cast<std::chrono::system_clock::duration>(dt_), scheduler_);
 	}
-	template<class _Rep, class _Period>
-	inline future_t<> sleep_for(const std::chrono::duration<_Rep, _Period>& dt_)
-	{
-		return sleep_for_(std::chrono::duration_cast<std::chrono::system_clock::duration>(dt_), *this_scheduler());
-	}
 
 	template<class _Clock, class _Duration = typename _Clock::duration>
 	inline future_t<> sleep_until(const std::chrono::time_point<_Clock, _Duration>& tp_, scheduler_t& scheduler_)
 	{
 		return sleep_until_(std::chrono::time_point_cast<std::chrono::system_clock::duration>(tp_), scheduler_);
 	}
+
+	template<class _Rep, class _Period>
+	inline future_t<> sleep_for(const std::chrono::duration<_Rep, _Period>& dt_)
+	{
+		co_await sleep_for_(std::chrono::duration_cast<std::chrono::system_clock::duration>(dt_), *current_scheduler());
+	}
 	template<class _Clock, class _Duration>
 	inline future_t<> sleep_until(const std::chrono::time_point<_Clock, _Duration>& tp_)
 	{
-		return sleep_until_(std::chrono::time_point_cast<std::chrono::system_clock::duration>(tp_), *this_scheduler());
+		co_await sleep_until_(std::chrono::time_point_cast<std::chrono::system_clock::duration>(tp_), *current_scheduler());
 	}
 
 	template <class Rep, class Period>
 	inline future_t<> operator co_await(std::chrono::duration<Rep, Period> dt_)
 	{
-		return sleep_for(dt_);
+		co_await sleep_for(dt_, *current_scheduler());
 	}
 
 }
