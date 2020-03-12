@@ -30,10 +30,10 @@ RESUMEF_NS
 		void run();
 		//void break_all();
 
-		template<class _Ty, typename = std::enable_if_t<is_callable_v<_Ty> || is_future_v<_Ty> || is_generator_v<_Ty> >>
+		template<class _Ty, typename = std::enable_if_t<traits::is_callable_v<_Ty> || traits::is_future_v<_Ty> || traits::is_generator_v<_Ty> >>
 		inline void operator + (_Ty&& t_)
 		{
-			if constexpr (is_callable_v<_Ty>)
+			if constexpr (traits::is_callable_v<_Ty>)
 				new_task(new ctx_task_t<_Ty>(t_));
 			else
 				new_task(new task_t<_Ty>(t_));

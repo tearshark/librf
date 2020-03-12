@@ -178,8 +178,6 @@
   <ItemGroup>
     <ClCompile Include="..\benchmark\benchmark_asio_echo.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\benchmark\benchmark_async_mem.cpp" />
     <ClCompile Include="..\benchmark\benchmark_channel_passing_next.cpp" />

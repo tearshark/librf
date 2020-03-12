@@ -23,7 +23,7 @@ RESUMEF_NS
 	struct task_t;
 
 	template<class _Ty>
-	struct task_t<_Ty, std::void_t<is_future<std::remove_reference_t<_Ty>>>> : public task_base_t
+	struct task_t<_Ty, std::void_t<traits::is_future<std::remove_reference_t<_Ty>>>> : public task_base_t
 	{
 		using future_type = std::remove_reference_t<_Ty>;
 		using value_type = typename future_type::value_type;

@@ -13,7 +13,7 @@ RESUMEF_NS
 		{
 			return false;
 		}
-		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 		inline void await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 		{
 			_PromiseT& promise = handler.promise();
@@ -31,7 +31,7 @@ RESUMEF_NS
 		{
 			return false;
 		}
-		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 		inline void await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 		{
 			_PromiseT& promise = handler.promise();
@@ -59,7 +59,7 @@ RESUMEF_NS
 	template <typename _Uty>
 	_Uty&& promise_impl_t<_Ty>::await_transform(_Uty&& _Whatever) noexcept
 	{
-		if constexpr (is_future_v<_Uty> || is_awaitable_v<_Uty>)
+		if constexpr (traits::has_state_v<_Uty>)
 		{
 			_Whatever._state->set_scheduler(get_state()->get_scheduler());
 		}

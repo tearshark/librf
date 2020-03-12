@@ -73,7 +73,7 @@ RESUMEF_NS
 			bool on_timeout();
 
 			//将自己加入到通知链表里
-			template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			scheduler_t* on_await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 			{
 				_PromiseT& promise = handler.promise();
@@ -130,7 +130,7 @@ RESUMEF_NS
 				return (_value = _event->try_wait_one());
 			}
 
-			template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend(coroutine_handle<_PromiseT> handler)
 			{
 				scoped_lock<detail::event_v2_impl::lock_type> lock_(_event->_lock);
@@ -179,7 +179,7 @@ RESUMEF_NS
 				return (_value = _event->try_wait_one());
 			}
 
-			template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend(coroutine_handle<_PromiseT> handler)
 			{
 				scoped_lock<detail::event_v2_impl::lock_type> lock_(_event->_lock);

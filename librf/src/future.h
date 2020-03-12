@@ -27,7 +27,7 @@ RESUMEF_NS
 			return _state->future_await_ready();
 		}
 
-		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 		void await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			_state->future_await_suspend(handler);

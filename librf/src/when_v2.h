@@ -28,7 +28,7 @@ RESUMEF_NS
 			bool on_timeout();
 
 			//将自己加入到通知链表里
-			template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			scheduler_t* on_await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 			{
 				_PromiseT& promise = handler.promise();
@@ -69,7 +69,7 @@ RESUMEF_NS
 				return _state->_counter.load(std::memory_order_relaxed) == 0;
 			}
 
-			template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			void await_suspend(coroutine_handle<_PromiseT> handler)
 			{
 				_state->on_await_suspend(handler);
@@ -85,31 +85,36 @@ RESUMEF_NS
 		using ignore_type = std::remove_const_t<decltype(std::ignore)>;
 
 		template<class _Ty>
-		struct remove_future
+		struct convert_void_2_ignore
 		{
 			using type = std::remove_reference_t<_Ty>;
 			using value_type = type;
 		};
 		template<>
-		struct remove_future<void>
+		struct convert_void_2_ignore<void>
 		{
 			using type = void;
 			using value_type = ignore_type;
 		};
+
 		template<class _Ty>
-		struct remove_future<future_t<_Ty> > : public remove_future<_Ty>{};
+		struct get_await_resume_result_type
+		{
+			using value_type = decltype(std::declval<std::remove_reference_t<_Ty>>().await_resume());
+		};
+
 		template<class _Ty>
-		struct remove_future<future_t<_Ty>&> : public remove_future<_Ty>{};
-		template<class _Ty>
-		struct remove_future<future_t<_Ty>&&> : public remove_future<_Ty>{};
-		template<class _Ty>
-		using remove_future_t = typename remove_future<_Ty>::value_type;
+		using awaitor_result_t = typename convert_void_2_ignore<
+				typename get_await_resume_result_type<
+					decltype(traits::get_awaitor(std::declval<_Ty>()))
+				>::value_type
+		>::value_type;
 
 
 		template<class _Awaitable, class _Ty>
 		future_t<> when_all_connector(state_when_t* state, _Awaitable awaitor, _Ty& value)
 		{
-			static_assert(is_awaitor_v<_Awaitable>);
+			static_assert(traits::is_awaitor_v<_Awaitable>);
 
 			if constexpr(std::is_same_v<_Ty, ignore_type>)
 				co_await awaitor;
@@ -151,9 +156,9 @@ RESUMEF_NS
 		future_t<> when_any_connector(counted_ptr<state_when_t> state, _Awaitable awaitor, when_any_pair_ptr value, intptr_t idx)
 		{
 			assert(idx >= 0);
-			static_assert(is_awaitor_v<_Awaitable>);
+			static_assert(traits::is_awaitor_v<_Awaitable>);
 
-			using value_type = remove_future_t<_Awaitable>;
+			using value_type = awaitor_result_t<_Awaitable>;
 
 			if constexpr (std::is_same_v<value_type, ignore_type>)
 			{
@@ -206,12 +211,12 @@ RESUMEF_NS
 inline namespace when_v2
 {
 	template<class... _Awaitable, 
-		class = std::enable_if_t<std::conjunction_v<is_awaitor<_Awaitable>...>>
+		class = std::enable_if_t<std::conjunction_v<traits::is_awaitor<_Awaitable>...>>
 	>
 	auto when_all(scheduler_t& sch, _Awaitable&&... args) 
-		-> detail::when_future_t<std::tuple<detail::remove_future_t<_Awaitable>...> >
+		-> detail::when_future_t<std::tuple<detail::awaitor_result_t<_Awaitable>...> >
 	{
-		using tuple_type = std::tuple<detail::remove_future_t<_Awaitable>...>;
+		using tuple_type = std::tuple<detail::awaitor_result_t<_Awaitable>...>;
 
 		detail::when_future_t<tuple_type> awaitor{ sizeof...(_Awaitable) };
 		detail::when_all_one__<tuple_type, 0u, _Awaitable...>(sch, awaitor._state.get(), *awaitor._values, std::forward<_Awaitable>(args)...);
@@ -221,12 +226,12 @@ inline namespace when_v2
 
 	template<class _Iter, 
 		class _Awaitable = decltype(*std::declval<_Iter>()),
-		class = std::enable_if_t<is_awaitor_v<_Awaitable>>
+		class = std::enable_if_t<traits::is_awaitor_v<_Awaitable>>
 	>
 	auto when_all(scheduler_t& sch, _Iter begin, _Iter end) 
-		-> detail::when_future_t<std::vector<detail::remove_future_t<_Awaitable> > >
+		-> detail::when_future_t<std::vector<detail::awaitor_result_t<_Awaitable> > >
 	{
-		using value_type = detail::remove_future_t<_Awaitable>;
+		using value_type = detail::awaitor_result_t<_Awaitable>;
 		using vector_type = std::vector<value_type>;
 
 		detail::when_future_t<vector_type> awaitor{ std::distance(begin, end) };
@@ -237,20 +242,20 @@ inline namespace when_v2
 	}
 
 	template<class... _Awaitable,
-		class = std::enable_if_t<std::conjunction_v<is_awaitor<_Awaitable>...>>
+		class = std::enable_if_t<std::conjunction_v<traits::is_awaitor<_Awaitable>...>>
 	>
 	auto when_all(_Awaitable&&... awaitor) 
-		-> future_t<std::tuple<detail::remove_future_t<_Awaitable>...>>
+		-> future_t<std::tuple<detail::awaitor_result_t<_Awaitable>...>>
 	{
 		co_return co_await when_all(*current_scheduler(), std::forward<_Awaitable>(awaitor)...);
 	}
 
 	template<class _Iter,
 		class _Awaitable = decltype(*std::declval<_Iter>()), 
-		class = std::enable_if_t<is_awaitor_v<_Awaitable>>
+		class = std::enable_if_t<traits::is_awaitor_v<_Awaitable>>
 	>
 	auto when_all(_Iter begin, _Iter end) 
-		-> future_t<std::vector<detail::remove_future_t<_Awaitable>>>
+		-> future_t<std::vector<detail::awaitor_result_t<_Awaitable>>>
 	{
 		co_return co_await when_all(*current_scheduler(), begin, end);
 	}
@@ -261,7 +266,7 @@ inline namespace when_v2
 
 
 	template<class... _Awaitable,
-		class = std::enable_if_t<std::conjunction_v<is_awaitor<_Awaitable>...>>
+		class = std::enable_if_t<std::conjunction_v<traits::is_awaitor<_Awaitable>...>>
 	>
 	auto when_any(scheduler_t& sch, _Awaitable&&... args) 
 		-> detail::when_future_t<detail::when_any_pair>
@@ -275,7 +280,7 @@ inline namespace when_v2
 
 	template<class _Iter,
 		typename _Awaitable = decltype(*std::declval<_Iter>()), 
-		class = std::enable_if_t<is_awaitor_v<_Awaitable>>
+		class = std::enable_if_t<traits::is_awaitor_v<_Awaitable>>
 	>
 	auto when_any(scheduler_t& sch, _Iter begin, _Iter end) 
 		-> detail::when_future_t<detail::when_any_pair>
@@ -288,7 +293,7 @@ inline namespace when_v2
 	}
 
 	template<class... _Awaitable,
-		class = std::enable_if_t<std::conjunction_v<is_awaitor<_Awaitable>...>>
+		class = std::enable_if_t<std::conjunction_v<traits::is_awaitor<_Awaitable>...>>
 	>
 	auto when_any(_Awaitable&&... awaitor) 
 		-> future_t<detail::when_any_pair>
@@ -298,7 +303,7 @@ inline namespace when_v2
 
 	template<class _Iter, 
 		typename _Awaitable = decltype(*std::declval<_Iter>()), 
-		class = std::enable_if_t<is_awaitor_v<_Awaitable>>
+		class = std::enable_if_t<traits::is_awaitor_v<_Awaitable>>
 	>
 	auto when_any(_Iter begin, _Iter end) 
 		-> future_t<detail::when_any_pair>

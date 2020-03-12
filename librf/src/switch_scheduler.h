@@ -17,7 +17,7 @@ RESUMEF_NS
 			return false;
 		}
 
-		template<class _PromiseT, typename = std::enable_if_t<is_promise_v<_PromiseT>>>
+		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			_PromiseT& promise = handler.promise();
