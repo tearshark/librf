@@ -152,7 +152,6 @@ RESUMEF_NS
 		template<class _Val, class _Iter, typename _Awaitable = decltype(*std::declval<_Iter>())>
 		inline void when_all_range__(scheduler_t& sch, state_when_t* state, std::vector<_Val> & values, _Iter begin, _Iter end)
 		{
-			const auto _First = begin;
 			intptr_t _Idx = 0;
 			for (; begin != end; ++begin, ++_Idx)
 			{
@@ -213,7 +212,6 @@ RESUMEF_NS
 		template<class _Iter>
 		inline void when_any_range__(scheduler_t& sch, state_when_t* state, when_any_pair_ptr value, _Iter begin, _Iter end)
 		{
-			const auto _First = begin;
 			intptr_t _Idx = 0;
 			for (; begin != end; ++begin, ++_Idx)
 			{
