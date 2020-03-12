@@ -104,5 +104,17 @@ RESUMEF_NS
 		{
 			return detail::get_awaitor_impl(static_cast<T&&>(value), 123);
 		}
-}
+
+		template<class _Ty, class = std::void_t<>>
+		struct awaitor_traits{};
+
+		template<class _Ty>
+		struct awaitor_traits<_Ty, 
+			std::void_t<decltype(get_awaitor(std::declval<_Ty>()))>
+		>
+		{
+			using type = decltype(get_awaitor(std::declval<_Ty>()));
+			using value_type = decltype(std::declval<type>().await_resume());
+		};
+	}
 }

@@ -98,16 +98,8 @@ RESUMEF_NS
 		};
 
 		template<class _Ty>
-		struct get_await_resume_result_type
-		{
-			using value_type = decltype(std::declval<std::remove_reference_t<_Ty>>().await_resume());
-		};
-
-		template<class _Ty>
 		using awaitor_result_t = typename convert_void_2_ignore<
-				typename get_await_resume_result_type<
-					decltype(traits::get_awaitor(std::declval<_Ty>()))
-				>::value_type
+			typename traits::awaitor_traits<_Ty>::value_type
 		>::value_type;
 
 
