@@ -79,4 +79,5 @@ RESUMEF_NS
 
 #include "exception.inl"
 #include "type_traits.inl"
+#include "type_concept.inl"
 #include "macro_def.inl"

@@ -107,7 +107,7 @@ RESUMEF_NS
 		template<class _Ty>
 		struct awaitor_result_impl<_Ty, true> : awaitor_result_impl<decltype(std::declval<_Ty>()()), false> {};
 		template<class _Ty>
-		using awaitor_result_t = typename awaitor_result_impl<_Ty>::value_type;
+		using awaitor_result_t = typename awaitor_result_impl<std::remove_reference_t<_Ty>>::value_type;
 
 
 		template<class _Ty>
@@ -222,11 +222,11 @@ RESUMEF_NS
 
 inline namespace when_v2
 {
-	template<class... _Awaitable, 
-		class = std::enable_if_t<std::conjunction_v<detail::is_when_task<_Awaitable>...>>
+	template<_WhenTaskT... _Awaitable
+		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
 	>
-	auto when_all(scheduler_t& sch, _Awaitable&&... args) 
-		-> detail::when_future_t<std::tuple<detail::awaitor_result_t<_Awaitable>...> >
+	decltype(auto) when_all(scheduler_t& sch, _Awaitable&&... args)
+	//	-> detail::when_future_t<std::tuple<detail::awaitor_result_t<_Awaitable>...> >
 	{
 		using tuple_type = std::tuple<detail::awaitor_result_t<_Awaitable>...>;
 
@@ -236,14 +236,13 @@ inline namespace when_v2
 		return awaitor;
 	}
 
-	template<class _Iter, 
-		class _Awaitable = decltype(*std::declval<_Iter>()),
-		class = std::enable_if_t<detail::is_when_task_v<_Awaitable>>
+	template<_WhenIterT _Iter
+		COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && detail::is_when_task_v<decltype(*std::declval<_Iter>())>)
 	>
-	auto when_all(scheduler_t& sch, _Iter begin, _Iter end) 
-		-> detail::when_future_t<std::vector<detail::awaitor_result_t<_Awaitable> > >
+	auto when_all(scheduler_t& sch, _Iter begin, _Iter end)
+	//	-> detail::when_future_t<std::vector<detail::awaitor_result_t<decltype(*std::declval<_Iter>())> > >
 	{
-		using value_type = detail::awaitor_result_t<_Awaitable>;
+		using value_type = detail::awaitor_result_t<decltype(*std::declval<_Iter>())>;
 		using vector_type = std::vector<value_type>;
 
 		detail::when_future_t<vector_type> awaitor{ std::distance(begin, end) };
@@ -253,8 +252,8 @@ inline namespace when_v2
 		return awaitor;
 	}
 
-	template<class... _Awaitable,
-		class = std::enable_if_t<std::conjunction_v<detail::is_when_task<_Awaitable>...>>
+	template<_WhenTaskT... _Awaitable
+		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
 	>
 	auto when_all(_Awaitable&&... awaitor) 
 		-> future_t<std::tuple<detail::awaitor_result_t<_Awaitable>...>>
@@ -262,12 +261,11 @@ inline namespace when_v2
 		co_return co_await when_all(*current_scheduler(), std::forward<_Awaitable>(awaitor)...);
 	}
 
-	template<class _Iter,
-		class _Awaitable = decltype(*std::declval<_Iter>()), 
-		class = std::enable_if_t<detail::is_when_task_v<_Awaitable>>
+	template<_WhenIterT _Iter
+		COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && detail::is_when_task_v<decltype(*std::declval<_Iter>())>)
 	>
-	auto when_all(_Iter begin, _Iter end) 
-		-> future_t<std::vector<detail::awaitor_result_t<_Awaitable>>>
+	auto when_all(_Iter begin, _Iter end)
+		-> future_t<std::vector<detail::awaitor_result_t<decltype(*std::declval<_Iter>())>>>
 	{
 		co_return co_await when_all(*current_scheduler(), begin, end);
 	}
@@ -277,11 +275,11 @@ inline namespace when_v2
 
 
 
-	template<class... _Awaitable,
-		class = std::enable_if_t<std::conjunction_v<detail::is_when_task<_Awaitable>...>>
+	template<_WhenTaskT... _Awaitable
+		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
 	>
 	auto when_any(scheduler_t& sch, _Awaitable&&... args) 
-		-> detail::when_future_t<detail::when_any_pair>
+	//	-> detail::when_future_t<detail::when_any_pair>
 	{
 		detail::when_future_t<detail::when_any_pair> awaitor{ sizeof...(_Awaitable) > 0 ? 1 : 0 };
 		awaitor._values->first = -1;
@@ -290,11 +288,10 @@ inline namespace when_v2
 		return awaitor;
 	}
 
-	template<class _Iter,
-		typename _Awaitable = decltype(*std::declval<_Iter>()), 
-		class = std::enable_if_t<detail::is_when_task_v<_Awaitable>>
+	template<_WhenIterT _Iter
+		COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && detail::is_when_task_v<decltype(*std::declval<_Iter>())>)
 	>
-	auto when_any(scheduler_t& sch, _Iter begin, _Iter end) 
+	auto when_any(scheduler_t& sch, _Iter begin, _Iter end)
 		-> detail::when_future_t<detail::when_any_pair>
 	{
 		detail::when_future_t<detail::when_any_pair> awaitor{ begin == end ? 0 : 1 };
@@ -304,8 +301,8 @@ inline namespace when_v2
 		return awaitor;
 	}
 
-	template<class... _Awaitable,
-		class = std::enable_if_t<std::conjunction_v<detail::is_when_task<_Awaitable>...>>
+	template<_WhenTaskT... _Awaitable
+		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
 	>
 	auto when_any(_Awaitable&&... awaitor) 
 		-> future_t<detail::when_any_pair>
@@ -313,9 +310,8 @@ inline namespace when_v2
 		co_return co_await when_any(*current_scheduler(), std::forward<_Awaitable>(awaitor)...);
 	}
 
-	template<class _Iter, 
-		typename _Awaitable = decltype(*std::declval<_Iter>()), 
-		class = std::enable_if_t<detail::is_when_task_v<_Awaitable>>
+	template<_WhenIterT _Iter
+		COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && detail::is_when_task_v<decltype(*std::declval<_Iter>())>)
 	>
 	auto when_any(_Iter begin, _Iter end) 
 		-> future_t<detail::when_any_pair>

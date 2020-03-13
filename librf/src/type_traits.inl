@@ -163,21 +163,35 @@ RESUMEF_NS
 			using value_type = decltype(std::declval<type>().await_resume());
 		};
 
-		template<typename _Function>
-		inline auto _IsCallable(_Function&& _Func, int) -> decltype(_Func(), std::true_type())
-		{
-			(_Func);
-			return std::true_type();
-		}
-		template<typename _Function>
-		inline std::false_type _IsCallable(_Function&&, ...)
-		{
-			return std::false_type();
-		}
-		template<typename _Function>
-		using is_callable = decltype(_IsCallable(std::declval<_Function>(), 0));
-		template<typename _Function>
-		constexpr bool is_callable_v = is_callable<_Function>::value;
+		template<typename _Ty, class = std::void_t<>>
+		struct is_callable : std::false_type{};
+		template<typename _Ty>
+		struct is_callable<_Ty, std::void_t<decltype(std::declval<_Ty>()())>> : std::true_type {};
+		template<typename _Ty>
+		constexpr bool is_callable_v = is_callable<_Ty>::value;
 
+		template<class _Ty, class = std::void_t<>>
+		struct is_iterator : std::false_type {};
+		template<class _Ty>
+		struct is_iterator
+			<_Ty,
+				std::void_t<
+					decltype(++std::declval<_Ty>())
+					, decltype(std::declval<_Ty>() != std::declval<_Ty>())
+					, decltype(*std::declval<_Ty>())
+				>
+			>
+			: std::true_type{};
+		template<class _Ty>
+		struct is_iterator<_Ty&> : is_iterator<_Ty> {};
+		template<class _Ty>
+		struct is_iterator<_Ty&&> : is_iterator<_Ty> {};
+		template<class _Ty>
+		struct is_iterator<const _Ty> : is_iterator<_Ty> {};
+		template<class _Ty>
+		struct is_iterator<const _Ty&> : is_iterator<_Ty> {};
+
+		template<class _Ty>
+		constexpr bool is_iterator_v = is_iterator<remove_cvref_t<_Ty>>::value;
 	}
 }

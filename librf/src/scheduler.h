@@ -30,7 +30,10 @@ RESUMEF_NS
 		void run();
 		//void break_all();
 
-		template<class _Ty, typename = std::enable_if_t<traits::is_callable_v<_Ty> || traits::is_future_v<_Ty> || traits::is_generator_v<_Ty> >>
+		template<class _Ty 
+			COMMA_RESUMEF_ENABLE_IF(traits::is_callable_v<_Ty> || traits::is_future_v<_Ty> || traits::is_generator_v<_Ty>)
+		>
+			RESUMEF_REQUIRES(traits::is_callable_v<_Ty> || traits::is_future_v<_Ty> || traits::is_generator_v<_Ty>)
 		inline void operator + (_Ty&& t_)
 		{
 			if constexpr (traits::is_callable_v<_Ty>)
