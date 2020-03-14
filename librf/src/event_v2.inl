@@ -101,7 +101,7 @@ RESUMEF_NS
 		};
 	}
 
-	namespace event_v2
+	inline namespace event_v2
 	{
 		inline void event_t::signal_all() const noexcept
 		{

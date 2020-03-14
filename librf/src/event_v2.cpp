@@ -104,7 +104,7 @@ RESUMEF_NS
 		}
 	}
 
-	namespace event_v2
+	inline namespace event_v2
 	{
 		event_t::event_t(bool initially)
 			:_event(std::make_shared<detail::event_v2_impl>(initially))

@@ -7,7 +7,7 @@ RESUMEF_NS
 		struct event_v2_impl;
 	}
 
-	namespace event_v2
+	inline namespace event_v2
 	{
 		struct event_t
 		{
@@ -22,6 +22,7 @@ RESUMEF_NS
 			void reset() const noexcept;
 
 			struct [[nodiscard]] awaiter;
+
 			awaiter operator co_await() const noexcept;
 			awaiter wait() const noexcept;
 
@@ -31,25 +32,113 @@ RESUMEF_NS
 			timeout_awaiter wait_for(const std::chrono::duration<_Rep, _Period>& dt) const noexcept;
 			template<class _Clock, class _Duration>
 			timeout_awaiter wait_until(const std::chrono::time_point<_Clock, _Duration>& tp) const noexcept;
+
+
+
+
+
+			template<_IteratorT _Iter
+				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && std::is_same_v<event_t&, decltype(*std::declval<_Iter>())>)
+			>
+			static future_t<intptr_t>
+			wait_any(_Iter begin_, _Iter end_)
+			{
+				when_any_pair idx = co_await when_any(begin_, end_);
+				co_return idx.first;
+			}
+
+			template<class _Cont
+				COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
+			>
+			static future_t<intptr_t>
+			wait_any(_Cont& cnt_)
+			{
+				when_any_pair idx = co_await when_any(std::begin(cnt_), std::end(cnt_));
+				co_return idx.first;
+			}
+
+			template<class _Rep, class _Period, _IteratorT _Iter
+				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && std::is_same_v<event_t&, decltype(*std::declval<_Iter>())>)
+			>
+			static future_t<intptr_t>
+			wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
+			{
+				auto tidx = co_await when_any(sleep_for(dt), when_any(begin_, end_));
+				if (tidx.first == 0) co_return -1;
+
+				when_any_pair idx = any_cast<when_any_pair>(tidx.second);
+				co_return idx.first;
+			}
+
+			template<class _Rep, class _Period, _ContainerT _Cont
+				COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
+			>
+			static future_t<intptr_t>
+			wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Cont& cont)
+			{
+				return wait_any_for(dt, std::begin(cont), std::end(cont));
+			}
+
+
+
+
+			template<_IteratorT _Iter
+				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && std::is_same_v<event_t&, decltype(*std::declval<_Iter>())>)
+			>
+			static future_t<bool>
+			wait_all(_Iter begin_, _Iter end_)
+			{
+				auto vb = co_await when_all(begin_, end_);
+				co_return is_all_succeeded(vb);
+			}
+
+			template<class _Cont
+				COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
+			>
+			static future_t<bool>
+			wait_all(_Cont& cnt_)
+			{
+				auto vb = co_await when_all(std::begin(cnt_), std::end(cnt_));
+				co_return is_all_succeeded(vb);
+			}
+
+			template<class _Rep, class _Period, _IteratorT _Iter
+				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && std::is_same_v<event_t&, decltype(*std::declval<_Iter>())>)
+			>
+			static future_t<bool>
+			wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
+			{
+				auto tidx = co_await when_any(sleep_for(dt), when_all(begin_, end_));
+				if (tidx.first == 0) co_return false;
+
+				std::vector<bool>& vb = any_cast<std::vector<bool>&>(tidx.second);
+				co_return is_all_succeeded(vb);
+			}
+
+			template<class _Rep, class _Period, _ContainerT _Cont
+				COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
+			>
+			static future_t<bool>
+			wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, _Cont& cont)
+			{
+				return wait_all_for(dt, std::begin(cont), std::end(cont));
+			}
+
+			event_t(const event_t&) = default;
+			event_t(event_t&&) = default;
+			event_t& operator = (const event_t&) = default;
+			event_t& operator = (event_t&&) = default;
 		private:
 			event_impl_ptr _event;
 
 			timeout_awaiter wait_until_(const clock_type::time_point& tp) const noexcept;
+			inline static bool is_all_succeeded(const std::vector<bool>& v)
+			{
+				return std::none_of(std::begin(v), std::end(v), [](auto v) 
+					{
+						return v == false;
+					});
+			}
 		};
 	}
-
-	template<class _Rep, class _Period>
-	auto wait_for(event_v2::event_t& e, const std::chrono::duration<_Rep, _Period>& dt)
-	{
-		return e.wait_for(dt);
-	}
-	
-	template<class _Clock, class _Duration>
-	auto wait_until(event_v2::event_t& e, const std::chrono::time_point<_Clock, _Duration>& tp)
-	{
-		return e.wait_until(tp);
-	}
-
-	//when_all_for(dt, args...) -> when_all(wait_for(args, dt)...)
-	//就不再单独为每个支持超时的类提供when_all_for实现了。借助when_all和非成员的wait_for实现
 }

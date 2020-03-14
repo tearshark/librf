@@ -30,6 +30,10 @@ RESUMEF_NS
 		//is_generator_v<T>
 		//判断是不是一个librf的generator_t类
 		//
+		//is_state_pointer<T>
+		//is_state_pointer_v<T>
+		//判断是不是一个librf的state_t类的指针或智能指针
+		//
 		//has_state<T>
 		//has_state_v<T>
 		//判断是否具有_state的成员变量
@@ -42,13 +46,21 @@ RESUMEF_NS
 		//	type:awaitor的类型
 		//	value_type:awaitor::await_resume()的返回值类型
 		//
+		//is_awaitable<T>
+		//is_awaitable_v<T>
+		//判断是否可以被co_await操作。可以是一个awaitor，也可以是重载了成员变量的T::operator co_await()，或者被重载了全局的operator co_awaitor(T)
+		//
 		//is_callable<T>
 		//is_callable_v<T>
 		//判断是不是一个可被调用的类型，如函数，仿函数，lambda等
 		//
-		//is_scheduler_task<T>
-		//is_scheduler_task_v<T>
-		//判断是不是可以被调度器调度的任务。调度器支持future和callable
+		//is_iterator<T>
+		//is_iterator_v<T>
+		//判断是不是一个支持向后迭代的迭代器
+		//
+		//is_container<T>
+		//is_container_v<T>
+		//判断是不是一个封闭区间的容器，或者数组。
 
 		template<class _Ty>
 		struct is_coroutine_handle : std::false_type {};
@@ -163,7 +175,6 @@ RESUMEF_NS
 
 		template<class _Ty, class = std::void_t<>>
 		struct awaitor_traits{};
-
 		template<class _Ty>
 		struct awaitor_traits<_Ty, 
 			std::void_t<decltype(get_awaitor(std::declval<_Ty>()))>
@@ -172,6 +183,16 @@ RESUMEF_NS
 			using type = decltype(get_awaitor(std::declval<_Ty>()));
 			using value_type = decltype(std::declval<type>().await_resume());
 		};
+
+		template<class _Ty, class = std::void_t<>>
+		struct is_awaitable : std::false_type {};
+		template<class _Ty>
+		struct is_awaitable<_Ty, 
+			std::void_t<typename awaitor_traits<_Ty>::value_type>
+		> : std::true_type {};
+		template<typename _Ty>
+		constexpr bool is_awaitable_v = is_awaitable<_Ty>::value;
+
 
 		template<typename _Ty, class = std::void_t<>>
 		struct is_callable : std::false_type{};
@@ -186,14 +207,14 @@ RESUMEF_NS
 		struct is_iterator
 			<_Ty,
 				std::void_t<
-					decltype(++std::declval<_Ty>())
+					decltype(std::declval<_Ty>() + 1)
 					, decltype(std::declval<_Ty>() != std::declval<_Ty>())
 					, decltype(*std::declval<_Ty>())
 				>
 			>
 			: std::true_type{};
 		template<class _Ty>
-		constexpr bool is_iterator_v = is_iterator<remove_cvref_t<_Ty>>::value;
+		constexpr bool is_iterator_v = is_iterator<_Ty>::value;
 
 		template<class _Ty, class = std::void_t<>>
 		struct is_container : std::false_type {};
@@ -201,11 +222,20 @@ RESUMEF_NS
 		struct is_container
 			<_Ty,
 				std::void_t<
-					decltype(std::begin(std::declval<_Ty>()))
-					, decltype(std::end(std::declval<_Ty>()))
+					decltype(std::declval<_Ty>().begin())
+					, decltype(std::declval<_Ty>().end())
 				>
 			>
-			: is_iterator<decltype(std::begin(std::declval<_Ty>()))> {};
+			: std::true_type {};
+			//: is_iterator<decltype(std::declval<_Ty>().begin())> {};
+
+		template<class _Ty, size_t _Size>
+		struct is_container<_Ty[_Size]> : std::true_type {};
+		template<class _Ty, size_t _Size>
+		struct is_container<_Ty(&)[_Size]> : std::true_type {};
+		template<class _Ty, size_t _Size>
+		struct is_container<_Ty(&&)[_Size]> : std::true_type {};
+
 		template<class _Ty>
 		constexpr bool is_container_v = is_container<remove_cvref_t<_Ty>>::value;
 	}

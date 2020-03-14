@@ -139,7 +139,7 @@ void test_wait_timeout_all()
 		intptr_t counter = 0;
 		for (;;)
 		{
-			if (co_await event_t::wait_all_until(system_clock::now() + 500ms, evts))
+			if (co_await event_t::wait_all_for(500ms, evts))
 			{
 				std::cout << counter << std::endl;
 				std::cout << "all event signal!" << std::endl;

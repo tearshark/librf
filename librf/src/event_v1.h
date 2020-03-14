@@ -40,7 +40,7 @@ RESUMEF_NS
 		};
 	}
 
-inline namespace event_v1
+namespace event_v1
 {
 
 	//提供一种在协程和非协程之间同步的手段。
