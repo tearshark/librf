@@ -173,7 +173,7 @@ RESUMEF_NS
 		template<class _Val, _WhenIterT _Iter>
 		inline void when_all_range__(scheduler_t& sch, state_when_t* state, std::vector<_Val> & values, _Iter begin, _Iter end)
 		{
-			using _Awaitable = decltype(*begin);
+			using _Awaitable = std::remove_reference_t<decltype(*begin)>;
 
 			intptr_t _Idx = 0;
 			for (; begin != end; ++begin, ++_Idx)
@@ -189,7 +189,7 @@ RESUMEF_NS
 		{
 			assert(idx >= 0);
 
-			decltype(auto) awaitor = when_real_awaitor(task);
+			auto awaitor = when_real_awaitor(task);
 
 			using value_type = awaitor_result_t<decltype(awaitor)>;
 
@@ -232,10 +232,12 @@ RESUMEF_NS
 		template<_WhenIterT _Iter>
 		inline void when_any_range__(scheduler_t& sch, state_when_t* state, when_any_pair_ptr value, _Iter begin, _Iter end)
 		{
+			using _Awaitable = std::remove_reference_t<decltype(*begin)>;
+
 			intptr_t _Idx = 0;
 			for (; begin != end; ++begin, ++_Idx)
 			{
-				sch + when_any_connector(state, std::move(*begin), value, static_cast<intptr_t>(_Idx));
+				sch + when_any_connector<_Awaitable>(state, *begin, value, static_cast<intptr_t>(_Idx));
 			}
 		}
 	}

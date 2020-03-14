@@ -34,7 +34,11 @@ RESUMEF_NS
 			timeout_awaiter wait_until(const std::chrono::time_point<_Clock, _Duration>& tp) const noexcept;
 
 
-
+			//以下wait_any/wait_all实现，借助when_any/when_all实现。
+			//其接口尽管兼容了v1版本的event_t，但是，其内部细节并没有兼容
+			//v1版本的event_t的wait_any，确保只触发了其中之一，或者超时
+			//而when_any会导致所有的event_t都被触发
+			//改日有空再补上
 
 
 			template<_IteratorT _Iter
