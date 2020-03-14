@@ -3,7 +3,9 @@
 
 RESUMEF_NS
 {
+#ifndef RESUMEF_ENABLE_CONCEPT
 #define RESUMEF_ENABLE_CONCEPT	1
+#endif
 
 #if RESUMEF_ENABLE_CONCEPT
 
@@ -16,7 +18,7 @@ RESUMEF_NS
 	};
 
 	template<typename T> 
-	concept _HasStateT = _AwaitorT<T> && requires(T && v)
+	concept _HasStateT = requires(T && v)
 	{
 		{ v._state };
 	};
@@ -44,11 +46,11 @@ RESUMEF_NS
 		{ ++u } -> T;
 		{ u != v } -> bool;
 		{ *u };
-		//requires _WhenTaskT<*u>;
+		requires _WhenTaskT<decltype(*u)>;
 	};
 
-#define COMMA_RESUMEF_ENABLE_IF(...) ,typename=std::enable_if_t<__VA_ARGS__>
-#define RESUMEF_ENABLE_IF(...) typename=std::enable_if_t<__VA_ARGS__>
+#define COMMA_RESUMEF_ENABLE_IF(...) 
+#define RESUMEF_ENABLE_IF(...) 
 #define RESUMEF_REQUIRES(...) requires __VA_ARGS__
 
 #else

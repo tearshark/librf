@@ -106,7 +106,7 @@ RESUMEF_NS
 		};
 		template<class _Ty>
 		struct awaitor_result_impl<_Ty, true> : awaitor_result_impl<decltype(std::declval<_Ty>()()), false> {};
-		template<class _Ty>
+		template<_WhenTaskT _Ty>
 		using awaitor_result_t = typename awaitor_result_impl<std::remove_reference_t<_Ty>>::value_type;
 
 
@@ -115,7 +115,11 @@ RESUMEF_NS
 		template<class _Ty>
 		constexpr bool is_when_task_v = is_when_task<_Ty>::value;
 
-		template<class _Awaitable>
+		template<class _Ty>
+		constexpr bool is_when_task_iter_v = traits::is_iterator_v<_Ty>
+											&& is_when_task_v<decltype(*std::declval<_Ty>())>;
+
+		template<_WhenTaskT _Awaitable>
 		decltype(auto) when_real_awaitor(_Awaitable&& awaitor)
 		{
 			if constexpr (traits::is_callable_v<_Awaitable>)
@@ -124,7 +128,7 @@ RESUMEF_NS
 				return std::forward<_Awaitable>(awaitor);
 		}
 
-		template<class _Awaitable, class _Ty>
+		template<_WhenTaskT _Awaitable, class _Ty>
 		future_t<> when_all_connector(state_when_t* state, _Awaitable task, _Ty& value)
 		{
 			decltype(auto) awaitor = when_real_awaitor(task);
@@ -141,7 +145,7 @@ RESUMEF_NS
 		{
 		}
 
-		template<class _Tup, size_t _Idx, class _Awaitable, class... _Rest>
+		template<class _Tup, size_t _Idx, _WhenTaskT _Awaitable, _WhenTaskT... _Rest>
 		inline void when_all_one__(scheduler_t& sch, state_when_t* state, _Tup& values, _Awaitable&& awaitable, _Rest&&... rest)
 		{
 			sch + when_all_connector(state, std::forward<_Awaitable>(awaitable), std::get<_Idx>(values));
@@ -149,7 +153,7 @@ RESUMEF_NS
 			when_all_one__<_Tup, _Idx + 1, _Rest...>(sch, state, values, std::forward<_Rest>(rest)...);
 		}
 
-		template<class _Val, class _Iter, typename _Awaitable = decltype(*std::declval<_Iter>())>
+		template<class _Val, _WhenIterT _Iter>
 		inline void when_all_range__(scheduler_t& sch, state_when_t* state, std::vector<_Val> & values, _Iter begin, _Iter end)
 		{
 			intptr_t _Idx = 0;
@@ -164,7 +168,7 @@ RESUMEF_NS
 		using when_any_pair = std::pair<intptr_t, any_t>;
 		using when_any_pair_ptr = std::shared_ptr<when_any_pair>;
 
-		template<class _Awaitable>
+		template<_WhenTaskT _Awaitable>
 		future_t<> when_any_connector(counted_ptr<state_when_t> state, _Awaitable task, when_any_pair_ptr value, intptr_t idx)
 		{
 			assert(idx >= 0);
@@ -201,7 +205,7 @@ RESUMEF_NS
 		{
 		}
 
-		template<class _Awaitable, class... _Rest>
+		template<_WhenTaskT _Awaitable, _WhenTaskT... _Rest>
 		inline void when_any_one__(scheduler_t& sch, state_when_t* state, when_any_pair_ptr value, intptr_t _Idx, _Awaitable&& awaitable, _Rest&&... rest)
 		{
 			sch + when_any_connector(state, std::forward<_Awaitable>(awaitable), value, _Idx);
@@ -209,7 +213,7 @@ RESUMEF_NS
 			when_any_one__(sch, state, value, _Idx + 1, std::forward<_Rest>(rest)...);
 		}
 
-		template<class _Iter>
+		template<_WhenIterT _Iter>
 		inline void when_any_range__(scheduler_t& sch, state_when_t* state, when_any_pair_ptr value, _Iter begin, _Iter end)
 		{
 			intptr_t _Idx = 0;
@@ -225,8 +229,8 @@ inline namespace when_v2
 	template<_WhenTaskT... _Awaitable
 		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
 	>
-	decltype(auto) when_all(scheduler_t& sch, _Awaitable&&... args)
-	//	-> detail::when_future_t<std::tuple<detail::awaitor_result_t<_Awaitable>...> >
+	auto when_all(scheduler_t& sch, _Awaitable&&... args)
+		-> detail::when_future_t<std::tuple<detail::awaitor_result_t<_Awaitable>...> >
 	{
 		using tuple_type = std::tuple<detail::awaitor_result_t<_Awaitable>...>;
 
@@ -237,10 +241,10 @@ inline namespace when_v2
 	}
 
 	template<_WhenIterT _Iter
-		COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && detail::is_when_task_v<decltype(*std::declval<_Iter>())>)
+		COMMA_RESUMEF_ENABLE_IF(detail::is_when_task_iter_v<_Iter>)
 	>
 	auto when_all(scheduler_t& sch, _Iter begin, _Iter end)
-	//	-> detail::when_future_t<std::vector<detail::awaitor_result_t<decltype(*std::declval<_Iter>())> > >
+		-> detail::when_future_t<std::vector<detail::awaitor_result_t<decltype(*std::declval<_Iter>())> > >
 	{
 		using value_type = detail::awaitor_result_t<decltype(*std::declval<_Iter>())>;
 		using vector_type = std::vector<value_type>;
@@ -255,14 +259,14 @@ inline namespace when_v2
 	template<_WhenTaskT... _Awaitable
 		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
 	>
-	auto when_all(_Awaitable&&... awaitor) 
+	auto when_all(_Awaitable&&... awaitor)
 		-> future_t<std::tuple<detail::awaitor_result_t<_Awaitable>...>>
 	{
 		co_return co_await when_all(*current_scheduler(), std::forward<_Awaitable>(awaitor)...);
 	}
 
 	template<_WhenIterT _Iter
-		COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && detail::is_when_task_v<decltype(*std::declval<_Iter>())>)
+		COMMA_RESUMEF_ENABLE_IF(detail::is_when_task_iter_v<_Iter>)
 	>
 	auto when_all(_Iter begin, _Iter end)
 		-> future_t<std::vector<detail::awaitor_result_t<decltype(*std::declval<_Iter>())>>>
@@ -272,14 +276,11 @@ inline namespace when_v2
 
 
 
-
-
-
 	template<_WhenTaskT... _Awaitable
 		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
 	>
-	auto when_any(scheduler_t& sch, _Awaitable&&... args) 
-	//	-> detail::when_future_t<detail::when_any_pair>
+	auto when_any(scheduler_t& sch, _Awaitable&&... args)
+		-> detail::when_future_t<detail::when_any_pair>
 	{
 		detail::when_future_t<detail::when_any_pair> awaitor{ sizeof...(_Awaitable) > 0 ? 1 : 0 };
 		awaitor._values->first = -1;
@@ -289,7 +290,7 @@ inline namespace when_v2
 	}
 
 	template<_WhenIterT _Iter
-		COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && detail::is_when_task_v<decltype(*std::declval<_Iter>())>)
+		COMMA_RESUMEF_ENABLE_IF(detail::is_when_task_iter_v<_Iter>)
 	>
 	auto when_any(scheduler_t& sch, _Iter begin, _Iter end)
 		-> detail::when_future_t<detail::when_any_pair>
@@ -311,7 +312,7 @@ inline namespace when_v2
 	}
 
 	template<_WhenIterT _Iter
-		COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && detail::is_when_task_v<decltype(*std::declval<_Iter>())>)
+		COMMA_RESUMEF_ENABLE_IF(detail::is_when_task_iter_v<_Iter>)
 	>
 	auto when_any(_Iter begin, _Iter end) 
 		-> future_t<detail::when_any_pair>
