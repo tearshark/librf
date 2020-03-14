@@ -115,6 +115,16 @@ RESUMEF_NS
 		constexpr bool is_generator_v = is_generator<remove_cvref_t<_Ty>>::value;
 
 		template<class _Ty, class = std::void_t<>>
+		struct is_state_pointer : std::false_type {};
+		template<class _Ty>
+		struct is_state_pointer<_Ty, std::void_t<std::enable_if_t<std::is_convertible_v<_Ty, state_base_t*>>>> : std::true_type {};
+		template<class _Ty>
+		struct is_state_pointer<counted_ptr<_Ty>> : is_state_pointer<_Ty> {};
+		template<class _Ty>
+		constexpr bool is_state_pointer_v = is_state_pointer<remove_cvref_t<_Ty>>::value;
+
+
+		template<class _Ty, class = std::void_t<>>
 		struct has_state : std::false_type {};
 		template<class _Ty>
 		struct has_state<_Ty, std::void_t<decltype(std::declval<_Ty>()._state)>> : std::true_type {};
@@ -183,15 +193,20 @@ RESUMEF_NS
 			>
 			: std::true_type{};
 		template<class _Ty>
-		struct is_iterator<_Ty&> : is_iterator<_Ty> {};
-		template<class _Ty>
-		struct is_iterator<_Ty&&> : is_iterator<_Ty> {};
-		template<class _Ty>
-		struct is_iterator<const _Ty> : is_iterator<_Ty> {};
-		template<class _Ty>
-		struct is_iterator<const _Ty&> : is_iterator<_Ty> {};
-
-		template<class _Ty>
 		constexpr bool is_iterator_v = is_iterator<remove_cvref_t<_Ty>>::value;
+
+		template<class _Ty, class = std::void_t<>>
+		struct is_container : std::false_type {};
+		template<class _Ty>
+		struct is_container
+			<_Ty,
+				std::void_t<
+					decltype(std::begin(std::declval<_Ty>()))
+					, decltype(std::end(std::declval<_Ty>()))
+				>
+			>
+			: is_iterator<decltype(std::begin(std::declval<_Ty>()))> {};
+		template<class _Ty>
+		constexpr bool is_container_v = is_container<remove_cvref_t<_Ty>>::value;
 	}
 }

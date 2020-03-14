@@ -115,9 +115,8 @@ RESUMEF_NS
 		template<class _Ty>
 		constexpr bool is_when_task_v = is_when_task<_Ty>::value;
 
-		template<class _Ty>
-		constexpr bool is_when_task_iter_v = traits::is_iterator_v<_Ty>
-											&& is_when_task_v<decltype(*std::declval<_Ty>())>;
+		template<class _Ty, class _Task = decltype(*std::declval<_Ty>())>
+		constexpr bool is_when_task_iter_v = traits::is_iterator_v<_Ty> && is_when_task_v<_Task>;
 
 		template<_WhenTaskT _Awaitable>
 		decltype(auto) when_real_awaitor(_Awaitable&& awaitor)
@@ -256,6 +255,14 @@ inline namespace when_v2
 		return awaitor;
 	}
 
+	template<_ContainerT _Cont
+		COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
+	>
+	decltype(auto) when_all(scheduler_t& sch, _Cont& cont)
+	{
+		return when_all(sch, std::begin(cont), std::end(cont));
+	}
+
 	template<_WhenTaskT... _Awaitable
 		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
 	>
@@ -272,6 +279,14 @@ inline namespace when_v2
 		-> future_t<std::vector<detail::awaitor_result_t<decltype(*std::declval<_Iter>())>>>
 	{
 		co_return co_await when_all(*current_scheduler(), begin, end);
+	}
+
+	template<_ContainerT _Cont
+		COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
+	>
+	decltype(auto) when_all(_Cont& cont)
+	{
+		return when_all(std::begin(cont), std::end(cont));
 	}
 
 
@@ -302,6 +317,14 @@ inline namespace when_v2
 		return awaitor;
 	}
 
+	template<_ContainerT _Cont
+		COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
+	>
+	decltype(auto) when_any(scheduler_t& sch, _Cont& cont)
+	{
+		return when_any(sch, std::begin(cont), std::end(cont));
+	}
+
 	template<_WhenTaskT... _Awaitable
 		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
 	>
@@ -318,6 +341,14 @@ inline namespace when_v2
 		-> future_t<detail::when_any_pair>
 	{
 		co_return co_await when_any(*current_scheduler(), begin, end);
+	}
+
+	template<_ContainerT _Cont
+		COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
+	>
+	decltype(auto) when_any(_Cont& cont)
+	{
+		return when_any(std::begin(cont), std::end(cont));
 	}
 
 }

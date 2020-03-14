@@ -8,11 +8,8 @@
 
 #include "librf.h"
 
-#if _HAS_CXX17 || RESUMEF_USE_BOOST_ANY
-
 using namespace resumef;
 
-/*
 void test_when_any()
 {
 	using namespace std::chrono;
@@ -61,12 +58,14 @@ void test_when_any()
 		};
 
 		std::vector<future_t<int> > v{ my_sleep("g"), my_sleep("h"), my_sleep("i") };
-		vals = co_await when_any(std::begin(v), std::end(v));
+		//vals = co_await when_any(*this_scheduler(), std::begin(v), std::end(v));
+		//vals = co_await when_any(std::begin(v), std::end(v));
+		vals = co_await when_any(v);
+
 		std::cout << "any range done! index is " << vals.first << ", valus is " << resumef::any_cast<int>(vals.second) << std::endl;
 	};
 	this_scheduler()->run_until_notask();
 }
-*/
 
 void test_when_all()
 {
@@ -91,7 +90,6 @@ void test_when_all()
 
 	GO
 	{
-		/*
 		co_await when_all();
 		std::cout << "when all: zero!" << std::endl << std::endl;
 
@@ -129,26 +127,24 @@ void test_when_all()
 		auto def = co_await when_all(my_sleep("d"), my_sleep_v("e"), my_sleep("f"));
 		//def.1 is std::ignore
 		std::cout << "when all - 4:" << std::get<0>(def) << "," << std::get<2>(def) << std::endl << std::endl;
-		*/
 
 		std::vector<future_t<int> > v{ my_sleep("g"), my_sleep("h"), my_sleep("i") };
-		auto vals = co_await when_all(*this_scheduler(), std::begin(v), std::end(v));
-		//std::cout << "when all - 5:" << vals[0] << "," << vals[1] << "," << vals[2] << "," << std::endl << std::endl;
+		//auto vals = co_await when_all(*this_scheduler(), std::begin(v), std::end(v));
+		//auto vals = co_await when_all(*this_scheduler(), v);
+		auto vals = co_await when_all(v);
+		std::cout << "when all - 5:" << vals[0] << "," << vals[1] << "," << vals[2] << "," << std::endl << std::endl;
 
-		//std::cout << "all range done!" << std::endl;
+		std::cout << "all range done!" << std::endl;
 	};
 	this_scheduler()->run_until_notask();
 }
-#endif
 
 void resumable_main_when_all()
 {
-#if _HAS_CXX17 || RESUMEF_USE_BOOST_ANY
 	srand((uint32_t)time(nullptr));
 
-	//test_when_any();
+	test_when_any();
 	std::cout << std::endl;
 	test_when_all();
-#endif
 }
 

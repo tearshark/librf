@@ -39,8 +39,11 @@
 #endif
 
 #include "src/def.h"
+#include "src/macro_def.inl"
 #include "src/spinlock.h"
 #include "src/counted_ptr.h"
+#include "src/type_traits.inl"
+#include "src/type_concept.inl"
 #include "src/state.h"
 #include "src/future.h"
 #include "src/promise.h"
