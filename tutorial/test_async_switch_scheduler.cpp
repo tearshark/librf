@@ -59,28 +59,28 @@ static future_t<> resumable_get_long_switch_scheduler(int64_t val, channel_t<boo
 	std::cout << ", scheduler = " << current_scheduler();
 	std::cout << ", value = " << val << std::endl;
 
-	co_await *sch_in_thread;
+	co_await via(sch_in_thread);
 	val = co_await async_get_long_switch_scheduler(val);
 
 	std::cout << "thread = " << std::this_thread::get_id();
 	std::cout << ", scheduler = " << current_scheduler();
 	std::cout << ", value = " << val << std::endl;
 
-	co_await *sch_in_main;
+	co_await via(sch_in_main);
 	val = co_await async_get_long_switch_scheduler(val);
 
 	std::cout << "thread = " << std::this_thread::get_id();
 	std::cout << ", scheduler = " << current_scheduler();
 	std::cout << ", value = " << val << std::endl;
 
-	co_await *sch_in_thread;
+	co_await via(sch_in_thread);
 	val = co_await async_get_long_switch_scheduler(val);
 
 	std::cout << "thread = " << std::this_thread::get_id();
 	std::cout << ", scheduler = " << current_scheduler();
 	std::cout << ", value = " << val << std::endl;
 
-	co_await *sch_in_thread;	//fake switch
+	co_await via(sch_in_thread);	//fake switch
 	val = co_await async_get_long_switch_scheduler(val);
 
 	std::cout << "thread = " << std::this_thread::get_id();
