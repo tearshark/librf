@@ -24,9 +24,12 @@ RESUMEF_NS
 
 		public:
 			static constexpr bool USE_SPINLOCK = true;
+			static constexpr bool USE_LINK_QUEUE = false;
 
-			using lock_type = std::conditional_t<USE_SPINLOCK, spinlock, std::deque<std::recursive_mutex>>;
-			using wait_queue_type = intrusive_link_queue<state_event_t, counted_ptr<state_event_t>>;
+			using lock_type = std::conditional_t<USE_SPINLOCK, spinlock, std::recursive_mutex>;
+			using state_event_ptr = counted_ptr<state_event_t>;
+			using link_state_queue = intrusive_link_queue<state_event_t, state_event_ptr>;
+			using wait_queue_type = std::conditional_t<USE_LINK_QUEUE, link_state_queue, std::list<state_event_ptr>>;
 
 			friend struct state_event_t;
 

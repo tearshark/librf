@@ -71,9 +71,36 @@ RESUMEF_NS
 		{
 		}
 
+		template<class _Ty, class _Ptr>
+		static auto try_pop_list(intrusive_link_queue<_Ty, _Ptr>& list)
+		{
+			return list.try_pop();
+		}
+		template<class _Ptr>
+		static _Ptr try_pop_list(std::list<_Ptr>& list)
+		{
+			if (!list.empty())
+			{
+				_Ptr ptr = list.front();
+				list.pop_front();
+				return ptr;
+			}
+			return nullptr;
+		}
+		template<class _Ty, class _Ptr>
+		static void clear_list(intrusive_link_queue<_Ty, _Ptr>& list)
+		{
+			for (; list.try_pop() != nullptr;);
+		}
+		template<class _Ptr>
+		static void clear_list(std::list<_Ptr>& list)
+		{
+			list.clear();
+		}
+
 		event_v2_impl::~event_v2_impl()
 		{
-			for (; _wait_awakes.try_pop() != nullptr;);
+			clear_list(_wait_awakes);
 		}
 
 		void event_v2_impl::signal_all() noexcept
@@ -83,7 +110,7 @@ RESUMEF_NS
 			_counter.store(0, std::memory_order_release);
 
 			counted_ptr<state_event_t> state;
-			for (; (state = _wait_awakes.try_pop()) != nullptr;)
+			for (; (state = try_pop_list(_wait_awakes)) != nullptr;)
 			{
 				(void)state->on_notify();
 			}
@@ -94,7 +121,7 @@ RESUMEF_NS
 			scoped_lock<lock_type> lock_(_lock);
 
 			counted_ptr<state_event_t> state;
-			for (; (state = _wait_awakes.try_pop()) != nullptr;)
+			for (; (state = try_pop_list(_wait_awakes)) != nullptr;)
 			{
 				if (state->on_notify())
 					return;

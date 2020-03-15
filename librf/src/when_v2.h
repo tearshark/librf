@@ -101,14 +101,20 @@ RESUMEF_NS
 		};
 
 		template<class _Ty, bool = traits::is_callable_v<_Ty>>
-		struct awaitor_result_impl
+		struct awaitor_result_impl2
 		{
 			using value_type = typename convert_void_2_ignore<
 				typename traits::awaitor_traits<_Ty>::value_type
 			>::value_type;
 		};
 		template<class _Ty>
-		struct awaitor_result_impl<_Ty, true> : awaitor_result_impl<decltype(std::declval<_Ty>()()), false> {};
+		struct awaitor_result_impl2<_Ty, true> : awaitor_result_impl2<decltype(std::declval<_Ty>()()), false> {};
+
+		template<class... _Ty>
+		struct awaitor_result_impl{};
+
+		template<class _Ty>
+		struct awaitor_result_impl<_Ty> : public awaitor_result_impl2<_Ty> {};
 		template<_WhenTaskT _Ty>
 		using awaitor_result_t = typename awaitor_result_impl<std::remove_reference_t<_Ty>>::value_type;
 

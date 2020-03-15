@@ -159,7 +159,7 @@ RESUMEF_NS
 			{
 				return operator co_await(static_cast<T&&>(value));
 			}
-			template<class T, std::enable_if_t<is_awaitor_v<T&&>, int> = 0>
+			template<class T, std::enable_if_t<is_awaitor_v<T>, int> = 0>
 			T&& get_awaitor_impl(T&& value, std::any) noexcept
 			{
 				return static_cast<T&&>(value);
