@@ -1,8 +1,12 @@
 #pragma once
 
 #ifndef RESUMEF_ENABLE_CONCEPT
-#define RESUMEF_ENABLE_CONCEPT	0
-#endif
+#ifdef __cpp_lib_concepts
+#define RESUMEF_ENABLE_CONCEPT	1
+#else
+#define RESUMEF_ENABLE_CONCEPT	1
+#endif	//#ifdef __cpp_lib_concepts
+#endif	//#ifndef RESUMEF_ENABLE_CONCEPT
 
 #if RESUMEF_ENABLE_CONCEPT
 #include <concepts>
@@ -14,7 +18,7 @@ RESUMEF_NS
 #if RESUMEF_ENABLE_CONCEPT
 
 	template<typename T>
-	concept _AwaitorT = requires(T && v)
+	concept _AwaitorT = requires(T&& v)
 	{
 		{ v.await_ready() } -> bool;
 		{ v.await_suspend(std::declval<std::experimental::coroutine_handle<promise_t<>>>()) };
@@ -22,7 +26,7 @@ RESUMEF_NS
 	};
 
 	template<typename T> 
-	concept _HasStateT = requires(T && v)
+	concept _HasStateT = requires(T&& v)
 	{
 		{ v._state };
 		{ traits::is_state_pointer_v<decltype(v._state)> != false };
@@ -43,10 +47,16 @@ RESUMEF_NS
 	concept _GeneratorT = std::is_same_v<T, generator_t<_Ty>>;
 
 	template<typename T>
-	concept _WhenTaskT = _AwaitorT<T> || _CallableT<T>;
+	concept _AwaitableT = requires(T&& v)
+	{
+		{ traits::get_awaitor(v) };
+	};
 
 	template<typename T>
-	concept _IteratorT = requires(T && u, T && v)
+	concept _WhenTaskT = _AwaitableT<T> || _CallableT<T>;
+
+	template<typename T>
+	concept _IteratorT = requires(T&& u, T&& v)
 	{
 		{ ++u }->T;
 		{ u != v } -> bool;
@@ -54,13 +64,13 @@ RESUMEF_NS
 	};
 
 	template<typename T>
-	concept _WhenIterT = _IteratorT<T> && requires(T&& u, T&& v)
+	concept _WhenIterT = _IteratorT<T> && requires(T&& u)
 	{
 		requires _WhenTaskT<decltype(*u)>;
 	};
 
 	template<typename T>
-	concept _ContainerT = requires(T && v)
+	concept _ContainerT = requires(T&& v)
 	{
 		{ std::begin(v) };
 		{ std::end(v) };
@@ -80,6 +90,7 @@ RESUMEF_NS
 #define _FutureT typename
 #define _CallableT typename
 #define _GeneratorT typename
+#define _AwaitableT typename
 #define _WhenTaskT typename
 #define _IteratorT typename
 #define _WhenIterT typename
