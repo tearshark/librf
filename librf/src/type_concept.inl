@@ -49,7 +49,7 @@ RESUMEF_NS
 	template<typename T>
 	concept _AwaitableT = requires(T&& v)
 	{
-		{ traits::get_awaitor(v) };
+		{ traits::get_awaitor(v) } ->_AwaitorT;
 	};
 
 	template<typename T>
@@ -66,17 +66,15 @@ RESUMEF_NS
 	template<typename T>
 	concept _WhenIterT = _IteratorT<T> && requires(T&& u)
 	{
-		requires _WhenTaskT<decltype(*u)>;
+		{ *u } ->_WhenTaskT;
 	};
 
 	template<typename T>
 	concept _ContainerT = requires(T&& v)
 	{
-		{ std::begin(v) };
-		{ std::end(v) };
+		{ std::begin(v) } ->_IteratorT;
+		{ std::end(v) } ->_IteratorT;
 		requires std::same_as<decltype(std::begin(v)), decltype(std::end(v))>;
-		requires _IteratorT<decltype(std::begin(v))>;
-		requires _IteratorT<decltype(std::end(v))>;
 	};
 
 #define COMMA_RESUMEF_ENABLE_IF(...) 
