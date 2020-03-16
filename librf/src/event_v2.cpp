@@ -22,22 +22,22 @@ RESUMEF_NS
 
 		void state_event_t::on_cancel() noexcept
 		{
-			bool* oldValue = _value.load(std::memory_order_acquire);
+			event_v2_impl** oldValue = _value.load(std::memory_order_acquire);
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
 			{
-				*oldValue = false;
+				*oldValue = nullptr;
 				_thandler.stop();
 
 				this->_coro = nullptr;
 			}
 		}
 
-		bool state_event_t::on_notify()
+		bool state_event_t::on_notify(event_v2_impl* eptr)
 		{
-			bool* oldValue = _value.load(std::memory_order_acquire);
+			event_v2_impl** oldValue = _value.load(std::memory_order_acquire);
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
 			{
-				*oldValue = true;
+				*oldValue = eptr;
 				_thandler.stop();
 
 				assert(this->_scheduler != nullptr);
@@ -51,10 +51,10 @@ RESUMEF_NS
 
 		bool state_event_t::on_timeout()
 		{
-			bool* oldValue = _value.load(std::memory_order_acquire);
+			event_v2_impl** oldValue = _value.load(std::memory_order_acquire);
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
 			{
-				*oldValue = false;
+				*oldValue = nullptr;
 				_thandler.reset();
 
 				assert(this->_scheduler != nullptr);
@@ -112,7 +112,7 @@ RESUMEF_NS
 			state_event_ptr state;
 			for (; (state = try_pop_list(_wait_awakes)) != nullptr;)
 			{
-				(void)state->on_notify();
+				(void)state->on_notify(this);
 			}
 		}
 
@@ -123,7 +123,7 @@ RESUMEF_NS
 			state_event_ptr state;
 			for (; (state = try_pop_list(_wait_awakes)) != nullptr;)
 			{
-				if (state->on_notify())
+				if (state->on_notify(this))
 					return;
 			}
 
@@ -138,13 +138,17 @@ RESUMEF_NS
 		{
 		}
 
+		event_t::event_t(std::adopt_lock_t)
+		{
+		}
+
 		event_t::~event_t()
 		{
 		}
 
 		event_t::timeout_awaiter event_t::wait_until_(const clock_type::time_point& tp) const noexcept
 		{
-			return { _event, tp };
+			return { _event.get(), tp };
 		}
 	}
 }

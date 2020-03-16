@@ -58,7 +58,6 @@ static void test_notify_all()
 	tt.join();
 }
 
-//目前还没法测试在多线程调度下，是否线程安全
 static void test_notify_one()
 {
 	using namespace std::chrono;

@@ -129,7 +129,7 @@ RESUMEF_NS
 
 	bool state_future_t::has_handler() const noexcept
 	{
-		scoped_lock<lock_type> __guard(_mtx);
+		scoped_lock<lock_type> __guard(this->_mtx);
 		return has_handler_skip_lock();
 	}
 

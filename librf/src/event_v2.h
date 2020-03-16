@@ -15,6 +15,7 @@ RESUMEF_NS
 			using clock_type = std::chrono::system_clock;
 
 			event_t(bool initially = false);
+			event_t(std::adopt_lock_t);
 			~event_t();
 
 			void signal_all() const noexcept;
@@ -40,27 +41,18 @@ RESUMEF_NS
 			//而when_any会导致所有的event_t都被触发
 			//改日有空再补上
 
+			template<class _Iter>
 			struct [[nodiscard]] any_awaiter;
 
 			template<class _Iter
 				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_of_v<_Iter, event_t>)
 			> RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
-			static future_t<intptr_t>
-			wait_any(_Iter begin_, _Iter end_)
-			{
-				when_any_pair idx = co_await when_any(begin_, end_);
-				co_return idx.first;
-			}
+			static auto wait_any(_Iter begin_, _Iter end_)->any_awaiter<_Iter>;
 
 			template<class _Cont
 				COMMA_RESUMEF_ENABLE_IF(traits::is_container_of_v<_Cont, event_t>)
 			> RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-			static future_t<intptr_t>
-			wait_any(_Cont& cnt_)
-			{
-				when_any_pair idx = co_await when_any(std::begin(cnt_), std::end(cnt_));
-				co_return idx.first;
-			}
+			static auto wait_any(_Cont& cnt_)->any_awaiter<decltype(std::begin(cnt_))>;
 
 			template<class _Rep, class _Period, class _Iter
 				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_of_v<_Iter, event_t>)
@@ -134,6 +126,8 @@ RESUMEF_NS
 			event_t& operator = (const event_t&) = default;
 			event_t& operator = (event_t&&) = default;
 		private:
+			//friend struct any_awaiter;
+
 			event_impl_ptr _event;
 
 			timeout_awaiter wait_until_(const clock_type::time_point& tp) const noexcept;

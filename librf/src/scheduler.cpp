@@ -108,7 +108,7 @@ RESUMEF_NS
 		sptr->set_scheduler(this);
 
 		{
-			scoped_lock<spinlock, spinlock> __guard(_lock_ready, _lock_running);
+			scoped_lock<spinlock> __guard(_lock_ready);
 			_ready_task.emplace(sptr, task);
 		}
 

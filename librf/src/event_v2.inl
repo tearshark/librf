@@ -64,7 +64,7 @@ RESUMEF_NS
 
 		struct state_event_t : public state_base_t
 		{
-			state_event_t(bool& val)
+			state_event_t(event_v2_impl*& val)
 				: _value(&val)
 			{}
 
@@ -72,7 +72,7 @@ RESUMEF_NS
 			virtual bool has_handler() const  noexcept override;
 
 			void on_cancel() noexcept;
-			bool on_notify();
+			bool on_notify(event_v2_impl* eptr);
 			bool on_timeout();
 
 			//将自己加入到通知链表里
@@ -80,8 +80,8 @@ RESUMEF_NS
 			scheduler_t* on_await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 			{
 				_PromiseT& promise = handler.promise();
-				auto* parent_state = promise.get_state();
-				scheduler_t* sch = parent_state->get_scheduler();
+				auto* parent = promise.get_state();
+				scheduler_t* sch = parent->get_scheduler();
 
 				this->_scheduler = sch;
 				this->_coro = handler;
@@ -93,14 +93,14 @@ RESUMEF_NS
 			typedef spinlock lock_type;
 
 			//为浸入式单向链表提供的next指针
-			counted_ptr<state_event_t> _next = nullptr;
+			//counted_ptr<state_event_t> _next = nullptr;
 			timer_handler _thandler;
 		private:
 			//_value引用awaitor保存的值，这样可以尽可能减少创建state的可能。而不必进入没有state就没有value实体被用于返回。
 			//在调用on_notify()或on_timeout()任意之一后，置为nullptr。
 			//这样来保证要么超时了，要么响应了signal的通知了。
 			//这个指针在on_notify()和on_timeout()里，当作一个互斥的锁来防止同时进入两个函数
-			std::atomic<bool*> _value;
+			std::atomic<event_v2_impl**> _value;
 		};
 	}
 
@@ -123,77 +123,71 @@ RESUMEF_NS
 
 		struct [[nodiscard]] event_t::awaiter
 		{
-			awaiter(event_impl_ptr evt) noexcept
-				: _event(std::move(evt))
+			awaiter(detail::event_v2_impl* evt) noexcept
+				: _event(evt)
 			{
 			}
 
 			bool await_ready() noexcept
 			{
-				return (_value = _event->try_wait_one());
+				return _event->try_wait_one();
 			}
 
 			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend(coroutine_handle<_PromiseT> handler)
 			{
-				scoped_lock<detail::event_v2_impl::lock_type> lock_(_event->_lock);
+				detail::event_v2_impl* evt = _event;
+				scoped_lock<detail::event_v2_impl::lock_type> lock_(evt->_lock);
 
-				if ((_value = _event->try_wait_one()) != false)
+				if (evt->try_wait_one())
 					return false;
 
-				_state = new detail::state_event_t(_value);
+				_state = new detail::state_event_t(_event);
+				_event = nullptr;
 				(void)_state->on_await_suspend(handler);
 
-				_event->add_wait_list(_state.get());
+				evt->add_wait_list(_state.get());
 
 				return true;
 			}
 
 			bool await_resume() noexcept
 			{
-				return _value;
+				return _event != nullptr;
 			}
-		private:
-			std::shared_ptr<detail::event_v2_impl> _event;
+
+		protected:
+			detail::event_v2_impl* _event;
 			counted_ptr<detail::state_event_t> _state;
-			bool _value = false;
 		};
 
 		inline event_t::awaiter event_t::operator co_await() const noexcept
 		{
-			return { _event };
+			return { _event.get() };
 		}
 
 		inline event_t::awaiter event_t::wait() const noexcept
 		{
-			return { _event };
+			return { _event.get() };
 		}
 
-		struct [[nodiscard]] event_t::timeout_awaiter
+		struct [[nodiscard]] event_t::timeout_awaiter : public event_t::awaiter
 		{
-			timeout_awaiter(event_impl_ptr evt, clock_type::time_point tp) noexcept
-				: _event(std::move(evt))
+			timeout_awaiter(detail::event_v2_impl* evt, clock_type::time_point tp) noexcept
+				: awaiter(evt)
 				, _tp(tp)
 			{
-			}
-
-			bool await_ready() noexcept
-			{
-				return (_value = _event->try_wait_one());
 			}
 
 			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend(coroutine_handle<_PromiseT> handler)
 			{
-				scoped_lock<detail::event_v2_impl::lock_type> lock_(_event->_lock);
-
-				if ((_value = _event->try_wait_one()) != false)
+				if (!awaiter::await_suspend(handler))
 					return false;
 
-				_state = new detail::state_event_t(_value);
-				scheduler_t* sch = _state->on_await_suspend(handler);
-
-				_event->add_wait_list(_state.get());
+				_PromiseT& promise = handler.promise();
+				auto* parent_state = promise.get_state();
+				scheduler_t* sch = parent_state->get_scheduler();
 
 				_state->_thandler = sch->timer()->add_handler(_tp, [_state=_state](bool canceld)
 					{
@@ -203,16 +197,8 @@ RESUMEF_NS
 
 				return true;
 			}
-
-			bool await_resume() noexcept
-			{
-				return _value;
-			}
 		private:
-			std::shared_ptr<detail::event_v2_impl> _event;
-			counted_ptr<detail::state_event_t> _state;
 			clock_type::time_point _tp;
-			bool _value = false;
 		};
 
 		template<class _Rep, class _Period>
@@ -225,6 +211,108 @@ RESUMEF_NS
 		inline event_t::timeout_awaiter event_t::wait_until(const std::chrono::time_point<_Clock, _Duration>& tp) const noexcept
 		{
 			return wait_until_(std::chrono::time_point_cast<clock_type::duration>(tp));
+		}
+
+
+		template<class _Iter>
+		struct [[nodiscard]] event_t::any_awaiter
+		{
+			any_awaiter(_Iter begin, _Iter end) noexcept
+				: _begin(begin)
+				, _end(end)
+			{
+			}
+
+			bool await_ready() noexcept
+			{
+				if (_begin == _end)
+					return true;
+
+				for (auto iter = _begin; iter != _end; ++iter)
+				{
+					detail::event_v2_impl* evt = (*iter)._event.get();
+					if (evt->try_wait_one())
+					{
+						_event = evt;
+						return true;
+					}
+				}
+
+				return false;
+			}
+
+			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			{
+				std::vector<detail::event_v2_impl::lock_type> lockes;
+				lockes.reserve(std::distance(_begin, _end));
+
+				for (auto iter = _begin; iter != _end; ++iter)
+				{
+					detail::event_v2_impl* evt = (*iter)._event.get();
+					lockes.push_back(evt->_lock);
+				}
+
+				scoped_lock_range<detail::event_v2_impl::lock_type> lock_(lockes);
+
+				for (auto iter = _begin; iter != _end; ++iter)
+				{
+					detail::event_v2_impl* evt = (*iter)._event.get();
+					if (evt->try_wait_one())
+					{
+						_event = evt;
+						return false;
+					}
+				}
+
+				_state = new detail::state_event_t(_event);
+				(void)_state->on_await_suspend(handler);
+
+				for (auto iter = _begin; iter != _end; ++iter)
+				{
+					detail::event_v2_impl* evt = (*iter)._event.get();
+					evt->add_wait_list(_state.get());
+				}
+
+				return true;
+			}
+
+			intptr_t await_resume() noexcept
+			{
+				if (_begin == _end)
+					return 0;
+				if (_event == nullptr)
+					return -1;
+
+				intptr_t idx = 0;
+				for (auto iter = _begin; iter != _end; ++iter, ++idx)
+				{
+					detail::event_v2_impl* evt = (*iter)._event.get();
+					if (evt == _event)
+						return idx;
+				}
+
+				return -1;
+			}
+		private:
+			detail::event_v2_impl* _event = nullptr;
+			counted_ptr<detail::state_event_t> _state;
+			_Iter _begin;
+			_Iter _end;
+		};
+
+		template<class _Iter COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
+		RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
+		auto event_t::wait_any(_Iter begin_, _Iter end_) ->event_t::any_awaiter<_Iter>
+		{
+			return { begin_, end_ };
+		}
+
+		template<class _Cont COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
+		RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
+		auto event_t::wait_any(_Cont& cnt_) ->event_t::any_awaiter<decltype(std::begin(cnt_))>
+		{
+			return { std::begin(cnt_), std::end(cnt_) };
 		}
 	}
 }

@@ -2,9 +2,9 @@
 
 #ifndef RESUMEF_ENABLE_CONCEPT
 #ifdef __cpp_lib_concepts
-#define RESUMEF_ENABLE_CONCEPT	1
+#define RESUMEF_ENABLE_CONCEPT	0
 #else
-#define RESUMEF_ENABLE_CONCEPT	1
+#define RESUMEF_ENABLE_CONCEPT	0
 #endif	//#ifdef __cpp_lib_concepts
 #endif	//#ifndef RESUMEF_ENABLE_CONCEPT
 
@@ -89,6 +89,7 @@ RESUMEF_NS
 		{ *std::begin(u) } ->std::same_as<E&>;
 	};
 
+#define COMMA_RESUMEF_ENABLE_IF_TYPENAME() 
 #define COMMA_RESUMEF_ENABLE_IF(...) 
 #define RESUMEF_ENABLE_IF(...) 
 #define RESUMEF_REQUIRES(...) requires __VA_ARGS__
@@ -108,6 +109,7 @@ RESUMEF_NS
 #define _ContainerT typename
 #define _ContainerOfT typename
 
+#define COMMA_RESUMEF_ENABLE_IF_TYPENAME() ,typename _EnableIf
 #define COMMA_RESUMEF_ENABLE_IF(...) ,typename=std::enable_if_t<__VA_ARGS__>
 #define RESUMEF_ENABLE_IF(...) typename=std::enable_if_t<__VA_ARGS__>
 #define RESUMEF_REQUIRES(...) 
