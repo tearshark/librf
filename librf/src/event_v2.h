@@ -40,10 +40,11 @@ RESUMEF_NS
 			//而when_any会导致所有的event_t都被触发
 			//改日有空再补上
 
+			struct [[nodiscard]] any_awaiter;
 
-			template<_IteratorT _Iter
-				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && std::is_same_v<event_t&, decltype(*std::declval<_Iter>())>)
-			>
+			template<class _Iter
+				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_of_v<_Iter, event_t>)
+			> RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
 			static future_t<intptr_t>
 			wait_any(_Iter begin_, _Iter end_)
 			{
@@ -52,8 +53,8 @@ RESUMEF_NS
 			}
 
 			template<class _Cont
-				COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
-			>
+				COMMA_RESUMEF_ENABLE_IF(traits::is_container_of_v<_Cont, event_t>)
+			> RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
 			static future_t<intptr_t>
 			wait_any(_Cont& cnt_)
 			{
@@ -61,9 +62,9 @@ RESUMEF_NS
 				co_return idx.first;
 			}
 
-			template<class _Rep, class _Period, _IteratorT _Iter
-				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && std::is_same_v<event_t&, decltype(*std::declval<_Iter>())>)
-			>
+			template<class _Rep, class _Period, class _Iter
+				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_of_v<_Iter, event_t>)
+			> RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
 			static future_t<intptr_t>
 			wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
 			{
@@ -74,9 +75,9 @@ RESUMEF_NS
 				co_return idx.first;
 			}
 
-			template<class _Rep, class _Period, _ContainerT _Cont
-				COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
-			>
+			template<class _Rep, class _Period, class _Cont
+				COMMA_RESUMEF_ENABLE_IF(traits::is_container_of_v<_Cont, event_t>)
+			> RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
 			static future_t<intptr_t>
 			wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Cont& cont)
 			{
@@ -86,9 +87,9 @@ RESUMEF_NS
 
 
 
-			template<_IteratorT _Iter
-				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && std::is_same_v<event_t&, decltype(*std::declval<_Iter>())>)
-			>
+			template<class _Iter
+				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_of_v<_Iter, event_t>)
+			> RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
 			static future_t<bool>
 			wait_all(_Iter begin_, _Iter end_)
 			{
@@ -97,8 +98,8 @@ RESUMEF_NS
 			}
 
 			template<class _Cont
-				COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
-			>
+				COMMA_RESUMEF_ENABLE_IF(traits::is_container_of_v<_Cont, event_t>)
+			> RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
 			static future_t<bool>
 			wait_all(_Cont& cnt_)
 			{
@@ -106,9 +107,9 @@ RESUMEF_NS
 				co_return is_all_succeeded(vb);
 			}
 
-			template<class _Rep, class _Period, _IteratorT _Iter
-				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_v<_Iter> && std::is_same_v<event_t&, decltype(*std::declval<_Iter>())>)
-			>
+			template<class _Rep, class _Period, class _Iter
+				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_of_v<_Iter, event_t>)
+			> RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
 			static future_t<bool>
 			wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
 			{
@@ -119,9 +120,9 @@ RESUMEF_NS
 				co_return is_all_succeeded(vb);
 			}
 
-			template<class _Rep, class _Period, _ContainerT _Cont
-				COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
-			>
+			template<class _Rep, class _Period, class _Cont
+				COMMA_RESUMEF_ENABLE_IF(traits::is_container_of_v<_Cont, event_t>)
+			> RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
 			static future_t<bool>
 			wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, _Cont& cont)
 			{

@@ -109,7 +109,7 @@ RESUMEF_NS
 
 			_counter.store(0, std::memory_order_release);
 
-			counted_ptr<state_event_t> state;
+			state_event_ptr state;
 			for (; (state = try_pop_list(_wait_awakes)) != nullptr;)
 			{
 				(void)state->on_notify();
@@ -120,7 +120,7 @@ RESUMEF_NS
 		{
 			scoped_lock<lock_type> lock_(_lock);
 
-			counted_ptr<state_event_t> state;
+			state_event_ptr state;
 			for (; (state = try_pop_list(_wait_awakes)) != nullptr;)
 			{
 				if (state->on_notify())

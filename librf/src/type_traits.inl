@@ -58,9 +58,15 @@ RESUMEF_NS
 		//is_iterator_v<T>
 		//判断是不是一个支持向后迭代的迭代器
 		//
+		//is_iterator_of_v<T, E>
+		//判断是不是一个支持向后迭代的迭代器，并且迭代器通过 operator *()返回的类型是 E&。
+		//
 		//is_container<T>
 		//is_container_v<T>
 		//判断是不是一个封闭区间的容器，或者数组。
+		//
+		//is_container_of_v<T, E>
+		//判断是不是一个封闭区间的容器，或者数组。其元素类型是E。
 
 		template<class _Ty>
 		struct is_coroutine_handle : std::false_type {};
@@ -215,6 +221,11 @@ RESUMEF_NS
 			: std::true_type{};
 		template<class _Ty>
 		constexpr bool is_iterator_v = is_iterator<_Ty>::value;
+		template<class _Ty, class _Ety>
+		constexpr bool is_iterator_of_v = std::conjunction<
+				is_iterator<_Ty>
+				, std::is_same<_Ety&, decltype(*std::declval<_Ty>())>
+			>::value;
 
 		template<class _Ty, class = std::void_t<>>
 		struct is_container : std::false_type {};
@@ -222,13 +233,11 @@ RESUMEF_NS
 		struct is_container
 			<_Ty,
 				std::void_t<
-					decltype(std::declval<_Ty>().begin())
-					, decltype(std::declval<_Ty>().end())
+					decltype(std::begin(std::declval<_Ty>()))
+					, decltype(std::end(std::declval<_Ty>()))
 				>
 			>
-			: std::true_type {};
-			//: is_iterator<decltype(std::declval<_Ty>().begin())> {};
-
+			: is_iterator<decltype(std::begin(std::declval<_Ty>()))> {};
 		template<class _Ty, size_t _Size>
 		struct is_container<_Ty[_Size]> : std::true_type {};
 		template<class _Ty, size_t _Size>
@@ -238,5 +247,29 @@ RESUMEF_NS
 
 		template<class _Ty>
 		constexpr bool is_container_v = is_container<remove_cvref_t<_Ty>>::value;
+
+		template<class _Ty, class _Ety, class = std::void_t<>>
+		struct is_container_of : std::false_type {};
+		template<class _Ty, class _Ety>
+		struct is_container_of
+			<_Ty, _Ety,
+				std::void_t<
+					decltype(std::begin(std::declval<_Ty>()))
+					, decltype(std::end(std::declval<_Ty>()))
+				>
+			>
+			: std::conjunction<
+				is_iterator<decltype(std::begin(std::declval<_Ty>()))>,
+				std::is_same<_Ety&, decltype(*std::begin(std::declval<_Ty>()))>
+			> {};
+		template<class _Ty, size_t _Size>
+		struct is_container_of<_Ty[_Size], _Ty> : std::true_type {};
+		template<class _Ty, size_t _Size>
+		struct is_container_of<_Ty(&)[_Size], _Ty> : std::true_type {};
+		template<class _Ty, size_t _Size>
+		struct is_container_of<_Ty(&&)[_Size], _Ty> : std::true_type {};
+
+		template<class _Ty, class _Ety>
+		constexpr bool is_container_of_v = is_container_of<remove_cvref_t<_Ty>, _Ety>::value;
 	}
 }

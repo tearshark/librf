@@ -29,7 +29,7 @@ RESUMEF_NS
 	concept _HasStateT = requires(T&& v)
 	{
 		{ v._state };
-		{ traits::is_state_pointer_v<decltype(v._state)> != false };
+		requires traits::is_state_pointer_v<decltype(v._state)>;
 	};
 
 	template<typename T>
@@ -59,8 +59,14 @@ RESUMEF_NS
 	concept _IteratorT = requires(T&& u, T&& v)
 	{
 		{ ++u }->T;
-		{ u != v } -> bool;
+		{ u != v } ->bool;
 		{ *u };
+	};
+
+	template<typename T, typename E>
+	concept _IteratorOfT = _IteratorT<T> && requires(T && u)
+	{
+		{ *u } ->std::same_as<E&>;
 	};
 
 	template<typename T>
@@ -77,6 +83,12 @@ RESUMEF_NS
 		requires std::same_as<decltype(std::begin(v)), decltype(std::end(v))>;
 	};
 
+	template<typename T, typename E>
+	concept _ContainerOfT = _ContainerT<T> && requires(T && u)
+	{
+		{ *std::begin(u) } ->std::same_as<E&>;
+	};
+
 #define COMMA_RESUMEF_ENABLE_IF(...) 
 #define RESUMEF_ENABLE_IF(...) 
 #define RESUMEF_REQUIRES(...) requires __VA_ARGS__
@@ -91,8 +103,10 @@ RESUMEF_NS
 #define _AwaitableT typename
 #define _WhenTaskT typename
 #define _IteratorT typename
+#define _IteratorOfT typename
 #define _WhenIterT typename
 #define _ContainerT typename
+#define _ContainerOfT typename
 
 #define COMMA_RESUMEF_ENABLE_IF(...) ,typename=std::enable_if_t<__VA_ARGS__>
 #define RESUMEF_ENABLE_IF(...) typename=std::enable_if_t<__VA_ARGS__>
