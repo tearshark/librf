@@ -150,8 +150,8 @@ static void test_wait_all_timeout()
 
 void resumable_main_event()
 {
-	//test_wait_one();
-	//std::cout << std::endl;
+	test_wait_one();
+	std::cout << std::endl;
 
 	test_wait_any();
 	std::cout << std::endl;

@@ -27,6 +27,9 @@ RESUMEF_NS
 			awaiter operator co_await() const noexcept;
 			awaiter wait() const noexcept;
 
+			template<class _Btype>
+			struct timeout_awaitor_impl;
+
 			struct [[nodiscard]] timeout_awaiter;
 
 			template<class _Rep, class _Period>
@@ -47,79 +50,61 @@ RESUMEF_NS
 			template<class _Iter
 				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_of_v<_Iter, event_t>)
 			> RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
-			static auto wait_any(_Iter begin_, _Iter end_)->any_awaiter<_Iter>;
+			static auto wait_any(_Iter begin_, _Iter end_)
+				->any_awaiter<_Iter>;
 
 			template<class _Cont
 				COMMA_RESUMEF_ENABLE_IF(traits::is_container_of_v<_Cont, event_t>)
 			> RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-			static auto wait_any(_Cont& cnt_)->any_awaiter<decltype(std::begin(cnt_))>;
+			static auto wait_any(_Cont& cnt_)
+				->any_awaiter<decltype(std::begin(cnt_))>;
+
+			template<class _Iter>
+			struct [[nodiscard]] timeout_any_awaiter;
 
 			template<class _Rep, class _Period, class _Iter
 				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_of_v<_Iter, event_t>)
 			> RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
-			static future_t<intptr_t>
-			wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
-			{
-				auto tidx = co_await when_any(sleep_for(dt), when_any(begin_, end_));
-				if (tidx.first == 0) co_return -1;
-
-				when_any_pair idx = any_cast<when_any_pair>(tidx.second);
-				co_return idx.first;
-			}
+			static auto wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
+				->timeout_any_awaiter<_Iter>;
 
 			template<class _Rep, class _Period, class _Cont
 				COMMA_RESUMEF_ENABLE_IF(traits::is_container_of_v<_Cont, event_t>)
 			> RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-			static future_t<intptr_t>
-			wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Cont& cont)
-			{
-				return wait_any_for(dt, std::begin(cont), std::end(cont));
-			}
+			static auto wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Cont& cnt_)
+				->timeout_any_awaiter<decltype(std::begin(cnt_))>;
 
 
 
+			template<class _Iter>
+			struct [[nodiscard]] all_awaiter;
 
 			template<class _Iter
 				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_of_v<_Iter, event_t>)
 			> RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
-			static future_t<bool>
-			wait_all(_Iter begin_, _Iter end_)
-			{
-				auto vb = co_await when_all(begin_, end_);
-				co_return is_all_succeeded(vb);
-			}
+			static auto wait_all(_Iter begin_, _Iter end_)
+				->all_awaiter<_Iter>;
 
 			template<class _Cont
 				COMMA_RESUMEF_ENABLE_IF(traits::is_container_of_v<_Cont, event_t>)
 			> RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-			static future_t<bool>
-			wait_all(_Cont& cnt_)
-			{
-				auto vb = co_await when_all(std::begin(cnt_), std::end(cnt_));
-				co_return is_all_succeeded(vb);
-			}
+			static auto wait_all(_Cont& cnt_)
+				->all_awaiter<decltype(std::begin(cnt_))>;
+
+			template<class _Iter>
+			struct [[nodiscard]] timeout_all_awaiter;
 
 			template<class _Rep, class _Period, class _Iter
 				COMMA_RESUMEF_ENABLE_IF(traits::is_iterator_of_v<_Iter, event_t>)
 			> RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
-			static future_t<bool>
-			wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
-			{
-				auto tidx = co_await when_any(sleep_for(dt), when_all(begin_, end_));
-				if (tidx.first == 0) co_return false;
-
-				std::vector<bool>& vb = any_cast<std::vector<bool>&>(tidx.second);
-				co_return is_all_succeeded(vb);
-			}
+			static auto wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
+				->timeout_all_awaiter<_Iter>;
 
 			template<class _Rep, class _Period, class _Cont
 				COMMA_RESUMEF_ENABLE_IF(traits::is_container_of_v<_Cont, event_t>)
 			> RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-			static future_t<bool>
-			wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, _Cont& cont)
-			{
-				return wait_all_for(dt, std::begin(cont), std::end(cont));
-			}
+			static auto wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, _Cont& cnt_)
+				->timeout_all_awaiter<decltype(std::begin(cnt_))>;
 
 			event_t(const event_t&) = default;
 			event_t(event_t&&) = default;

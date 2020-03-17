@@ -4,7 +4,7 @@ RESUMEF_NS
 {
 	namespace detail
 	{
-		void state_event_t::resume()
+		void state_event_base_t::resume()
 		{
 			coroutine_handle<> handler = _coro;
 			if (handler)
@@ -15,7 +15,7 @@ RESUMEF_NS
 			}
 		}
 
-		bool state_event_t::has_handler() const  noexcept
+		bool state_event_base_t::has_handler() const  noexcept
 		{
 			return (bool)_coro;
 		}
@@ -65,6 +65,61 @@ RESUMEF_NS
 			}
 			return false;
 		}
+
+
+
+
+		void state_event_all_t::on_cancel() noexcept
+		{
+			intptr_t oldValue = _counter.load(std::memory_order_acquire);
+			if (oldValue >= 0 && _counter.compare_exchange_strong(oldValue, -1, std::memory_order_acq_rel))
+			{
+				*_value = false;
+				_thandler.stop();
+
+				this->_coro = nullptr;
+			}
+		}
+
+		bool state_event_all_t::on_notify(event_v2_impl*)
+		{
+			intptr_t oldValue = _counter.load(std::memory_order_acquire);
+			if (oldValue <= 0) return false;
+
+			oldValue = _counter.fetch_add(-1, std::memory_order_acq_rel);
+			if (oldValue == 1)
+			{
+				*_value = true;
+				_thandler.stop();
+
+				assert(this->_scheduler != nullptr);
+				if (this->_coro)
+					this->_scheduler->add_generator(this);
+
+				return true;
+			}
+
+			return oldValue >= 1;
+		}
+
+		bool state_event_all_t::on_timeout()
+		{
+			intptr_t oldValue = _counter.load(std::memory_order_acquire);
+			if (oldValue >= 0 && _counter.compare_exchange_strong(oldValue, -1, std::memory_order_acq_rel))
+			{
+				*_value = false;
+				_thandler.reset();
+
+				assert(this->_scheduler != nullptr);
+				if (this->_coro)
+					this->_scheduler->add_generator(this);
+
+				return true;
+			}
+			return false;
+		}
+
+
 
 		event_v2_impl::event_v2_impl(bool initially) noexcept
 			: _counter(initially ? 1 : 0)
@@ -148,7 +203,7 @@ RESUMEF_NS
 
 		event_t::timeout_awaiter event_t::wait_until_(const clock_type::time_point& tp) const noexcept
 		{
-			return { _event.get(), tp };
+			return { tp, _event.get() };
 		}
 	}
 }
