@@ -13,19 +13,19 @@ future_t<> test_sleep_use_timer()
 {
 	using namespace std::chrono;
 
-	(void)resumef::sleep_for(100ms);		//incorrect!!!
+	(void)sleep_for(100ms);		//incorrect!!!
 
-	co_await resumef::sleep_for(100ms);
+	co_await sleep_for(100ms);
 	std::cout << "sleep_for 100ms." << std::endl;
 	co_await 100ms;
 	std::cout << "co_await 100ms." << std::endl;
 
 	try
 	{
-		co_await resumef::sleep_until(system_clock::now() + 200ms);
+		co_await sleep_until(system_clock::now() + 200ms);
 		std::cout << "timer after 200ms." << std::endl;
 	}
-	catch (resumef::timer_canceled_exception)
+	catch (timer_canceled_exception)
 	{
 		std::cout << "timer canceled." << std::endl;
 	}
@@ -50,7 +50,7 @@ void test_wait_all_events_with_signal_by_sleep()
 	{
 		go[&, i]() -> future_t<>
 		{
-			co_await resumef::sleep_for(1ms * (500 + rand() % 1000));
+			co_await sleep_for(1ms * (500 + rand() % 1000));
 			evts[i].signal();
 			std::cout << "event[ " << i << " ] signal!" << std::endl;
 		};

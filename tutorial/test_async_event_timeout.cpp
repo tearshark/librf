@@ -37,7 +37,7 @@ void test_wait_timeout_one()
 		intptr_t counter = 0;
 		for (;;)
 		{
-			if (co_await evt.wait_for(500ms))
+			if (co_await evt.wait_for(100ms))
 				break;
 			++counter;
 			std::cout << ".";
@@ -45,8 +45,8 @@ void test_wait_timeout_one()
 		std::cout << counter << std::endl;
 	};
 
-	async_set_event(evt, 10s + 50ms);
-	//go resumalbe_set_event(evt, 10s + 50ms);
+	async_set_event(evt, 2s + 50ms);
+	//go resumalbe_set_event(evt, 2s + 50ms);
 
 	this_scheduler()->run_until_notask();
 }
@@ -139,7 +139,7 @@ void test_wait_timeout_all()
 		intptr_t counter = 0;
 		for (;;)
 		{
-			if (co_await event_t::wait_all_for(500ms, evts))
+			if (co_await event_t::wait_all_for(1500ms, evts))
 			{
 				std::cout << counter << std::endl;
 				std::cout << "all event signal!" << std::endl;
@@ -148,14 +148,16 @@ void test_wait_timeout_all()
 
 			++counter;
 			std::cout << ".";
+			std::cout << "timeout!" << std::endl;
+			break;
 		}
 	};
 
 	srand((int)time(nullptr));
 	for (auto & e : evts)
 	{
-		go resumalbe_set_event(e, 1ms * (1000 + rand() % 5000));
-		//async_set_event(e, 1ms * (1000 + rand() % 5000));
+		//go resumalbe_set_event(e, 1ms * (1000 + rand() % 5000));
+		async_set_event(e, 1ms * (1000 + rand() % 1000));
 	}
 
 	this_scheduler()->run_until_notask();

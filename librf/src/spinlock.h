@@ -92,20 +92,51 @@ RESUMEF_NS
 	namespace detail
 	{
 		template<class _Ty>
+		void _Lock_ref(_Ty& _LkN)
+		{
+			_LkN.lock();
+		}
+		template<class _Ty>
+		void _Lock_ref(std::reference_wrapper<_Ty> _LkN)
+		{
+			_LkN.get().lock();
+		}
+		template<class _Ty>
+		void _Unlock_ref(_Ty& _LkN)
+		{
+			_LkN.unlock();
+		}
+		template<class _Ty>
+		void _Unlock_ref(std::reference_wrapper<_Ty> _LkN)
+		{
+			_LkN.get().unlock();
+		}
+		template<class _Ty>
+		bool _Try_lock_ref(_Ty& _LkN)
+		{
+			return _LkN.try_lock();
+		}
+		template<class _Ty>
+		bool _Try_lock_ref(std::reference_wrapper<_Ty> _LkN)
+		{
+			return _LkN.get().try_lock();
+		}
+
+		template<class _Ty>
 		void _Lock_from_locks(const int _Target, std::vector<_Ty>& _LkN) { // lock _LkN[_Target]
-			_LkN[_Target].lock();
+			_Lock_ref(_LkN[_Target]);
 		}
 		// FUNCTION TEMPLATE _Try_lock_from_locks
 		template<class _Ty>
 		bool _Try_lock_from_locks(const int _Target, std::vector<_Ty>& _LkN) { // try to lock _LkN[_Target]
-			return _LkN[_Target].try_lock();
+			return _Try_lock_ref(_LkN[_Target]);
 		}
 
 		// FUNCTION TEMPLATE _Unlock_locks
 		template<class _Ty>
 		void _Unlock_locks(int _First, int _Last, std::vector<_Ty>& _LkN) noexcept /* terminates */ {
 			for (; _First != _Last; ++_First) {
-				_LkN[_First].unlock();
+				_Unlock_ref(_LkN[_First]);
 			}
 		}
 
@@ -169,20 +200,20 @@ RESUMEF_NS
 		}
 					
 		template <class _Lock0, class _Lock1>
-		bool _Lock_attempt_small(_Lock0& _Lk0, _Lock1& _Lk1)
+		bool _Lock_attempt_small2(_Lock0& _Lk0, _Lock1& _Lk1)
 		{
 			// attempt to lock 2 locks, by first locking _Lk0, and then trying to lock _Lk1 returns whether to try again
-			_Lk0.lock();
+			_Lock_ref(_Lk0);
 			try {
-				if (_Lk1.try_lock())
+				if (_Try_lock_ref(_Lk1))
 					return false;
 			}
 			catch (...) {
-				_Lk0.unlock();
+				_Unlock_ref(_Lk0);
 				throw;
 			}
 
-			_Lk0.unlock();
+			_Unlock_ref(_Lk0);
 			std::this_thread::yield();
 			return true;
 		}
@@ -191,7 +222,7 @@ RESUMEF_NS
 		void _Lock_nonmember2(_Lock0& _Lk0, _Lock1& _Lk1)
 		{
 			// lock 2 locks, without deadlock, special case for better codegen and reduced metaprogramming for common case
-			while (_Lock_attempt_small(_Lk0, _Lk1) && _Lock_attempt_small(_Lk1, _Lk0)) { // keep trying
+			while (_Lock_attempt_small2(_Lk0, _Lk1) && _Lock_attempt_small2(_Lk1, _Lk0)) { // keep trying
 			}
 		}
 
@@ -203,7 +234,7 @@ RESUMEF_NS
 			}
 			else if (lockes.size() == 1)
 			{
-				lockes[0].lock();
+				_Lock_ref(lockes[0]);
 			}
 			else if (lockes.size() == 2)
 			{

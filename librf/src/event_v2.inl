@@ -33,7 +33,7 @@ RESUMEF_NS
 
 			bool try_wait_one() noexcept
 			{
-				if (_counter.load(std::memory_order_acquire) > 0)
+				if (_counter.load(std::memory_order_consume) > 0)
 				{
 					if (_counter.fetch_add(-1, std::memory_order_acq_rel) > 0)
 						return true;
@@ -156,6 +156,7 @@ RESUMEF_NS
 
 			bool await_ready() noexcept
 			{
+				scoped_lock<detail::event_v2_impl::lock_type> lock_(_event->_lock);
 				return _event->try_wait_one();
 			}
 
@@ -215,10 +216,10 @@ RESUMEF_NS
 				auto* parent_state = promise.get_state();
 				scheduler_t* sch = parent_state->get_scheduler();
 
-				_state->_thandler = sch->timer()->add_handler(_tp, [_state = _state](bool canceld)
+				this->_state->_thandler = sch->timer()->add_handler(_tp, [st = this->_state](bool canceld)
 				{
 					if (!canceld)
-						_state->on_timeout();
+						st->on_timeout();
 				});
 
 				return true;
@@ -259,35 +260,23 @@ RESUMEF_NS
 
 			bool await_ready() noexcept
 			{
-				if (_begin == _end)
-					return true;
-
-				for (auto iter = _begin; iter != _end; ++iter)
-				{
-					detail::event_v2_impl* evt = (*iter)._event.get();
-					if (evt->try_wait_one())
-					{
-						_event = evt;
-						return true;
-					}
-				}
-
-				return false;
+				return _begin == _end;
 			}
 
 			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend(coroutine_handle<_PromiseT> handler)
 			{
-				std::vector<detail::event_v2_impl::lock_type> lockes;
+				using ref_lock_type = std::reference_wrapper<detail::event_v2_impl::lock_type>;
+				std::vector<ref_lock_type> lockes;
 				lockes.reserve(std::distance(_begin, _end));
 
 				for (auto iter = _begin; iter != _end; ++iter)
 				{
 					detail::event_v2_impl* evt = (*iter)._event.get();
-					lockes.push_back(evt->_lock);
+					lockes.emplace_back(std::ref(evt->_lock));
 				}
 
-				scoped_lock_range<detail::event_v2_impl::lock_type> lock_(lockes);
+				scoped_lock_range<ref_lock_type> lock_(lockes);
 
 				for (auto iter = _begin; iter != _end; ++iter)
 				{
@@ -355,7 +344,7 @@ RESUMEF_NS
 		struct [[nodiscard]] event_t::timeout_any_awaiter : timeout_awaitor_impl<event_t::any_awaiter<_Iter>>
 		{
 			timeout_any_awaiter(clock_type::time_point tp, _Iter begin, _Iter end) noexcept
-				: timeout_awaitor_impl(tp, begin, end)
+				: timeout_awaitor_impl<event_t::any_awaiter<_Iter>>(tp, begin, end)
 			{}
 		};
 
@@ -399,7 +388,8 @@ RESUMEF_NS
 			{
 				intptr_t count = std::distance(_begin, _end);
 
-				std::vector<detail::event_v2_impl::lock_type> lockes;
+				using ref_lock_type = std::reference_wrapper<detail::event_v2_impl::lock_type>;
+				std::vector<ref_lock_type> lockes;
 				lockes.reserve(count);
 
 				for (auto iter = _begin; iter != _end; ++iter)
@@ -411,7 +401,7 @@ RESUMEF_NS
 				_state = new detail::state_event_all_t(count, _value);
 				(void)_state->on_await_suspend(handler);
 
-				scoped_lock_range<detail::event_v2_impl::lock_type> lock_(lockes);
+				scoped_lock_range<ref_lock_type> lock_(lockes);
 
 				for (auto iter = _begin; iter != _end; ++iter)
 				{
@@ -468,7 +458,7 @@ RESUMEF_NS
 		struct [[nodiscard]] event_t::timeout_all_awaiter : timeout_awaitor_impl<event_t::all_awaiter<_Iter>>
 		{
 			timeout_all_awaiter(clock_type::time_point tp, _Iter begin, _Iter end) noexcept
-				: timeout_awaitor_impl(tp, begin, end)
+				: timeout_awaitor_impl<event_t::all_awaiter<_Iter>>(tp, begin, end)
 			{}
 		};
 

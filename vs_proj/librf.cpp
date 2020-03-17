@@ -44,10 +44,10 @@ int main(int argc, const char* argv[])
 	//test_ring_queue<resumef::ring_queue_lockfree<int, uint64_t>>();
 
 	//resumable_main_event_v2();
-	resumable_main_event();
+	//resumable_main_event();
 	//resumable_main_event_timeout();
 	//resumable_main_sleep();
-	return 0;
+	//return 0;
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
