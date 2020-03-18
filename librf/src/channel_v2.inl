@@ -232,13 +232,13 @@ namespace detail
 	{
 		if constexpr (USE_LINK_QUEUE)
 		{
-			return reinterpret_cast<state_read_t*>(_read_awakes.try_pop());
+			return _read_awakes.try_pop();
 		}
 		else
 		{
 			if (!_read_awakes.empty())
 			{
-				state_write_t* state = _read_awakes.front();
+				state_read_t* state = _read_awakes.front();
 				_read_awakes.pop_front();
 				return state;
 			}
@@ -251,7 +251,7 @@ namespace detail
 	{
 		if constexpr (USE_LINK_QUEUE)
 		{
-			return reinterpret_cast<state_write_t*>(_write_awakes.try_pop());
+			return _write_awakes.try_pop();
 		}
 		else
 		{

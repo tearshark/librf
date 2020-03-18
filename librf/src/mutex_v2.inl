@@ -155,7 +155,7 @@ RESUMEF_NS
 					return false;
 
 				_state = new detail::state_mutex_t();
-				(void)_state->on_await_suspend(handler, parent->get_scheduler(), _root);
+				_state->on_await_suspend(handler, parent->get_scheduler(), _root);
 
 				_mutex->add_wait_list_lockless(_state.get());
 

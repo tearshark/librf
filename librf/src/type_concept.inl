@@ -20,9 +20,12 @@ RESUMEF_NS
 	template<typename T>
 	concept _AwaitorT = requires(T&& v)
 	{
-		{ v.await_ready() } -> bool;
+		{ v.await_ready() } ->bool;
 		{ v.await_suspend(std::declval<std::experimental::coroutine_handle<promise_t<>>>()) };
 		{ v.await_resume() };
+		requires traits::is_valid_await_suspend_return_v<
+			decltype(v.await_suspend(std::declval<std::experimental::coroutine_handle<promise_t<>>>()))
+		>;
 	};
 
 	template<typename T> 
