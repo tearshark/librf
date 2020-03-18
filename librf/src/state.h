@@ -33,6 +33,7 @@ RESUMEF_NS
 	public:
 		virtual void resume() = 0;
 		virtual bool has_handler() const  noexcept = 0;
+		virtual state_base_t* get_parent() const noexcept;
 
 		void set_scheduler(scheduler_t* sch)
 		{
@@ -41,6 +42,18 @@ RESUMEF_NS
 		coroutine_handle<> get_handler() const
 		{
 			return _coro;
+		}
+
+		state_base_t* get_root() const noexcept
+		{
+			state_base_t* root = const_cast<state_base_t*>(this);
+			state_base_t* next = root->get_parent();
+			while (next != nullptr)
+			{
+				root = next;
+				next = next->get_parent();
+			}
+			return root;
 		}
 	};
 	
@@ -125,7 +138,8 @@ RESUMEF_NS
 		virtual void destroy_deallocate() override;
 		virtual void resume() override;
 		virtual bool has_handler() const  noexcept override;
-	
+		virtual state_base_t* get_parent() const noexcept override;
+
 		inline bool is_ready() const noexcept
 		{
 			//msvc认为是constexpr表达式(不写还给警告)，然而，clang不这么认为。
@@ -149,10 +163,6 @@ RESUMEF_NS
 			return _parent ? _parent->get_scheduler() : _scheduler;
 		}
 
-		inline state_base_t * get_parent() const noexcept
-		{
-			return _parent;
-		}
 		inline uint32_t get_alloc_size() const noexcept
 		{
 			return _alloc_size;

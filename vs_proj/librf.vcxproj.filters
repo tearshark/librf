@@ -25,9 +25,6 @@
     <ClCompile Include="librf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\librf\src\mutex.cpp">
-      <Filter>librf\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\librf\src\rf_task.cpp">
       <Filter>librf\src</Filter>
     </ClCompile>
@@ -119,6 +116,12 @@
       <Filter>tutorial</Filter>
     </ClCompile>
     <ClCompile Include="..\librf\src\when_v2.cpp">
+      <Filter>librf\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\librf\src\mutex_v1.cpp">
+      <Filter>librf\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\librf\src\mutex_v2.cpp">
       <Filter>librf\src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -228,6 +231,12 @@
     <ClInclude Include="..\librf\src\when_v2.h">
       <Filter>librf\src</Filter>
     </ClInclude>
+    <ClInclude Include="..\librf\src\mutex_v1.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\mutex_v2.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\librf\src\asio_task_1.12.0.inl">
@@ -259,6 +268,9 @@
       <Filter>librf\src</Filter>
     </None>
     <None Include="..\librf\src\type_concept.inl">
+      <Filter>librf\src</Filter>
+    </None>
+    <None Include="..\librf\src\mutex_v2.inl">
       <Filter>librf\src</Filter>
     </None>
   </ItemGroup>

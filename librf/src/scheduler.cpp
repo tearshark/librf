@@ -18,6 +18,7 @@ RESUMEF_NS
 		"unlock_more",
 		"read_before_write",
 		"timer_canceled",
+		"not_await_lock",
 	};
 
 	char sz_future_error_buffer[256];

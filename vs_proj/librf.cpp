@@ -47,7 +47,8 @@ int main(int argc, const char* argv[])
 	//resumable_main_event();
 	//resumable_main_event_timeout();
 	//resumable_main_sleep();
-	//return 0;
+	resumable_main_mutex();
+	return 0;
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));

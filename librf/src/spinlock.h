@@ -15,7 +15,7 @@ RESUMEF_NS
 		static const int FREE_VALUE = 0;
 		static const int LOCKED_VALUE = 1;
 
-		volatile std::atomic<int> lck;
+		std::atomic<int> lck;
 #if _DEBUG
 		std::thread::id owner_thread_id;
 #endif

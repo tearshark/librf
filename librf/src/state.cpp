@@ -10,6 +10,11 @@ RESUMEF_NS
 	{
 		delete this;
 	}
+	
+	state_base_t* state_base_t::get_parent() const noexcept
+	{
+		return nullptr;
+	}
 
 	void state_future_t::destroy_deallocate()
 	{
@@ -86,6 +91,11 @@ RESUMEF_NS
 		sch->add_generator(this);
 
 		return true;
+	}
+
+	state_base_t* state_future_t::get_parent() const noexcept
+	{
+		return _parent;
 	}
 
 	void state_future_t::resume()

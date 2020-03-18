@@ -183,7 +183,8 @@
     <ClCompile Include="..\benchmark\benchmark_channel_passing_next.cpp" />
     <ClCompile Include="..\librf\src\event_v1.cpp" />
     <ClCompile Include="..\librf\src\event_v2.cpp" />
-    <ClCompile Include="..\librf\src\mutex.cpp" />
+    <ClCompile Include="..\librf\src\mutex_v1.cpp" />
+    <ClCompile Include="..\librf\src\mutex_v2.cpp" />
     <ClCompile Include="..\librf\src\rf_task.cpp" />
     <ClCompile Include="..\librf\src\scheduler.cpp" />
     <ClCompile Include="..\librf\src\sleep.cpp" />
@@ -233,6 +234,8 @@
     <ClInclude Include="..\librf\src\future.h" />
     <ClInclude Include="..\librf\src\generator.h" />
     <ClInclude Include="..\librf\src\intrusive_link_queue.h" />
+    <ClInclude Include="..\librf\src\mutex_v1.h" />
+    <ClInclude Include="..\librf\src\mutex_v2.h" />
     <ClInclude Include="..\librf\src\promise.h" />
     <ClInclude Include="..\librf\src\mutex.h" />
     <ClInclude Include="..\librf\src\rf_task.h" />
@@ -260,6 +263,7 @@
     <None Include="..\librf\src\event_v2.inl" />
     <None Include="..\librf\src\exception.inl" />
     <None Include="..\librf\src\macro_def.inl" />
+    <None Include="..\librf\src\mutex_v2.inl" />
     <None Include="..\librf\src\promise.inl" />
     <None Include="..\librf\src\state.inl" />
     <None Include="..\librf\src\type_concept.inl" />

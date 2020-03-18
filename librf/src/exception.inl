@@ -10,6 +10,7 @@ RESUMEF_NS
 		unlock_more,		// unlock 次数多余lock次数
 		read_before_write,	// 0容量的channel，先读后写
 		timer_canceled,		// 定时器被意外取消
+		not_await_lock,		// 没有在协程中使用co_await等待lock结果
 
 		max__
 	};

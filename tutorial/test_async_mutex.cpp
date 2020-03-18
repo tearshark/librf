@@ -19,7 +19,7 @@ future_t<> test_mutex_pop(size_t idx)
 
 	for (size_t i = 0; i < 10; ++i)
 	{
-		co_await resumf_guard_lock(g_lock);
+		auto _locker = co_await g_lock.lock();
 
 		if (g_queue.size() > 0)
 		{
@@ -32,14 +32,15 @@ future_t<> test_mutex_pop(size_t idx)
 	}
 }
 
-future_t<> test_mutex_push()
+future_t<> test_mutex_push(size_t idx)
 {
 	using namespace std::chrono;
 
 	for (size_t i = 0; i < 10; ++i)
 	{
-		co_await resumf_guard_lock(g_lock);
+		auto _locker = co_await g_lock.lock();
 		g_queue.push_back(i);
+		std::cout << i << " on " << idx << std::endl;
 
 		co_await sleep_for(500ms);
 	}
@@ -47,7 +48,7 @@ future_t<> test_mutex_push()
 
 void resumable_main_mutex()
 {
-	go test_mutex_push();
+	go test_mutex_push(0);
 	go test_mutex_pop(1);
 
 	this_scheduler()->run_until_notask();
