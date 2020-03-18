@@ -11,6 +11,7 @@ RESUMEF_NS
 	{
 		struct scoped_lock_mutex_t;
 
+		//支持递归的锁
 		struct mutex_t
 		{
 			typedef std::shared_ptr<detail::mutex_v2_impl> mutex_impl_ptr;
@@ -22,11 +23,12 @@ RESUMEF_NS
 
 			struct [[nodiscard]] awaiter;
 
+			awaiter operator co_await() const noexcept;
 			awaiter lock() const noexcept;
 
-			scoped_lock_mutex_t lock(scheduler_t* sch) const noexcept;
-			bool try_lock(scheduler_t* sch) const noexcept;
-			void unlock(scheduler_t* sch) const noexcept;
+			scoped_lock_mutex_t lock(void* unique_address) const;
+			bool try_lock(void* unique_address) const;
+			void unlock(void* unique_address) const;
 
 			mutex_t(const mutex_t&) = default;
 			mutex_t(mutex_t&&) = default;

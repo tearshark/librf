@@ -39,7 +39,7 @@ RESUMEF_NS
 				return _owner.load(std::memory_order_relaxed);
 			}
 
-			bool try_lock(void* sch) noexcept;			//内部加锁
+			bool try_lock(void* sch);					//内部加锁
 			bool unlock(void* sch);						//内部加锁
 			void lock_until_succeed(void* sch);			//内部加锁
 		public:
@@ -74,26 +74,26 @@ RESUMEF_NS
 
 			//此函数，应该在try_lock()获得锁后使用
 			//或者在协程里，由awaiter使用
-			scoped_lock_mutex_t(std::adopt_lock_t, detail::mutex_v2_impl* mtx, void* sch)
-				: _mutex(mtx->shared_from_this())
+			scoped_lock_mutex_t(std::adopt_lock_t, mutex_impl_ptr mtx, void* sch)
+				: _mutex(std::move(mtx))
 				, _owner(sch)
 			{}
 
 			//此函数，适合在非协程里使用
-			scoped_lock_mutex_t(detail::mutex_v2_impl* mtx, void* sch)
-				: _mutex(mtx->shared_from_this())
+			scoped_lock_mutex_t(mutex_impl_ptr mtx, void* sch)
+				: _mutex(std::move(mtx))
 				, _owner(sch)
 			{
-				if (sch != nullptr)
+				if (_mutex != nullptr)
 					_mutex->lock_until_succeed(sch);
 			}
 
 
 			scoped_lock_mutex_t(std::adopt_lock_t, const mutex_t& mtx, void* sch)
-				: scoped_lock_mutex_t(std::adopt_lock, mtx._mutex.get(), sch)
+				: scoped_lock_mutex_t(std::adopt_lock, mtx._mutex, sch)
 			{}
 			scoped_lock_mutex_t(const mutex_t& mtx, void* sch)
-				: scoped_lock_mutex_t(mtx._mutex.get(), sch)
+				: scoped_lock_mutex_t(mtx._mutex, sch)
 			{}
 
 			~scoped_lock_mutex_t()
@@ -123,9 +123,10 @@ RESUMEF_NS
 
 		struct [[nodiscard]] mutex_t::awaiter
 		{
-			awaiter(detail::mutex_v2_impl* evt) noexcept
-				: _mutex(evt)
+			awaiter(detail::mutex_v2_impl* mtx) noexcept
+				: _mutex(mtx)
 			{
+				assert(_mutex != nullptr);
 			}
 
 			~awaiter() noexcept(false)
@@ -163,7 +164,7 @@ RESUMEF_NS
 
 			scoped_lock_mutex_t await_resume() noexcept
 			{
-				detail::mutex_v2_impl* mtx = _mutex;
+				mutex_impl_ptr mtx = _root ? _mutex->shared_from_this() : nullptr;
 				_mutex = nullptr;
 
 				return { std::adopt_lock, mtx, _root };
@@ -174,30 +175,30 @@ RESUMEF_NS
 			state_base_t* _root = nullptr;
 		};
 
+		inline mutex_t::awaiter mutex_t::operator co_await() const noexcept
+		{
+			return { _mutex.get() };
+		}
+
 		inline mutex_t::awaiter mutex_t::lock() const noexcept
 		{
 			return { _mutex.get() };
 		}
 
-		inline scoped_lock_mutex_t mutex_t::lock(scheduler_t* sch) const noexcept
+		inline scoped_lock_mutex_t mutex_t::lock(void* unique_address) const
 		{
-			if (sch != nullptr)
-				_mutex->lock_until_succeed(sch);
-
-			return { std::adopt_lock, _mutex.get(), sch };
+			_mutex->lock_until_succeed(unique_address);
+			return { std::adopt_lock, _mutex, unique_address };
 		}
 
-		inline bool mutex_t::try_lock(scheduler_t* sch) const noexcept
+		inline bool mutex_t::try_lock(void* unique_address) const
 		{
-			if (sch == nullptr)
-				return false;
-			return _mutex->try_lock(sch);
+			return _mutex->try_lock(unique_address);
 		}
 
-		inline void mutex_t::unlock(scheduler_t* sch) const noexcept
+		inline void mutex_t::unlock(void* unique_address) const
 		{
-			assert(sch != nullptr);
-			_mutex->unlock(sch);
+			_mutex->unlock(unique_address);
 		}
 	}
 }

@@ -50,7 +50,7 @@ RESUMEF_NS
 			}
 		}
 
-		bool mutex_v2_impl::try_lock(void* sch) noexcept
+		bool mutex_v2_impl::try_lock(void* sch)
 		{
 			scoped_lock<detail::mutex_v2_impl::lock_type> lock_(_lock);
 			return try_lock_lockless(sch);
@@ -59,11 +59,15 @@ RESUMEF_NS
 		bool mutex_v2_impl::try_lock_lockless(void* sch) noexcept
 		{
 			void* oldValue = _owner.load(std::memory_order_relaxed);
-			if (oldValue == nullptr || oldValue == sch)
+			if (oldValue == nullptr)
 			{
 				_owner.store(sch, std::memory_order_relaxed);
 				_counter.fetch_add(1, std::memory_order_relaxed);
-
+				return true;
+			}
+			if (oldValue == sch)
+			{
+				_counter.fetch_add(1, std::memory_order_relaxed);
 				return true;
 			}
 			return false;
