@@ -47,7 +47,7 @@ int main(int argc, const char* argv[])
 	//resumable_main_event();
 	//resumable_main_event_timeout();
 	//resumable_main_sleep();
-	resumable_main_resumable();
+	//resumable_main_resumable();
 	//return 0;
 
 	//if (argc > 1)
