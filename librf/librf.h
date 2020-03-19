@@ -60,6 +60,7 @@
 #include "src/switch_scheduler.h"
 #include "src/current_scheduler.h"
 
+#include "src/yield.h"
 #include "src/sleep.h"
 #include "src/when.h"
 

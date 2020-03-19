@@ -56,6 +56,17 @@ RESUMEF_NS
 			return try_lock_lockless(sch);
 		}
 
+		bool mutex_v2_impl::try_lock_until(clock_type::time_point tp, void* sch)
+		{
+			do
+			{
+				if (try_lock(sch))
+					return true;
+				std::this_thread::yield();
+			} while (clock_type::now() <= tp);
+			return false;
+		}
+
 		bool mutex_v2_impl::try_lock_lockless(void* sch) noexcept
 		{
 			void* oldValue = _owner.load(std::memory_order_relaxed);

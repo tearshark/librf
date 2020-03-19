@@ -237,6 +237,9 @@
     <ClInclude Include="..\librf\src\mutex_v2.h">
       <Filter>librf\src</Filter>
     </ClInclude>
+    <ClInclude Include="..\librf\src\yield.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\librf\src\asio_task_1.12.0.inl">

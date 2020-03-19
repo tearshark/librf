@@ -30,7 +30,7 @@ static future_t<> test_mutex_pop(size_t idx)
 
 			co_await 50ms;
 
-			auto _locker_2 = co_await g_lock.lock();
+			auto _locker_2 = co_await g_lock;
 
 			--g_counter;
 			std::cout << "pop :" << g_counter << " on " << idx << std::endl;
@@ -41,17 +41,36 @@ static future_t<> test_mutex_pop(size_t idx)
 
 //🔒-50ms-🗝-50ms-🔒-50ms-🗝-50ms-|
 //---------........---------.......
+//方法之一
 static future_t<> test_mutex_push(size_t idx)
 {
 	for (size_t i = 0; i < N; ++i)
 	{
 		{
-			auto _locker = co_await g_lock;
+			auto _locker = co_await g_lock.lock();
 
 			++g_counter;
 			std::cout << "push:" << g_counter << " on " << idx << std::endl;
 
 			co_await 50ms;
+		}
+		co_await 50ms;
+	}
+}
+
+static future_t<> test_mutex_try_push(size_t idx)
+{
+	for (size_t i = 0; i < N; ++i)
+	{
+		{
+			while (!co_await g_lock.try_lock())
+				co_await yield();
+
+			++g_counter;
+			std::cout << "push:" << g_counter << " on " << idx << std::endl;
+
+			co_await 50ms;
+			co_await g_lock.unlock();
 		}
 		co_await 50ms;
 	}
@@ -66,12 +85,15 @@ static std::thread test_mutex_async_push(size_t idx)
 		char provide_unique_address = 0;
 		for (size_t i = 0; i < N; ++i)
 		{
+			if (g_lock.try_lock_for(500ms, &provide_unique_address))
 			{
-				auto _locker = g_lock.lock(&provide_unique_address);
+				//scoped_lock_mutex_t _locker(std::adopt_lock, g_lock, &provide_unique_address);
 
 				++g_counter;
 				std::cout << "push:" << g_counter << " on " << idx << std::endl;
 				std::this_thread::sleep_for(50ms);
+
+				g_lock.unlock(&provide_unique_address);
 			}
 
 			std::this_thread::sleep_for(50ms);
@@ -81,7 +103,7 @@ static std::thread test_mutex_async_push(size_t idx)
 
 static void resumable_mutex_synch()
 {
-	go test_mutex_push(0);
+	go test_mutex_try_push(0);
 	go test_mutex_pop(1);
 
 	this_scheduler()->run_until_notask();

@@ -14,3 +14,4 @@
 #endif
 
 #define current_scheduler() (co_await ::resumef::get_current_scheduler())
+#define root_state() (co_await ::resumef::get_root_state())

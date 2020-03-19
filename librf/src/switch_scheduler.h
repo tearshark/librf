@@ -4,6 +4,11 @@ RESUMEF_NS
 {
 	struct switch_scheduler_awaitor
 	{
+		using value_type = void;
+		using state_type = state_t<value_type>;
+		using promise_type = promise_t<value_type>;
+		using lock_type = typename state_type::lock_type;
+
 		switch_scheduler_awaitor(scheduler_t* sch)
 			:_scheduler(sch) {}
 		switch_scheduler_awaitor(const switch_scheduler_awaitor&) = default;
@@ -21,9 +26,16 @@ RESUMEF_NS
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			_PromiseT& promise = handler.promise();
-
 			auto* sptr = promise.get_state();
-			return sptr->switch_scheduler_await_suspend(_scheduler, handler);
+			if (sptr->switch_scheduler_await_suspend(_scheduler))
+			{
+				counted_ptr<state_t<void>> _state = state_future_t::_Alloc_state<state_type>(true);
+				_state->set_value();
+				_state->future_await_suspend(handler);
+
+				return true;
+			}
+			return false;
 		}
 
 		void await_resume() noexcept

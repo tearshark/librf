@@ -252,6 +252,7 @@
     <ClInclude Include="..\librf\src\unix\coroutine.h" />
     <ClInclude Include="..\librf\src\when.h" />
     <ClInclude Include="..\librf\src\when_v2.h" />
+    <ClInclude Include="..\librf\src\yield.h" />
     <ClInclude Include="..\librf\src\_awaker.h" />
     <ClInclude Include="..\tutorial\test_ring_queue.h" />
     <ClInclude Include="dcas.h" />

@@ -55,6 +55,10 @@ RESUMEF_NS
 			}
 			return root;
 		}
+		scheduler_t* get_scheduler() const
+		{
+			return get_root()->_scheduler;
+		}
 	};
 	
 	struct state_generator_t : public state_base_t
@@ -65,7 +69,7 @@ RESUMEF_NS
 		virtual void resume() override;
 		virtual bool has_handler() const  noexcept override;
 
-		bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler);
+		bool switch_scheduler_await_suspend(scheduler_t* sch);
 
 		void set_initial_suspend(coroutine_handle<> handler)
 		{
@@ -158,11 +162,6 @@ RESUMEF_NS
 			return (bool)_coro || _is_initor != initor_type::None;
 		}
 
-		inline scheduler_t* get_scheduler() const
-		{
-			return _parent ? _parent->get_scheduler() : _scheduler;
-		}
-
 		inline uint32_t get_alloc_size() const noexcept
 		{
 			return _alloc_size;
@@ -176,7 +175,7 @@ RESUMEF_NS
 		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 		void future_await_suspend(coroutine_handle<_PromiseT> handler);
 
-		bool switch_scheduler_await_suspend(scheduler_t* sch, coroutine_handle<> handler);
+		bool switch_scheduler_await_suspend(scheduler_t* sch);
 
 		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 		void promise_initial_suspend(coroutine_handle<_PromiseT> handler);
