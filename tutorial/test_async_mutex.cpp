@@ -76,6 +76,24 @@ static future_t<> test_mutex_try_push(size_t idx)
 	}
 }
 
+static future_t<> test_mutex_timeout_push(size_t idx)
+{
+	for (size_t i = 0; i < N; ++i)
+	{
+		{
+			while (!co_await g_lock.try_lock_for(10ms))
+				co_await yield();
+
+			++g_counter;
+			std::cout << "push:" << g_counter << " on " << idx << std::endl;
+
+			co_await 50ms;
+			co_await g_lock.unlock();
+		}
+		co_await 50ms;
+	}
+}
+
 //🔒-50ms-🗝-50ms-🔒-50ms-🗝-50ms-|
 //---------........---------.......
 static std::thread test_mutex_async_push(size_t idx)
@@ -103,7 +121,7 @@ static std::thread test_mutex_async_push(size_t idx)
 
 static void resumable_mutex_synch()
 {
-	go test_mutex_try_push(0);
+	go test_mutex_timeout_push(0);
 	go test_mutex_pop(1);
 
 	this_scheduler()->run_until_notask();

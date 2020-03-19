@@ -4,13 +4,15 @@ RESUMEF_NS
 {
 	namespace detail
 	{
-		struct state_mutex_t : public state_base_t
+		struct state_mutex_base_t : public state_base_t
 		{
 			virtual void resume() override;
 			virtual bool has_handler() const  noexcept override;
 			virtual state_base_t* get_parent() const noexcept override;
 
-			bool on_notify();
+			virtual void on_cancel() noexcept = 0;
+			virtual bool on_notify(mutex_v2_impl* eptr) = 0;
+			virtual bool on_timeout() = 0;
 
 			inline scheduler_t* get_scheduler() const noexcept
 			{
@@ -24,12 +26,53 @@ RESUMEF_NS
 				this->_root = root;
 			}
 
-		private:
+			inline void add_timeout_timer(std::chrono::system_clock::time_point tp)
+			{
+				this->_thandler = this->_scheduler->timer()->add_handler(tp,
+					[st = counted_ptr<state_mutex_base_t>{ this }](bool canceld)
+					{
+						if (!canceld)
+							st->on_timeout();
+					});
+			}
+
+			timer_handler _thandler;
+		protected:
 			state_base_t* _root;
-			//friend mutex_v2::mutex_t;
 		};
 
-		//做成递归锁?
+		struct state_mutex_t : public state_mutex_base_t
+		{
+			state_mutex_t(mutex_v2_impl*& val)
+				: _value(&val)
+			{}
+
+			virtual void on_cancel() noexcept override;
+			virtual bool on_notify(mutex_v2_impl* eptr) override;
+			virtual bool on_timeout() override;
+		public:
+			timer_handler _thandler;
+		protected:
+			std::atomic<mutex_v2_impl**> _value;
+		};
+
+		struct state_mutex_all_t : public state_event_base_t
+		{
+			state_mutex_all_t(intptr_t count, bool& val)
+				: _counter(count)
+				, _value(&val)
+			{}
+
+			virtual void on_cancel() noexcept override;
+			virtual bool on_notify(event_v2_impl* eptr) override;
+			virtual bool on_timeout() override;
+		public:
+			timer_handler _thandler;
+			std::atomic<intptr_t> _counter;
+		protected:
+			bool* _value;
+		};
+
 		struct mutex_v2_impl : public std::enable_shared_from_this<mutex_v2_impl>
 		{
 			using clock_type = std::chrono::system_clock;
@@ -159,12 +202,18 @@ RESUMEF_NS
 				_PromiseT& promise = handler.promise();
 				auto* parent = promise.get_state();
 				_root = parent->get_root();
+				if (_root == nullptr)
+				{
+					assert(false);
+					_mutex = nullptr;
+					return false;
+				}
 
 				scoped_lock<detail::mutex_v2_impl::lock_type> lock_(_mutex->_lock);
 				if (_mutex->try_lock_lockless(_root))
 					return false;
 
-				_state = new detail::state_mutex_t();
+				_state = new detail::state_mutex_t(_mutex);
 				_state->on_await_suspend(handler, parent->get_scheduler(), _root);
 
 				_mutex->add_wait_list_lockless(_state.get());
@@ -174,7 +223,7 @@ RESUMEF_NS
 
 			scoped_lock_mutex_t await_resume() noexcept
 			{
-				mutex_impl_ptr mtx = _root ? _mutex->shared_from_this() : nullptr;
+				mutex_impl_ptr mtx = _mutex ? _mutex->shared_from_this() : nullptr;
 				_mutex = nullptr;
 
 				return { std::adopt_lock, mtx, _root };
@@ -203,6 +252,14 @@ RESUMEF_NS
 			{
 				assert(_mutex != nullptr);
 			}
+			~try_awaiter() noexcept(false)
+			{
+				assert(_mutex == nullptr);
+				if (_mutex != nullptr)
+				{
+					throw lock_exception(error_code::not_await_lock);
+				}
+			}
 
 			bool await_ready() noexcept
 			{
@@ -222,7 +279,9 @@ RESUMEF_NS
 
 			bool await_resume() noexcept
 			{
-				return _mutex != nullptr;
+				detail::mutex_v2_impl* mtx = _mutex;
+				_mutex = nullptr;
+				return mtx != nullptr;
 			}
 		protected:
 			detail::mutex_v2_impl* _mutex;
@@ -239,6 +298,14 @@ RESUMEF_NS
 				: _mutex(mtx)
 			{
 				assert(_mutex != nullptr);
+			}
+			~unlock_awaiter() noexcept(false)
+			{
+				assert(_mutex == nullptr);
+				if (_mutex != nullptr)
+				{
+					throw lock_exception(error_code::not_await_lock);
+				}
 			}
 
 			bool await_ready() noexcept
@@ -258,6 +325,7 @@ RESUMEF_NS
 
 			void await_resume() noexcept
 			{
+				_mutex = nullptr;
 			}
 		protected:
 			detail::mutex_v2_impl* _mutex;
@@ -270,73 +338,32 @@ RESUMEF_NS
 
 
 
-		struct [[nodiscard]] mutex_t::timeout_awaiter
+
+		struct [[nodiscard]] mutex_t::timeout_awaiter : public event_t::timeout_awaitor_impl<awaiter>
 		{
-			timeout_awaiter(detail::mutex_v2_impl* mtx, clock_type::time_point tp) noexcept
-				: _mutex(mtx)
-				, _tp(tp)
+			timeout_awaiter(clock_type::time_point tp, detail::mutex_v2_impl * mtx) noexcept
+				: event_t::timeout_awaitor_impl<mutex_t::awaiter>(tp, mtx)
+			{}
+
+			bool await_resume() noexcept
 			{
-				assert(_mutex != nullptr);
+				detail::mutex_v2_impl* mtx = this->_mutex;
+				this->_mutex = nullptr;
+				return mtx != nullptr;
 			}
-
-			~timeout_awaiter() noexcept(false)
-			{
-				assert(_mutex == nullptr);
-				if (_mutex != nullptr)
-				{
-					throw lock_exception(error_code::not_await_lock);
-				}
-			}
-
-			bool await_ready() noexcept
-			{
-				return false;
-			}
-
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
-			{
-				_PromiseT& promise = handler.promise();
-				auto* parent = promise.get_state();
-				_root = parent->get_root();
-
-				scoped_lock<detail::mutex_v2_impl::lock_type> lock_(_mutex->_lock);
-				if (_mutex->try_lock_lockless(_root))
-					return false;
-
-				_state = new detail::state_mutex_t();
-				_state->on_await_suspend(handler, parent->get_scheduler(), _root);
-
-				_mutex->add_wait_list_lockless(_state.get());
-
-				return true;
-			}
-
-			scoped_lock_mutex_t await_resume() noexcept
-			{
-				mutex_impl_ptr mtx = _root ? _mutex->shared_from_this() : nullptr;
-				_mutex = nullptr;
-
-				return { std::adopt_lock, mtx, _root };
-			}
-		protected:
-			detail::mutex_v2_impl* _mutex;
-			clock_type::time_point _tp;
-			counted_ptr<detail::state_mutex_t> _state;
-			state_base_t* _root = nullptr;
 		};
 
 		template <class _Rep, class _Period>
 		inline mutex_t::timeout_awaiter mutex_t::try_lock_until(const std::chrono::time_point<_Rep, _Period>& tp) const noexcept
 		{
-			return { _mutex.get(), tp };
+			return { tp, _mutex.get() };
 		}
 
 		template <class _Rep, class _Period>
 		inline mutex_t::timeout_awaiter mutex_t::try_lock_for(const std::chrono::duration<_Rep, _Period>& dt) const noexcept
 		{
 			auto tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
-			return { _mutex.get(), tp };
+			return { tp, _mutex.get() };
 		}
 
 

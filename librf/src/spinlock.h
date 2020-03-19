@@ -88,172 +88,127 @@ RESUMEF_NS
 	};
 
 #endif
-	
+
 	namespace detail
 	{
-		template<class _Ty>
-		void _Lock_ref(_Ty& _LkN)
+#if RESUMEF_ENABLE_CONCEPT
+		template<typename T>
+		concept _LockAssembleT = requires(T && v)
 		{
-			_LkN.lock();
-		}
+			{ v.size() };
+			{ v[0] };
+			{ v._Lock_ref(v[0]) } ->void;
+			{ v._Try_lock_ref(v[0]) } ->bool;
+			{ v._Unlock_ref(v[0]) } ->void;
+			{ v._Yield() };
+			{ v._ReturnValue() };
+			{ v._ReturnValue(0) };
+			requires std::is_integral_v<decltype(v.size())>;
+		};
+#else
+#define _LockAssembleT typename
+#endif
+
 		template<class _Ty>
-		void _Lock_ref(std::reference_wrapper<_Ty> _LkN)
+		struct _LockVectorAssembleT
 		{
-			_LkN.get().lock();
-		}
-		template<class _Ty>
-		void _Unlock_ref(_Ty& _LkN)
-		{
-			_LkN.unlock();
-		}
-		template<class _Ty>
-		void _Unlock_ref(std::reference_wrapper<_Ty> _LkN)
-		{
-			_LkN.get().unlock();
-		}
-		template<class _Ty>
-		bool _Try_lock_ref(_Ty& _LkN)
-		{
-			return _LkN.try_lock();
-		}
-		template<class _Ty>
-		bool _Try_lock_ref(std::reference_wrapper<_Ty> _LkN)
-		{
-			return _LkN.get().try_lock();
-		}
-
-		template<class _Ty>
-		void _Lock_from_locks(const int _Target, std::vector<_Ty>& _LkN) { // lock _LkN[_Target]
-			_Lock_ref(_LkN[_Target]);
-		}
-		// FUNCTION TEMPLATE _Try_lock_from_locks
-		template<class _Ty>
-		bool _Try_lock_from_locks(const int _Target, std::vector<_Ty>& _LkN) { // try to lock _LkN[_Target]
-			return _Try_lock_ref(_LkN[_Target]);
-		}
-
-		// FUNCTION TEMPLATE _Unlock_locks
-		template<class _Ty>
-		void _Unlock_locks(int _First, int _Last, std::vector<_Ty>& _LkN) noexcept /* terminates */ {
-			for (; _First != _Last; ++_First) {
-				_Unlock_ref(_LkN[_First]);
-			}
-		}
-
-		// FUNCTION TEMPLATE try_lock
-		template<class _Ty>
-		int _Try_lock_range(const int _First, const int _Last, std::vector<_Ty>& _LkN) {
-			int _Next = _First;
-			try {
-				for (; _Next != _Last; ++_Next) {
-					if (!_Try_lock_from_locks(_Next, _LkN)) { // try_lock failed, backout
-						_Unlock_locks(_First, _Next, _LkN);
-						return _Next;
-					}
-				}
-			}
-			catch (...) {
-				_Unlock_locks(_First, _Next, _LkN);
-				throw;
-			}
-
-			return -1;
-		}
-
-		// FUNCTION TEMPLATE lock
-		template<class _Ty>
-		int _Lock_attempt(const int _Hard_lock, std::vector<_Ty>& _LkN) {
-			// attempt to lock 3 or more locks, starting by locking _LkN[_Hard_lock] and trying to lock the rest
-			_Lock_from_locks(_Hard_lock, _LkN);
-			int _Failed = -1;
-			int _Backout_start = _Hard_lock; // that is, unlock _Hard_lock
-
-			try {
-				_Failed = _Try_lock_range(0, _Hard_lock, _LkN);
-				if (_Failed == -1) {
-					_Backout_start = 0; // that is, unlock [0, _Hard_lock] if the next throws
-					_Failed = _Try_lock_range(_Hard_lock + 1, (int)_LkN.size(), _LkN);
-					if (_Failed == -1) { // we got all the locks
-						return -1;
-					}
-				}
-			}
-			catch (...) {
-				_Unlock_locks(_Backout_start, _Hard_lock + 1, _LkN);
-				throw;
-			}
-
-			// we didn't get all the locks, backout
-			_Unlock_locks(_Backout_start, _Hard_lock + 1, _LkN);
-			std::this_thread::yield();
-
-			return _Failed;
-		}
-
-		template<class _Ty>
-		void _Lock_nonmember3(std::vector<_Ty>& _LkN) {
-			// lock 3 or more locks, without deadlock
-			int _Hard_lock = 0;
-			while (_Hard_lock != -1) {
-				_Hard_lock = _Lock_attempt(_Hard_lock, _LkN);
-			}
-		}
-					
-		template <class _Lock0, class _Lock1>
-		bool _Lock_attempt_small2(_Lock0& _Lk0, _Lock1& _Lk1)
-		{
-			// attempt to lock 2 locks, by first locking _Lk0, and then trying to lock _Lk1 returns whether to try again
-			_Lock_ref(_Lk0);
-			try {
-				if (_Try_lock_ref(_Lk1))
-					return false;
-			}
-			catch (...) {
-				_Unlock_ref(_Lk0);
-				throw;
-			}
-
-			_Unlock_ref(_Lk0);
-			std::this_thread::yield();
-			return true;
-		}
-
-		template <class _Lock0, class _Lock1>
-		void _Lock_nonmember2(_Lock0& _Lk0, _Lock1& _Lk1)
-		{
-			// lock 2 locks, without deadlock, special case for better codegen and reduced metaprogramming for common case
-			while (_Lock_attempt_small2(_Lk0, _Lk1) && _Lock_attempt_small2(_Lk1, _Lk0)) { // keep trying
-			}
-		}
-
-		template<class _Ty>
-		void _Lock_range(std::vector<_Ty>& lockes)
-		{
-			if (lockes.size() == 0)
+		private:
+			std::vector<_Ty>& _Lks;
+		public:
+			_LockVectorAssembleT(std::vector<_Ty>& _LkN)
+				: _Lks(_LkN)
+			{}
+			size_t size() const
 			{
+				return _Lks.size();
 			}
-			else if (lockes.size() == 1)
+			_Ty& operator[](int _Idx)
 			{
-				_Lock_ref(lockes[0]);
+				return _Lks[_Idx];
 			}
-			else if (lockes.size() == 2)
+			void _Lock_ref(_Ty& _LkN) const
 			{
-				_Lock_nonmember2(lockes[0], lockes[1]);
+				_LkN.lock();
 			}
-			else
+			bool _Try_lock_ref(_Ty& _LkN) const
 			{
-				_Lock_nonmember3(lockes);
+				return _LkN.try_lock();
 			}
-		}
+			void _Unlock_ref(_Ty& _LkN) const
+			{
+				_LkN.unlock();
+			}
+			void _Yield() const
+			{
+				std::this_thread::yield();
+			}
+			void _ReturnValue() const noexcept {}
+			template<class U>
+			U _ReturnValue(U v) const noexcept
+			{
+				return v;
+			}
+		};
+
+		template<class _Ty>
+		struct _LockVectorAssembleT<std::reference_wrapper<_Ty>>
+		{
+		private:
+			std::vector<std::reference_wrapper<_Ty>>& _Lks;
+		public:
+			_LockVectorAssembleT(std::vector<std::reference_wrapper<_Ty>>& _LkN)
+				: _Lks(_LkN)
+			{}
+			size_t size() const
+			{
+				return _Lks.size();
+			}
+			std::reference_wrapper<_Ty> operator[](int _Idx)
+			{
+				return _Lks[_Idx];
+			}
+			void _Lock_ref(std::reference_wrapper<_Ty> _LkN) const
+			{
+				_LkN.get().lock();
+			}
+			void _Unlock_ref(std::reference_wrapper<_Ty> _LkN) const
+			{
+				_LkN.get().unlock();
+			}
+			bool _Try_lock_ref(std::reference_wrapper<_Ty> _LkN) const
+			{
+				return _LkN.get().try_lock();
+			}
+			void _Yield() const
+			{
+				std::this_thread::yield();
+			}
+			void _ReturnValue() const noexcept {}
+			template<class U>
+			U _ReturnValue(U v) const noexcept
+			{
+				return v;
+			}
+		};
 	}
+}
 
+#define LOCK_ASSEMBLE_AWAIT(a) (a)
+#define LOCK_ASSEMBLE_RETURN(a) return (a)
+#include "without_deadlock_assemble.inl"
+#undef LOCK_ASSEMBLE_AWAIT
+#undef LOCK_ASSEMBLE_RETURN
+
+RESUMEF_NS
+{
 	template<class _Ty>
 	class scoped_lock_range { // class with destructor that unlocks mutexes
 	public:
 		explicit scoped_lock_range(std::vector<_Ty>& locks_)
 			: _LkN(locks_)
 		{
-			detail::_Lock_range(locks_);
+			detail::_LockVectorAssembleT<_Ty> LA{ _LkN };
+			detail::_Lock_range(LA);
 		}
 
 		explicit scoped_lock_range(std::adopt_lock_t, std::vector<_Ty>& locks_)
@@ -263,7 +218,8 @@ RESUMEF_NS
 
 		~scoped_lock_range() noexcept
 		{
-			detail::_Unlock_locks(0, (int)_LkN.size(), _LkN);
+			detail::_LockVectorAssembleT<_Ty> LA{ _LkN };
+			detail::_Unlock_locks(0, (int)_LkN.size(), LA);
 		}
 
 		scoped_lock_range(const scoped_lock_range&) = delete;

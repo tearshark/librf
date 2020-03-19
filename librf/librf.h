@@ -40,10 +40,10 @@
 
 #include "src/def.h"
 #include "src/macro_def.inl"
-#include "src/spinlock.h"
 #include "src/counted_ptr.h"
 #include "src/type_traits.inl"
 #include "src/type_concept.inl"
+#include "src/spinlock.h"
 #include "src/state.h"
 #include "src/future.h"
 #include "src/promise.h"
@@ -65,8 +65,8 @@
 #include "src/when.h"
 
 #include "src/_awaker.h"
-#include "src/mutex.h"
 #include "src/ring_queue.h"
 #include "src/intrusive_link_queue.h"
 #include "src/channel.h"
 #include "src/event.h"
+#include "src/mutex.h"

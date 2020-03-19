@@ -69,7 +69,6 @@ RESUMEF_NS
 			virtual bool on_notify(event_v2_impl* eptr) = 0;
 			virtual bool on_timeout() = 0;
 
-			//将自己加入到通知链表里
 			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			scheduler_t* on_await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 			{
@@ -83,8 +82,19 @@ RESUMEF_NS
 				return sch;
 			}
 
-			//为浸入式单向链表提供的next指针
+			inline void add_timeout_timer(std::chrono::system_clock::time_point tp)
+			{
+				this->_thandler = this->_scheduler->timer()->add_handler(tp, 
+					[st = counted_ptr<state_event_base_t>{ this }](bool canceld)
+					{
+						if (!canceld)
+							st->on_timeout();
+					});
+			}
+
+			//为侵入式单向链表提供的next指针
 			//counted_ptr<state_event_base_t> _next = nullptr;
+			timer_handler _thandler;
 		};
 
 		struct state_event_t : public state_event_base_t
@@ -96,10 +106,6 @@ RESUMEF_NS
 			virtual void on_cancel() noexcept override;
 			virtual bool on_notify(event_v2_impl* eptr) override;
 			virtual bool on_timeout() override;
-		public:
-			//typedef spinlock lock_type;
-
-			timer_handler _thandler;
 		protected:
 			//_value引用awaitor保存的值，这样可以尽可能减少创建state的可能。而不必进入没有state就没有value实体被用于返回。
 			//在调用on_notify()或on_timeout()任意之一后，置为nullptr。
@@ -118,12 +124,7 @@ RESUMEF_NS
 			virtual void on_cancel() noexcept override;
 			virtual bool on_notify(event_v2_impl* eptr) override;
 			virtual bool on_timeout() override;
-		public:
-			//typedef spinlock lock_type;
 
-			//为浸入式单向链表提供的next指针
-			//counted_ptr<state_event_t> _next = nullptr;
-			timer_handler _thandler;
 			std::atomic<intptr_t> _counter;
 		protected:
 			bool* _value;
@@ -202,7 +203,7 @@ RESUMEF_NS
 		struct event_t::timeout_awaitor_impl : public _Btype
 		{
 			template<class... Args>
-			timeout_awaitor_impl(clock_type::time_point tp, Args... args)
+			timeout_awaitor_impl(clock_type::time_point tp, Args&&... args) noexcept(std::is_nothrow_constructible_v<_Btype, Args&&...>)
 				: _Btype(std::forward<Args>(args)...)
 				, _tp(tp)
 			{}
@@ -211,29 +212,18 @@ RESUMEF_NS
 			{
 				if (!_Btype::await_suspend(handler))
 					return false;
-
-				_PromiseT& promise = handler.promise();
-				auto* parent_state = promise.get_state();
-				scheduler_t* sch = parent_state->get_scheduler();
-
-				this->_state->_thandler = sch->timer()->add_handler(_tp, [st = this->_state](bool canceld)
-				{
-					if (!canceld)
-						st->on_timeout();
-				});
-
+				this->_state->add_timeout_timer(_tp);
 				return true;
 			}
 		protected:
 			clock_type::time_point _tp;
 		};
 
-		struct [[nodiscard]] event_t::timeout_awaiter : event_t::timeout_awaitor_impl<event_t::awaiter>
+		struct [[nodiscard]] event_t::timeout_awaiter : timeout_awaitor_impl<event_t::awaiter>
 		{
 			timeout_awaiter(clock_type::time_point tp, detail::event_v2_impl* evt) noexcept
-				: timeout_awaitor_impl(tp, evt)
-			{
-			}
+				: timeout_awaitor_impl<event_t::awaiter>(tp, evt)
+			{}
 		};
 
 		template<class _Rep, class _Period>

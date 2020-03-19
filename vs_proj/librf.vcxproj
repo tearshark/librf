@@ -263,6 +263,7 @@
     <None Include="..\librf\src\channel_v2.inl" />
     <None Include="..\librf\src\event_v2.inl" />
     <None Include="..\librf\src\exception.inl" />
+    <None Include="..\librf\src\without_deadlock_assemble.inl" />
     <None Include="..\librf\src\macro_def.inl" />
     <None Include="..\librf\src\mutex_v2.inl" />
     <None Include="..\librf\src\promise.inl" />
