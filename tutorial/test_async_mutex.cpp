@@ -145,7 +145,7 @@ static future_t<> resumable_mutex_range_push(size_t idx, mutex_t a, mutex_t b, m
 {
 	for (int i = 0; i < 10; ++i)
 	{
-		auto __lockers = mutex_t::lock(a, b, c);
+		auto __lockers = co_await mutex_t::lock(a, b, c);
 
 		++g_counter;
 		std::cout << "push:" << g_counter << " on " << idx << std::endl;
@@ -158,7 +158,7 @@ static future_t<> resumable_mutex_range_pop(size_t idx, mutex_t a, mutex_t b, mu
 {
 	for (int i = 0; i < 10; ++i)
 	{
-		auto __lockers = mutex_t::lock(a, b, c);
+		auto __lockers = co_await mutex_t::lock(a, b, c);
 
 		--g_counter;
 		std::cout << "pop :" << g_counter << " on " << idx << std::endl;

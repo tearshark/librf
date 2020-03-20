@@ -546,10 +546,10 @@ RESUMEF_NS
 		}
 
 		template<class... _Mtxs, typename>
-		inline void mutex_t::unlock_address(void* unique_address, mutex_t& _First, _Mtxs&... _Rest)
+		inline void mutex_t::unlock(void* unique_address, _Mtxs&... mtxs)
 		{
-			_First.unlock(unique_address);
-			unlock_address(unique_address, _Rest...);
+			int _Ignored[] = { (mtxs.unlock(unique_address), 0)... };
+			(void)_Ignored;
 		}
 	}
 }

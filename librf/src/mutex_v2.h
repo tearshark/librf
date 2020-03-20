@@ -52,12 +52,15 @@ RESUMEF_NS
 			bool try_lock_until(const std::chrono::time_point<_Rep, _Period>& tp, void* unique_address);
 			void unlock(void* unique_address) const;
 
+
+
 			struct _MutexAwaitAssembleT;
 
 			template<class... _Mtxs
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<std::remove_cvref_t<_Mtxs>, mutex_t>...>>
 			>
 			static future_t<scoped_unlock_range_t> lock(_Mtxs&... mtxs);
+
 
 			template<class... _Mtxs
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<std::remove_cvref_t<_Mtxs>, mutex_t>...>>
@@ -67,10 +70,7 @@ RESUMEF_NS
 			template<class... _Mtxs
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<std::remove_cvref_t<_Mtxs>, mutex_t>...>>
 			>
-			static void unlock(void* unique_address, _Mtxs&... mtxs)
-			{
-				unlock_address(unique_address, mtxs...);
-			}
+			static void unlock(void* unique_address, _Mtxs&... mtxs);
 
 			mutex_t(const mutex_t&) = default;
 			mutex_t(mutex_t&&) = default;
@@ -79,12 +79,6 @@ RESUMEF_NS
 		private:
 			friend struct scoped_lock_mutex_t;
 			mutex_impl_ptr _mutex;
-
-			template<class... _Mtxs
-				, typename = std::enable_if_t<std::conjunction_v<std::is_same<std::remove_cvref_t<_Mtxs>, mutex_t>...>>
-			>
-			static void unlock_address(void* unique_address, mutex_t& _First, _Mtxs&... _Rest);
-			static void unlock_address(void*) {}
 		};
 	}
 }
