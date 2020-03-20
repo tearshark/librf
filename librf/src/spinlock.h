@@ -91,31 +91,13 @@ RESUMEF_NS
 
 	namespace detail
 	{
-#if RESUMEF_ENABLE_CONCEPT
-		template<typename T>
-		concept _LockAssembleT = requires(T && v)
-		{
-			{ v.size() };
-			{ v[0] };
-			{ v._Lock_ref(v[0]) } ->void;
-			{ v._Try_lock_ref(v[0]) } ->bool;
-			{ v._Unlock_ref(v[0]) } ->void;
-			{ v._Yield() };
-			{ v._ReturnValue() };
-			{ v._ReturnValue(0) };
-			requires std::is_integral_v<decltype(v.size())>;
-		};
-#else
-#define _LockAssembleT typename
-#endif
-
-		template<class _Ty>
+		template<class _Ty, class _Cont = std::vector<_Ty>>
 		struct _LockVectorAssembleT
 		{
 		private:
-			std::vector<_Ty>& _Lks;
+			_Cont& _Lks;
 		public:
-			_LockVectorAssembleT(std::vector<_Ty>& _LkN)
+			_LockVectorAssembleT(_Cont& _LkN)
 				: _Lks(_LkN)
 			{}
 			size_t size() const
@@ -142,21 +124,18 @@ RESUMEF_NS
 			{
 				std::this_thread::yield();
 			}
-			void _ReturnValue() const noexcept {}
+			void _ReturnValue() const;
 			template<class U>
-			U _ReturnValue(U v) const noexcept
-			{
-				return v;
-			}
+			U _ReturnValue(U v) const;
 		};
 
-		template<class _Ty>
-		struct _LockVectorAssembleT<std::reference_wrapper<_Ty>>
+		template<class _Ty, class _Cont>
+		struct _LockVectorAssembleT<std::reference_wrapper<_Ty>, _Cont>
 		{
 		private:
-			std::vector<std::reference_wrapper<_Ty>>& _Lks;
+			_Cont& _Lks;
 		public:
-			_LockVectorAssembleT(std::vector<std::reference_wrapper<_Ty>>& _LkN)
+			_LockVectorAssembleT(_Cont& _LkN)
 				: _Lks(_LkN)
 			{}
 			size_t size() const
@@ -183,48 +162,83 @@ RESUMEF_NS
 			{
 				std::this_thread::yield();
 			}
-			void _ReturnValue() const noexcept {}
+			void _ReturnValue() const;
 			template<class U>
-			U _ReturnValue(U v) const noexcept
-			{
-				return v;
-			}
+			U _ReturnValue(U v) const;
 		};
-	}
-}
 
+#define LOCK_ASSEMBLE_NAME(fnName) scoped_lock_range_##fnName
 #define LOCK_ASSEMBLE_AWAIT(a) (a)
 #define LOCK_ASSEMBLE_RETURN(a) return (a)
 #include "without_deadlock_assemble.inl"
+#undef LOCK_ASSEMBLE_NAME
 #undef LOCK_ASSEMBLE_AWAIT
 #undef LOCK_ASSEMBLE_RETURN
+	}
 
-RESUMEF_NS
-{
-	template<class _Ty>
+	template<class _Ty, class _Cont = std::vector<_Ty>, class _Assemble = detail::_LockVectorAssembleT<_Ty, _Cont>>
 	class scoped_lock_range { // class with destructor that unlocks mutexes
 	public:
-		explicit scoped_lock_range(std::vector<_Ty>& locks_)
-			: _LkN(locks_)
+		explicit scoped_lock_range(_Cont& locks_)
+			: _LkN(&locks_)
+			, _LA(*_LkN)
 		{
-			detail::_LockVectorAssembleT<_Ty> LA{ _LkN };
-			detail::_Lock_range(LA);
+			detail::scoped_lock_range_lock_impl::_Lock_range(_LA);
+		}
+		explicit scoped_lock_range(_Cont& locks_, _Assemble& la_)
+			: _LkN(&locks_)
+			, _LA(la_)
+		{
+			detail::scoped_lock_range_lock_impl::_Lock_range(_LA);
 		}
 
-		explicit scoped_lock_range(std::adopt_lock_t, std::vector<_Ty>& locks_)
-			: _LkN(locks_)
+		explicit scoped_lock_range(std::adopt_lock_t, _Cont& locks_)
+			: _LkN(&locks_)
+			, _LA(*_LkN)
+		{ // construct but don't lock
+		}
+		explicit scoped_lock_range(std::adopt_lock_t, _Cont& locks_, _Assemble& la_)
+			: _LkN(&locks_)
+			, _LA(la_)
 		{ // construct but don't lock
 		}
 
 		~scoped_lock_range() noexcept
 		{
-			detail::_LockVectorAssembleT<_Ty> LA{ _LkN };
-			detail::_Unlock_locks(0, (int)_LkN.size(), LA);
+			if (_LkN != nullptr)
+				detail::scoped_lock_range_lock_impl::_Unlock_locks(0, (int)_LA.size(), _LA);
+		}
+
+		void unlock()
+		{
+			if (_LkN != nullptr)
+			{
+				_LkN = nullptr;
+				detail::scoped_lock_range_lock_impl::_Unlock_locks(0, (int)_LA.size(), _LA);
+			}
 		}
 
 		scoped_lock_range(const scoped_lock_range&) = delete;
 		scoped_lock_range& operator=(const scoped_lock_range&) = delete;
+
+		scoped_lock_range(scoped_lock_range&& _Right)
+			: _LkN(_Right._LkN)
+			, _LA(std::move(_Right._LA))
+		{
+			_Right._LkN = nullptr;
+		}
+		scoped_lock_range& operator=(scoped_lock_range&& _Right)
+		{
+			if (this != &_Right)
+			{
+				_LkN = _Right._LkN;
+				_Right._LkN = nullptr;
+
+				_LA = std::move(_Right._LA);
+			}
+		}
 	private:
-		std::vector<_Ty>& _LkN;
+		_Cont* _LkN;
+		_Assemble _LA;
 	};
 }

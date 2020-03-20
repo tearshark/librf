@@ -2,9 +2,9 @@
 
 #ifndef RESUMEF_ENABLE_CONCEPT
 #ifdef __cpp_lib_concepts
-#define RESUMEF_ENABLE_CONCEPT	1
+#define RESUMEF_ENABLE_CONCEPT	0
 #else
-#define RESUMEF_ENABLE_CONCEPT	1
+#define RESUMEF_ENABLE_CONCEPT	0
 #endif	//#ifdef __cpp_lib_concepts
 #endif	//#ifndef RESUMEF_ENABLE_CONCEPT
 
@@ -117,6 +117,24 @@ RESUMEF_NS
 #define RESUMEF_ENABLE_IF(...) typename=std::enable_if_t<__VA_ARGS__>
 #define RESUMEF_REQUIRES(...) 
 
+#endif
+
+#if RESUMEF_ENABLE_CONCEPT
+template<typename T>
+concept _LockAssembleT = requires(T && v)
+{
+	{ v.size() };
+	{ v[0] };
+	{ v._Lock_ref(v[0]) };
+	{ v._Try_lock_ref(v[0]) };
+	{ v._Unlock_ref(v[0]) } ->void;
+	{ v._Yield() };
+	{ v._ReturnValue() };
+	{ v._ReturnValue(0) };
+	requires std::is_integral_v<decltype(v.size())>;
+};
+#else
+#define _LockAssembleT typename
 #endif
 
 }

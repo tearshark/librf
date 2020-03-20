@@ -141,10 +141,63 @@ static void resumable_mutex_async()
 	std::cout << "result:" << g_counter << std::endl;
 }
 
+static future_t<> resumable_mutex_range_push(size_t idx, mutex_t a, mutex_t b, mutex_t c)
+{
+	for (int i = 0; i < 10; ++i)
+	{
+		auto __lockers = mutex_t::lock(a, b, c);
+
+		++g_counter;
+		std::cout << "push:" << g_counter << " on " << idx << std::endl;
+		
+		co_await 5ms;
+	}
+}
+
+static future_t<> resumable_mutex_range_pop(size_t idx, mutex_t a, mutex_t b, mutex_t c)
+{
+	for (int i = 0; i < 10; ++i)
+	{
+		auto __lockers = mutex_t::lock(a, b, c);
+
+		--g_counter;
+		std::cout << "pop :" << g_counter << " on " << idx << std::endl;
+
+		co_await 5ms;
+	}
+}
+
+static void resumable_mutex_lock_range()
+{
+	mutex_t mtxA, mtxB, mtxC;
+
+	//不同的线程里加锁也需要是线程安全的
+	std::thread push_th([&]
+	{
+		local_scheduler __ls__;
+
+		go resumable_mutex_range_push(10, mtxA, mtxB, mtxC);
+		go resumable_mutex_range_push(11, mtxA, mtxC, mtxB);
+
+		this_scheduler()->run_until_notask();
+	});
+
+	go resumable_mutex_range_pop(12, mtxC, mtxB, mtxA);
+	go resumable_mutex_range_pop(13, mtxB, mtxA, mtxC);
+
+	this_scheduler()->run_until_notask();
+	push_th.join();
+
+	std::cout << "result:" << g_counter << std::endl;
+}
+
 void resumable_main_mutex()
 {
 	resumable_mutex_synch();
 	std::cout << std::endl;
 
 	resumable_mutex_async();
+	std::cout << std::endl;
+
+	resumable_mutex_lock_range();
 }

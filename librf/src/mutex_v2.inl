@@ -110,6 +110,58 @@ RESUMEF_NS
 			mutex_v2_impl& operator=(const mutex_v2_impl&) = delete;
 			mutex_v2_impl& operator=(mutex_v2_impl&&) = delete;
 		};
+
+		struct _MutexAddressAssembleT
+		{
+		private:
+			void* _Address;
+		public:
+			std::vector<mutex_t> _Lks;
+
+			template<class... _Mtxs>
+			_MutexAddressAssembleT(void* unique_address, _Mtxs&... mtxs)
+				: _Address(unique_address)
+				, _Lks({ mtxs... })
+			{}
+			size_t size() const
+			{
+				return _Lks.size();
+			}
+			mutex_t& operator[](int _Idx)
+			{
+				return _Lks[_Idx];
+			}
+			void _Lock_ref(mutex_t& _LkN) const
+			{
+				return _LkN.lock(_Address);
+			}
+			bool _Try_lock_ref(mutex_t& _LkN) const
+			{
+				return _LkN.try_lock(_Address);
+			}
+			void _Unlock_ref(mutex_t& _LkN) const
+			{
+				_LkN.unlock(_Address);
+			}
+			void _Yield() const
+			{
+				std::this_thread::yield();
+			}
+			void _ReturnValue() const noexcept {}
+			template<class U>
+			U _ReturnValue(U v) const noexcept
+			{
+				return v;
+			}
+		};
+
+#define LOCK_ASSEMBLE_NAME(fnName) mutex_lock_await_##fnName
+#define LOCK_ASSEMBLE_AWAIT(a) co_await (a)
+#define LOCK_ASSEMBLE_RETURN(a) co_return (a)
+#include "without_deadlock_assemble.inl"
+#undef LOCK_ASSEMBLE_NAME
+#undef LOCK_ASSEMBLE_AWAIT
+#undef LOCK_ASSEMBLE_RETURN
 	}
 
 	inline namespace mutex_v2
@@ -393,5 +445,112 @@ RESUMEF_NS
 		{
 			_mutex->unlock(unique_address);
 		}
+
+		struct [[nodiscard]] scoped_unlock_range_t
+		{
+			//此函数，应该在try_lock()获得锁后使用
+			//或者在协程里，由awaiter使用
+			scoped_unlock_range_t(std::vector<mutex_t>&& mtxs, void* sch)
+				: _mutex(std::move(mtxs))
+				, _owner(sch)
+			{}
+
+			~scoped_unlock_range_t()
+			{
+				if (_owner != nullptr)
+				{
+					for(mutex_t& mtx : _mutex)
+						mtx.unlock(_owner);
+				}
+			}
+
+			inline void unlock() noexcept
+			{
+				if (_owner != nullptr)
+				{
+					for (mutex_t& mtx : _mutex)
+						mtx.unlock(_owner);
+					_owner = nullptr;
+				}
+			}
+
+			scoped_unlock_range_t(const scoped_unlock_range_t&) = delete;
+			scoped_unlock_range_t& operator = (const scoped_unlock_range_t&) = delete;
+			scoped_unlock_range_t(scoped_unlock_range_t&&) = default;
+			scoped_unlock_range_t& operator = (scoped_unlock_range_t&&) = default;
+		private:
+			std::vector<mutex_t> _mutex;
+			void* _owner;
+		};
+
+		struct mutex_t::_MutexAwaitAssembleT
+		{
+		private:
+			void* _Address;
+		public:
+			std::vector<mutex_t> _Lks;
+
+			template<class... _Mtxs>
+			_MutexAwaitAssembleT(void* unique_address, _Mtxs&... mtxs)
+				: _Address(unique_address)
+				, _Lks({ mtxs... })
+			{}
+			size_t size() const
+			{
+				return _Lks.size();
+			}
+			mutex_t& operator[](int _Idx)
+			{
+				return _Lks[_Idx];
+			}
+			auto _Lock_ref(mutex_t& _LkN) const
+			{
+				return _LkN.lock();
+			}
+			auto _Try_lock_ref(mutex_t& _LkN) const
+			{
+				return _LkN.try_lock();
+			}
+			void _Unlock_ref(mutex_t& _LkN) const
+			{
+				_LkN.unlock(_Address);
+			}
+			future_t<> _Yield() const
+			{
+				for (int cnt = rand() % (1 + _Lks.size()); cnt >= 0; --cnt)
+					co_await ::resumef::yield();
+			}
+			future_t<> _ReturnValue() const;
+			template<class U>
+			future_t<U> _ReturnValue(U v) const;
+		};
+
+		template<class... _Mtxs, typename>
+		inline future_t<scoped_unlock_range_t> mutex_t::lock(_Mtxs&... mtxs)
+		{
+			auto* root = root_state();
+			_MutexAwaitAssembleT MAA(root, mtxs...);
+			co_await detail::mutex_lock_await_lock_impl::_Lock_range(MAA);
+
+			co_return scoped_unlock_range_t{ std::move(MAA._Lks), root };
+		}
+
+
+		template<class... _Mtxs, typename>
+		inline scoped_unlock_range_t mutex_t::lock(void* unique_address, _Mtxs&... mtxs)
+		{
+			detail::_MutexAddressAssembleT MAA(unique_address, mtxs...);
+			detail::scoped_lock_range_lock_impl::_Lock_range(MAA);
+			
+			return scoped_unlock_range_t{ std::move(MAA._Lks), unique_address };
+		}
+
+		template<class... _Mtxs, typename>
+		inline void mutex_t::unlock_address(void* unique_address, mutex_t& _First, _Mtxs&... _Rest)
+		{
+			_First.unlock(unique_address);
+			unlock_address(unique_address, _Rest...);
+		}
 	}
 }
+
