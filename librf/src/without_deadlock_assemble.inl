@@ -13,7 +13,7 @@ struct LOCK_ASSEMBLE_NAME(lock_impl)
 	// FUNCTION TEMPLATE try_lock
 	template<_LockAssembleT _LA>
 	static auto _Try_lock_range(const int _First, const int _Last, _LA& _LkN)
-		->decltype(_LkN._ReturnValue<int>(0))
+		->decltype(_LkN._ReturnValue(123))
 	{
 		int _Next = _First;
 		try {
@@ -37,10 +37,10 @@ struct LOCK_ASSEMBLE_NAME(lock_impl)
 	// FUNCTION TEMPLATE lock
 	template<_LockAssembleT _LA>
 	static auto _Lock_attempt(const int _Hard_lock, _LA& _LkN)
-		->decltype(_LkN._ReturnValue<int>(0))
+		->decltype(_LkN._ReturnValue(123))
 	{
 		// attempt to lock 3 or more locks, starting by locking _LkN[_Hard_lock] and trying to lock the rest
-		LOCK_ASSEMBLE_AWAIT(_LkN._Lock_ref(_LkN[_Hard_lock]));
+		(void)LOCK_ASSEMBLE_AWAIT(_LkN._Lock_ref(_LkN[_Hard_lock]));
 		int _Failed = -1;
 		int _Backout_start = _Hard_lock; // that is, unlock _Hard_lock
 
@@ -79,10 +79,10 @@ struct LOCK_ASSEMBLE_NAME(lock_impl)
 					
 	template<_LockAssembleT _LA>
 	static auto _Lock_attempt_small2(_LA& _LkN, const int _Idx0, const int _Idx1)
-		->decltype(_LkN._ReturnValue<bool>(false))
+		->decltype(_LkN._ReturnValue(false))
 	{
 		// attempt to lock 2 locks, by first locking _Lk0, and then trying to lock _Lk1 returns whether to try again
-		LOCK_ASSEMBLE_AWAIT(_LkN._Lock_ref(_LkN[_Idx0]));
+		(void)LOCK_ASSEMBLE_AWAIT(_LkN._Lock_ref(_LkN[_Idx0]));
 		try {
 			if (LOCK_ASSEMBLE_AWAIT(_LkN._Try_lock_ref(_LkN[_Idx1])))
 				LOCK_ASSEMBLE_RETURN(false);
@@ -116,15 +116,15 @@ struct LOCK_ASSEMBLE_NAME(lock_impl)
 		}
 		else if (lockes.size() == 1)
 		{
-			LOCK_ASSEMBLE_AWAIT(lockes._Lock_ref(lockes[0]));
+			(void)LOCK_ASSEMBLE_AWAIT(lockes._Lock_ref(lockes[0]));
 		}
 		else if (lockes.size() == 2)
 		{
-			LOCK_ASSEMBLE_AWAIT(_Lock_nonmember2(lockes));
+			(void)LOCK_ASSEMBLE_AWAIT(_Lock_nonmember2(lockes));
 		}
 		else
 		{
-			LOCK_ASSEMBLE_AWAIT(_Lock_nonmember3(lockes));
+			(void)LOCK_ASSEMBLE_AWAIT(_Lock_nonmember3(lockes));
 		}
 	}
 };
