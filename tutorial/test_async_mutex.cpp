@@ -23,14 +23,14 @@ static future_t<> test_mutex_pop(size_t idx)
 	for (size_t i = 0; i < N / 2; ++i)
 	{
 		{
-			auto _locker = co_await g_lock.lock();	//_locker析构后，会调用对应的unlock()函数。
+			scoped_unlock_t _locker = co_await g_lock.lock();	//_locker析构后，会调用对应的unlock()函数。
 
 			--g_counter;
 			std::cout << "pop :" << g_counter << " on " << idx << std::endl;
 
 			co_await 50ms;
 
-			auto _locker_2 = co_await g_lock;
+			scoped_unlock_t _locker_2 = co_await g_lock;
 
 			--g_counter;
 			std::cout << "pop :" << g_counter << " on " << idx << std::endl;
@@ -47,7 +47,7 @@ static future_t<> test_mutex_push(size_t idx)
 	for (size_t i = 0; i < N; ++i)
 	{
 		{
-			auto _locker = co_await g_lock.lock();
+			scoped_unlock_t _locker = co_await g_lock.lock();
 
 			++g_counter;
 			std::cout << "push:" << g_counter << " on " << idx << std::endl;
@@ -105,7 +105,7 @@ static std::thread test_mutex_async_push(size_t idx)
 		{
 			if (g_lock.try_lock_for(500ms, &provide_unique_address))
 			{
-				//scoped_lock_mutex_t _locker(std::adopt_lock, g_lock, &provide_unique_address);
+				//scoped_unlock_t _locker(std::adopt_lock, g_lock, &provide_unique_address);
 
 				++g_counter;
 				std::cout << "push:" << g_counter << " on " << idx << std::endl;
@@ -143,9 +143,9 @@ static void resumable_mutex_async()
 
 static future_t<> resumable_mutex_range_push(size_t idx, mutex_t a, mutex_t b, mutex_t c)
 {
-	for (int i = 0; i < 1000001; ++i)
+	for (int i = 0; i < 1000; ++i)
 	{
-		auto __lockers = co_await mutex_t::lock(a, b, c);
+		scoped_unlock_t __lockers = co_await mutex_t::lock(a, b, c);
 		assert(a.is_locked());
 		assert(b.is_locked());
 		assert(c.is_locked());
@@ -159,9 +159,9 @@ static future_t<> resumable_mutex_range_push(size_t idx, mutex_t a, mutex_t b, m
 
 static future_t<> resumable_mutex_range_pop(size_t idx, mutex_t a, mutex_t b, mutex_t c)
 {
-	for (int i = 0; i < 1000000; ++i)
+	for (int i = 0; i < 1000; ++i)
 	{
-		auto __lockers = co_await mutex_t::lock(a, b, c);
+		scoped_unlock_t __lockers = co_await mutex_t::lock(a, b, c);
 		assert(a.is_locked());
 		assert(b.is_locked());
 		assert(c.is_locked());
@@ -199,11 +199,11 @@ static void resumable_mutex_lock_range()
 
 void resumable_main_mutex()
 {
-	//resumable_mutex_synch();
-	//std::cout << std::endl;
+	resumable_mutex_synch();
+	std::cout << std::endl;
 
-	//resumable_mutex_async();
-	//std::cout << std::endl;
+	resumable_mutex_async();
+	std::cout << std::endl;
 
 	resumable_mutex_lock_range();
 }

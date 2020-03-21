@@ -166,21 +166,22 @@ RESUMEF_NS
 
 	inline namespace mutex_v2
 	{
-		struct [[nodiscard]] scoped_lock_mutex_t
+		template<>
+		struct [[nodiscard]] scoped_unlock_t<mutex_t>
 		{
 			typedef std::shared_ptr<detail::mutex_v2_impl> mutex_impl_ptr;
 
-			scoped_lock_mutex_t() {}
+			scoped_unlock_t() {}
 
 			//此函数，应该在try_lock()获得锁后使用
 			//或者在协程里，由awaiter使用
-			scoped_lock_mutex_t(std::adopt_lock_t, mutex_impl_ptr mtx, void* sch)
+			scoped_unlock_t(std::adopt_lock_t, void* sch, mutex_impl_ptr mtx)
 				: _mutex(std::move(mtx))
 				, _owner(sch)
 			{}
 
 			//此函数，适合在非协程里使用
-			scoped_lock_mutex_t(mutex_impl_ptr mtx, void* sch)
+			scoped_unlock_t(void* sch, mutex_impl_ptr mtx)
 				: _mutex(std::move(mtx))
 				, _owner(sch)
 			{
@@ -189,14 +190,14 @@ RESUMEF_NS
 			}
 
 
-			scoped_lock_mutex_t(std::adopt_lock_t, const mutex_t& mtx, void* sch)
-				: scoped_lock_mutex_t(std::adopt_lock, mtx._mutex, sch)
+			scoped_unlock_t(std::adopt_lock_t, void* sch, const mutex_t& mtx)
+				: scoped_unlock_t(std::adopt_lock, sch, mtx._mutex)
 			{}
-			scoped_lock_mutex_t(const mutex_t& mtx, void* sch)
-				: scoped_lock_mutex_t(mtx._mutex, sch)
+			scoped_unlock_t(void* sch, const mutex_t& mtx)
+				: scoped_unlock_t(sch, mtx._mutex)
 			{}
 
-			~scoped_lock_mutex_t()
+			~scoped_unlock_t()
 			{
 				if (_mutex != nullptr)
 					_mutex->unlock(_owner);
@@ -211,31 +212,10 @@ RESUMEF_NS
 				}
 			}
 
-			inline bool is_locked() const noexcept
-			{
-				return _mutex != nullptr && _mutex->owner() == _owner;
-			}
-
-			scoped_lock_mutex_t(const scoped_lock_mutex_t&) = delete;
-			scoped_lock_mutex_t& operator = (const scoped_lock_mutex_t&) = delete;
-
-			scoped_lock_mutex_t(scoped_lock_mutex_t&& _Right) noexcept
-				: _mutex(std::move(_Right._mutex))
-				, _owner(_Right._owner)
-			{
-				assert(_Right._mutex == nullptr);
-			}
-
-			scoped_lock_mutex_t& operator = (scoped_lock_mutex_t&& _Right) noexcept
-			{
-				if (this != &_Right)
-				{
-					_mutex = std::move(_Right._mutex);
-					assert(_Right._mutex == nullptr);
-					_owner = _Right._owner;
-				}
-				return *this;
-			}
+			scoped_unlock_t(const scoped_unlock_t&) = delete;
+			scoped_unlock_t& operator = (const scoped_unlock_t&) = delete;
+			scoped_unlock_t(scoped_unlock_t&& _Right) = default;
+			scoped_unlock_t& operator = (scoped_unlock_t&& _Right) = default;
 		private:
 			mutex_impl_ptr _mutex;
 			void* _owner;
@@ -293,12 +273,12 @@ RESUMEF_NS
 		{
 			using lock_awaiter::lock_awaiter;
 
-			scoped_lock_mutex_t await_resume() noexcept
+			scoped_unlock_t<mutex_t> await_resume() noexcept
 			{
 				mutex_impl_ptr mtx = _mutex ? _mutex->shared_from_this() : nullptr;
 				_mutex = nullptr;
 
-				return { std::adopt_lock, mtx, _root };
+				return { std::adopt_lock, _root, mtx };
 			}
 		};
 
@@ -312,18 +292,18 @@ RESUMEF_NS
 			return { _mutex.get() };
 		}
 
-		inline auto mutex_t::lock(std::defer_lock_t) const noexcept
+		struct mutex_t::manual_awaiter : public lock_awaiter
 		{
-			struct discard_unlock_awaiter : lock_awaiter
+			using lock_awaiter::lock_awaiter;
+			void await_resume() noexcept
 			{
-				using lock_awaiter::lock_awaiter;
-				void await_resume() noexcept
-				{
-					_mutex = nullptr;
-				}
-			};
+				_mutex = nullptr;
+			}
+		};
 
-			return discard_unlock_awaiter{ _mutex.get() };
+		inline mutex_t::manual_awaiter mutex_t::lock(adopt_manual_unlock_t) const noexcept
+		{
+			return { _mutex.get() };
 		}
 
 		inline bool mutex_t::is_locked() const
@@ -485,6 +465,8 @@ RESUMEF_NS
 			_mutex->unlock(unique_address);
 		}
 
+
+
 		struct mutex_t::_MutexAwaitAssembleT
 		{
 		public:
@@ -506,7 +488,7 @@ RESUMEF_NS
 			}
 			auto _Lock_ref(mutex_t& _LkN) const
 			{
-				return _LkN.lock(std::defer_lock);
+				return _LkN.lock(adopt_manual_unlock);
 			}
 			auto _Try_lock_ref(mutex_t& _LkN) const
 			{
@@ -527,24 +509,36 @@ RESUMEF_NS
 			future_t<> _ReturnValue() const;
 			template<class U>
 			future_t<U> _ReturnValue(U v) const;
+
+			_MutexAwaitAssembleT(const _MutexAwaitAssembleT&) = default;
+			_MutexAwaitAssembleT& operator = (const _MutexAwaitAssembleT&) = default;
+			_MutexAwaitAssembleT(_MutexAwaitAssembleT&& _Right) = default;
+			_MutexAwaitAssembleT& operator = (_MutexAwaitAssembleT&& _Right) = default;
 		};
 
-		struct [[nodiscard]] scoped_unlock_range_t
+		template<class... _Mtxs>
+		struct [[nodiscard]] scoped_unlock_t
 		{
 			mutex_t::_MutexAwaitAssembleT _MAA;
 
 			//此函数，应该在try_lock()获得锁后使用
 			//或者在协程里，由awaiter使用
-			template<class... _Mtxs>
-			scoped_unlock_range_t(void* unique_address, _Mtxs&&... mtxs)
-				: _MAA(unique_address, std::forward<_Mtxs>(mtxs)...)
+			template<class... U>
+			scoped_unlock_t(void* sch, U&&... mtxs)
+				: _MAA(sch, std::forward<U>(mtxs)...)
+			{
+				detail::scoped_lock_range_lock_impl::_Lock_range(_MAA);
+			}
+			template<class... U>
+			scoped_unlock_t(std::adopt_lock_t, void* sch, U&&... mtxs)
+				: _MAA(sch, std::forward<U>(mtxs)...)
 			{}
 
-			~scoped_unlock_range_t()
+			~scoped_unlock_t()
 			{
 				if (_MAA._owner != nullptr)
 				{
-					for(mutex_t& mtx : _MAA._mutex)
+					for (mutex_t& mtx : _MAA._mutex)
 						mtx.unlock(_MAA._owner);
 				}
 			}
@@ -559,29 +553,28 @@ RESUMEF_NS
 				}
 			}
 
-			scoped_unlock_range_t(const scoped_unlock_range_t&) = delete;
-			scoped_unlock_range_t& operator = (const scoped_unlock_range_t&) = delete;
-			scoped_unlock_range_t(scoped_unlock_range_t&& _Right) noexcept = default;
-			scoped_unlock_range_t& operator = (scoped_unlock_range_t&& _Right) noexcept = default;
+			scoped_unlock_t(const scoped_unlock_t&) = delete;
+			scoped_unlock_t& operator = (const scoped_unlock_t&) = delete;
+			scoped_unlock_t(scoped_unlock_t&& _Right) = default;
+			scoped_unlock_t& operator = (scoped_unlock_t&& _Right) = default;
 		};
 
+		template<class... _Mtxs>
+		scoped_unlock_t()->scoped_unlock_t<scoped_unlock_t<_Mtxs...>&&>;
+
 		template<class... _Mtxs, typename>
-		inline future_t<scoped_unlock_range_t> mutex_t::lock(_Mtxs&... mtxs)
+		inline future_t<scoped_unlock_t<_Mtxs...>> mutex_t::lock(_Mtxs&... mtxs)
 		{
-			scoped_unlock_range_t unlock_guard{ root_state(), mtxs... };
+			scoped_unlock_t<_Mtxs...> unlock_guard{ std::adopt_lock, root_state(), mtxs... };
 			co_await detail::mutex_lock_await_lock_impl::_Lock_range(unlock_guard._MAA);
-			co_return unlock_guard;
+			co_return std::move(unlock_guard);
 		}
 
 		template<class... _Mtxs, typename>
-		inline scoped_unlock_range_t mutex_t::lock(void* unique_address, _Mtxs&... mtxs)
+		inline scoped_unlock_t<_Mtxs...> mutex_t::lock(void* unique_address, _Mtxs&... mtxs)
 		{
 			assert(unique_address != nullptr);
-
-			detail::_MutexAddressAssembleT MAA(unique_address, mtxs...);
-			detail::scoped_lock_range_lock_impl::_Lock_range(MAA);
-			
-			return scoped_unlock_range_t{ std::move(MAA._Lks), unique_address };
+			return { unique_address, mtxs... };
 		}
 
 		template<class... _Mtxs, typename>
