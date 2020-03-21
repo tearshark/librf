@@ -40,6 +40,8 @@ RESUMEF_NS
 
 		bool state_mutex_t::on_notify(mutex_v2_impl* eptr)
 		{
+			assert(eptr != nullptr);
+
 			mutex_v2_impl** oldValue = _value.load(std::memory_order_acquire);
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
 			{
@@ -139,12 +141,16 @@ RESUMEF_NS
 
 		bool mutex_v2_impl::try_lock(void* sch)
 		{
+			assert(sch != nullptr);
+
 			scoped_lock<detail::mutex_v2_impl::lock_type> lock_(_lock);
 			return try_lock_lockless(sch);
 		}
 
 		bool mutex_v2_impl::try_lock_until(clock_type::time_point tp, void* sch)
 		{
+			assert(sch != nullptr);
+
 			do
 			{
 				if (try_lock(sch))
@@ -156,16 +162,18 @@ RESUMEF_NS
 
 		bool mutex_v2_impl::try_lock_lockless(void* sch) noexcept
 		{
-			void* oldValue = _owner.load(std::memory_order_relaxed);
+			assert(sch != nullptr);
+
+			void* oldValue = _owner.load(std::memory_order_acquire);
 			if (oldValue == nullptr)
 			{
-				_owner.store(sch, std::memory_order_relaxed);
-				_counter.fetch_add(1, std::memory_order_relaxed);
+				_owner.store(sch, std::memory_order_release);
+				_counter.fetch_add(1, std::memory_order_acq_rel);
 				return true;
 			}
 			if (oldValue == sch)
 			{
-				_counter.fetch_add(1, std::memory_order_relaxed);
+				_counter.fetch_add(1, std::memory_order_acq_rel);
 				return true;
 			}
 			return false;
@@ -173,27 +181,31 @@ RESUMEF_NS
 
 		bool mutex_v2_impl::unlock(void* sch)
 		{
+			assert(sch != nullptr);
+
 			scoped_lock<lock_type> lock_(_lock);
 
-			void* oldValue = _owner.load(std::memory_order_relaxed);
+			void* oldValue = _owner.load(std::memory_order_acquire);
 			if (oldValue == sch)
 			{
-				if (_counter.fetch_sub(1, std::memory_order_relaxed) == 1)
+				if (_counter.fetch_sub(1, std::memory_order_acquire) == 1)
 				{
-					_owner.store(nullptr, std::memory_order_relaxed);
+					_owner.store(nullptr, std::memory_order_release);
 					while (!_wait_awakes.empty())
 					{
 						state_mutex_ptr state = _wait_awakes.front();
 						_wait_awakes.pop_front();
 
+						//先将锁定状态转移到新的state上
+						_owner.store(state->get_root(), std::memory_order_release);
+						_counter.fetch_add(1, std::memory_order_acq_rel);
+						
 						if (state->on_notify(this))
-						{
-							//锁定状态转移到新的state上
-							_owner.store(state->get_root(), std::memory_order_relaxed);
-							_counter.fetch_add(1, std::memory_order_relaxed);
-
 							break;
-						}
+
+						//转移状态失败，恢复成空
+						_owner.store(nullptr, std::memory_order_release);
+						_counter.fetch_sub(1, std::memory_order_acq_rel);
 					}
 				}
 

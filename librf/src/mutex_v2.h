@@ -22,7 +22,9 @@ RESUMEF_NS
 			mutex_t(std::adopt_lock_t) noexcept;
 			~mutex_t() noexcept;
 
+			struct lock_awaiter;
 			struct [[nodiscard]] awaiter;
+
 			awaiter/*scoped_lock_mutex_t*/ lock() const noexcept;
 			awaiter/*scoped_lock_mutex_t*/ operator co_await() const noexcept;
 
@@ -71,6 +73,9 @@ RESUMEF_NS
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<std::remove_cvref_t<_Mtxs>, mutex_t>...>>
 			>
 			static void unlock(void* unique_address, _Mtxs&... mtxs);
+
+			bool is_locked() const;
+			auto lock(std::defer_lock_t) const noexcept;
 
 			mutex_t(const mutex_t&) = default;
 			mutex_t(mutex_t&&) = default;

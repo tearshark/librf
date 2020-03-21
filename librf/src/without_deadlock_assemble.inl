@@ -40,7 +40,7 @@ struct LOCK_ASSEMBLE_NAME(lock_impl)
 		->decltype(_LkN._ReturnValue(123))
 	{
 		// attempt to lock 3 or more locks, starting by locking _LkN[_Hard_lock] and trying to lock the rest
-		(void)LOCK_ASSEMBLE_AWAIT(_LkN._Lock_ref(_LkN[_Hard_lock]));
+		LOCK_ASSEMBLE_AWAIT(_LkN._Lock_ref(_LkN[_Hard_lock]));
 		int _Failed = -1;
 		int _Backout_start = _Hard_lock; // that is, unlock _Hard_lock
 
@@ -82,7 +82,7 @@ struct LOCK_ASSEMBLE_NAME(lock_impl)
 		->decltype(_LkN._ReturnValue(false))
 	{
 		// attempt to lock 2 locks, by first locking _Lk0, and then trying to lock _Lk1 returns whether to try again
-		(void)LOCK_ASSEMBLE_AWAIT(_LkN._Lock_ref(_LkN[_Idx0]));
+		LOCK_ASSEMBLE_AWAIT(_LkN._Lock_ref(_LkN[_Idx0]));
 		try {
 			if (LOCK_ASSEMBLE_AWAIT(_LkN._Try_lock_ref(_LkN[_Idx1])))
 				LOCK_ASSEMBLE_RETURN(false);
@@ -116,7 +116,7 @@ struct LOCK_ASSEMBLE_NAME(lock_impl)
 		}
 		else if (lockes.size() == 1)
 		{
-			(void)LOCK_ASSEMBLE_AWAIT(lockes._Lock_ref(lockes[0]));
+			LOCK_ASSEMBLE_AWAIT(lockes._Lock_ref(lockes[0]));
 		}
 		else if (lockes.size() == 2)
 		{

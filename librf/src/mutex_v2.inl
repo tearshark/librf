@@ -81,7 +81,7 @@ RESUMEF_NS
 
 			inline void* owner() const noexcept
 			{
-				return _owner.load(std::memory_order_relaxed);
+				return _owner.load(std::memory_order_acquire);
 			}
 
 			bool try_lock(void* sch);					//内部加锁
@@ -218,23 +218,38 @@ RESUMEF_NS
 
 			scoped_lock_mutex_t(const scoped_lock_mutex_t&) = delete;
 			scoped_lock_mutex_t& operator = (const scoped_lock_mutex_t&) = delete;
-			scoped_lock_mutex_t(scoped_lock_mutex_t&&) = default;
-			scoped_lock_mutex_t& operator = (scoped_lock_mutex_t&&) = default;
+
+			scoped_lock_mutex_t(scoped_lock_mutex_t&& _Right) noexcept
+				: _mutex(std::move(_Right._mutex))
+				, _owner(_Right._owner)
+			{
+				assert(_Right._mutex == nullptr);
+			}
+
+			scoped_lock_mutex_t& operator = (scoped_lock_mutex_t&& _Right) noexcept
+			{
+				if (this != &_Right)
+				{
+					_mutex = std::move(_Right._mutex);
+					assert(_Right._mutex == nullptr);
+					_owner = _Right._owner;
+				}
+				return *this;
+			}
 		private:
 			mutex_impl_ptr _mutex;
 			void* _owner;
 		};
 
-
-		struct [[nodiscard]] mutex_t::awaiter
+		struct mutex_t::lock_awaiter
 		{
-			awaiter(detail::mutex_v2_impl* mtx) noexcept
+			lock_awaiter(detail::mutex_v2_impl* mtx) noexcept
 				: _mutex(mtx)
 			{
 				assert(_mutex != nullptr);
 			}
 
-			~awaiter() noexcept(false)
+			~lock_awaiter() noexcept(false)
 			{
 				assert(_mutex == nullptr);
 				if (_mutex != nullptr)
@@ -254,12 +269,8 @@ RESUMEF_NS
 				_PromiseT& promise = handler.promise();
 				auto* parent = promise.get_state();
 				_root = parent->get_root();
-				if (_root == nullptr)
-				{
-					assert(false);
-					_mutex = nullptr;
-					return false;
-				}
+				assert(_root != nullptr);
+				assert(_root->get_parent() == nullptr);
 
 				scoped_lock<detail::mutex_v2_impl::lock_type> lock_(_mutex->_lock);
 				if (_mutex->try_lock_lockless(_root))
@@ -272,6 +283,15 @@ RESUMEF_NS
 
 				return true;
 			}
+		protected:
+			detail::mutex_v2_impl* _mutex;
+			counted_ptr<detail::state_mutex_t> _state;
+			state_base_t* _root = nullptr;
+		};
+
+		struct [[nodiscard]] mutex_t::awaiter : public lock_awaiter
+		{
+			using lock_awaiter::lock_awaiter;
 
 			scoped_lock_mutex_t await_resume() noexcept
 			{
@@ -280,10 +300,6 @@ RESUMEF_NS
 
 				return { std::adopt_lock, mtx, _root };
 			}
-		protected:
-			detail::mutex_v2_impl* _mutex;
-			counted_ptr<detail::state_mutex_t> _state;
-			state_base_t* _root = nullptr;
 		};
 
 		inline mutex_t::awaiter mutex_t::operator co_await() const noexcept
@@ -296,6 +312,24 @@ RESUMEF_NS
 			return { _mutex.get() };
 		}
 
+		inline auto mutex_t::lock(std::defer_lock_t) const noexcept
+		{
+			struct discard_unlock_awaiter : lock_awaiter
+			{
+				using lock_awaiter::lock_awaiter;
+				void await_resume() noexcept
+				{
+					_mutex = nullptr;
+				}
+			};
+
+			return discard_unlock_awaiter{ _mutex.get() };
+		}
+
+		inline bool mutex_t::is_locked() const
+		{
+			return _mutex->owner() != nullptr;
+		}
 
 		struct [[nodiscard]] mutex_t::try_awaiter
 		{
@@ -421,91 +455,58 @@ RESUMEF_NS
 
 		inline void mutex_t::lock(void* unique_address) const
 		{
+			assert(unique_address != nullptr);
 			_mutex->lock_until_succeed(unique_address);
 		}
 
 		inline bool mutex_t::try_lock(void* unique_address) const
 		{
+			assert(unique_address != nullptr);
 			return _mutex->try_lock(unique_address);
 		}
 
 		template <class _Rep, class _Period>
 		inline bool mutex_t::try_lock_for(const std::chrono::duration<_Rep, _Period>& dt, void* unique_address)
 		{
+			assert(unique_address != nullptr);
 			return _mutex->try_lock_until(clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt), unique_address);
 		}
 
 		template <class _Rep, class _Period>
 		inline bool mutex_t::try_lock_until(const std::chrono::time_point<_Rep, _Period>& tp, void* unique_address)
 		{
+			assert(unique_address != nullptr);
 			return _mutex->try_lock_until(std::chrono::time_point_cast<clock_type::time_point>(tp), unique_address);
 		}
 
 		inline void mutex_t::unlock(void* unique_address) const
 		{
+			assert(unique_address != nullptr);
 			_mutex->unlock(unique_address);
 		}
 
-		struct [[nodiscard]] scoped_unlock_range_t
-		{
-			//此函数，应该在try_lock()获得锁后使用
-			//或者在协程里，由awaiter使用
-			scoped_unlock_range_t(std::vector<mutex_t>&& mtxs, void* sch)
-				: _mutex(std::move(mtxs))
-				, _owner(sch)
-			{}
-
-			~scoped_unlock_range_t()
-			{
-				if (_owner != nullptr)
-				{
-					for(mutex_t& mtx : _mutex)
-						mtx.unlock(_owner);
-				}
-			}
-
-			inline void unlock() noexcept
-			{
-				if (_owner != nullptr)
-				{
-					for (mutex_t& mtx : _mutex)
-						mtx.unlock(_owner);
-					_owner = nullptr;
-				}
-			}
-
-			scoped_unlock_range_t(const scoped_unlock_range_t&) = delete;
-			scoped_unlock_range_t& operator = (const scoped_unlock_range_t&) = delete;
-			scoped_unlock_range_t(scoped_unlock_range_t&&) = default;
-			scoped_unlock_range_t& operator = (scoped_unlock_range_t&&) = default;
-		private:
-			std::vector<mutex_t> _mutex;
-			void* _owner;
-		};
-
 		struct mutex_t::_MutexAwaitAssembleT
 		{
-		private:
-			void* _Address;
 		public:
-			std::vector<mutex_t> _Lks;
+			std::vector<mutex_t> _mutex;
+			void* _owner;
 
 			template<class... _Mtxs>
 			_MutexAwaitAssembleT(void* unique_address, _Mtxs&... mtxs)
-				: _Address(unique_address)
-				, _Lks({ mtxs... })
+				: _mutex({ mtxs... })
+				, _owner(unique_address)
 			{}
 			size_t size() const
 			{
-				return _Lks.size();
+				return _mutex.size();
 			}
 			mutex_t& operator[](int _Idx)
 			{
-				return _Lks[_Idx];
+				return _mutex[_Idx];
 			}
 			auto _Lock_ref(mutex_t& _LkN) const
 			{
-				return _LkN.lock();
+				return _LkN.lock(std::defer_lock);
 			}
 			auto _Try_lock_ref(mutex_t& _LkN) const
 			{
@@ -513,32 +514,70 @@ RESUMEF_NS
 			}
 			void _Unlock_ref(mutex_t& _LkN) const
 			{
-				_LkN.unlock(_Address);
+				_LkN.unlock(_owner);
 			}
 			future_t<> _Yield() const
 			{
-				for (int cnt = rand() % (1 + _Lks.size()); cnt >= 0; --cnt)
+				for (int cnt = rand() % (1 + _mutex.size()); cnt >= 0; --cnt)
+				{
+					std::this_thread::yield();	//还要考虑多线程里运行的情况
 					co_await ::resumef::yield();
+				}
 			}
 			future_t<> _ReturnValue() const;
 			template<class U>
 			future_t<U> _ReturnValue(U v) const;
 		};
 
+		struct [[nodiscard]] scoped_unlock_range_t
+		{
+			mutex_t::_MutexAwaitAssembleT _MAA;
+
+			//此函数，应该在try_lock()获得锁后使用
+			//或者在协程里，由awaiter使用
+			template<class... _Mtxs>
+			scoped_unlock_range_t(void* unique_address, _Mtxs&&... mtxs)
+				: _MAA(unique_address, std::forward<_Mtxs>(mtxs)...)
+			{}
+
+			~scoped_unlock_range_t()
+			{
+				if (_MAA._owner != nullptr)
+				{
+					for(mutex_t& mtx : _MAA._mutex)
+						mtx.unlock(_MAA._owner);
+				}
+			}
+
+			inline void unlock() noexcept
+			{
+				if (_MAA._owner != nullptr)
+				{
+					for (mutex_t& mtx : _MAA._mutex)
+						mtx.unlock(_MAA._owner);
+					_MAA._owner = nullptr;
+				}
+			}
+
+			scoped_unlock_range_t(const scoped_unlock_range_t&) = delete;
+			scoped_unlock_range_t& operator = (const scoped_unlock_range_t&) = delete;
+			scoped_unlock_range_t(scoped_unlock_range_t&& _Right) noexcept = default;
+			scoped_unlock_range_t& operator = (scoped_unlock_range_t&& _Right) noexcept = default;
+		};
+
 		template<class... _Mtxs, typename>
 		inline future_t<scoped_unlock_range_t> mutex_t::lock(_Mtxs&... mtxs)
 		{
-			auto* root = root_state();
-			_MutexAwaitAssembleT MAA(root, mtxs...);
-			co_await detail::mutex_lock_await_lock_impl::_Lock_range(MAA);
-
-			co_return scoped_unlock_range_t{ std::move(MAA._Lks), root };
+			scoped_unlock_range_t unlock_guard{ root_state(), mtxs... };
+			co_await detail::mutex_lock_await_lock_impl::_Lock_range(unlock_guard._MAA);
+			co_return unlock_guard;
 		}
-
 
 		template<class... _Mtxs, typename>
 		inline scoped_unlock_range_t mutex_t::lock(void* unique_address, _Mtxs&... mtxs)
 		{
+			assert(unique_address != nullptr);
+
 			detail::_MutexAddressAssembleT MAA(unique_address, mtxs...);
 			detail::scoped_lock_range_lock_impl::_Lock_range(MAA);
 			
@@ -548,6 +587,8 @@ RESUMEF_NS
 		template<class... _Mtxs, typename>
 		inline void mutex_t::unlock(void* unique_address, _Mtxs&... mtxs)
 		{
+			assert(unique_address != nullptr);
+
 			int _Ignored[] = { (mtxs.unlock(unique_address), 0)... };
 			(void)_Ignored;
 		}
