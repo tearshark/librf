@@ -211,8 +211,8 @@ RESUMEF_NS
 				return false;
 			}
 
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 			{
 				_PromiseT& promise = handler.promise();
 				auto* parent = promise.get_state();
@@ -226,6 +226,7 @@ RESUMEF_NS
 
 				_state = new detail::state_mutex_t(_mutex);
 				_state->on_await_suspend(handler, parent->get_scheduler(), _root);
+				cb();
 
 				_mutex->add_wait_list_lockless(_state.get());
 
@@ -241,6 +242,11 @@ RESUMEF_NS
 		{
 			using lock_awaiter::lock_awaiter;
 
+			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			{
+				return await_suspend2(handler, []{});
+			}
 			scoped_unlock_t<mutex_t> await_resume() noexcept
 			{
 				mutex_impl_ptr mtx = _mutex ? _mutex->shared_from_this() : nullptr;
@@ -263,6 +269,11 @@ RESUMEF_NS
 		struct mutex_t::manual_awaiter : public lock_awaiter
 		{
 			using lock_awaiter::lock_awaiter;
+			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			{
+				return await_suspend2(handler, []{});
+			}
 			void await_resume() noexcept
 			{
 				_mutex = nullptr;

@@ -161,8 +161,8 @@ RESUMEF_NS
 				return _event->try_wait_one();
 			}
 
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 			{
 				detail::event_v2_impl* evt = _event;
 				scoped_lock<detail::event_v2_impl::lock_type> lock_(evt->_lock);
@@ -173,10 +173,17 @@ RESUMEF_NS
 				_state = new detail::state_event_t(_event);
 				_event = nullptr;
 				(void)_state->on_await_suspend(handler);
+				cb();
 
 				evt->add_wait_list(_state.get());
 
 				return true;
+			}
+
+			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			{
+				return await_suspend2(handler, []{});
 			}
 
 			bool await_resume() noexcept
@@ -210,9 +217,11 @@ RESUMEF_NS
 			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend(coroutine_handle<_PromiseT> handler)
 			{
-				if (!_Btype::await_suspend(handler))
+				if (!_Btype::await_suspend2(handler, [this]
+					{
+						this->_state->add_timeout_timer(_tp);
+					}))
 					return false;
-				this->_state->add_timeout_timer(_tp);
 				return true;
 			}
 		protected:
@@ -251,8 +260,8 @@ RESUMEF_NS
 				return _begin == _end;
 			}
 
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 			{
 				using ref_lock_type = std::reference_wrapper<detail::event_v2_impl::lock_type>;
 				std::vector<ref_lock_type> lockes;
@@ -278,6 +287,7 @@ RESUMEF_NS
 
 				_state = new detail::state_event_t(_event);
 				(void)_state->on_await_suspend(handler);
+				cb();
 
 				for (auto iter = _begin; iter != _end; ++iter)
 				{
@@ -286,6 +296,12 @@ RESUMEF_NS
 				}
 
 				return true;
+			}
+
+			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			{
+				return await_suspend2(handler, []{});
 			}
 
 			intptr_t await_resume() noexcept
@@ -369,8 +385,8 @@ RESUMEF_NS
 				return _value;
 			}
 
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 			{
 				intptr_t count = std::distance(_begin, _end);
 
@@ -386,6 +402,7 @@ RESUMEF_NS
 
 				_state = new detail::state_event_all_t(count, _value);
 				(void)_state->on_await_suspend(handler);
+				cb();
 
 				scoped_lock_range<ref_lock_type> lock_(lockes);
 
@@ -411,6 +428,12 @@ RESUMEF_NS
 				}
 
 				return true;
+			}
+
+			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			{
+				return await_suspend2(handler, []{});
 			}
 
 			bool await_resume() noexcept
