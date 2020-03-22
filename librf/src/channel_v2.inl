@@ -358,6 +358,7 @@ inline namespace channel_v2
 
 		read_awaiter(channel_type* ch) noexcept
 			: _channel(ch)
+			, _value()
 		{}
 
 		~read_awaiter()

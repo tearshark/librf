@@ -323,7 +323,9 @@ inline namespace when_v2
 	auto when_any(scheduler_t& sch, _Awaitable&&... args)
 		-> detail::when_future_t<when_any_pair>
 	{
+#pragma warning(disable : 6326)	//warning C6326: Potential comparison of a constant with another constant.
 		detail::when_future_t<when_any_pair> awaitor{ sizeof...(_Awaitable) > 0 ? 1 : 0 };
+#pragma warning(default : 6326)
 		awaitor._values->first = -1;
 		detail::when_any_one__(sch, awaitor._state.get(), awaitor._values, 0, std::forward<_Awaitable>(args)...);
 

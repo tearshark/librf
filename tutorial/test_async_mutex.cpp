@@ -143,7 +143,7 @@ static void resumable_mutex_async()
 
 static future_t<> resumable_mutex_range_push(size_t idx, mutex_t a, mutex_t b, mutex_t c)
 {
-	for (int i = 0; i < 1000; ++i)
+	for (int i = 0; i < 100000; ++i)
 	{
 		scoped_unlock_t __lockers = co_await mutex_t::lock(a, b, c);
 		assert(a.is_locked());
@@ -159,7 +159,7 @@ static future_t<> resumable_mutex_range_push(size_t idx, mutex_t a, mutex_t b, m
 
 static future_t<> resumable_mutex_range_pop(size_t idx, mutex_t a, mutex_t b, mutex_t c)
 {
-	for (int i = 0; i < 1000; ++i)
+	for (int i = 0; i < 100000; ++i)
 	{
 		scoped_unlock_t __lockers = co_await mutex_t::lock(a, b, c);
 		assert(a.is_locked());

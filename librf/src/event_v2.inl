@@ -219,11 +219,9 @@ RESUMEF_NS
 			clock_type::time_point _tp;
 		};
 
-		struct [[nodiscard]] event_t::timeout_awaiter : timeout_awaitor_impl<event_t::awaiter>
+		struct [[nodiscard]] event_t::timeout_awaiter : timeout_awaitor_impl<awaiter>
 		{
-			timeout_awaiter(clock_type::time_point tp, detail::event_v2_impl* evt) noexcept
-				: timeout_awaitor_impl<event_t::awaiter>(tp, evt)
-			{}
+			using timeout_awaitor_impl<awaiter>::timeout_awaitor_impl;
 		};
 
 		template<class _Rep, class _Period>
@@ -331,11 +329,9 @@ RESUMEF_NS
 
 
 		template<class _Iter>
-		struct [[nodiscard]] event_t::timeout_any_awaiter : timeout_awaitor_impl<event_t::any_awaiter<_Iter>>
+		struct [[nodiscard]] event_t::timeout_any_awaiter : timeout_awaitor_impl<any_awaiter<_Iter>>
 		{
-			timeout_any_awaiter(clock_type::time_point tp, _Iter begin, _Iter end) noexcept
-				: timeout_awaitor_impl<event_t::any_awaiter<_Iter>>(tp, begin, end)
-			{}
+			using timeout_awaitor_impl<any_awaiter<_Iter>>::timeout_awaitor_impl;
 		};
 
 		template<class _Rep, class _Period, class _Iter COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
@@ -445,11 +441,9 @@ RESUMEF_NS
 
 
 		template<class _Iter>
-		struct [[nodiscard]] event_t::timeout_all_awaiter : timeout_awaitor_impl<event_t::all_awaiter<_Iter>>
+		struct [[nodiscard]] event_t::timeout_all_awaiter : timeout_awaitor_impl<all_awaiter<_Iter>>
 		{
-			timeout_all_awaiter(clock_type::time_point tp, _Iter begin, _Iter end) noexcept
-				: timeout_awaitor_impl<event_t::all_awaiter<_Iter>>(tp, begin, end)
-			{}
+			using timeout_awaitor_impl<all_awaiter<_Iter>>::timeout_awaitor_impl;
 		};
 
 		template<class _Rep, class _Period, class _Iter COMMA_RESUMEF_ENABLE_IF_TYPENAME()>

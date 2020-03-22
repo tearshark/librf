@@ -4,16 +4,22 @@ RESUMEF_NS
 {
 	namespace detail
 	{
-		struct state_mutex_base_t : public state_base_t
+		struct state_mutex_t : public state_base_t
 		{
+			state_mutex_t(mutex_v2_impl*& val)
+				: _value(&val)
+			{}
+
 			virtual void resume() override;
 			virtual bool has_handler() const  noexcept override;
 			virtual state_base_t* get_parent() const noexcept override;
 
-			virtual void on_cancel() noexcept = 0;
-			virtual bool on_notify(mutex_v2_impl* eptr) = 0;
-			virtual bool on_timeout() = 0;
-
+			void on_cancel() noexcept;
+			bool on_notify(mutex_v2_impl* eptr);
+			bool on_timeout();
+			
+			void add_timeout_timer(std::chrono::system_clock::time_point tp);
+			
 			inline scheduler_t* get_scheduler() const noexcept
 			{
 				return _scheduler;
@@ -26,51 +32,10 @@ RESUMEF_NS
 				this->_root = root;
 			}
 
-			inline void add_timeout_timer(std::chrono::system_clock::time_point tp)
-			{
-				this->_thandler = this->_scheduler->timer()->add_handler(tp,
-					[st = counted_ptr<state_mutex_base_t>{ this }](bool canceld)
-					{
-						if (!canceld)
-							st->on_timeout();
-					});
-			}
-
 			timer_handler _thandler;
 		protected:
 			state_base_t* _root;
-		};
-
-		struct state_mutex_t : public state_mutex_base_t
-		{
-			state_mutex_t(mutex_v2_impl*& val)
-				: _value(&val)
-			{}
-
-			virtual void on_cancel() noexcept override;
-			virtual bool on_notify(mutex_v2_impl* eptr) override;
-			virtual bool on_timeout() override;
-		public:
-			timer_handler _thandler;
-		protected:
 			std::atomic<mutex_v2_impl**> _value;
-		};
-
-		struct state_mutex_all_t : public state_event_base_t
-		{
-			state_mutex_all_t(intptr_t count, bool& val)
-				: _counter(count)
-				, _value(&val)
-			{}
-
-			virtual void on_cancel() noexcept override;
-			virtual bool on_notify(event_v2_impl* eptr) override;
-			virtual bool on_timeout() override;
-		public:
-			timer_handler _thandler;
-			std::atomic<intptr_t> _counter;
-		protected:
-			bool* _value;
 		};
 
 		struct mutex_v2_impl : public std::enable_shared_from_this<mutex_v2_impl>
@@ -79,9 +44,10 @@ RESUMEF_NS
 
 			mutex_v2_impl() {}
 
-			inline void* owner() const noexcept
+			inline void* owner() noexcept
 			{
-				return _owner.load(std::memory_order_acquire);
+				scoped_lock<lock_type> lock_(_lock);
+				return _owner.load(std::memory_order_relaxed);
 			}
 
 			bool try_lock(void* sch);					//内部加锁
@@ -171,7 +137,9 @@ RESUMEF_NS
 		{
 			typedef std::shared_ptr<detail::mutex_v2_impl> mutex_impl_ptr;
 
-			scoped_unlock_t() {}
+			scoped_unlock_t() 
+				: _owner(nullptr)
+			{}
 
 			//此函数，应该在try_lock()获得锁后使用
 			//或者在协程里，由awaiter使用
@@ -405,12 +373,9 @@ RESUMEF_NS
 
 
 
-		struct [[nodiscard]] mutex_t::timeout_awaiter : public event_t::timeout_awaitor_impl<awaiter>
+		struct [[nodiscard]] mutex_t::timeout_awaiter : public event_t::timeout_awaitor_impl<lock_awaiter>
 		{
-			timeout_awaiter(clock_type::time_point tp, detail::mutex_v2_impl * mtx) noexcept
-				: event_t::timeout_awaitor_impl<mutex_t::awaiter>(tp, mtx)
-			{}
-
+			using event_t::timeout_awaitor_impl<lock_awaiter>::timeout_awaitor_impl;
 			bool await_resume() noexcept
 			{
 				detail::mutex_v2_impl* mtx = this->_mutex;

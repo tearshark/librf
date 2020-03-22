@@ -4,7 +4,7 @@ RESUMEF_NS
 {
 	namespace detail
 	{
-		void state_mutex_base_t::resume()
+		void state_mutex_t::resume()
 		{
 			coroutine_handle<> handler = _coro;
 			if (handler)
@@ -15,12 +15,12 @@ RESUMEF_NS
 			}
 		}
 
-		bool state_mutex_base_t::has_handler() const  noexcept
+		bool state_mutex_t::has_handler() const  noexcept
 		{
 			return (bool)_coro;
 		}
 		
-		state_base_t* state_mutex_base_t::get_parent() const noexcept
+		state_base_t* state_mutex_t::get_parent() const noexcept
 		{
 			return _root;
 		}
@@ -74,59 +74,18 @@ RESUMEF_NS
 			return false;
 		}
 
-
-		void state_mutex_all_t::on_cancel() noexcept
+		void state_mutex_t::add_timeout_timer(std::chrono::system_clock::time_point tp)
 		{
-			intptr_t oldValue = _counter.load(std::memory_order_acquire);
-			if (oldValue >= 0 && _counter.compare_exchange_strong(oldValue, -1, std::memory_order_acq_rel))
+			this->_thandler = this->_scheduler->timer()->add_handler(tp,
+				[st = counted_ptr<state_mutex_t>{ this }](bool canceld)
 			{
-				*_value = false;
-				_thandler.stop();
-
-				this->_coro = nullptr;
-			}
-		}
-
-		bool state_mutex_all_t::on_notify(event_v2_impl*)
-		{
-			intptr_t oldValue = _counter.load(std::memory_order_acquire);
-			if (oldValue <= 0) return false;
-
-			oldValue = _counter.fetch_add(-1, std::memory_order_acq_rel);
-			if (oldValue == 1)
-			{
-				*_value = true;
-				_thandler.stop();
-
-				assert(this->_scheduler != nullptr);
-				if (this->_coro)
-					this->_scheduler->add_generator(this);
-
-				return true;
-			}
-
-			return oldValue >= 1;
-		}
-
-		bool state_mutex_all_t::on_timeout()
-		{
-			intptr_t oldValue = _counter.load(std::memory_order_acquire);
-			if (oldValue >= 0 && _counter.compare_exchange_strong(oldValue, -1, std::memory_order_acq_rel))
-			{
-				*_value = false;
-				_thandler.reset();
-
-				assert(this->_scheduler != nullptr);
-				if (this->_coro)
-					this->_scheduler->add_generator(this);
-
-				return true;
-			}
-			return false;
+				if (!canceld)
+					st->on_timeout();
+			});
 		}
 
 
-		
+
 		void mutex_v2_impl::lock_until_succeed(void* sch)
 		{
 			assert(sch != nullptr);
@@ -164,16 +123,16 @@ RESUMEF_NS
 		{
 			assert(sch != nullptr);
 
-			void* oldValue = _owner.load(std::memory_order_acquire);
+			void* oldValue = _owner.load(std::memory_order_relaxed);
 			if (oldValue == nullptr)
 			{
-				_owner.store(sch, std::memory_order_release);
-				_counter.fetch_add(1, std::memory_order_acq_rel);
+				_owner.store(sch, std::memory_order_relaxed);
+				_counter.fetch_add(1, std::memory_order_relaxed);
 				return true;
 			}
 			if (oldValue == sch)
 			{
-				_counter.fetch_add(1, std::memory_order_acq_rel);
+				_counter.fetch_add(1, std::memory_order_relaxed);
 				return true;
 			}
 			return false;
@@ -185,12 +144,13 @@ RESUMEF_NS
 
 			scoped_lock<lock_type> lock_(_lock);
 
-			void* oldValue = _owner.load(std::memory_order_acquire);
+			void* oldValue = _owner.load(std::memory_order_relaxed);
 			if (oldValue == sch)
 			{
-				if (_counter.fetch_sub(1, std::memory_order_acquire) == 1)
+				if (_counter.fetch_sub(1, std::memory_order_relaxed) == 1)
 				{
-					_owner.store(nullptr, std::memory_order_release);
+					_owner.store(nullptr, std::memory_order_relaxed);
+
 					while (!_wait_awakes.empty())
 					{
 						state_mutex_ptr state = _wait_awakes.front();
@@ -204,8 +164,8 @@ RESUMEF_NS
 							break;
 
 						//转移状态失败，恢复成空
-						_owner.store(nullptr, std::memory_order_release);
-						_counter.fetch_sub(1, std::memory_order_acq_rel);
+						_owner.store(nullptr, std::memory_order_relaxed);
+						_counter.fetch_sub(1, std::memory_order_relaxed);
 					}
 				}
 
