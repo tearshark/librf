@@ -56,18 +56,18 @@ RESUMEF_NS
 
 
 			template<class... _Mtxs
-				, typename = std::enable_if_t<std::conjunction_v<std::is_same<std::remove_cvref_t<_Mtxs>, mutex_t>...>>
+				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
 			>
 			static future_t<scoped_unlock_t<_Mtxs...>> lock(_Mtxs&... mtxs);
 
 
 			template<class... _Mtxs
-				, typename = std::enable_if_t<std::conjunction_v<std::is_same<std::remove_cvref_t<_Mtxs>, mutex_t>...>>
+				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
 			>
 			static scoped_unlock_t<_Mtxs...> lock(void* unique_address, _Mtxs&... mtxs);
 
 			template<class... _Mtxs
-				, typename = std::enable_if_t<std::conjunction_v<std::is_same<std::remove_cvref_t<_Mtxs>, mutex_t>...>>
+				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
 			>
 			static void unlock(void* unique_address, _Mtxs&... mtxs);
 
