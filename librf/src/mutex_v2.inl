@@ -536,7 +536,7 @@ RESUMEF_NS
 		};
 
 		template<class... _Mtxs>
-		scoped_unlock_t()->scoped_unlock_t<scoped_unlock_t<_Mtxs...>&&>;
+		scoped_unlock_t()->scoped_unlock_t<_Mtxs...>;
 
 		template<class... _Mtxs, typename>
 		inline future_t<scoped_unlock_t<_Mtxs...>> mutex_t::lock(_Mtxs&... mtxs)

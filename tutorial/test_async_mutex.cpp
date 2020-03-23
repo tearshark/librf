@@ -105,13 +105,13 @@ static std::thread test_mutex_async_push(size_t idx)
 		{
 			if (g_lock.try_lock_for(500ms, &provide_unique_address))
 			{
-				//scoped_unlock_t _locker(std::adopt_lock, g_lock, &provide_unique_address);
+				scoped_unlock_t _locker(std::adopt_lock, &provide_unique_address, g_lock);
 
 				++g_counter;
 				std::cout << "push:" << g_counter << " on " << idx << std::endl;
 				std::this_thread::sleep_for(50ms);
 
-				g_lock.unlock(&provide_unique_address);
+				//g_lock.unlock(&provide_unique_address);
 			}
 
 			std::this_thread::sleep_for(50ms);
