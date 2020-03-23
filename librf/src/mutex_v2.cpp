@@ -78,10 +78,10 @@ RESUMEF_NS
 		{
 			this->_thandler = this->_scheduler->timer()->add_handler(tp,
 				[st = counted_ptr<state_mutex_t>{ this }](bool canceld)
-			{
-				if (!canceld)
-					st->on_timeout();
-			});
+				{
+					if (!canceld)
+						st->on_timeout();
+				});
 		}
 
 

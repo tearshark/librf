@@ -20,20 +20,14 @@ RESUMEF_NS
 			
 			void add_timeout_timer(std::chrono::system_clock::time_point tp);
 			
-			inline scheduler_t* get_scheduler() const noexcept
-			{
-				return _scheduler;
-			}
-
 			inline void on_await_suspend(coroutine_handle<> handler, scheduler_t* sch, state_base_t* root) noexcept
 			{
 				this->_scheduler = sch;
 				this->_coro = handler;
 				this->_root = root;
 			}
-
-			timer_handler _thandler;
 		protected:
+			timer_handler _thandler;
 			state_base_t* _root;
 			std::atomic<mutex_v2_impl**> _value;
 		};
