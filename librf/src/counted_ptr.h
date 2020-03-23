@@ -82,12 +82,6 @@ RESUMEF_NS
 		T* _p = nullptr;
 	};
 
-	template <typename T, typename... Args>
-	counted_ptr<T> make_counted(Args&&... args)
-	{
-		return new T{std::forward<Args>(args)...};
-	}
-
 	template <typename T, typename U>
 	inline bool operator == (const counted_ptr<T>& _Left, const counted_ptr<U>& _Right)
 	{

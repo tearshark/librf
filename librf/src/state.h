@@ -65,6 +65,7 @@ RESUMEF_NS
 	{
 	private:
 		virtual void destroy_deallocate() override;
+		state_generator_t() = default;
 	public:
 		virtual void resume() override;
 		virtual bool has_handler() const  noexcept override;
@@ -76,16 +77,13 @@ RESUMEF_NS
 			_coro = handler;
 		}
 
-		static state_generator_t * _Alloc_state()
+#if RESUMEF_INLINE_STATE
+		static state_generator_t* _Construct(void* _Ptr)
 		{
-			_Alloc_char _Al;
-			size_t _Size = sizeof(state_generator_t);
-#if RESUMEF_DEBUG_COUNTER
-			std::cout << "state_generator_t::alloc, size=" << sizeof(state_generator_t) << std::endl;
-#endif
-			char* _Ptr = _Al.allocate(_Size);
 			return new(_Ptr) state_generator_t();
 		}
+#endif
+		static state_generator_t* _Alloc_state();
 	};
 
 	struct state_future_t : public state_base_t
@@ -123,14 +121,7 @@ RESUMEF_NS
 		static_assert(alignof(bool) == 1);
 		static_assert(sizeof(std::atomic<initor_type>) == 1);
 		static_assert(alignof(std::atomic<initor_type>) == 1);
-	public:
-		state_future_t()
-		{
-#if RESUMEF_DEBUG_COUNTER
-			_id = ++g_resumef_state_id;
-#endif
-			_is_future = true;
-		}
+	protected:
 		explicit state_future_t(bool awaitor)
 		{
 #if RESUMEF_DEBUG_COUNTER
@@ -138,7 +129,7 @@ RESUMEF_NS
 #endif
 			_is_future = !awaitor;
 		}
-
+	public:
 		virtual void destroy_deallocate() override;
 		virtual void resume() override;
 		virtual bool has_handler() const  noexcept override;
@@ -182,16 +173,29 @@ RESUMEF_NS
 		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 		void promise_final_suspend(coroutine_handle<_PromiseT> handler);
 
+#if RESUMEF_INLINE_STATE
+		template<class _Sty>
+		static _Sty* _Construct(void* _Ptr, size_t _Size)
+		{
+			_Sty* st = new(_Ptr) _Sty(false);
+			st->_alloc_size = _Size;
+
+			return st;
+		}
+#endif
 		template<class _Sty>
 		static inline _Sty* _Alloc_state(bool awaitor)
 		{
 			_Alloc_char _Al;
-			size_t _Size = sizeof(_Sty);
+			size_t _Size = _Align_size<_Sty>();
 #if RESUMEF_DEBUG_COUNTER
 			std::cout << "state_future_t::alloc, size=" << _Size << std::endl;
 #endif
 			char* _Ptr = _Al.allocate(_Size);
-			return new(_Ptr) _Sty(awaitor);
+			_Sty* st = new(_Ptr) _Sty(awaitor);
+			st->_alloc_size = _Size;
+
+			return st;
 		}
 	};
 
@@ -202,15 +206,8 @@ RESUMEF_NS
 
 		using state_future_t::lock_type;
 		using value_type = _Ty;
-
-		explicit state_t(size_t alloc_size) :state_future_t()
-		{
-			_alloc_size = static_cast<uint32_t>(alloc_size);
-		}
-		explicit state_t(bool awaitor) :state_future_t(awaitor)
-		{
-			_alloc_size = sizeof(*this);
-		}
+	private:
+		explicit state_t(bool awaitor) :state_future_t(awaitor) {}
 	public:
 		~state_t()
 		{
@@ -260,15 +257,8 @@ RESUMEF_NS
 		using state_future_t::lock_type;
 		using value_type = _Ty;
 		using reference_type = _Ty&;
-
-		explicit state_t(size_t alloc_size) :state_future_t()
-		{
-			_alloc_size = static_cast<uint32_t>(alloc_size);
-		}
-		explicit state_t(bool awaitor) :state_future_t(awaitor)
-		{
-			_alloc_size = sizeof(*this);
-		}
+	private:
+		explicit state_t(bool awaitor) :state_future_t(awaitor) {}
 	public:
 		~state_t()
 		{
@@ -304,15 +294,8 @@ RESUMEF_NS
 	{
 		friend state_future_t;
 		using state_future_t::lock_type;
-
-		explicit state_t(size_t alloc_size) :state_future_t()
-		{
-			_alloc_size = static_cast<uint32_t>(alloc_size);
-		}
-		explicit state_t(bool awaitor) :state_future_t(awaitor)
-		{
-			_alloc_size = sizeof(*this);
-		}
+	private:
+		explicit state_t(bool awaitor) :state_future_t(awaitor) {}
 	public:
 		void future_await_resume();
 		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>

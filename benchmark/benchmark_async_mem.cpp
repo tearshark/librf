@@ -7,7 +7,7 @@
 
 #include "librf.h"
 
-const size_t N = 5000000;
+const size_t N = 2000000;
 const size_t LOOP_COUNT = 50;
 
 volatile size_t globalValue = 0;

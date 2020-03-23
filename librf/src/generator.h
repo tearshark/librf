@@ -210,7 +210,7 @@ RESUMEF_NS
 
 				//在初始地址上构造state
 				{
-					state_type* st = new(ptr) state_type();
+					state_type* st = state_type::_Construct(ptr);
 					st->lock();
 				}
 

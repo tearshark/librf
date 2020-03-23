@@ -23,7 +23,7 @@ namespace asio {
 			typedef resumef::state_t<result_type> state_type;
 
 			promise_handler_base()
-				: state_(resumef::make_counted<state_type>(true))
+				: state_(resumef::state_future_t::_Alloc_state<state_type>(true))
 			{
 			}
 

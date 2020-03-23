@@ -27,7 +27,18 @@ RESUMEF_NS
 		_Alloc_char _Al;
 		return _Al.deallocate(reinterpret_cast<char*>(this), _Size);
 	}
-	
+
+	state_generator_t* state_generator_t::_Alloc_state()
+	{
+		_Alloc_char _Al;
+		size_t _Size = _Align_size<state_generator_t>();
+#if RESUMEF_DEBUG_COUNTER
+		std::cout << "state_generator_t::alloc, size=" << sizeof(state_generator_t) << std::endl;
+#endif
+		char* _Ptr = _Al.allocate(_Size);
+		return new(_Ptr) state_generator_t();
+	}
+
 	void state_generator_t::destroy_deallocate()
 	{
 		size_t _Size = _Align_size<state_generator_t>();
