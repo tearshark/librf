@@ -30,18 +30,21 @@ RESUMEF_NS
 	template<class _Rep, class _Period>
 	inline future_t<> sleep_for(std::chrono::duration<_Rep, _Period> dt_)
 	{
-		co_await sleep_for_(std::chrono::duration_cast<std::chrono::system_clock::duration>(dt_), *current_scheduler());
+		scheduler_t* sch = current_scheduler();
+		co_await sleep_for_(std::chrono::duration_cast<std::chrono::system_clock::duration>(dt_), *sch);
 	}
 	template<class _Clock, class _Duration>
 	inline future_t<> sleep_until(std::chrono::time_point<_Clock, _Duration> tp_)
 	{
-		co_await sleep_until_(std::chrono::time_point_cast<std::chrono::system_clock::duration>(tp_), *current_scheduler());
+		scheduler_t* sch = current_scheduler();
+		co_await sleep_until_(std::chrono::time_point_cast<std::chrono::system_clock::duration>(tp_), *sch);
 	}
 
 	template <class Rep, class Period>
 	inline future_t<> operator co_await(std::chrono::duration<Rep, Period> dt_)
 	{
-		co_await sleep_for(dt_, *current_scheduler());
+		scheduler_t* sch = current_scheduler();
+		co_await sleep_for(dt_, *sch);
 	}
 
 }

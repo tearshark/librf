@@ -294,7 +294,8 @@ inline namespace when_v2
 	auto when_all(_Awaitable&&... awaitor)
 		-> future_t<std::tuple<detail::awaitor_result_t<_Awaitable>...>>
 	{
-		co_return co_await when_all(*current_scheduler(), std::forward<_Awaitable>(awaitor)...);
+		scheduler_t* sch = current_scheduler();
+		co_return co_await when_all(*sch, std::forward<_Awaitable>(awaitor)...);
 	}
 
 	template<_WhenIterT _Iter
@@ -303,7 +304,8 @@ inline namespace when_v2
 	auto when_all(_Iter begin, _Iter end)
 		-> future_t<std::vector<detail::awaitor_result_t<decltype(*begin)>>>
 	{
-		co_return co_await when_all(*current_scheduler(), begin, end);
+		scheduler_t* sch = current_scheduler();
+		co_return co_await when_all(*sch, begin, end);
 	}
 
 	template<_ContainerT _Cont
@@ -359,7 +361,8 @@ inline namespace when_v2
 	auto when_any(_Awaitable&&... awaitor) 
 		-> future_t<when_any_pair>
 	{
-		co_return co_await when_any(*current_scheduler(), std::forward<_Awaitable>(awaitor)...);
+		scheduler_t* sch = current_scheduler();
+		co_return co_await when_any(*sch, std::forward<_Awaitable>(awaitor)...);
 	}
 
 	template<_WhenIterT _Iter
@@ -368,7 +371,8 @@ inline namespace when_v2
 	auto when_any(_Iter begin, _Iter end) 
 		-> future_t<when_any_pair>
 	{
-		co_return co_await when_any(*current_scheduler(), begin, end);
+		scheduler_t* sch = current_scheduler();
+		co_return co_await when_any(*sch, begin, end);
 	}
 
 	template<_ContainerT _Cont
