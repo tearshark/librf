@@ -1,6 +1,7 @@
 ﻿
 #include "librf.h"
 #include <optional>
+#include <crtdbg.h>
 
 //#define _WITH_LOCK_FREE_Q_KEEP_REAL_SIZE	1
 #include "src/ring_queue.h"
@@ -36,6 +37,7 @@ extern void resumable_main_benchmark_asio_client(intptr_t nNum);
 
 int main(int argc, const char* argv[])
 {
+	//_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHECK_DF);
 	(void)argc;
 	(void)argv;
 
@@ -51,30 +53,31 @@ int main(int argc, const char* argv[])
 	//else
 	//	resumable_main_benchmark_asio_server();
 
-	resumable_main_cb();
-	resumable_main_layout();
-	resumable_main_modern_cb();
-	resumable_main_suspend_always();
-	resumable_main_yield_return();
-	resumable_main_resumable();
-	resumable_main_routine();
-	resumable_main_exception();
-	resumable_main_dynamic_go();
-	resumable_main_multi_thread();
-	resumable_main_timer();
-	resumable_main_benchmark_mem(false);
-	resumable_main_mutex();
-	resumable_main_event();
-	resumable_main_event_v2();
-	resumable_main_event_timeout();
-	resumable_main_channel();
-	resumable_main_channel_mult_thread();
-	resumable_main_sleep();
-	resumable_main_when_all();
-	resumable_main_switch_scheduler();
+	resumable_main_cb(); _CrtCheckMemory();
+	resumable_main_layout(); _CrtCheckMemory();
+	resumable_main_modern_cb(); _CrtCheckMemory();
+	resumable_main_suspend_always(); _CrtCheckMemory();
+	resumable_main_yield_return(); _CrtCheckMemory();
+	resumable_main_resumable(); _CrtCheckMemory();
+	resumable_main_routine(); _CrtCheckMemory();
+	resumable_main_exception(); _CrtCheckMemory();
+	resumable_main_dynamic_go(); _CrtCheckMemory();
+	resumable_main_multi_thread(); _CrtCheckMemory();
+	resumable_main_timer(); _CrtCheckMemory();
+	resumable_main_benchmark_mem(false); _CrtCheckMemory();
+	resumable_main_mutex(); _CrtCheckMemory();
+	resumable_main_event(); _CrtCheckMemory();
+	resumable_main_event_v2(); _CrtCheckMemory();
+	resumable_main_event_timeout(); _CrtCheckMemory();
+	resumable_main_channel(); _CrtCheckMemory();
+	resumable_main_channel_mult_thread(); _CrtCheckMemory();
+	resumable_main_sleep(); _CrtCheckMemory();
+	resumable_main_when_all(); _CrtCheckMemory();
+	resumable_main_switch_scheduler(); _CrtCheckMemory();
 	std::cout << "ALL OK!" << std::endl;
 
 	benchmark_main_channel_passing_next();	//这是一个死循环测试
+	_CrtCheckMemory();
 
 	return 0;
 }

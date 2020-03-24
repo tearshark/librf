@@ -548,6 +548,14 @@ RESUMEF_NS
 		}
 
 		template<class... _Mtxs, typename>
+		inline void mutex_t::lock(adopt_manual_unlock_t, void* unique_address, _Mtxs&... mtxs)
+		{
+			assert(unique_address != nullptr);
+			mutex_t::_MutexAwaitAssembleT _MAA{ unique_address, mtxs... };
+			detail::scoped_lock_range_lock_impl::_Lock_range(_MAA);
+		}
+
+		template<class... _Mtxs, typename>
 		inline void mutex_t::unlock(void* unique_address, _Mtxs&... mtxs)
 		{
 			assert(unique_address != nullptr);

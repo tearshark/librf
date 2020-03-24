@@ -178,7 +178,7 @@ RESUMEF_NS
 		static _Sty* _Construct(void* _Ptr, size_t _Size)
 		{
 			_Sty* st = new(_Ptr) _Sty(false);
-			st->_alloc_size = _Size;
+			st->_alloc_size = static_cast<uint32_t>(_Size);
 
 			return st;
 		}
@@ -193,7 +193,7 @@ RESUMEF_NS
 #endif
 			char* _Ptr = _Al.allocate(_Size);
 			_Sty* st = new(_Ptr) _Sty(awaitor);
-			st->_alloc_size = _Size;
+			st->_alloc_size = static_cast<uint32_t>(_Size);
 
 			return st;
 		}
