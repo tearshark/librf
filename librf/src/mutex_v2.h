@@ -128,6 +128,24 @@ RESUMEF_NS
 			>
 			static future_t<scoped_unlock_t<_Mtxs...>> lock(_Mtxs&... mtxs);
 
+			/**
+			 * @brief 在协程中，无死锁的批量加锁。不会阻塞当前线程。直到获得所有锁之前，会阻塞当前协程。
+			 * @return [co_await] void
+			 */
+			template<class... _Mtxs
+				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
+			>
+			static future_t<> lock(adopt_manual_unlock_t, _Mtxs&... mtxs);
+
+			/**
+			 * @brief 在协程中解锁。如果可能，使用unlock(root_state(), mtxs...)来替代。
+			 * @return [co_await] void
+			 */
+			template<class... _Mtxs
+				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
+			>
+			static future_t<> unlock(_Mtxs&... mtxs);
+
 
 			/**
 			 * @brief 在非协程中，无死锁的批量加锁。会阻塞当前线程，直到获得所有锁为止。

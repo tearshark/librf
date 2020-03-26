@@ -177,7 +177,7 @@ RESUMEF_NS
 
 	template<class _Ty>
 	template<class U>
-	inline std::experimental::suspend_always promise_t<_Ty>::yield_value(U&& val)
+	inline suspend_always promise_t<_Ty>::yield_value(U&& val)
 	{
         this->get_state()->promise_yield_value(this, std::forward<U>(val));
 		return {};
@@ -190,7 +190,7 @@ RESUMEF_NS
 	}
 
 	template<class _Ty>
-	inline std::experimental::suspend_always promise_t<_Ty&>::yield_value(_Ty& val)
+	inline suspend_always promise_t<_Ty&>::yield_value(_Ty& val)
 	{
 		this->get_state()->promise_yield_value(this, val);
 		return {};
@@ -201,7 +201,7 @@ RESUMEF_NS
         this->get_state()->set_value();
 	}
 
-	inline std::experimental::suspend_always promise_t<void>::yield_value()
+	inline suspend_always promise_t<void>::yield_value()
 	{
         this->get_state()->promise_yield_value(this);
 		return {};

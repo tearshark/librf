@@ -53,7 +53,7 @@ RESUMEF_NS
 		template<class U>
 		void return_value(U&& val);	//co_return val
 		template<class U>
-		std::experimental::suspend_always yield_value(U&& val);
+		suspend_always yield_value(U&& val);
 	};
 
 	template<class _Ty>
@@ -63,7 +63,7 @@ RESUMEF_NS
 		using promise_impl_t<_Ty&>::get_return_object;
 
 		void return_value(_Ty& val);	//co_return val
-		std::experimental::suspend_always yield_value(_Ty& val);
+		suspend_always yield_value(_Ty& val);
 	};
 
 	template<>
@@ -72,7 +72,7 @@ RESUMEF_NS
 		using promise_impl_t<void>::get_return_object;
 
 		void return_void();			//co_return;
-		std::experimental::suspend_always yield_value();
+		suspend_always yield_value();
 	};
 
 }

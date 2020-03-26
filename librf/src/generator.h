@@ -121,17 +121,17 @@ RESUMEF_NS
 				return generator_t{ *this };
 			}
 
-			std::experimental::suspend_always initial_suspend() noexcept
+			suspend_always initial_suspend() noexcept
 			{
 				return {};
 			}
 
-			std::experimental::suspend_always final_suspend() noexcept
+			suspend_always final_suspend() noexcept
 			{
 				return {};
 			}
 
-			std::experimental::suspend_always yield_value(_Ty const& _Value) noexcept
+			suspend_always yield_value(_Ty const& _Value) noexcept
 			{
 				_CurrentValue = std::addressof(_Value);
 				return {};

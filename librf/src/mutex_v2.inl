@@ -76,20 +76,20 @@ RESUMEF_NS
 		private:
 			void* _Address;
 		public:
-			std::vector<mutex_t> _Lks;
+			std::vector<mutex_t> _mutex;
 
 			template<class... _Mtxs>
 			_MutexAddressAssembleT(void* unique_address, _Mtxs&... mtxs)
 				: _Address(unique_address)
-				, _Lks({ mtxs... })
+				, _mutex({ mtxs... })
 			{}
 			size_t size() const
 			{
-				return _Lks.size();
+				return _mutex.size();
 			}
 			mutex_t& operator[](int _Idx)
 			{
-				return _Lks[_Idx];
+				return _mutex[_Idx];
 			}
 			void _Lock_ref(mutex_t& _LkN) const
 			{
@@ -541,17 +541,39 @@ RESUMEF_NS
 		}
 
 		template<class... _Mtxs, typename>
+		inline future_t<> mutex_t::lock(adopt_manual_unlock_t, _Mtxs&... mtxs)
+		{
+			mutex_t::_MutexAwaitAssembleT _MAA{ root_state(), mtxs... };
+			co_await detail::mutex_lock_await_lock_impl::_Lock_range(_MAA);
+		}
+
+		template<class... _Mtxs, typename>
+		inline future_t<> mutex_t::unlock(_Mtxs&... mtxs)
+		{
+			void* unique_address = root_state();
+
+			(mtxs.unlock(unique_address), ...);
+		}
+
+		template<class... _Mtxs, typename>
 		inline scoped_unlock_t<_Mtxs...> mutex_t::lock(void* unique_address, _Mtxs&... mtxs)
 		{
 			assert(unique_address != nullptr);
-			return { unique_address, mtxs... };
+
+			detail::_MutexAddressAssembleT _MAA{ unique_address, mtxs... };
+			detail::scoped_lock_range_lock_impl::_Lock_range(_MAA);
+			
+			scoped_unlock_t<_Mtxs...> su{ std::adopt_lock, unique_address };
+			su._MAA._mutex = std::move(_MAA._mutex);
+			return su;
 		}
 
 		template<class... _Mtxs, typename>
 		inline void mutex_t::lock(adopt_manual_unlock_t, void* unique_address, _Mtxs&... mtxs)
 		{
 			assert(unique_address != nullptr);
-			mutex_t::_MutexAwaitAssembleT _MAA{ unique_address, mtxs... };
+
+			detail::_MutexAddressAssembleT _MAA{ unique_address, mtxs... };
 			detail::scoped_lock_range_lock_impl::_Lock_range(_MAA);
 		}
 
@@ -560,7 +582,7 @@ RESUMEF_NS
 		{
 			assert(unique_address != nullptr);
 
-			(..., mtxs.unlock(unique_address));
+			(mtxs.unlock(unique_address), ...);
 		}
 	}
 }

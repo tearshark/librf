@@ -38,6 +38,9 @@ RESUMEF_NS
 
 	template<typename _PromiseT = void>
 	using coroutine_handle = std::experimental::coroutine_handle<_PromiseT>;
+	using suspend_if = std::experimental::suspend_if;
+	using suspend_always = std::experimental::suspend_always;
+	using suspend_never = std::experimental::suspend_never;
 
 	struct state_base_t;
 
