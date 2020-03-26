@@ -491,14 +491,6 @@ RESUMEF_NS
 		{
 			mutex_t::_MutexAwaitAssembleT _MAA;
 
-			//此函数，应该在try_lock()获得锁后使用
-			//或者在协程里，由awaiter使用
-			template<class... U>
-			scoped_unlock_t(void* sch, U&&... mtxs)
-				: _MAA(sch, std::forward<U>(mtxs)...)
-			{
-				detail::scoped_lock_range_lock_impl::_Lock_range(_MAA);
-			}
 			template<class... U>
 			scoped_unlock_t(std::adopt_lock_t, void* sch, U&&... mtxs)
 				: _MAA(sch, std::forward<U>(mtxs)...)
