@@ -1,8 +1,11 @@
-# librf 2.8
+# librf 2.9.3
 
 ### librf  - 协程库
  * librf是一个基于C++ Coroutines提案 ‘Stackless Resumable Functions’编写的非对称stackless协程库。
 
+2020-03-26 更新：
+
+	兼容xcode 11.2.1。
 2020-03-18 更新：
 
 	更新event/mutex/when_all/when_any实现。至此，2.x版本完整恢复1.x版本的所有功能。
