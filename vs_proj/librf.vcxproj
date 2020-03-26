@@ -192,6 +192,7 @@
     <ClCompile Include="..\librf\src\state.cpp" />
     <ClCompile Include="..\librf\src\timer.cpp" />
     <ClCompile Include="..\librf\src\when_v2.cpp" />
+    <ClCompile Include="..\test_librf.cpp" />
     <ClCompile Include="..\tutorial\test_async_cb.cpp" />
     <ClCompile Include="..\tutorial\test_async_channel.cpp" />
     <ClCompile Include="..\tutorial\test_async_channel_mult_thread.cpp" />
@@ -212,11 +213,6 @@
     <ClCompile Include="..\tutorial\test_async_timer.cpp" />
     <ClCompile Include="..\tutorial\test_async_when_all.cpp" />
     <ClCompile Include="..\tutorial\test_async_yield_return.cpp" />
-    <ClCompile Include="librf.cpp">
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
-      <BufferSecurityCheck Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</BufferSecurityCheck>
-      <SDLCheck Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</SDLCheck>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\librf\librf.h" />

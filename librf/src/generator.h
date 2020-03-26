@@ -22,7 +22,7 @@ RESUMEF_NS
 
 		coroutine_handle<promise_type> _Coro;
 
-		generator_iterator(nullptr_t) : _Coro(nullptr)
+		generator_iterator(std::nullptr_t) : _Coro(nullptr)
 		{
 		}
 
@@ -58,9 +58,9 @@ RESUMEF_NS
 	};
 
 	template <typename promise_type>
-	struct generator_iterator<nullptr_t, promise_type> : public generator_iterator<void, promise_type>
+	struct generator_iterator<std::nullptr_t, promise_type> : public generator_iterator<void, promise_type>
 	{
-		generator_iterator(nullptr_t) : generator_iterator<void, promise_type>(nullptr)
+		generator_iterator(std::nullptr_t) : generator_iterator<void, promise_type>(nullptr)
 		{
 		}
 		generator_iterator(coroutine_handle<promise_type> _CoroArg) : generator_iterator<void, promise_type>(_CoroArg)
@@ -75,7 +75,7 @@ RESUMEF_NS
 		using reference = _Ty const&;
 		using pointer = _Ty const*;
 
-		generator_iterator(nullptr_t) : generator_iterator<void, promise_type>(nullptr)
+		generator_iterator(std::nullptr_t) : generator_iterator<void, promise_type>(nullptr)
 		{
 		}
 		generator_iterator(coroutine_handle<promise_type> _CoroArg) : generator_iterator<void, promise_type>(_CoroArg)
