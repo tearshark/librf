@@ -1,11 +1,15 @@
-﻿#pragma once
+#pragma once
 
-#define LIB_RESUMEF_VERSION 20902 // 2.9.2
+#define LIB_RESUMEF_VERSION 20903 // 2.9.3
 
 #if defined(RESUMEF_MODULE_EXPORT)
 #define RESUMEF_NS export namespace resumef
 #else
 #define RESUMEF_NS namespace resumef
+#endif
+
+#ifndef RESUMEF_ENABLE_MULT_SCHEDULER
+#define RESUMEF_ENABLE_MULT_SCHEDULER   1
 #endif
 
 //如果不清楚context frame的内存布局的情况下，该值设置为0

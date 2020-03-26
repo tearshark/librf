@@ -1,8 +1,7 @@
-﻿
+
 #include <chrono>
 #include <iostream>
 #include <string>
-#include <conio.h>
 #include <thread>
 
 #include "librf.h"
@@ -33,7 +32,7 @@ void resumable_main_benchmark_mem(bool wait_key)
 	if (wait_key)
 	{
 		std::cout << "press any key to continue." << std::endl;
-		(void)_getch();
+		(void)getchar();
 	}
 }
 

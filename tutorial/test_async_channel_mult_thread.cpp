@@ -1,9 +1,8 @@
-﻿//验证channel是否线程安全
+//验证channel是否线程安全
 
 #include <chrono>
 #include <iostream>
 #include <string>
-#include <conio.h>
 #include <thread>
 #include <deque>
 #include <mutex>

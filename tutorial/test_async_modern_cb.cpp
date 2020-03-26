@@ -1,4 +1,4 @@
-﻿
+
 #include "librf.h"
 
 #include <chrono>
@@ -9,7 +9,6 @@
 
 //原旨主义的异步函数，其回调写法大致如下
 template<typename _Input_t, typename _Callable_t>
-__declspec(noinline)
 void tostring_async_originalism(_Input_t&& value, _Callable_t&& token)
 {
 	std::thread([callback = std::move(token), value = std::forward<_Input_t>(value)]
@@ -78,7 +77,6 @@ struct modern_callback_adapter_t
 //忽视异常处理，故没有_Exception_t。
 //
 template<typename _Input_t, typename _Callable_t>
-__declspec(noinline)
 auto tostring_async(_Input_t&& value, _Callable_t&& token)
 {
 	//适配器类型
@@ -364,7 +362,6 @@ auto muldiv_async(_Ty1&& val1, _Ty2&& val2, _Callable_t&& token)
 	MODERN_CALLBACK_RETURN();
 }
 
-__declspec(noinline)
 void resumable_main_modern_cb()
 {
 	using namespace std::literals;

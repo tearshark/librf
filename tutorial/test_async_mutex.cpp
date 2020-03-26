@@ -1,8 +1,7 @@
-﻿
+
 #include <chrono>
 #include <iostream>
 #include <string>
-#include <conio.h>
 #include <thread>
 #include <deque>
 
