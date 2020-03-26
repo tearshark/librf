@@ -28,11 +28,48 @@ extern void benchmark_main_channel_passing_next();
 extern void resumable_main_benchmark_asio_server();
 extern void resumable_main_benchmark_asio_client(intptr_t nNum);
 
+
 int main(int argc, const char* argv[])
 {
-    std::cout << __clang_major__ << std::endl;
-    
 	(void)argc;
 	(void)argv;
+
+	//test_ring_queue_simple<resumef::ring_queue<int>>();
+	//test_ring_queue<resumef::ring_queue_spinlock<int, false, uint32_t>>();
+	//test_ring_queue<resumef::ring_queue_lockfree<int, uint64_t>>();
+
+	resumable_main_mutex();
+	return 0;
+
+	//if (argc > 1)
+	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
+	//else
+	//	resumable_main_benchmark_asio_server();
+
+	resumable_main_cb();
+	resumable_main_layout();
+	resumable_main_modern_cb();
+	resumable_main_suspend_always();
+	resumable_main_yield_return();
+	resumable_main_resumable();
+	resumable_main_routine();
+	resumable_main_exception();
+	resumable_main_dynamic_go();
+	resumable_main_multi_thread();
+	resumable_main_timer();
+	resumable_main_benchmark_mem(false);
+	resumable_main_mutex();
+	resumable_main_event();
+	resumable_main_event_v2();
+	resumable_main_event_timeout();
+	resumable_main_channel();
+	resumable_main_channel_mult_thread();
+	resumable_main_sleep();
+	resumable_main_when_all();
+	resumable_main_switch_scheduler();
+	std::cout << "ALL OK!" << std::endl;
+
+	benchmark_main_channel_passing_next();	//这是一个死循环测试
+
 	return 0;
 }
