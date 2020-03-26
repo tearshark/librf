@@ -560,8 +560,7 @@ RESUMEF_NS
 		{
 			assert(unique_address != nullptr);
 
-			int _Ignored[] = { (mtxs.unlock(unique_address), 0)... };
-			(void)_Ignored;
+			(..., mtxs.unlock(unique_address));
 		}
 	}
 }

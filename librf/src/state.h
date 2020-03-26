@@ -137,6 +137,7 @@ RESUMEF_NS
 
 		inline bool is_ready() const noexcept
 		{
+#pragma warning(disable : 6326)	//warning C6326: Potential comparison of a constant with another constant.
 			//msvc认为是constexpr表达式(不写还给警告)，然而，clang不这么认为。
 			//放弃constexpr，反正合格的编译器都会优化掉这个if判断的。
 			if 
@@ -147,6 +148,7 @@ RESUMEF_NS
 				return 0 != reinterpret_cast<const std::atomic<uint16_t> &>(_has_value).load(std::memory_order_acquire);
 			else
 				return _has_value.load(std::memory_order_acquire) != result_type::None || _is_future;
+#pragma warning(default : 6326)
 		}
 		inline bool has_handler_skip_lock() const noexcept
 		{
