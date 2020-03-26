@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #define LIB_RESUMEF_VERSION 20903 // 2.9.3
 

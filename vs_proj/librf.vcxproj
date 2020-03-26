@@ -84,7 +84,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_CONSOLE;ASIO_STANDALONE;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1;ASIO_DISABLE_CONCEPTS=1;RESUMEF_ENABLE_MULT_SCHEDULER=1;_DEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;_CONSOLE;ASIO_STANDALONE;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1;ASIO_DISABLE_CONCEPTS=1;RESUMEF_ENABLE_MULT_SCHEDULER=1;_DEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\librf;..\..\asio\asio\include;..\..\asio-1.10.6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/await</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -103,7 +103,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_CONSOLE;ASIO_STANDALONE;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1;ASIO_DISABLE_CONCEPTS=1;RESUMEF_ENABLE_MULT_SCHEDULER=1;RESUMEF_DEBUG_COUNTER=0;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;_CONSOLE;ASIO_STANDALONE;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1;ASIO_DISABLE_CONCEPTS=1;RESUMEF_ENABLE_MULT_SCHEDULER=1;RESUMEF_DEBUG_COUNTER=0;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\librf;..\..\asio\asio\include;..\..\asio-1.10.6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/await</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -123,7 +123,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Full</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_CONSOLE;ASIO_STANDALONE;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1;ASIO_DISABLE_CONCEPTS=1;RESUMEF_ENABLE_MULT_SCHEDULER=1;NDEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;_CONSOLE;ASIO_STANDALONE;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1;ASIO_DISABLE_CONCEPTS=1;RESUMEF_ENABLE_MULT_SCHEDULER=1;NDEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>
       </SDLCheck>
       <AdditionalIncludeDirectories>..\librf;..\..\asio\asio\include;..\..\asio-1.10.6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -150,7 +150,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Full</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_CONSOLE;ASIO_STANDALONE;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1;ASIO_DISABLE_CONCEPTS=1;RESUMEF_ENABLE_MULT_SCHEDULER=1;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;_CONSOLE;ASIO_STANDALONE;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1;ASIO_DISABLE_CONCEPTS=1;RESUMEF_ENABLE_MULT_SCHEDULER=1;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\librf;..\..\asio\asio\include;..\..\asio-1.10.6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/await</AdditionalOptions>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
