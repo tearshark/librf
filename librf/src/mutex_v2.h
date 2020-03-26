@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
 	namespace detail
@@ -9,14 +10,27 @@ RESUMEF_NS
 
 	inline namespace mutex_v2
 	{
+#endif
+		/**
+		 * @brief 提示手工解锁，故相关的lock()函数不再返回scoped_unlock_t。
+		 */
 		struct adopt_manual_unlock_t{};
+
+		/**
+		 * @brief 提示手工解锁，故相关的lock()函数不再返回scoped_unlock_t。
+		 */
 		constexpr adopt_manual_unlock_t adopt_manual_unlock;
 
+		/**
+		 * @brief 在析构的时候自动解锁mutex_t的辅助类。
+		 */
 		template<class... _Mtxs>
 		struct [[nodiscard]] scoped_unlock_t;
 
-		//支持递归的锁
-		//锁被本协程所在的跟协程所拥有。支持在跟协程下的所有协程里递归加锁。
+		/**
+		 * @brief 支持递归的锁。
+		 * 锁被本协程所在的跟协程所拥有。支持在跟协程下的所有协程里递归加锁。
+		 */
 		struct mutex_t
 		{
 			bool is_locked() const;
@@ -40,9 +54,10 @@ RESUMEF_NS
 			/**
 			 * @brief 在协程中加锁，如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。
 			 * 需要随后调用unlock()函数解锁。lock()/unlock()调用必须在同一个跟协程下配对调用。
+			 * @param manual_unlock_tag 提示手工解锁
 			 * @return [co_await] void
 			 */
-			manual_awaiter/*void*/ lock(adopt_manual_unlock_t) const noexcept;
+			manual_awaiter/*void*/ lock(adopt_manual_unlock_t manual_unlock_tag) const noexcept;
 
 
 			struct [[nodiscard]] try_awaiter;
@@ -113,7 +128,7 @@ RESUMEF_NS
 			bool try_lock_until(const std::chrono::time_point<_Rep, _Period>& tp, void* unique_address);
 
 			/**
-			 * @brief 在非协程中解锁。立即返回。
+			 * @brief 在非协程中解锁。立即返回。由于立即返回，也可在协程中如此使用：mtx.unlock(root_state())
 			 * @param unique_address 代表获得锁的拥有者。
 			 */
 			void unlock(void* unique_address) const;
@@ -121,58 +136,85 @@ RESUMEF_NS
 
 			/**
 			 * @brief 在协程中，无死锁的批量加锁。不会阻塞当前线程。直到获得所有锁之前，会阻塞当前协程。
+			 * @param mtxs... 需要获得的锁列表。
 			 * @return [co_await] scoped_unlock_t
 			 */
 			template<class... _Mtxs
+#ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
+#endif
 			>
 			static future_t<scoped_unlock_t<_Mtxs...>> lock(_Mtxs&... mtxs);
 
 			/**
 			 * @brief 在协程中，无死锁的批量加锁。不会阻塞当前线程。直到获得所有锁之前，会阻塞当前协程。
+			 * @param manual_unlock_tag 提示手工解锁
+			 * @param mtxs... 需要获得的锁列表。
 			 * @return [co_await] void
 			 */
 			template<class... _Mtxs
+#ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
+#endif
 			>
-			static future_t<> lock(adopt_manual_unlock_t, _Mtxs&... mtxs);
+			static future_t<> lock(adopt_manual_unlock_t manual_unlock_tag, _Mtxs&... mtxs);
 
 			/**
-			 * @brief 在协程中解锁。如果可能，使用unlock(root_state(), mtxs...)来替代。
+			 * @brief 在协程中批量解锁。如果可能，使用unlock(root_state(), mtxs...)来替代。
+			 * @param mtxs... 需要解锁的锁列表。
 			 * @return [co_await] void
 			 */
 			template<class... _Mtxs
+#ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
+#endif
 			>
 			static future_t<> unlock(_Mtxs&... mtxs);
 
 
 			/**
 			 * @brief 在非协程中，无死锁的批量加锁。会阻塞当前线程，直到获得所有锁为止。
+			 * @param unique_address 代表获得锁的拥有者。
+			 * @param mtxs... 需要获得的锁列表。
 			 * @return scoped_unlock_t
 			 */
 			template<class... _Mtxs
+#ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
+#endif
 			>
 			static scoped_unlock_t<_Mtxs...> lock(void* unique_address, _Mtxs&... mtxs);
 
 			/**
 			 * @brief 在非协程中，无死锁的批量加锁。会阻塞当前线程，直到获得所有锁为止。
+			 * @param manual_unlock_tag 提示手工解锁
+			 * @param unique_address 代表获得锁的拥有者。
+			 * @param mtxs... 需要获得的锁列表。
 			 */
 			template<class... _Mtxs
+#ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
+#endif
 			>
-			static void lock(adopt_manual_unlock_t, void* unique_address, _Mtxs&... mtxs);
+			static void lock(adopt_manual_unlock_t manual_unlock_tag, void* unique_address, _Mtxs&... mtxs);
 
 			/**
-			 * @brief 在非协程中，批量解锁。立即返回。
+			 * @brief 在非协程中批量解锁。立即返回。由于立即返回，也可在协程中如此使用：unlock(root_state(), mtxs...)
+			 * @param unique_address 代表获得锁的拥有者。
+			 * @param mtxs... 需要解锁的锁列表。
 			 */
 			template<class... _Mtxs
+#ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
+#endif
 			>
 			static void unlock(void* unique_address, _Mtxs&... mtxs);
 
 			mutex_t();
+
+			/**
+			 * @brief 构造一个无效的mutex_t。
+			 */
 			mutex_t(std::adopt_lock_t) noexcept;
 			~mutex_t() noexcept;
 
@@ -181,6 +223,7 @@ RESUMEF_NS
 			mutex_t& operator = (const mutex_t&) = default;
 			mutex_t& operator = (mutex_t&&) = default;
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 			typedef std::shared_ptr<detail::mutex_v2_impl> mutex_impl_ptr;
 			typedef std::chrono::system_clock clock_type;
 		private:
@@ -189,6 +232,7 @@ RESUMEF_NS
 			template<class... _Mtxs> friend struct scoped_unlock_t;
 
 			mutex_impl_ptr _mutex;
+#endif
 		};
 	}
 }
