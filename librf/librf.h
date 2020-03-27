@@ -38,6 +38,8 @@
 #include <experimental/coroutine>
 #endif
 
+#include "src/config.h"
+
 #include "src/def.h"
 #include "src/macro_def.inl"
 #include "src/counted_ptr.h"

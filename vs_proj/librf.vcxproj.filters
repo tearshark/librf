@@ -240,6 +240,9 @@
     <ClInclude Include="..\librf\src\yield.h">
       <Filter>librf\src</Filter>
     </ClInclude>
+    <ClInclude Include="..\librf\src\config.h">
+      <Filter>librf\src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\librf\src\asio_task_1.12.0.inl">
@@ -279,5 +282,6 @@
     <None Include="..\librf\src\without_deadlock_assemble.inl">
       <Filter>librf\src</Filter>
     </None>
+    <None Include="..\config.h.in" />
   </ItemGroup>
 </Project>

@@ -13,6 +13,51 @@ endif()
 
 message(STATUS "C++ flags: ${CMAKE_CXX_FLAGS}")
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	option(OPT_INLINE_STATE "Enable Inline state" ON)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+	option(OPT_INLINE_STATE "Enable Inline state" ON)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	option(OPT_INLINE_STATE "Enable Inline state" ON)
+else()
+	option(OPT_INLINE_STATE "Enable Inline state" OFF)
+endif()
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	option(OPT_USE_CONCEPT "Use conecpt instead of enable_if" ON)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	option(OPT_USE_CONCEPT "Use conecpt instead of enable_if" ON)
+else()
+	option(OPT_USE_CONCEPT "Use conecpt instead of enable_if" OFF)
+endif()
+
+option(OPT_MULT_SCHEDULER "Enable multiple schedulers" ON)
+option(OPT_DEBUG_COUNTER "Debug objects count" OFF)
+option(OPT_KEEP_REAL_SIZE "Keep real size in queue" OFF)
+
+#set(RESUMEF_USE_CUSTOM_SPINLOCK "std::mutex")
+
+if(OPT_MULT_SCHEDULER)
+	set(RESUMEF_ENABLE_MULT_SCHEDULER 1)
+endif()
+if(OPT_INLINE_STATE)
+	set(RESUMEF_INLINE_STATE 1)
+endif()
+if(OPT_DEBUG_COUNTER)
+	set(RESUMEF_DEBUG_COUNTER 1)
+endif()
+if(OPT_USE_CONCEPT)
+	set(RESUMEF_ENABLE_CONCEPT 1)
+endif()
+if(OPT_KEEP_REAL_SIZE)
+	set(_WITH_LOCK_FREE_Q_KEEP_REAL_SIZE 1)
+endif()
+
+configure_file(
+${PROJECT_SOURCE_DIR}/config.h.in
+${PROJECT_SOURCE_DIR}/librf/src/config.h)
+
+
 include_directories(
 ${PROJECT_SOURCE_DIR}/librf
 )
