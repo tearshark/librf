@@ -29,7 +29,7 @@ RESUMEF_NS
 
 		/**
 		 * @brief 支持递归的锁。
-		 * 锁被本协程所在的跟协程所拥有。支持在跟协程下的所有协程里递归加锁。
+		 * @details 锁被本协程所在的跟协程所拥有。支持在跟协程下的所有协程里递归加锁。
 		 */
 		struct mutex_t
 		{
@@ -53,7 +53,7 @@ RESUMEF_NS
 
 			/**
 			 * @brief 在协程中加锁，如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。
-			 * 需要随后调用unlock()函数解锁。lock()/unlock()调用必须在同一个跟协程下配对调用。
+			 * @details 需要随后调用unlock()函数解锁。lock()/unlock()调用必须在同一个跟协程下配对调用。
 			 * @param manual_unlock_tag 提示手工解锁
 			 * @return [co_await] void
 			 */
@@ -64,7 +64,7 @@ RESUMEF_NS
 
 			/**
 			 * @brief 尝试在协程中加锁。此操作无论成功与否都会立即返回，不会有协程切换。
-			 * 如果加锁成功，则需要调用co_await unlock()解锁。或者使用unlock(root_state())解锁。
+			 * @details 如果加锁成功，则需要调用co_await unlock()解锁。或者使用unlock(root_state())解锁。\n
 			 * 如果加锁失败，且要循环尝试加锁，则最好调用co_await yield()让出一次调度。否则，可能造成本调度器死循环。
 			 * @return [co_await] bool
 			 */
@@ -100,7 +100,7 @@ RESUMEF_NS
 
 			/**
 			 * @brief 在非协程中加锁。如果不能立即获得锁，则反复尝试，直到获得锁。故会阻塞当前协程
-			 * @param unique_address 代表获得锁的拥有者。此地址应当与随后的unlock()的地址一致。
+			 * @param unique_address 代表获得锁的拥有者。此地址应当与随后的unlock()的地址一致。\n
 			 * 一般做法，是申明一个跟当前线程关联的局部变量，以此局部变量的地址为参数。
 			 */
 			void lock(void* unique_address) const;

@@ -19,8 +19,8 @@ struct move_only_type
 	_Ty value;
 
 	move_only_type() = default;
-	move_only_type(const _Ty& val) : value(val) {}
-	move_only_type(_Ty&& val) : value(std::forward<_Ty>(val)) {}
+	explicit move_only_type(const _Ty& val) : value(val) {}
+	explicit move_only_type(_Ty&& val) : value(std::forward<_Ty>(val)) {}
 
 	move_only_type(const move_only_type&) = delete;
 	move_only_type& operator =(const move_only_type&) = delete;

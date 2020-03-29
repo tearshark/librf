@@ -54,14 +54,6 @@ namespace detail
 			this->_coro = handler;
 		}
 
-		void on_await_resume()
-		{
-			if (_error != error_code::none)
-			{
-				std::rethrow_exception(std::make_exception_ptr(channel_exception{ _error }));
-			}
-		}
-
 		friend _Chty;
 	public:
 		//为浸入式单向链表提供的next指针
@@ -73,7 +65,6 @@ namespace detail
 		std::shared_ptr<_Chty> _channel;
 	protected:
 		value_type* _value;
-		error_code _error = error_code::none;
 	};
 
 
@@ -90,7 +81,7 @@ namespace detail
 		using state_read_t = state_channel_t<optional_type, this_type>;
 		using state_write_t = state_channel_t<value_type, this_type>;
 
-		channel_impl_v2(size_t max_counter_);
+		channel_impl_v2(size_t cache_size);
 
 		bool try_read(optional_type& val);
 		bool try_read_nolock(optional_type& val);
@@ -142,9 +133,9 @@ namespace detail
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
 	template<class _Ty, class _Opty>
-	channel_impl_v2<_Ty, _Opty>::channel_impl_v2(size_t max_counter_)
-		: _max_counter(max_counter_)
-		, _values(USE_RING_QUEUE ? max_counter_ : 0)
+	channel_impl_v2<_Ty, _Opty>::channel_impl_v2(size_t cache_size)
+		: _max_counter(cache_size)
+		, _values(USE_RING_QUEUE ? cache_size : 0)
 	{
 	}
 
@@ -271,22 +262,16 @@ namespace detail
 		state_read_t* state = try_pop_reader_();
 		if (state != nullptr)
 		{
+			assert(!_values.empty());
+
 			if constexpr (USE_RING_QUEUE)
 			{
-				if (!_values.try_pop(*state->_value))
-					state->_error = error_code::read_before_write;
+				_values.try_pop(*state->_value);
 			}
 			else
 			{
-				if (_values.size() > 0)
-				{
-					*state->_value = std::move(_values.front());
-					_values.pop_front();
-				}
-				else
-				{
-					state->_error = error_code::read_before_write;
-				}
+				*state->_value = std::move(_values.front());
+				_values.pop_front();
 			}
 
 			state->on_notify();
@@ -364,7 +349,9 @@ inline namespace channel_v2
 		~read_awaiter()
 		{//为了不在协程中也能正常使用
 			if (_channel != nullptr)
-				_channel->try_read(_value);
+			{
+				while(!_channel->try_read(_value));
+			}
 		}
 
 		bool await_ready()
@@ -402,9 +389,6 @@ inline namespace channel_v2
 		}
 		value_type await_resume()
 		{
-			if (_state.get() != nullptr)
-				_state->on_await_resume();
-
 			if constexpr (use_optional)
 				return std::move(_value).value();
 			else
@@ -430,7 +414,9 @@ inline namespace channel_v2
 		~write_awaiter()
 		{//为了不在协程中也能正常使用
 			if (_channel != nullptr)
-				_channel->try_write(_value);
+			{
+				while(!_channel->try_write(_value));
+			}
 		}
 
 		bool await_ready()
@@ -468,8 +454,6 @@ inline namespace channel_v2
 		}
 		void await_resume()
 		{
-			if (_state.get() != nullptr)
-				_state->on_await_resume();
 		}
 	private:
 		channel_type* _channel;
@@ -478,8 +462,8 @@ inline namespace channel_v2
 	};
 
 	template<class _Ty, bool _Optional, bool _OptimizationThread>
-	channel_t<_Ty, _Optional, _OptimizationThread>::channel_t(size_t max_counter)
-		:_chan(std::make_shared<channel_type>(max_counter))
+	channel_t<_Ty, _Optional, _OptimizationThread>::channel_t(size_t cache_size)
+		:_chan(std::make_shared<channel_type>(cache_size))
 	{
 
 	}
@@ -505,7 +489,7 @@ inline namespace channel_v2
 	}
 
 	template<class _Ty, bool _Optional, bool _OptimizationThread>
-	template<class U>
+	template<class U COMMA_RESUMEF_ENABLE_IF_TYPENAME()> RESUMEF_REQUIRES(std::is_constructible_v<_Ty, U&&>)
 	typename channel_t<_Ty, _Optional, _OptimizationThread>::write_awaiter
 		channel_t<_Ty, _Optional, _OptimizationThread>::write(U&& val) const noexcept(std::is_move_constructible_v<U>)
 	{
@@ -513,7 +497,7 @@ inline namespace channel_v2
 	}
 
 	template<class _Ty, bool _Optional, bool _OptimizationThread>
-	template<class U>
+	template<class U COMMA_RESUMEF_ENABLE_IF_TYPENAME()> RESUMEF_REQUIRES(std::is_constructible_v<_Ty, U&&>)
 	typename channel_t<_Ty, _Optional, _OptimizationThread>::write_awaiter
 		channel_t<_Ty, _Optional, _OptimizationThread>::operator << (U&& val) const noexcept(std::is_move_constructible_v<U>)
 	{
