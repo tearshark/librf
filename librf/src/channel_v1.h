@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-RESUMEF_NS
+namespace resumef
 {
 	namespace detail
 	{
@@ -240,4 +240,4 @@ namespace channel_v1
 	using semaphore_t = channel_t<bool>;
 
 }	//namespace v1
-}	//RESUMEF_NS
+}	//namespace resumef

@@ -1,10 +1,7 @@
 ﻿#pragma once
 
-#ifndef DOXYGEN_SKIP_PROPERTY
-RESUMEF_NS
+namespace resumef
 {
-#endif	//DOXYGEN_SKIP_PROPERTY
-
 	struct timer_manager;
 	typedef std::shared_ptr<timer_manager> timer_mgr_ptr;
 	typedef std::weak_ptr<timer_manager> timer_mgr_wptr;

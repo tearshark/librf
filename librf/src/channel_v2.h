@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#ifndef DOXYGEN_SKIP_PROPERTY
-RESUMEF_NS
+namespace resumef
 {
+#ifndef DOXYGEN_SKIP_PROPERTY
 namespace detail
 {
 	template<class _Ty, class _Opty>
@@ -42,7 +42,8 @@ inline namespace channel_v2
 		size_t capacity() const noexcept;
 
 		/**
-		 * @brief 在协程中从channel_t里读取一个数据。参考read()函数
+		 * @brief 在协程中从channel_t里读取一个数据。
+		 * @see 参考{read}()函数
 		 */
 		read_awaiter operator co_await() const noexcept;
 
@@ -57,7 +58,8 @@ inline namespace channel_v2
 		read_awaiter read() const noexcept;
 
 		/**
-		 * @brief 在协程中向channel_t里写入一个数据。参考write()函数
+		 * @brief 在协程中向channel_t里写入一个数据。
+		 * @see 参考{write}()函数
 		 */
 		template<class U
 #ifndef DOXYGEN_SKIP_PROPERTY
@@ -121,4 +123,4 @@ inline namespace channel_v2
 	using semaphore_t = channel_t<bool, false, true>;
 
 }	//namespace channel_v2
-}	//RESUMEF_NS
+}	//namespace resumef

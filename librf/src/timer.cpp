@@ -1,8 +1,7 @@
 #include "../librf.h"
 
-RESUMEF_NS
+namespace resumef
 {
-
 	timer_manager::timer_manager()
 	{
 		_added_timers.reserve(128);

@@ -2,7 +2,7 @@
 
 #pragma once
 
-RESUMEF_NS
+namespace resumef
 {
 #if defined(RESUMEF_USE_CUSTOM_SPINLOCK)
 	using spinlock = RESUMEF_USE_CUSTOM_SPINLOCK;

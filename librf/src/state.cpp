@@ -1,6 +1,6 @@
 ﻿#include "../librf.h"
 
-RESUMEF_NS
+namespace resumef
 {
 	state_base_t::~state_base_t()
 	{

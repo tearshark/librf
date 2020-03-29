@@ -1,9 +1,7 @@
 #pragma once
 
-#ifndef DOXYGEN_SKIP_PROPERTY
-RESUMEF_NS
+namespace resumef
 {
-#endif	//DOXYGEN_SKIP_PROPERTY
 
 	struct get_current_scheduler_awaitor
 	{

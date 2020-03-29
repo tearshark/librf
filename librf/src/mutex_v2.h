@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#ifndef DOXYGEN_SKIP_PROPERTY
-RESUMEF_NS
+namespace resumef
 {
+#ifndef DOXYGEN_SKIP_PROPERTY
 	namespace detail
 	{
 		struct mutex_v2_impl;
@@ -46,7 +46,8 @@ RESUMEF_NS
 			awaiter/*batch_unlock_t*/ lock() const noexcept;
 			
 			/**
-			 * @brief 等同调用 co_await lock()。
+			 * @brief 在协程中加锁。
+			 * @see 等同调用 co_await {lock}()。
 			 * @return [co_await] batch_unlock_t
 			 */
 			awaiter/*batch_unlock_t*/ operator co_await() const noexcept;

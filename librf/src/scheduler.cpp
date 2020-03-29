@@ -8,7 +8,7 @@ std::atomic<intptr_t> g_resumef_evtctx_count = 0;
 std::atomic<intptr_t> g_resumef_state_id = 0;
 #endif
 
-RESUMEF_NS
+namespace resumef
 {
 	const char * future_error_string[(size_t)error_code::max__]
 	{

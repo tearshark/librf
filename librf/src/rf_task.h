@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#ifndef DOXYGEN_SKIP_PROPERTY
-RESUMEF_NS
+namespace resumef
 {
+#ifndef DOXYGEN_SKIP_PROPERTY
 	/**
 	 * @brief 协程任务的基类。
 	 */

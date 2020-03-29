@@ -2,7 +2,7 @@
 
 #ifndef DOXYGEN_SKIP_PROPERTY
 
-RESUMEF_NS
+namespace resumef
 {
 	namespace detail
 	{

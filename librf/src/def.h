@@ -2,15 +2,9 @@
 
 #define LIB_RESUMEF_VERSION 20905 // 2.9.5
 
-#if defined(RESUMEF_MODULE_EXPORT)
-#define RESUMEF_NS export namespace resumef
-#else
-#define RESUMEF_NS namespace resumef
-#endif
-
-#ifndef DOXYGEN_SKIP_PROPERTY
-RESUMEF_NS
+namespace resumef
 {
+#ifndef DOXYGEN_SKIP_PROPERTY
 	struct scheduler_t;
 
 	template<class _Ty = void>
@@ -30,8 +24,6 @@ RESUMEF_NS
 	struct state_base_t;
 
 	struct switch_scheduler_t;
-#else	//DOXYGEN_SKIP_PROPERTY
-namespace resumef {
 #endif	//DOXYGEN_SKIP_PROPERTY
 
 	template<typename _PromiseT = void>
@@ -58,7 +50,7 @@ extern std::atomic<intptr_t> g_resumef_evtctx_count;
 extern std::atomic<intptr_t> g_resumef_state_id;
 #endif
 
-RESUMEF_NS
+namespace resumef
 {
 	template<class T>
 	struct remove_cvref

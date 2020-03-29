@@ -1,6 +1,6 @@
 ﻿#include "../librf.h"
 
-RESUMEF_NS
+namespace resumef
 {
 	task_base_t::~task_base_t()
 	{

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-RESUMEF_NS
+namespace resumef
 {
 namespace detail
 {
@@ -505,4 +505,4 @@ inline namespace channel_v2
 	}
 
 }	//namespace channel_v2
-}	//RESUMEF_NS
+}	//namespace resumef

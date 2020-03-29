@@ -4,10 +4,8 @@
 //
 #pragma once
 
-RESUMEF_NS
+namespace resumef
 {
-	struct scheduler_t;
-
 	future_t<> sleep_until_(std::chrono::system_clock::time_point tp_, scheduler_t& scheduler_);
 
 	inline future_t<> sleep_for_(std::chrono::system_clock::duration dt_, scheduler_t& scheduler_)

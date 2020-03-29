@@ -1,6 +1,6 @@
 #pragma once
 
-RESUMEF_NS
+namespace resumef
 {
 	template<class _Node, class _Nodeptr = _Node*, class _Sty = uint32_t>
 	struct intrusive_link_queue

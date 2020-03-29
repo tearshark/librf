@@ -4,7 +4,7 @@
 #undef new
 
 #ifndef DOXYGEN_SKIP_PROPERTY
-RESUMEF_NS
+namespace resumef
 {
 	struct suspend_on_initial;
 	struct suspend_on_final;

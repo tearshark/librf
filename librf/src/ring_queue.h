@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-RESUMEF_NS
+namespace resumef
 {
 	//使用自旋锁完成的线程安全的环形队列。
 	//支持多个线程同时push和pop。

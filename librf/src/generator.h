@@ -9,11 +9,8 @@
 #pragma push_macro("new")
 #undef new
 
-#ifndef DOXYGEN_SKIP_PROPERTY
-RESUMEF_NS
+namespace resumef
 {
-#endif	//DOXYGEN_SKIP_PROPERTY
-
 	template <typename _Ty, typename promise_type>
 	struct generator_iterator;
 

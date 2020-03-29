@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#ifndef DOXYGEN_SKIP_PROPERTY
-RESUMEF_NS
+namespace resumef
 {
+#ifndef DOXYGEN_SKIP_PROPERTY
 	namespace detail
 	{
 		struct event_v2_impl;

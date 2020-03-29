@@ -1,10 +1,7 @@
 ﻿#pragma once
 
-#ifndef DOXYGEN_SKIP_PROPERTY
-RESUMEF_NS
+namespace resumef
 {
-#endif	//DOXYGEN_SKIP_PROPERTY
-
 	struct state_base_t
 	{
 		using _Alloc_char = std::allocator<char>;

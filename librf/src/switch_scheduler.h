@@ -1,6 +1,6 @@
 #pragma once
 
-RESUMEF_NS
+namespace resumef
 {
 	struct switch_scheduler_awaitor
 	{
@@ -52,10 +52,23 @@ RESUMEF_NS
 	//{
 	//	return { &sch };
 	//}
+
+	/**
+	 * @fn 将本协程切换到指定调度器上运行。
+	 * @details 由于调度器必然在某个线程里运行，故达到了切换到特定线程里运行的目的。\n
+	 * 如果指定的协程就是本协程的调度器，则协程不暂停直接运行接下来的代码。
+	 * 如果指定的协程不是本协程的调度器，则协程暂停后放入到目的协程的调度队列，等待下一次运行。
+	 * @param sch 将要运行此后代码的协程
+	 */
 	inline switch_scheduler_awaitor via(scheduler_t& sch) noexcept
 	{
 		return { &sch };
 	}
+
+	/**
+	 * @fn 将本协程切换到指定调度器上运行。
+	 * @see 参考{via}(scheduler_t&)版本。
+	 */
 	inline switch_scheduler_awaitor via(scheduler_t* sch) noexcept
 	{
 		return { sch };

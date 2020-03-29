@@ -4,7 +4,7 @@
 #include <concepts>
 #endif
 
-RESUMEF_NS
+namespace resumef
 {
 
 #if RESUMEF_ENABLE_CONCEPT

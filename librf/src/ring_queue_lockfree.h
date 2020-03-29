@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-RESUMEF_NS
+namespace resumef
 {
 	//目前无法解决三个索引数值回绕导致的问题
 	//如果为了避免索引回绕的问题，索引采用uint64_t类型，

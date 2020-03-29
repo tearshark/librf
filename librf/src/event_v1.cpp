@@ -1,6 +1,6 @@
 ﻿#include "../librf.h"
 
-RESUMEF_NS
+namespace resumef
 {
 	namespace detail
 	{

@@ -1,5 +1,5 @@
 ﻿
-RESUMEF_NS
+namespace resumef
 {
 	/*
 	Note: the awaiter object is part of coroutine state (as a temporary whose lifetime crosses a suspension point) 

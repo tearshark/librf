@@ -1,6 +1,6 @@
 #include "../librf.h"
 
-RESUMEF_NS
+namespace resumef
 {
 	future_t<> sleep_until_(std::chrono::system_clock::time_point tp_, scheduler_t& scheduler_)
 	{

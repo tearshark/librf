@@ -1,5 +1,5 @@
 ﻿
-RESUMEF_NS
+namespace resumef
 {
 	template<class _PromiseT, typename _Enable>
 	void state_future_t::promise_initial_suspend(coroutine_handle<_PromiseT> handler)

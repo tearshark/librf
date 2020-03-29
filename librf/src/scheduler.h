@@ -1,11 +1,7 @@
 ﻿#pragma once
 
-#ifndef DOXYGEN_SKIP_PROPERTY
-RESUMEF_NS
+namespace resumef
 {
-	struct local_scheduler;
-#endif	//DOXYGEN_SKIP_PROPERTY
-
 	struct scheduler_t : public std::enable_shared_from_this<scheduler_t>
 	{
 	private:

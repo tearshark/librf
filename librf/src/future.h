@@ -1,10 +1,8 @@
 ﻿
 #pragma once
 
-#ifndef DOXYGEN_SKIP_PROPERTY
-RESUMEF_NS
+namespace resumef
 {
-#endif	//DOXYGEN_SKIP_PROPERTY
 
 	template<class _Ty>
 	struct [[nodiscard]] future_t

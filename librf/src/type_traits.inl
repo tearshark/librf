@@ -1,6 +1,6 @@
 #pragma once
 
-RESUMEF_NS
+namespace resumef
 {
 	namespace traits
 	{
