@@ -10,7 +10,7 @@ RESUMEF_NS
 
 	inline namespace mutex_v2
 	{
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 		/**
 		 * @brief 提示手工解锁，故相关的lock()函数不再返回scoped_unlock_t。
 		 */
@@ -142,7 +142,7 @@ RESUMEF_NS
 			template<class... _Mtxs
 #ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 			>
 			static future_t<scoped_unlock_t<_Mtxs...>> lock(_Mtxs&... mtxs);
 
@@ -155,7 +155,7 @@ RESUMEF_NS
 			template<class... _Mtxs
 #ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 			>
 			static future_t<> lock(adopt_manual_unlock_t manual_unlock_tag, _Mtxs&... mtxs);
 
@@ -167,7 +167,7 @@ RESUMEF_NS
 			template<class... _Mtxs
 #ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 			>
 			static future_t<> unlock(_Mtxs&... mtxs);
 
@@ -181,7 +181,7 @@ RESUMEF_NS
 			template<class... _Mtxs
 #ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 			>
 			static scoped_unlock_t<_Mtxs...> lock(void* unique_address, _Mtxs&... mtxs);
 
@@ -194,7 +194,7 @@ RESUMEF_NS
 			template<class... _Mtxs
 #ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 			>
 			static void lock(adopt_manual_unlock_t manual_unlock_tag, void* unique_address, _Mtxs&... mtxs);
 
@@ -206,7 +206,7 @@ RESUMEF_NS
 			template<class... _Mtxs
 #ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 			>
 			static void unlock(void* unique_address, _Mtxs&... mtxs);
 
@@ -232,7 +232,7 @@ RESUMEF_NS
 			template<class... _Mtxs> friend struct scoped_unlock_t;
 
 			mutex_impl_ptr _mutex;
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 		};
 	}
 }

@@ -105,7 +105,7 @@ RESUMEF_NS
 
 	void scheduler_t::new_task(task_base_t * task)
 	{
-		state_base_t* sptr = task->get_state();
+		state_base_t* sptr = task->_state.get();
 		sptr->set_scheduler(this);
 
 		{
@@ -152,7 +152,7 @@ RESUMEF_NS
 
 	void scheduler_t::add_switch(std::unique_ptr<task_base_t> task)
 	{
-		state_base_t* sptr = task->get_state();
+		state_base_t* sptr = task->_state.get();
 
 		scoped_lock<spinlock> __guard(_lock_ready);
 		this->_ready_task.emplace(sptr, std::move(task));

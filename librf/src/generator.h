@@ -9,10 +9,15 @@
 #pragma push_macro("new")
 #undef new
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
+#endif	//DOXYGEN_SKIP_PROPERTY
+
 	template <typename _Ty, typename promise_type>
 	struct generator_iterator;
+
+#ifndef DOXYGEN_SKIP_PROPERTY
 
 	template<typename promise_type>
 	struct generator_iterator<void, promise_type>
@@ -92,6 +97,7 @@ RESUMEF_NS
 			return this->_Coro.promise()._CurrentValue;
 		}
 	};
+#endif	//DOXYGEN_SKIP_PROPERTY
 
 	template <typename _Ty, typename _Alloc>
 	struct generator_t
@@ -99,6 +105,7 @@ RESUMEF_NS
 		using value_type = _Ty;
 		using state_type = state_generator_t;
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 		struct promise_type
 		{
 			using value_type = _Ty;
@@ -247,6 +254,7 @@ RESUMEF_NS
 			counted_ptr<state_type> _state = state_generator_t::_Alloc_state();
 #endif
 		};
+#endif	//DOXYGEN_SKIP_PROPERTY
 
 		typedef generator_iterator<_Ty, promise_type> iterator;
 
@@ -314,6 +322,8 @@ RESUMEF_NS
 #pragma pop_macro("new")
 #pragma pack(pop)
 
+#ifndef DOXYGEN_SKIP_PROPERTY
+
 namespace std {
 	namespace experimental {
 		
@@ -324,3 +334,5 @@ namespace std {
 		};
 	}
 } // namespace std::experimental
+
+#endif	//DOXYGEN_SKIP_PROPERTY

@@ -1,7 +1,10 @@
 #pragma once
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
+#endif	//DOXYGEN_SKIP_PROPERTY
+
 	enum struct error_code
 	{
 		none,

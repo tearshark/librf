@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#ifndef DOXYGEN_SKIP_PROPERTY
+
 RESUMEF_NS
 {
 	namespace detail
@@ -57,3 +59,6 @@ RESUMEF_NS
 		};
 	}
 }
+
+#endif	//DOXYGEN_SKIP_PROPERTY
+ 

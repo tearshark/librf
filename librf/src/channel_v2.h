@@ -11,7 +11,7 @@ namespace detail
 
 inline namespace channel_v2
 {
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 
 	/**
 	 * @brief 可传递数据的模板信号量。
@@ -62,11 +62,11 @@ inline namespace channel_v2
 		template<class U
 #ifndef DOXYGEN_SKIP_PROPERTY
 			COMMA_RESUMEF_ENABLE_IF(std::is_constructible_v<value_type, U&&>)
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 		>
 #ifndef DOXYGEN_SKIP_PROPERTY
 		RESUMEF_REQUIRES(std::is_constructible_v<_Ty, U&&>)
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 		write_awaiter operator << (U&& val) const noexcept(std::is_move_constructible_v<U>);
 
 		/**
@@ -79,11 +79,11 @@ inline namespace channel_v2
 		template<class U
 #ifndef DOXYGEN_SKIP_PROPERTY
 			COMMA_RESUMEF_ENABLE_IF(std::is_constructible_v<value_type, U&&>)
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 		>
 #ifndef DOXYGEN_SKIP_PROPERTY
 		RESUMEF_REQUIRES(std::is_constructible_v<_Ty, U&&>)
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 		write_awaiter write(U&& val) const noexcept(std::is_move_constructible_v<U>);
 
 
@@ -103,7 +103,7 @@ inline namespace channel_v2
 		channel_t& operator = (channel_t&&) = default;
 	private:
 		std::shared_ptr<channel_type> _chan;
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 	};
 
 
@@ -113,7 +113,7 @@ inline namespace channel_v2
 	struct channel_t<void, _Option, _OptimizationThread>
 	{
 	};
-#endif
+#endif	//DOXYGEN_SKIP_PROPERTY
 
 	/**
 	 * @brief 利用channel_t重定义的信号量。

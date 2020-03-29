@@ -1,8 +1,10 @@
-﻿
-#pragma once
+﻿#pragma once
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
+#endif	//DOXYGEN_SKIP_PROPERTY
+
 	template <typename T>
 	struct counted_ptr
 	{

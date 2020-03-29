@@ -1,8 +1,11 @@
 ﻿
 #pragma once
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
+#endif	//DOXYGEN_SKIP_PROPERTY
+
 	template<class _Ty>
 	struct [[nodiscard]] future_t
 	{
@@ -40,7 +43,7 @@ RESUMEF_NS
 	};
 }
 
-
+#ifndef DOXYGEN_SKIP_PROPERTY
 namespace std {
 	namespace experimental {
 
@@ -56,4 +59,4 @@ namespace std {
 		};
 	}
 } // namespace std::experimental
-
+#endif	//DOXYGEN_SKIP_PROPERTY

@@ -8,6 +8,7 @@
 #define RESUMEF_NS namespace resumef
 #endif
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
 	struct scheduler_t;
@@ -26,23 +27,28 @@ RESUMEF_NS
 	template<class _Ty = void>
 	struct awaitable_t;
 
-	//获得当前线程下的调度器
-	scheduler_t* this_scheduler();
+	struct state_base_t;
+
+	struct switch_scheduler_t;
+#else	//DOXYGEN_SKIP_PROPERTY
+namespace resumef {
+#endif	//DOXYGEN_SKIP_PROPERTY
 
 	template<typename _PromiseT = void>
 	using coroutine_handle = std::experimental::coroutine_handle<_PromiseT>;
 	using suspend_always = std::experimental::suspend_always;
 	using suspend_never = std::experimental::suspend_never;
 
-	struct state_base_t;
-
-	struct switch_scheduler_t;
-
 	template<class... _Mutexes>
 	using scoped_lock = std::scoped_lock<_Mutexes...>;
 
 	constexpr size_t _Version = LIB_RESUMEF_VERSION;
+
+	//获得当前线程下的调度器
+	scheduler_t* this_scheduler();
 }
+
+#ifndef DOXYGEN_SKIP_PROPERTY
 
 #if RESUMEF_DEBUG_COUNTER
 extern std::mutex g_resumef_cout_mutex;
@@ -73,3 +79,5 @@ RESUMEF_NS
 }
 
 #include "exception.inl"
+
+#endif	//DOXYGEN_SKIP_PROPERTY

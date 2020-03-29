@@ -1,7 +1,10 @@
 #pragma once
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
+#endif	//DOXYGEN_SKIP_PROPERTY
+
 	struct get_current_scheduler_awaitor
 	{
 		bool await_ready() const noexcept

@@ -1,7 +1,10 @@
-#pragma once
+﻿#pragma once
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
+#endif	//DOXYGEN_SKIP_PROPERTY
+
 	struct timer_manager;
 	typedef std::shared_ptr<timer_manager> timer_mgr_ptr;
 	typedef std::weak_ptr<timer_manager> timer_mgr_wptr;
@@ -11,6 +14,9 @@ RESUMEF_NS
 		typedef std::chrono::system_clock timer_clock_type;
 		typedef std::function<void(bool)> timer_callback_type;
 
+		/**
+		 * @brief 定时器对象。
+		 */
 		struct timer_target : public std::enable_shared_from_this<timer_target>
 		{
 			friend timer_manager;
@@ -46,22 +52,28 @@ RESUMEF_NS
 			timer_target & operator = (const timer_target &) = delete;
 			timer_target & operator = (timer_target && right_) = delete;
 		};
+
 		typedef std::shared_ptr<timer_target> timer_target_ptr;
 		typedef std::weak_ptr<timer_target> timer_target_wptr;
 	}
 
+	/**
+	 * @brief 定时器句柄。
+	 * @details 对定时器对象和定时器管理器都采用弱引用。
+	 */
 	struct timer_handler
 	{
 	private:
 		timer_mgr_wptr				_manager;
 		detail::timer_target_wptr	_target;
 	public:
+#ifndef DOXYGEN_SKIP_PROPERTY
 		timer_handler() = default;
 		timer_handler(const timer_handler &) = default;
 		timer_handler(timer_handler && right_) noexcept;
 		timer_handler & operator = (const timer_handler &) = default;
 		timer_handler & operator = (timer_handler && right_) noexcept;
-
+#endif	//DOXYGEN_SKIP_PROPERTY
 		timer_handler(timer_manager * manager_, const detail::timer_target_ptr & target_);
 
 		void reset();
@@ -69,8 +81,12 @@ RESUMEF_NS
 		bool expired() const;
 	};
 
+	/**
+	 * @brief 定时器管理器。
+	 */
 	struct timer_manager : public std::enable_shared_from_this<timer_manager>
 	{
+#ifndef DOXYGEN_SKIP_PROPERTY
 		typedef detail::timer_target timer_target;
 		typedef detail::timer_target_ptr timer_target_ptr;
 		typedef detail::timer_clock_type clock_type;
@@ -79,12 +95,8 @@ RESUMEF_NS
 
 		typedef std::vector<timer_target_ptr> timer_vector_type;
 		typedef std::multimap<clock_type::time_point, timer_target_ptr> timer_map_type;
-	protected:
-		spinlock _added_mtx;
-		timer_vector_type	_added_timers;
+#endif
 	public:
-		timer_map_type		_runing_timers;
-
 		timer_manager();
 		~timer_manager();
 
@@ -118,6 +130,7 @@ RESUMEF_NS
 		void clear();
 		void update();
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 		template<class _Cb>
 		timer_target_ptr add_(const duration_type & dt_, _Cb && cb_)
 		{
@@ -129,8 +142,13 @@ RESUMEF_NS
 			return add_(std::make_shared<timer_target>(tp_, std::forward<_Cb>(cb_)));
 		}
 	private:
+		spinlock _added_mtx;
+		timer_vector_type	_added_timers;
+		timer_map_type		_runing_timers;
+
 		timer_target_ptr add_(const timer_target_ptr & sptr);
 		static void call_target_(const timer_target_ptr & sptr, bool canceld);
+#endif
 	};
 
 

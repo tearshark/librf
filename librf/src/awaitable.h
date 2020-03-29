@@ -1,7 +1,10 @@
 #pragma once
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
+#endif	//DOXYGEN_SKIP_PROPERTY
+
 	template<class _Ty>
 	struct awaitable_impl_t
 	{
@@ -52,6 +55,7 @@ RESUMEF_NS
 		}
 	};
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 	template<class _Ty>
 	struct [[nodiscard]] awaitable_t<_Ty&> : public awaitable_impl_t<_Ty&>
 	{
@@ -76,4 +80,5 @@ RESUMEF_NS
 			this->_state = nullptr;
 		}
 	};
+#endif	//DOXYGEN_SKIP_PROPERTY
 }

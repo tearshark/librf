@@ -89,6 +89,7 @@ RESUMEF_NS
 
 #endif
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 	namespace detail
 	{
 		template<class _Ty, class _Cont = std::vector<_Ty>>
@@ -175,6 +176,7 @@ RESUMEF_NS
 #undef LOCK_ASSEMBLE_AWAIT
 #undef LOCK_ASSEMBLE_RETURN
 	}
+#endif	//DOXYGEN_SKIP_PROPERTY
 
 	template<class _Ty, class _Cont = std::vector<_Ty>, class _Assemble = detail::_LockVectorAssembleT<_Ty, _Cont>>
 	class scoped_lock_range { // class with destructor that unlocks mutexes

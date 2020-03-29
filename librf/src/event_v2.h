@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
 	namespace detail
@@ -9,6 +10,8 @@ RESUMEF_NS
 
 	inline namespace event_v2
 	{
+#endif	//DOXYGEN_SKIP_PROPERTY
+
 		struct event_t
 		{
 			using event_impl_ptr = std::shared_ptr<detail::event_v2_impl>;

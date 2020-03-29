@@ -12,6 +12,7 @@ RESUMEF_NS
 //最最重要的，要统一ranged when_any的返回值，还得做一个运行时通过下标设置std::variant<>的东西
 //std::any除了内存布局不太理想，其他方面几乎没缺点（在此应用下）
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
 	using when_any_pair = std::pair<intptr_t, any_t>;
@@ -248,8 +249,16 @@ RESUMEF_NS
 		}
 	}
 
+#endif	//DOXYGEN_SKIP_PROPERTY
+
+#ifndef DOXYGEN_SKIP_PROPERTY
 inline namespace when_v2
 {
+#else
+struct when
+{
+#endif
+
 	template<_WhenTaskT... _Awaitable
 		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
 	>

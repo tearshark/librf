@@ -1,27 +1,39 @@
 ﻿#pragma once
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
-	struct task_base_t;
-
+	/**
+	 * @brief 协程任务的基类。
+	 */
 	struct task_base_t
 	{
 		task_base_t() = default;
 		virtual ~task_base_t();
 
-		state_base_t* get_state() const noexcept
-		{
-			return _state.get();
-		}
 	protected:
+		friend scheduler_t;
 		counted_ptr<state_base_t> _state;
 	};
+#endif
 
 	//----------------------------------------------------------------------------------------------
 
+	/**
+	 * @brief 协程任务类。
+	 * @details 每启动一个新的协程，则对应一个协程任务类。\n
+	 * 一方面，task_t<>用于标记协程是否执行完毕；\n
+	 * 另一方面，对于通过函数对象(functor/lambda)启动的协程，有很大概率，此协程的内部变量，依赖此函数对象的生存期。\n
+	 * tast_t<>的针对函数对象的特化版本，会持有此函数对象的拷贝，从而保证协程内部变量的生存期。从而减少外部使用协程函数对象的工作量。\n
+	 * 如果不希望task_t<>持有此函数对象，则通过调用此函数对象来启动协程，即:\n
+	 * go functor; \n
+	 * 替换为\n
+	 * go functor();
+	 */
 	template<class _Ty, class = std::void_t<>>
 	struct task_t;
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 	template<class _Ty>
 	struct task_t<_Ty, std::void_t<traits::is_future<std::remove_reference_t<_Ty>>>> : public task_base_t
 	{
@@ -79,4 +91,5 @@ RESUMEF_NS
 			this->initialize(f);
 		}
 	};
+#endif	//DOXYGEN_SKIP_PROPERTY
 }

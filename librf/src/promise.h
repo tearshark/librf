@@ -3,6 +3,7 @@
 #pragma push_macro("new")
 #undef new
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
 	struct suspend_on_initial;
@@ -74,7 +75,7 @@ RESUMEF_NS
 		void return_void();			//co_return;
 		suspend_always yield_value();
 	};
-
+#endif	//DOXYGEN_SKIP_PROPERTY
 }
 
 #pragma pop_macro("new")

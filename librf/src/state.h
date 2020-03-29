@@ -1,7 +1,10 @@
 ﻿#pragma once
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 RESUMEF_NS
 {
+#endif	//DOXYGEN_SKIP_PROPERTY
+
 	struct state_base_t
 	{
 		using _Alloc_char = std::allocator<char>;
@@ -251,6 +254,7 @@ RESUMEF_NS
 		void set_exception_internal(std::exception_ptr e);
 	};
 
+#ifndef DOXYGEN_SKIP_PROPERTY
 	template <typename _Ty>
 	struct state_t<_Ty&> final : public state_future_t
 	{
@@ -314,5 +318,6 @@ RESUMEF_NS
 	private:
 		std::exception_ptr _exception;
 	};
+#endif	//DOXYGEN_SKIP_PROPERTY
 }
 
