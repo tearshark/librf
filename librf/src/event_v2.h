@@ -215,18 +215,7 @@ namespace resumef
 			event_t& operator = (const event_t&) = default;
 			event_t& operator = (event_t&&) = default;
 		private:
-			//friend struct any_awaiter;
-
 			event_impl_ptr _event;
-
-			timeout_awaiter wait_until_(const clock_type::time_point& tp) const noexcept;
-			inline static bool is_all_succeeded(const std::vector<bool>& v)
-			{
-				return std::none_of(std::begin(v), std::end(v), [](auto v) 
-					{
-						return v == false;
-					});
-			}
 		};
 	}
 }

@@ -200,10 +200,5 @@ namespace resumef
 		event_t::~event_t()
 		{
 		}
-
-		event_t::timeout_awaiter event_t::wait_until_(const clock_type::time_point& tp) const noexcept
-		{
-			return { tp, _event.get() };
-		}
 	}
 }

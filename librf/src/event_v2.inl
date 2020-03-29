@@ -236,13 +236,15 @@ namespace resumef
 		template<class _Rep, class _Period>
 		inline event_t::timeout_awaiter event_t::wait_for(const std::chrono::duration<_Rep, _Period>& dt) const noexcept
 		{
-			return wait_until_(clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt));
+			clock_type::time_point tp2 = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
+			return { tp2, _event.get() };
 		}
 
 		template<class _Clock, class _Duration>
 		inline event_t::timeout_awaiter event_t::wait_until(const std::chrono::time_point<_Clock, _Duration>& tp) const noexcept
 		{
-			return wait_until_(std::chrono::time_point_cast<clock_type::duration>(tp));
+			clock_type::time_point tp2 = std::chrono::time_point_cast<clock_type::duration>(tp);
+			return { tp2, _event.get() };
 		}
 
 
