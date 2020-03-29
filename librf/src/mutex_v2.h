@@ -12,12 +12,12 @@ RESUMEF_NS
 	{
 #endif	//DOXYGEN_SKIP_PROPERTY
 		/**
-		 * @brief 提示手工解锁，故相关的lock()函数不再返回scoped_unlock_t。
+		 * @brief 提示手工解锁，故相关的lock()函数不再返回batch_unlock_t。
 		 */
 		struct adopt_manual_unlock_t{};
 
 		/**
-		 * @brief 提示手工解锁，故相关的lock()函数不再返回scoped_unlock_t。
+		 * @brief 提示手工解锁，故相关的lock()函数不再返回batch_unlock_t。
 		 */
 		constexpr adopt_manual_unlock_t adopt_manual_unlock;
 
@@ -25,7 +25,7 @@ RESUMEF_NS
 		 * @brief 在析构的时候自动解锁mutex_t的辅助类。
 		 */
 		template<class... _Mtxs>
-		struct [[nodiscard]] scoped_unlock_t;
+		struct [[nodiscard]] batch_unlock_t;
 
 		/**
 		 * @brief 支持递归的锁。
@@ -41,15 +41,15 @@ RESUMEF_NS
 
 			/**
 			 * @brief 在协程中加锁，如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。
-			 * @return [co_await] scoped_unlock_t
+			 * @return [co_await] batch_unlock_t
 			 */
-			awaiter/*scoped_unlock_t*/ lock() const noexcept;
+			awaiter/*batch_unlock_t*/ lock() const noexcept;
 			
 			/**
 			 * @brief 等同调用 co_await lock()。
-			 * @return [co_await] scoped_unlock_t
+			 * @return [co_await] batch_unlock_t
 			 */
-			awaiter/*scoped_unlock_t*/ operator co_await() const noexcept;
+			awaiter/*batch_unlock_t*/ operator co_await() const noexcept;
 
 			/**
 			 * @brief 在协程中加锁，如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。
@@ -137,14 +137,14 @@ RESUMEF_NS
 			/**
 			 * @brief 在协程中，无死锁的批量加锁。不会阻塞当前线程。直到获得所有锁之前，会阻塞当前协程。
 			 * @param mtxs... 需要获得的锁列表。
-			 * @return [co_await] scoped_unlock_t
+			 * @return [co_await] batch_unlock_t
 			 */
 			template<class... _Mtxs
 #ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
 #endif	//DOXYGEN_SKIP_PROPERTY
 			>
-			static future_t<scoped_unlock_t<_Mtxs...>> lock(_Mtxs&... mtxs);
+			static future_t<batch_unlock_t<_Mtxs...>> lock(_Mtxs&... mtxs);
 
 			/**
 			 * @brief 在协程中，无死锁的批量加锁。不会阻塞当前线程。直到获得所有锁之前，会阻塞当前协程。
@@ -176,14 +176,14 @@ RESUMEF_NS
 			 * @brief 在非协程中，无死锁的批量加锁。会阻塞当前线程，直到获得所有锁为止。
 			 * @param unique_address 代表获得锁的拥有者。
 			 * @param mtxs... 需要获得的锁列表。
-			 * @return scoped_unlock_t
+			 * @return batch_unlock_t
 			 */
 			template<class... _Mtxs
 #ifndef DOXYGEN_SKIP_PROPERTY
 				, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
 #endif	//DOXYGEN_SKIP_PROPERTY
 			>
-			static scoped_unlock_t<_Mtxs...> lock(void* unique_address, _Mtxs&... mtxs);
+			static batch_unlock_t<_Mtxs...> lock(void* unique_address, _Mtxs&... mtxs);
 
 			/**
 			 * @brief 在非协程中，无死锁的批量加锁。会阻塞当前线程，直到获得所有锁为止。
@@ -229,7 +229,7 @@ RESUMEF_NS
 		private:
 			struct _MutexAwaitAssembleT;
 
-			template<class... _Mtxs> friend struct scoped_unlock_t;
+			template<class... _Mtxs> friend struct batch_unlock_t;
 
 			mutex_impl_ptr _mutex;
 #endif	//DOXYGEN_SKIP_PROPERTY

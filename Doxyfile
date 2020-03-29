@@ -905,7 +905,11 @@ RECURSIVE              = NO
 
 EXCLUDE                = channel_v1.h \
                          event_v1.h \
-                         mutex_v1.h
+                         mutex_v1.h \
+                         ring_queue.h \
+                         ring_queue_lockfree.h \
+                         ring_queue_spinlock.h \
+                         intrusive_link_queue.h
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded

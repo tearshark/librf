@@ -273,7 +273,7 @@ RESUMEF_NS
 					lockes.emplace_back(std::ref(evt->_lock));
 				}
 
-				scoped_lock_range<ref_lock_type> lock_(lockes);
+				batch_lock_t<ref_lock_type> lock_(lockes);
 
 				for (auto iter = _begin; iter != _end; ++iter)
 				{
@@ -404,7 +404,7 @@ RESUMEF_NS
 				(void)_state->on_await_suspend(handler);
 				cb();
 
-				scoped_lock_range<ref_lock_type> lock_(lockes);
+				batch_lock_t<ref_lock_type> lock_(lockes);
 
 				for (auto iter = _begin; iter != _end; ++iter)
 				{

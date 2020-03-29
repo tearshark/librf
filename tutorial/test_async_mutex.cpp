@@ -21,14 +21,14 @@ static future_t<> test_mutex_pop(size_t idx)
 	for (size_t i = 0; i < N / 2; ++i)
 	{
 		{
-			scoped_unlock_t _locker = co_await g_lock.lock();	//_locker析构后，会调用对应的unlock()函数。
+			batch_unlock_t _locker = co_await g_lock.lock();	//_locker析构后，会调用对应的unlock()函数。
 
 			--g_counter;
 			std::cout << "pop :" << g_counter << " on " << idx << std::endl;
 
 			co_await 50ms;
 
-			scoped_unlock_t _locker_2 = co_await g_lock;
+			batch_unlock_t _locker_2 = co_await g_lock;
 
 			--g_counter;
 			std::cout << "pop :" << g_counter << " on " << idx << std::endl;
@@ -45,7 +45,7 @@ static future_t<> test_mutex_push(size_t idx)
 	for (size_t i = 0; i < N; ++i)
 	{
 		{
-			scoped_unlock_t _locker = co_await g_lock.lock();
+			batch_unlock_t _locker = co_await g_lock.lock();
 
 			++g_counter;
 			std::cout << "push:" << g_counter << " on " << idx << std::endl;
@@ -103,7 +103,7 @@ static std::thread test_mutex_async_push(size_t idx)
 		{
 			if (g_lock.try_lock_for(500ms, &provide_unique_address))
 			{
-				scoped_unlock_t _locker(std::adopt_lock, &provide_unique_address, g_lock);
+				batch_unlock_t _locker(std::adopt_lock, &provide_unique_address, g_lock);
 
 				++g_counter;
 				std::cout << "push:" << g_counter << " on " << idx << std::endl;
@@ -143,7 +143,7 @@ static future_t<> resumable_mutex_range_push(size_t idx, mutex_t a, mutex_t b, m
 {
 	for (int i = 0; i < 10000; ++i)
 	{
-		scoped_unlock_t __lockers = co_await mutex_t::lock(a, b, c);
+		batch_unlock_t __lockers = co_await mutex_t::lock(a, b, c);
 		assert(a.is_locked());
 		assert(b.is_locked());
 		assert(c.is_locked());

@@ -178,34 +178,36 @@ RESUMEF_NS
 	}
 #endif	//DOXYGEN_SKIP_PROPERTY
 
+	// class with destructor that unlocks mutexes
 	template<class _Ty, class _Cont = std::vector<_Ty>, class _Assemble = detail::_LockVectorAssembleT<_Ty, _Cont>>
-	class scoped_lock_range { // class with destructor that unlocks mutexes
+	class batch_lock_t
+	{
 	public:
-		explicit scoped_lock_range(_Cont& locks_)
+		explicit batch_lock_t(_Cont& locks_)
 			: _LkN(&locks_)
 			, _LA(*_LkN)
 		{
 			detail::scoped_lock_range_lock_impl::_Lock_range(_LA);
 		}
-		explicit scoped_lock_range(_Cont& locks_, _Assemble& la_)
+		explicit batch_lock_t(_Cont& locks_, _Assemble& la_)
 			: _LkN(&locks_)
 			, _LA(la_)
 		{
 			detail::scoped_lock_range_lock_impl::_Lock_range(_LA);
 		}
 
-		explicit scoped_lock_range(std::adopt_lock_t, _Cont& locks_)
+		explicit batch_lock_t(std::adopt_lock_t, _Cont& locks_)
 			: _LkN(&locks_)
 			, _LA(*_LkN)
 		{ // construct but don't lock
 		}
-		explicit scoped_lock_range(std::adopt_lock_t, _Cont& locks_, _Assemble& la_)
+		explicit batch_lock_t(std::adopt_lock_t, _Cont& locks_, _Assemble& la_)
 			: _LkN(&locks_)
 			, _LA(la_)
 		{ // construct but don't lock
 		}
 
-		~scoped_lock_range() noexcept
+		~batch_lock_t() noexcept
 		{
 			if (_LkN != nullptr)
 				detail::scoped_lock_range_lock_impl::_Unlock_locks(0, (int)_LA.size(), _LA);
@@ -220,16 +222,16 @@ RESUMEF_NS
 			}
 		}
 
-		scoped_lock_range(const scoped_lock_range&) = delete;
-		scoped_lock_range& operator=(const scoped_lock_range&) = delete;
+		batch_lock_t(const batch_lock_t&) = delete;
+		batch_lock_t& operator=(const batch_lock_t&) = delete;
 
-		scoped_lock_range(scoped_lock_range&& _Right)
+		batch_lock_t(batch_lock_t&& _Right)
 			: _LkN(_Right._LkN)
 			, _LA(std::move(_Right._LA))
 		{
 			_Right._LkN = nullptr;
 		}
-		scoped_lock_range& operator=(scoped_lock_range&& _Right)
+		batch_lock_t& operator=(batch_lock_t&& _Right)
 		{
 			if (this != &_Right)
 			{

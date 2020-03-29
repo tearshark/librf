@@ -256,7 +256,7 @@ RESUMEF_NS
 		};
 #endif	//DOXYGEN_SKIP_PROPERTY
 
-		typedef generator_iterator<_Ty, promise_type> iterator;
+		using iterator = generator_iterator<_Ty, promise_type>;
 
 		iterator begin()
 		{
