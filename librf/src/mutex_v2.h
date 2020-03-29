@@ -47,7 +47,7 @@ namespace resumef
 			
 			/**
 			 * @brief 在协程中加锁。
-			 * @see 等同调用 co_await {lock}()。
+			 * @see 等同调用 co_await lock()。
 			 * @return [co_await] batch_unlock_t
 			 */
 			awaiter/*batch_unlock_t*/ operator co_await() const noexcept;

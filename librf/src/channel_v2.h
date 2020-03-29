@@ -43,7 +43,7 @@ inline namespace channel_v2
 
 		/**
 		 * @brief 在协程中从channel_t里读取一个数据。
-		 * @see 参考{read}()函数
+		 * @see 参考read()函数
 		 */
 		read_awaiter operator co_await() const noexcept;
 
@@ -59,7 +59,7 @@ inline namespace channel_v2
 
 		/**
 		 * @brief 在协程中向channel_t里写入一个数据。
-		 * @see 参考{write}()函数
+		 * @see 参考write()函数
 		 */
 		template<class U
 #ifndef DOXYGEN_SKIP_PROPERTY

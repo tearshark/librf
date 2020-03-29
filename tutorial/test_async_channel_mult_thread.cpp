@@ -79,9 +79,8 @@ void resumable_main_channel_mult_thread()
 		{
 			local_scheduler my_scheduler;
 			go test_channel_producer(c, READ_BATCH * READ_THREAD / WRITE_THREAD);
-#if RESUMEF_ENABLE_MULT_SCHEDULER
 			this_scheduler()->run_until_notask();
-#endif
+
 			{
 				scoped_lock<std::mutex> __lock(cout_mutex);
 				std::cout << "Write OK\r\n";
@@ -98,9 +97,8 @@ void resumable_main_channel_mult_thread()
 		{
 			local_scheduler my_scheduler;
 			go test_channel_consumer(c, READ_BATCH);
-#if RESUMEF_ENABLE_MULT_SCHEDULER
 			this_scheduler()->run_until_notask();
-#endif
+
 			{
 				scoped_lock<std::mutex> __lock(cout_mutex);
 				std::cout << "Read OK\r\n";
@@ -108,10 +106,8 @@ void resumable_main_channel_mult_thread()
 		});
 	}
 	
-#if !RESUMEF_ENABLE_MULT_SCHEDULER
 	std::this_thread::sleep_for(100ms);
 	scheduler_t::g_scheduler.run_until_notask();
-#endif
 
 	for(auto & th : read_th)
 		th.join();

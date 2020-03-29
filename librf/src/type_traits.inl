@@ -259,8 +259,8 @@ namespace resumef
 				>
 			>
 			: std::conjunction<
-				is_iterator<decltype(std::begin(std::declval<_Ty>()))>,
-				std::is_same<_Ety&, decltype(*std::begin(std::declval<_Ty>()))>
+				is_iterator<decltype(std::begin(std::declval<_Ty>()))>
+				, std::is_same<_Ety, remove_cvref_t<decltype(*std::begin(std::declval<_Ty>()))>>
 			> {};
 		template<class _Ty, size_t _Size>
 		struct is_container_of<_Ty[_Size], _Ty> : std::true_type {};

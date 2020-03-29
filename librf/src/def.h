@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#define LIB_RESUMEF_VERSION 20905 // 2.9.5
+#define LIB_RESUMEF_VERSION 20906 // 2.9.6
 
 namespace resumef
 {
@@ -34,10 +34,16 @@ namespace resumef
 	template<class... _Mutexes>
 	using scoped_lock = std::scoped_lock<_Mutexes...>;
 
+	/**
+	 * @brief 版本号。
+	 */
 	constexpr size_t _Version = LIB_RESUMEF_VERSION;
 
-	//获得当前线程下的调度器
+	/**
+	 * @brief 获得当前线程下的调度器。
+	 */
 	scheduler_t* this_scheduler();
+
 }
 
 #ifndef DOXYGEN_SKIP_PROPERTY

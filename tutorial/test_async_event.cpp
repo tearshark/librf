@@ -61,6 +61,33 @@ static void test_wait_one()
 	}
 }
 
+static void test_wait_three()
+{
+	using namespace std::chrono;
+
+	event_t evt1, evt2, evt3;
+
+	go[&]() -> future_t<>
+	{
+		if (co_await event_t::wait_all(std::initializer_list{ evt1, evt2, evt3 }))
+			std::cout << "all event signal!" << std::endl;
+		else
+			std::cout << "time out!" << std::endl;
+	};
+
+	std::vector<std::thread> vtt;
+
+	srand((int)time(nullptr));
+	vtt.emplace_back(async_set_event(evt1, 1ms * (500 + rand() % 1000)));
+	vtt.emplace_back(async_set_event(evt2, 1ms * (500 + rand() % 1000)));
+	vtt.emplace_back(async_set_event(evt3, 1ms * (500 + rand() % 1000)));
+
+	this_scheduler()->run_until_notask();
+
+	for (auto& tt : vtt)
+		tt.join();
+}
+
 static void test_wait_any()
 {
 	using namespace std::chrono;
@@ -149,6 +176,9 @@ static void test_wait_all_timeout()
 void resumable_main_event()
 {
 	test_wait_one();
+	std::cout << std::endl;
+
+	test_wait_three();
 	std::cout << std::endl;
 
 	test_wait_any();

@@ -31,15 +31,11 @@ else()
 	option(OPT_USE_CONCEPT "Use conecpt instead of enable_if" OFF)
 endif()
 
-option(OPT_MULT_SCHEDULER "Enable multiple schedulers" ON)
 option(OPT_DEBUG_COUNTER "Debug objects count" OFF)
 option(OPT_KEEP_REAL_SIZE "Keep real size in queue" OFF)
 
 #set(RESUMEF_USE_CUSTOM_SPINLOCK "std::mutex")
 
-if(OPT_MULT_SCHEDULER)
-	set(RESUMEF_ENABLE_MULT_SCHEDULER 1)
-endif()
 if(OPT_INLINE_STATE)
 	set(RESUMEF_INLINE_STATE 1)
 endif()

@@ -36,7 +36,6 @@ namespace resumef
 		return future_error_string[(size_t)(fe)];
 	}
 
-#if RESUMEF_ENABLE_MULT_SCHEDULER
 	thread_local scheduler_t * th_scheduler_ptr = nullptr;
 
 	//获得当前线程下的调度器
@@ -44,11 +43,9 @@ namespace resumef
 	{
 		return th_scheduler_ptr ? th_scheduler_ptr : &scheduler_t::g_scheduler;
 	}
-#endif
 
 	local_scheduler::local_scheduler()
 	{
-#if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (th_scheduler_ptr == nullptr)
 		{
 			_scheduler_ptr = new scheduler_t;
@@ -58,28 +55,23 @@ namespace resumef
 		{
 			_scheduler_ptr = nullptr;
 		}
-#endif
 	}
 
 	local_scheduler::local_scheduler(scheduler_t& sch)
 	{
-#if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (th_scheduler_ptr == nullptr)
 		{
 			th_scheduler_ptr = &sch;
 		}
 
 		_scheduler_ptr = nullptr;
-#endif
 	}
 
 	local_scheduler::~local_scheduler()
 	{
-#if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (th_scheduler_ptr == _scheduler_ptr)
 			th_scheduler_ptr = nullptr;
 		delete _scheduler_ptr;
-#endif
 	}
 
 	scheduler_t::scheduler_t()
@@ -88,19 +80,15 @@ namespace resumef
 		_runing_states.reserve(1024);
 		_cached_states.reserve(1024);
 
-#if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (th_scheduler_ptr == nullptr)
 			th_scheduler_ptr = this;
-#endif
 	}
 
 	scheduler_t::~scheduler_t()
 	{
 		//cancel_all_task_();
-#if RESUMEF_ENABLE_MULT_SCHEDULER
 		if (th_scheduler_ptr == this)
 			th_scheduler_ptr = nullptr;
-#endif
 	}
 
 	void scheduler_t::new_task(task_base_t * task)
@@ -195,15 +183,6 @@ namespace resumef
 	void scheduler_t::run_until_notask()
 	{
 		while (!this->empty())
-		{
-			this->run_one_batch();
-			std::this_thread::yield();
-		}
-	}
-
-	void scheduler_t::run()
-	{
-		for (;;)
 		{
 			this->run_one_batch();
 			std::this_thread::yield();

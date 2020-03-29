@@ -138,7 +138,6 @@ void RunOneBenchmark(bool bMain)
 
 void resumable_main_benchmark_asio_server()
 {
-#if RESUMEF_ENABLE_MULT_SCHEDULER
 	std::array<std::thread, 2> thds;
 	for (size_t i = 0; i < thds.size(); ++i)
 	{
@@ -147,9 +146,6 @@ void resumable_main_benchmark_asio_server()
 
 	for (auto & t : thds)
 		t.join();
-#else
-	RunOneBenchmark(true);
-#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------

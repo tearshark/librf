@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef RESUMEF_ENABLE_MULT_SCHEDULER
-#define RESUMEF_ENABLE_MULT_SCHEDULER 1
-#endif	//RESUMEF_ENABLE_MULT_SCHEDULER
-
 #ifndef RESUMEF_INLINE_STATE
 #if defined(__clang__) || defined(_MSC_VER)
 #define RESUMEF_INLINE_STATE 1

@@ -337,7 +337,7 @@ namespace resumef
 
 		template<class _Cont COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
 		RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-		auto event_t::wait_any(_Cont& cnt_) ->event_t::any_awaiter<decltype(std::begin(cnt_))>
+		auto event_t::wait_any(const _Cont& cnt_) ->event_t::any_awaiter<decltype(std::begin(cnt_))>
 		{
 			return { std::begin(cnt_), std::end(cnt_) };
 		}
@@ -361,7 +361,7 @@ namespace resumef
 
 		template<class _Rep, class _Period, class _Cont COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
 		RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-		auto event_t::wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Cont& cnt_) 
+		auto event_t::wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, const _Cont& cnt_)
 			->event_t::timeout_any_awaiter<decltype(std::begin(cnt_))>
 		{
 			clock_type::time_point tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
@@ -449,18 +449,17 @@ namespace resumef
 
 		template<class _Iter COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
 		RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
-		auto event_t::wait_all(_Iter begin_, _Iter end_) ->event_t::all_awaiter<_Iter>
+		auto event_t::wait_all(_Iter begin_, _Iter end_) ->all_awaiter<_Iter>
 		{
 			return { begin_, end_ };
 		}
 
 		template<class _Cont COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
 		RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-		auto event_t::wait_all(_Cont& cnt_) ->event_t::all_awaiter<decltype(std::begin(cnt_))>
+		auto event_t::wait_all(const _Cont& cnt_) ->all_awaiter<decltype(std::begin(cnt_))>
 		{
 			return { std::begin(cnt_), std::end(cnt_) };
 		}
-
 
 
 		template<class _Iter>
@@ -480,7 +479,7 @@ namespace resumef
 
 		template<class _Rep, class _Period, class _Cont COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
 		RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-		auto event_t::wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, _Cont& cnt_)
+		auto event_t::wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, const _Cont& cnt_)
 			->event_t::timeout_all_awaiter<decltype(std::begin(cnt_))>
 		{
 			clock_type::time_point tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
