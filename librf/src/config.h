@@ -14,9 +14,9 @@
 
 #ifndef RESUMEF_ENABLE_CONCEPT
 #ifdef __cpp_lib_concepts
-/* #undef RESUMEF_ENABLE_CONCEPT */
+#define RESUMEF_ENABLE_CONCEPT 1
 #else
-/* #undef RESUMEF_ENABLE_CONCEPT */
+#define RESUMEF_ENABLE_CONCEPT 1
 #endif	//#ifdef __cpp_lib_concepts
 #endif	//#ifndef RESUMEF_ENABLE_CONCEPT
 

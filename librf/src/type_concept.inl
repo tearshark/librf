@@ -59,7 +59,7 @@ namespace resumef
 	};
 
 	template<typename T, typename E>
-	concept _IteratorOfT = _IteratorT<T> && requires(T && u)
+	concept _IteratorOfT = _IteratorT<T> && requires(T&& u)
 	{
 		{ *u } ->std::same_as<E&>;
 	};
@@ -79,9 +79,9 @@ namespace resumef
 	};
 
 	template<typename T, typename E>
-	concept _ContainerOfT = _ContainerT<T> && requires(T && u)
+	concept _ContainerOfT = _ContainerT<T> && requires(T&& v)
 	{
-		{ *std::begin(u) } ->std::same_as<E&>;
+		requires std::is_same_v<E, remove_cvref_t<decltype(*std::begin(v))>>;
 	};
 
 #define COMMA_RESUMEF_ENABLE_IF_TYPENAME() 
