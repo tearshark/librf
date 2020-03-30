@@ -2,27 +2,45 @@
 
 namespace resumef
 {
-
+	/**
+	 * @brief 专用与state的智能计数指针，通过管理state内嵌的引用计数来管理state的生存期。
+	 */
 	template <typename T>
 	struct counted_ptr
 	{
+		/**
+		 * @brief 构造一个无内容的计数指针。
+		 */
 		counted_ptr() noexcept = default;
-		counted_ptr(const counted_ptr& cp) : _p(cp._p) 
+
+		/**
+		 * @brief 拷贝构造函数。
+		 */
+		counted_ptr(const counted_ptr& cp) : _p(cp._p)
 		{
 			_lock();
 		}
 
-		counted_ptr(T* p) : _p(p) 
+		/**
+		 * @brief 通过裸指针构造一个计数指针。
+		 */
+		counted_ptr(T* p) : _p(p)
 		{
 			_lock();
 		}
 
+		/**
+		 * @brief 移动构造函数。
+		 */
 		counted_ptr(counted_ptr&& cp) noexcept
 		{
 			std::swap(_p, cp._p);
 		}
 
-		counted_ptr& operator=(const counted_ptr& cp) 
+		/**
+		 * @brief 拷贝赋值函数。
+		 */
+		counted_ptr& operator=(const counted_ptr& cp)
 		{
 			if (&cp != this)
 			{
@@ -32,6 +50,9 @@ namespace resumef
 			return *this;
 		}
 
+		/**
+		 * @brief 移动赋值函数。
+		 */
 		counted_ptr& operator=(counted_ptr&& cp) noexcept
 		{
 			if (&cp != this)
@@ -39,21 +60,33 @@ namespace resumef
 			return *this;
 		}
 
+		/**
+		 * @brief 析构函数中自动做一个计数减一操作。计数减为0，则删除state对象。
+		 */
 		~counted_ptr()
 		{
 			_unlock();
 		}
 
+		/**
+		 * @brief 重载指针操作符。
+		 */
 		T* operator->() const noexcept
 		{
 			return _p;
 		}
 
+		/**
+		 * @brief 获得管理的state指针。
+		 */
 		T* get() const noexcept
 		{
 			return _p;
 		}
 
+		/**
+		 * @brief 重置为空指针。
+		 */
 		void reset()
 		{
 			_unlock();

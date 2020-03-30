@@ -26,6 +26,11 @@ namespace resumef
 		scheduler_t* _scheduler;
 	};
 
+	/**
+	 * @brief 获得当前协程绑定的调度器。
+	 * @details 立即返回，没有协程切换和等待。
+	 * @return [co_await] scheduler_t*
+	 */
 	inline get_current_scheduler_awaitor get_current_scheduler()
 	{
 		return {};
@@ -55,6 +60,11 @@ namespace resumef
 		state_base_t* _state;
 	};
 
+	/**
+	 * @brief 获得当前协程的跟state指针。
+	 * @details 立即返回，没有协程切换和等待。
+	 * @return [co_await] state_base_t*
+	 */
 	inline get_root_state_awaitor get_root_state()
 	{
 		return {};

@@ -4,6 +4,12 @@
 namespace resumef
 {
 
+	/**
+	 * @brief 用于resumef协程的返回值。
+	 * @details 由于coroutines的限制，协程的返回值必须明确申明，而不能通过auto推导。\n
+	 * 用在恢复函数(resumeable function)里，支持co_await和co_yield。\n
+	 * 用在可等待函数(awaitable function)里，与awaitable_t<>配套使用。
+	 */
 	template<class _Ty>
 	struct [[nodiscard]] future_t
 	{

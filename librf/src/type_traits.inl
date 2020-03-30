@@ -65,6 +65,7 @@ namespace resumef
 		//is_container_v<T>
 		//判断是不是一个封闭区间的容器，或者数组。
 		//
+		//is_container_of<T, E>
 		//is_container_of_v<T, E>
 		//判断是不是一个封闭区间的容器，或者数组。其元素类型是E。
 

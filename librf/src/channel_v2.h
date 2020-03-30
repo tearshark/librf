@@ -44,6 +44,7 @@ inline namespace channel_v2
 		/**
 		 * @brief 在协程中从channel_t里读取一个数据。
 		 * @see 参考read()函数
+		 * @return [co_await] value_type
 		 */
 		read_awaiter operator co_await() const noexcept;
 

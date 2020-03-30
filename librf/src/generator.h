@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Modify from <experimental/generator_t.h>
 * Purpose: Library support of coroutines. generator_t class
 * http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/p0057r0.pdf
@@ -96,6 +96,9 @@ namespace resumef
 	};
 #endif	//DOXYGEN_SKIP_PROPERTY
 
+	/**
+	 * @brief 专用于co_yield函数。
+	 */
 	template <typename _Ty, typename _Alloc>
 	struct generator_t
 	{
@@ -212,7 +215,7 @@ namespace resumef
 				std::cout << "  generator_promise::new, return ptr=" << (void*)_Rptr << std::endl;
 #endif
 
-				//�ڳ�ʼ��ַ�Ϲ���state
+				//在初始地址上构造state
 				{
 					state_type* st = state_type::_Construct(ptr);
 					st->lock();

@@ -6,11 +6,18 @@
 
 namespace asio {
 
+	/**
+	 * @brief 用于指示asio相关异步函数，返回resumef::future_t<>的类型，从而变成支持 librf 的协程函数。
+	 */
 	template <typename Executor = executor>
 	struct rf_task_t
 	{
 		ASIO_CONSTEXPR rf_task_t() {}
 	};
+
+	/**
+	 * @brief 用于指示asio相关异步函数，返回resumef::future_t<>的常量，从而变成支持 librf 的协程函数。
+	 */
 	constexpr rf_task_t<> rf_task;
 
 	namespace librf {

@@ -8,6 +8,9 @@ namespace resumef
 	using spinlock = RESUMEF_USE_CUSTOM_SPINLOCK;
 #else
 
+	/**
+	 * @brief 一个自旋锁实现。
+	 */
 	struct spinlock
 	{
 		static const size_t MAX_ACTIVE_SPIN = 4000;
@@ -20,11 +23,17 @@ namespace resumef
 		std::thread::id owner_thread_id;
 #endif
 
+		/**
+		 * @brief 初始为未加锁。
+		 */
 		spinlock() noexcept
 		{
 			lck = FREE_VALUE;
 		}
 
+		/**
+		 * @brief 获得锁。会一直阻塞线程直到获得锁。
+		 */
 		void lock() noexcept
 		{
 			int val = FREE_VALUE;
@@ -66,6 +75,9 @@ namespace resumef
 #endif
 		}
 
+		/**
+		 * @brief 尝试获得锁一次。
+		 */
 		bool try_lock() noexcept
 		{
 			int val = FREE_VALUE;
@@ -78,6 +90,9 @@ namespace resumef
 			return ret;
 		}
 
+		/**
+		 * @brief 释放锁。
+		 */
 		void unlock() noexcept
 		{
 #if _DEBUG
@@ -178,17 +193,29 @@ namespace resumef
 	}
 #endif	//DOXYGEN_SKIP_PROPERTY
 
-	// class with destructor that unlocks mutexes
+	/**
+	 * @brief 无死锁的批量枷锁。
+	 * @param _Ty 锁的类型。例如std::mutex，resumef::spinlock，resumef::mutex_t(线程用法）均可。
+	 * @param _Cont 容纳一批锁的容器。
+	 * @param _Assemble 与_Cont配套的锁集合，特化了如何操作_Ty。
+	 */
 	template<class _Ty, class _Cont = std::vector<_Ty>, class _Assemble = detail::_LockVectorAssembleT<_Ty, _Cont>>
 	class batch_lock_t
 	{
 	public:
+		/**
+		 * @brief 通过锁容器构造，并立刻应用加锁算法。
+		 */
 		explicit batch_lock_t(_Cont& locks_)
 			: _LkN(&locks_)
 			, _LA(*_LkN)
 		{
 			detail::scoped_lock_range_lock_impl::_Lock_range(_LA);
 		}
+		
+		/**
+		 * @brief 通过锁容器和锁集合构造，并立刻应用加锁算法。
+		 */
 		explicit batch_lock_t(_Cont& locks_, _Assemble& la_)
 			: _LkN(&locks_)
 			, _LA(la_)
@@ -196,23 +223,36 @@ namespace resumef
 			detail::scoped_lock_range_lock_impl::_Lock_range(_LA);
 		}
 
+		/**
+		 * @brief 通过锁容器构造，容器里的锁已经全部获得。
+		 */
 		explicit batch_lock_t(std::adopt_lock_t, _Cont& locks_)
 			: _LkN(&locks_)
 			, _LA(*_LkN)
 		{ // construct but don't lock
 		}
+
+		/**
+		 * @brief 通过锁容器和锁集合构造，容器里的锁已经全部获得。
+		 */
 		explicit batch_lock_t(std::adopt_lock_t, _Cont& locks_, _Assemble& la_)
 			: _LkN(&locks_)
 			, _LA(la_)
 		{ // construct but don't lock
 		}
 
+		/**
+		 * @brief 析构函数里，释放容器里的锁。
+		 */
 		~batch_lock_t() noexcept
 		{
 			if (_LkN != nullptr)
 				detail::scoped_lock_range_lock_impl::_Unlock_locks(0, (int)_LA.size(), _LA);
 		}
 
+		/**
+		 * @brief 手工释放容器里的锁，析构函数里将不再有释放操作。
+		 */
 		void unlock()
 		{
 			if (_LkN != nullptr)
@@ -222,15 +262,29 @@ namespace resumef
 			}
 		}
 
+		/**
+		 * @brief 不支持拷贝构造。
+		 */
 		batch_lock_t(const batch_lock_t&) = delete;
+
+		/**
+		 * @brief 不支持拷贝赋值。
+		 */
 		batch_lock_t& operator=(const batch_lock_t&) = delete;
 
+		/**
+		 * @brief 支持移动构造。
+		 */
 		batch_lock_t(batch_lock_t&& _Right)
 			: _LkN(_Right._LkN)
 			, _LA(std::move(_Right._LA))
 		{
 			_Right._LkN = nullptr;
 		}
+
+		/**
+		 * @brief 支持移动赋值。
+		 */
 		batch_lock_t& operator=(batch_lock_t&& _Right)
 		{
 			if (this != &_Right)

@@ -2,6 +2,9 @@
 
 namespace resumef
 {
+	/**
+	 * @brief state基类，state用于在协程的promise和future之间共享数据。
+	 */
 	struct state_base_t
 	{
 		using _Alloc_char = std::allocator<char>;
@@ -61,6 +64,9 @@ namespace resumef
 		}
 	};
 	
+	/**
+	 * @brief 专用于generator_t<>的state类。
+	 */
 	struct state_generator_t : public state_base_t
 	{
 	private:
@@ -86,6 +92,9 @@ namespace resumef
 		static state_generator_t* _Alloc_state();
 	};
 
+	/**
+	 * @brief 专用于future_t<>的state基类，实现了针对于future_t<>的公共方法等。
+	 */
 	struct state_future_t : public state_base_t
 	{
 		enum struct initor_type : uint8_t
@@ -201,6 +210,9 @@ namespace resumef
 		}
 	};
 
+	/**
+	 * @brief 专用于future_t<>的state类。
+	 */
 	template <typename _Ty>
 	struct state_t final : public state_future_t
 	{

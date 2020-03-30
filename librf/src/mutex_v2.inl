@@ -198,7 +198,7 @@ namespace resumef
 				assert(_mutex == nullptr);
 				if (_mutex != nullptr)
 				{
-					throw lock_exception(error_code::not_await_lock);
+					throw mutex_exception(error_code::not_await_lock);
 				}
 			}
 
@@ -298,7 +298,7 @@ namespace resumef
 				assert(_mutex == nullptr);
 				if (_mutex != nullptr)
 				{
-					throw lock_exception(error_code::not_await_lock);
+					throw mutex_exception(error_code::not_await_lock);
 				}
 			}
 
@@ -345,7 +345,7 @@ namespace resumef
 				assert(_mutex == nullptr);
 				if (_mutex != nullptr)
 				{
-					throw lock_exception(error_code::not_await_lock);
+					throw mutex_exception(error_code::not_await_lock);
 				}
 			}
 

@@ -27,6 +27,10 @@ namespace resumef
 		}
 	};
 
+	/**
+	 * @fn 将本协程让渡出一次调用。
+	 * @return [co_await] void
+	 */
 	inline yield_awaitor yield()
 	{
 		return {};
