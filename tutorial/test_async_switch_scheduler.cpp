@@ -12,7 +12,7 @@ static std::atomic<scheduler_t*> sch_in_thread = nullptr;
 
 void run_in_thread(channel_t<bool> c_done)
 {
-	local_scheduler my_scheduler;			//产生本线程唯一的调度器
+	local_scheduler_t my_scheduler;			//产生本线程唯一的调度器
 	sch_in_thread = this_scheduler();		//本线程唯一的调度器赋值给sch_in_thread，以便于后续测试直接访问此线程的调度器
 
 	(void)c_done.write(true);				//数据都准备好了，通过channel通知其他协程可以启动后续依赖sch_in_thread变量的协程了

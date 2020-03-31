@@ -44,7 +44,7 @@ namespace resumef
 		return th_scheduler_ptr ? th_scheduler_ptr : &scheduler_t::g_scheduler;
 	}
 
-	local_scheduler::local_scheduler()
+	local_scheduler_t::local_scheduler_t()
 	{
 		if (th_scheduler_ptr == nullptr)
 		{
@@ -57,7 +57,7 @@ namespace resumef
 		}
 	}
 
-	local_scheduler::local_scheduler(scheduler_t& sch)
+	local_scheduler_t::local_scheduler_t(scheduler_t& sch)
 	{
 		if (th_scheduler_ptr == nullptr)
 		{
@@ -67,7 +67,7 @@ namespace resumef
 		_scheduler_ptr = nullptr;
 	}
 
-	local_scheduler::~local_scheduler()
+	local_scheduler_t::~local_scheduler_t()
 	{
 		if (th_scheduler_ptr == _scheduler_ptr)
 			th_scheduler_ptr = nullptr;

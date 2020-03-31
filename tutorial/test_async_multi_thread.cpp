@@ -42,14 +42,14 @@ future_t<> heavy_computing_sequential(int64_t val)
 
 void test_use_single_thread(int64_t val)
 {
-	//使用local_scheduler来申明一个绑定到本线程的调度器 my_scheduler
+	//使用local_scheduler_t来申明一个绑定到本线程的调度器 my_scheduler
 	//后续在本线程运行的协程，通过this_scheduler()获得my_scheduler的地址
 	//从而将这些协程的所有操作都绑定到my_scheduler里面去调度
 	//实现一个协程始终绑定到一个线程的目的
-	//在同一个线程里，申明多个local_scheduler会怎么样？
+	//在同一个线程里，申明多个local_scheduler_t会怎么样？
 	//----我也不知道
 	//如果不申明my_scheduler，则this_scheduler()获得默认主调度器的地址
-	local_scheduler my_scheduler;
+	local_scheduler_t my_scheduler;
 	
 	{
 		scoped_lock<std::mutex> __lock(cout_mutex);

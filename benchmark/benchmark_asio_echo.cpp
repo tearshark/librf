@@ -120,7 +120,7 @@ void StartPrintEchoCount()
 
 void RunOneBenchmark(bool bMain)
 {
-	resumef::local_scheduler ls;
+	resumef::local_scheduler_t ls;
 
 	asio::io_service io_service;
 	tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), 3456));

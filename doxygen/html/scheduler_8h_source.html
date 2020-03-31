@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.17"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>librf: librf/src/scheduler.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">librf
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.17 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_3c80010775d22af2067790ecc9cdcf9d.html">librf</a></li><li class="navelem"><a class="el" href="dir_54ae0e78d997f6903cdf0996223d047f.html">src</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">scheduler.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="keyword">namespace </span>resumef</div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;{</div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="structresumef_1_1scheduler__t.html">   10</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a> : <span class="keyword">public</span> std::enable_shared_from_this&lt;scheduler_t&gt;</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    {</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;        <span class="keyword">using</span> <a class="code" href="structresumef_1_1counted__ptr.html">state_sptr</a> = <a class="code" href="structresumef_1_1counted__ptr.html">counted_ptr&lt;state_base_t&gt;</a>;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;        <span class="keyword">using</span> state_vector = std::vector&lt;state_sptr&gt;;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;        <span class="keyword">using</span> <a class="code" href="structresumef_1_1spinlock.html">lock_type</a> = <a class="code" href="structresumef_1_1spinlock.html">spinlock</a>;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;        <span class="keyword">using</span> task_dictionary_type = std::unordered_map&lt;state_base_t*, std::unique_ptr&lt;task_base_t&gt;&gt;;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <span class="keyword">mutable</span> <a class="code" href="structresumef_1_1spinlock.html">spinlock</a> _lock_running;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        state_vector _runing_states;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        state_vector _cached_states;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <span class="keyword">mutable</span> <a class="code" href="structresumef_1_1spinlock.html">spinlock</a> _lock_ready;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        task_dictionary_type _ready_task;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        timer_mgr_ptr _timer;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keywordtype">void</span> new_task(task_base_t* task);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        <span class="comment">//void cancel_all_task_();</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="structresumef_1_1scheduler__t.html#a8b396c23730b15afd345328b96dbe1cc">run_one_batch</a>();</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="structresumef_1_1scheduler__t.html#ae4ef2589ef2ce0335107d579b9e244a8">run_until_notask</a>();</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="comment">//void break_all();</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="keyword">template</span>&lt;<span class="keyword">class </span>_Ty</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">#ifndef DOXYGEN_SKIP_PROPERTY</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            COMMA_RESUMEF_ENABLE_IF(traits::is_callable_v&lt;_Ty&gt; || traits::is_future_v&lt;_Ty&gt; || traits::is_generator_v&lt;_Ty&gt;)</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#endif  //DOXYGEN_SKIP_PROPERTY</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        &gt;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#ifndef DOXYGEN_SKIP_PROPERTY</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        RESUMEF_REQUIRES(traits::is_callable_v&lt;_Ty&gt; || traits::is_future_v&lt;_Ty&gt; || traits::is_generator_v&lt;_Ty&gt;)</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#endif  //DOXYGEN_SKIP_PROPERTY</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="structresumef_1_1scheduler__t.html#a449d34ba6a8e28284f2b02089cb7dcec">   60</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="structresumef_1_1scheduler__t.html#a449d34ba6a8e28284f2b02089cb7dcec">operator + </a>(_Ty&amp;&amp; coro)</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            <span class="keywordflow">if</span> constexpr (traits::is_callable_v&lt;_Ty&gt;)</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                new_task(<span class="keyword">new</span> ctx_task_t&lt;_Ty&gt;(coro));</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                new_task(<span class="keyword">new</span> <a class="code" href="structresumef_1_1task__t.html">task_t&lt;_Ty&gt;</a>(coro));</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="structresumef_1_1scheduler__t.html#a9d22640803eb9397cb844e532f4c8585">   75</a></span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="structresumef_1_1scheduler__t.html#a9d22640803eb9397cb844e532f4c8585">empty</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;            scoped_lock&lt;spinlock, spinlock&gt; __guard(_lock_ready, _lock_running);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;            <span class="keywordflow">return</span> _ready_task.empty() &amp;&amp; _runing_states.empty() &amp;&amp; _timer-&gt;empty();</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        }</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno"><a class="line" href="structresumef_1_1scheduler__t.html#a1d369882e156db4efc1a1693acfc0e22">   84</a></span>&#160;        <a class="code" href="structresumef_1_1timer__manager.html">timer_manager</a>* <a class="code" href="structresumef_1_1scheduler__t.html#a1d369882e156db4efc1a1693acfc0e22">timer</a>() const noexcept</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        {</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;            <span class="keywordflow">return</span> _timer.get();</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        }</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#ifndef DOXYGEN_SKIP_PROPERTY</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordtype">void</span> add_generator(<a class="code" href="structresumef_1_1state__base__t.html">state_base_t</a>* sptr);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="keywordtype">void</span> del_final(<a class="code" href="structresumef_1_1state__base__t.html">state_base_t</a>* sptr);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        std::unique_ptr&lt;task_base_t&gt; del_switch(<a class="code" href="structresumef_1_1state__base__t.html">state_base_t</a>* sptr);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <span class="keywordtype">void</span> add_switch(std::unique_ptr&lt;task_base_t&gt; task);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <span class="keyword">friend</span> <span class="keyword">struct </span><a class="code" href="structresumef_1_1local__scheduler__t.html">local_scheduler_t</a>;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a>();</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        ~<a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a>();</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a>(<a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a>&amp;&amp; right_) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a>&amp; operator = (<a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a>&amp;&amp; right_) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a>(<span class="keyword">const</span> <a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a>&amp; operator = (<span class="keyword">const</span> <a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        <span class="keyword">static</span> <a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a> g_scheduler;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="preprocessor">#endif  //DOXYGEN_SKIP_PROPERTY</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    };</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
+<div class="line"><a name="l00117"></a><span class="lineno"><a class="line" href="structresumef_1_1local__scheduler__t.html">  117</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="structresumef_1_1local__scheduler__t.html">local_scheduler_t</a></div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    {</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        <a class="code" href="structresumef_1_1local__scheduler__t.html#a05f60c654c1f7390682cab7cdcddb112">local_scheduler_t</a>();</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <a class="code" href="structresumef_1_1local__scheduler__t.html#a05f60c654c1f7390682cab7cdcddb112">local_scheduler_t</a>(<a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a> &amp; sch);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <a class="code" href="structresumef_1_1local__scheduler__t.html#af4c4cd1c6626930ccf891368e3f3e6ec">~local_scheduler_t</a>();</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        <a class="code" href="structresumef_1_1local__scheduler__t.html#a05f60c654c1f7390682cab7cdcddb112">local_scheduler_t</a>(<a class="code" href="structresumef_1_1local__scheduler__t.html">local_scheduler_t</a>&amp;&amp; right_) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <a class="code" href="structresumef_1_1local__scheduler__t.html">local_scheduler_t</a>&amp; operator = (<a class="code" href="structresumef_1_1local__scheduler__t.html">local_scheduler_t</a>&amp;&amp; right_) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <a class="code" href="structresumef_1_1local__scheduler__t.html#a05f60c654c1f7390682cab7cdcddb112">local_scheduler_t</a>(<span class="keyword">const</span> <a class="code" href="structresumef_1_1local__scheduler__t.html">local_scheduler_t</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        <a class="code" href="structresumef_1_1local__scheduler__t.html">local_scheduler_t</a>&amp; operator = (<span class="keyword">const</span> <a class="code" href="structresumef_1_1local__scheduler__t.html">local_scheduler_t</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <a class="code" href="structresumef_1_1scheduler__t.html">scheduler_t</a>* _scheduler_ptr;</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    };</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;}</div>
+</div><!-- fragment --></div><!-- contents -->
+<div class="ttc" id="astructresumef_1_1timer__manager_html"><div class="ttname"><a href="structresumef_1_1timer__manager.html">resumef::timer_manager</a></div><div class="ttdoc">定时器管理器。</div><div class="ttdef"><b>Definition:</b> timer.h:84</div></div>
+<div class="ttc" id="astructresumef_1_1scheduler__t_html"><div class="ttname"><a href="structresumef_1_1scheduler__t.html">resumef::scheduler_t</a></div><div class="ttdoc">协程调度器。</div><div class="ttdef"><b>Definition:</b> scheduler.h:10</div></div>
+<div class="ttc" id="astructresumef_1_1local__scheduler__t_html_af4c4cd1c6626930ccf891368e3f3e6ec"><div class="ttname"><a href="structresumef_1_1local__scheduler__t.html#af4c4cd1c6626930ccf891368e3f3e6ec">resumef::local_scheduler_t::~local_scheduler_t</a></div><div class="ttdeci">~local_scheduler_t()</div><div class="ttdoc">如果当前线程绑定的调度器由local_scheduler_t所创建，则会销毁调度器，并解绑线程。</div></div>
+<div class="ttc" id="astructresumef_1_1scheduler__t_html_a9d22640803eb9397cb844e532f4c8585"><div class="ttname"><a href="structresumef_1_1scheduler__t.html#a9d22640803eb9397cb844e532f4c8585">resumef::scheduler_t::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdoc">判断所有协程是否运行完毕。</div><div class="ttdef"><b>Definition:</b> scheduler.h:75</div></div>
+<div class="ttc" id="astructresumef_1_1scheduler__t_html_a8b396c23730b15afd345328b96dbe1cc"><div class="ttname"><a href="structresumef_1_1scheduler__t.html#a8b396c23730b15afd345328b96dbe1cc">resumef::scheduler_t::run_one_batch</a></div><div class="ttdeci">void run_one_batch()</div><div class="ttdoc">运行一批准备妥当的协程。</div></div>
+<div class="ttc" id="astructresumef_1_1scheduler__t_html_ae4ef2589ef2ce0335107d579b9e244a8"><div class="ttname"><a href="structresumef_1_1scheduler__t.html#ae4ef2589ef2ce0335107d579b9e244a8">resumef::scheduler_t::run_until_notask</a></div><div class="ttdeci">void run_until_notask()</div><div class="ttdoc">循环运行所有的协程，直到所有协程都运行完成。</div></div>
+<div class="ttc" id="astructresumef_1_1state__base__t_html"><div class="ttname"><a href="structresumef_1_1state__base__t.html">resumef::state_base_t</a></div><div class="ttdoc">state基类，state用于在协程的promise和future之间共享数据。</div><div class="ttdef"><b>Definition:</b> state.h:8</div></div>
+<div class="ttc" id="astructresumef_1_1scheduler__t_html_a1d369882e156db4efc1a1693acfc0e22"><div class="ttname"><a href="structresumef_1_1scheduler__t.html#a1d369882e156db4efc1a1693acfc0e22">resumef::scheduler_t::timer</a></div><div class="ttdeci">timer_manager * timer() const noexcept</div><div class="ttdoc">获得定时管理器。</div><div class="ttdef"><b>Definition:</b> scheduler.h:84</div></div>
+<div class="ttc" id="astructresumef_1_1counted__ptr_html"><div class="ttname"><a href="structresumef_1_1counted__ptr.html">resumef::counted_ptr</a></div><div class="ttdoc">专用与state的智能计数指针，通过管理state内嵌的引用计数来管理state的生存期。</div><div class="ttdef"><b>Definition:</b> counted_ptr.h:9</div></div>
+<div class="ttc" id="astructresumef_1_1spinlock_html"><div class="ttname"><a href="structresumef_1_1spinlock.html">resumef::spinlock</a></div><div class="ttdoc">一个自旋锁实现。</div><div class="ttdef"><b>Definition:</b> spinlock.h:14</div></div>
+<div class="ttc" id="astructresumef_1_1local__scheduler__t_html"><div class="ttname"><a href="structresumef_1_1local__scheduler__t.html">resumef::local_scheduler_t</a></div><div class="ttdoc">创建一个线程相关的调度器。</div><div class="ttdef"><b>Definition:</b> scheduler.h:117</div></div>
+<div class="ttc" id="astructresumef_1_1local__scheduler__t_html_a05f60c654c1f7390682cab7cdcddb112"><div class="ttname"><a href="structresumef_1_1local__scheduler__t.html#a05f60c654c1f7390682cab7cdcddb112">resumef::local_scheduler_t::local_scheduler_t</a></div><div class="ttdeci">local_scheduler_t()</div><div class="ttdoc">尽可能的创建一个线程相关的调度器。</div></div>
+<div class="ttc" id="astructresumef_1_1scheduler__t_html_a449d34ba6a8e28284f2b02089cb7dcec"><div class="ttname"><a href="structresumef_1_1scheduler__t.html#a449d34ba6a8e28284f2b02089cb7dcec">resumef::scheduler_t::operator+</a></div><div class="ttdeci">void operator+(_Ty &amp;&amp;coro)</div><div class="ttdoc">将一个协程加入到调度器里开始运行。</div><div class="ttdef"><b>Definition:</b> scheduler.h:60</div></div>
+<div class="ttc" id="astructresumef_1_1task__t_html"><div class="ttname"><a href="structresumef_1_1task__t.html">resumef::task_t</a></div><div class="ttdoc">协程任务类。</div><div class="ttdef"><b>Definition:</b> rf_task.h:34</div></div>
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者 &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.17
+</small></address>
+</body>
+</html>

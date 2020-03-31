@@ -135,7 +135,7 @@ void test_channel_performance_double_thread(size_t buff_size)
 
 	std::thread wr_th([c]
 	{
-		local_scheduler ls;
+		local_scheduler_t ls;
 
 		GO
 		{

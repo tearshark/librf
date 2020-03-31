@@ -2,6 +2,9 @@
 
 namespace resumef
 {
+	/**
+	 * @brief 切换协程的可等待对象。
+	 */
 	struct switch_scheduler_awaitor
 	{
 		using value_type = void;
@@ -41,8 +44,33 @@ namespace resumef
 		void await_resume() noexcept
 		{
 		}
+
 	private:
 		scheduler_t* _scheduler;
+#ifdef DOXYGEN_SKIP_PROPERTY
+	public:
+		/**
+		 * @brief 将本协程切换到指定调度器上运行。
+		 * @details 由于调度器必然在某个线程里运行，故达到了切换到特定线程里运行的目的。\n
+		 * 如果指定的协程就是本协程的调度器，则协程不暂停直接运行接下来的代码。
+		 * 如果指定的协程不是本协程的调度器，则协程暂停后放入到目的协程的调度队列，等待下一次运行。
+		 * @param sch 将要运行后续代码的协程
+		 * @return [co_await] void
+		 * @note 本函数是resumef名字空间下的全局函数。由于doxygen使用上的问题，将之归纳到 switch_scheduler_awaitor 类下。
+		 */
+		static switch_scheduler_awaitor via(scheduler_t& sch) noexcept;
+
+		/**
+		 * @brief 将本协程切换到指定调度器上运行。
+		 * @details 由于调度器必然在某个线程里运行，故达到了切换到特定线程里运行的目的。\n
+		 * 如果指定的协程就是本协程的调度器，则协程不暂停直接运行接下来的代码。
+		 * 如果指定的协程不是本协程的调度器，则协程暂停后放入到目的协程的调度队列，等待下一次运行。
+		 * @param sch 将要运行后续代码的协程
+		 * @return [co_await] void
+		 * @note 本函数是resumef名字空间下的全局函数。由于doxygen使用上的问题，将之归纳到 switch_scheduler_awaitor 类下。
+		 */
+		static switch_scheduler_awaitor via(scheduler_t* sch) noexcept;
+#endif	//DOXYGEN_SKIP_PROPERTY
 	};
 
 	//由于跟when_all/when_any混用的时候，在clang上编译失败：
@@ -54,7 +82,7 @@ namespace resumef
 	//}
 
 	/**
-	 * @fn 将本协程切换到指定调度器上运行。
+	 * @brief 将本协程切换到指定调度器上运行。
 	 * @details 由于调度器必然在某个线程里运行，故达到了切换到特定线程里运行的目的。\n
 	 * 如果指定的协程就是本协程的调度器，则协程不暂停直接运行接下来的代码。
 	 * 如果指定的协程不是本协程的调度器，则协程暂停后放入到目的协程的调度队列，等待下一次运行。

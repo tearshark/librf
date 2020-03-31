@@ -1,0 +1,820 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.17"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>librf: resumef::mutex_t结构体 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">librf
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.17 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>resumef</b></li><li class="navelem"><a class="el" href="structresumef_1_1mutex__t.html">mutex_t</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pub-static-methods">静态 Public 成员函数</a> &#124;
+<a href="structresumef_1_1mutex__t-members.html">所有成员列表</a>  </div>
+  <div class="headertitle">
+<div class="title">resumef::mutex_t结构体 参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>支持递归的锁。  
+ <a href="structresumef_1_1mutex__t.html#details">更多...</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a15c654948f47113fc92223a811d60090"><td class="memItemLeft" align="right" valign="top">awaiter&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#a15c654948f47113fc92223a811d60090">lock</a> () const noexcept</td></tr>
+<tr class="memdesc:a15c654948f47113fc92223a811d60090"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中加锁，如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。  <a href="structresumef_1_1mutex__t.html#a15c654948f47113fc92223a811d60090">更多...</a><br /></td></tr>
+<tr class="separator:a15c654948f47113fc92223a811d60090"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f086f150094d041b0c4372a8de504de"><td class="memItemLeft" align="right" valign="top">awaiter&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#a9f086f150094d041b0c4372a8de504de">operator co_await</a> () const noexcept</td></tr>
+<tr class="memdesc:a9f086f150094d041b0c4372a8de504de"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中加锁。  <a href="structresumef_1_1mutex__t.html#a9f086f150094d041b0c4372a8de504de">更多...</a><br /></td></tr>
+<tr class="separator:a9f086f150094d041b0c4372a8de504de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad074e28785741eb1615d3126da6088a"><td class="memItemLeft" align="right" valign="top">manual_awaiter&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#aad074e28785741eb1615d3126da6088a">lock</a> (<a class="el" href="structresumef_1_1adopt__manual__unlock__t.html">adopt_manual_unlock_t</a> manual_unlock_tag) const noexcept</td></tr>
+<tr class="memdesc:aad074e28785741eb1615d3126da6088a"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中加锁，如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。  <a href="structresumef_1_1mutex__t.html#aad074e28785741eb1615d3126da6088a">更多...</a><br /></td></tr>
+<tr class="separator:aad074e28785741eb1615d3126da6088a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2844d5df6562c153bc5b32d1720efb30"><td class="memItemLeft" align="right" valign="top">try_awaiter&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#a2844d5df6562c153bc5b32d1720efb30">try_lock</a> () const noexcept</td></tr>
+<tr class="memdesc:a2844d5df6562c153bc5b32d1720efb30"><td class="mdescLeft">&#160;</td><td class="mdescRight">尝试在协程中加锁。此操作无论成功与否都会立即返回，不会有协程切换。  <a href="structresumef_1_1mutex__t.html#a2844d5df6562c153bc5b32d1720efb30">更多...</a><br /></td></tr>
+<tr class="separator:a2844d5df6562c153bc5b32d1720efb30"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a430ec9f4b9bb1c5711b6ba7ef3a1ad99"><td class="memItemLeft" align="right" valign="top">unlock_awaiter&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#a430ec9f4b9bb1c5711b6ba7ef3a1ad99">unlock</a> () const noexcept</td></tr>
+<tr class="memdesc:a430ec9f4b9bb1c5711b6ba7ef3a1ad99"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中解锁。此操作立即返回，不会有协程切换。  <a href="structresumef_1_1mutex__t.html#a430ec9f4b9bb1c5711b6ba7ef3a1ad99">更多...</a><br /></td></tr>
+<tr class="separator:a430ec9f4b9bb1c5711b6ba7ef3a1ad99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afca20661d92d6acac34b324cab774310"><td class="memTemplParams" colspan="2">template&lt;class _Rep , class _Period &gt; </td></tr>
+<tr class="memitem:afca20661d92d6acac34b324cab774310"><td class="memTemplItemLeft" align="right" valign="top">timeout_awaiter&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#afca20661d92d6acac34b324cab774310">try_lock_for</a> (const std::chrono::duration&lt; _Rep, _Period &gt; &amp;dt) const noexcept</td></tr>
+<tr class="memdesc:afca20661d92d6acac34b324cab774310"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中尝试加锁，直到超时。如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。  <a href="structresumef_1_1mutex__t.html#afca20661d92d6acac34b324cab774310">更多...</a><br /></td></tr>
+<tr class="separator:afca20661d92d6acac34b324cab774310"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada9a310ff364fa8b1ee78dc2f799a8a5"><td class="memTemplParams" colspan="2">template&lt;class _Rep , class _Period &gt; </td></tr>
+<tr class="memitem:ada9a310ff364fa8b1ee78dc2f799a8a5"><td class="memTemplItemLeft" align="right" valign="top">timeout_awaiter&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#ada9a310ff364fa8b1ee78dc2f799a8a5">try_lock_until</a> (const std::chrono::time_point&lt; _Rep, _Period &gt; &amp;tp) const noexcept</td></tr>
+<tr class="memdesc:ada9a310ff364fa8b1ee78dc2f799a8a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中尝试加锁，直到超时。如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。  <a href="structresumef_1_1mutex__t.html#ada9a310ff364fa8b1ee78dc2f799a8a5">更多...</a><br /></td></tr>
+<tr class="separator:ada9a310ff364fa8b1ee78dc2f799a8a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3442f7c56bed34e086bd5bd41e4a9c5a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#a3442f7c56bed34e086bd5bd41e4a9c5a">lock</a> (void *unique_address) const</td></tr>
+<tr class="memdesc:a3442f7c56bed34e086bd5bd41e4a9c5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">在非协程中加锁。如果不能立即获得锁，则反复尝试，直到获得锁。故会阻塞当前协程  <a href="structresumef_1_1mutex__t.html#a3442f7c56bed34e086bd5bd41e4a9c5a">更多...</a><br /></td></tr>
+<tr class="separator:a3442f7c56bed34e086bd5bd41e4a9c5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1dd128870c1fdcc7261ef0fa63e12254"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#a1dd128870c1fdcc7261ef0fa63e12254">try_lock</a> (void *unique_address) const</td></tr>
+<tr class="memdesc:a1dd128870c1fdcc7261ef0fa63e12254"><td class="mdescLeft">&#160;</td><td class="mdescRight">尝试在非协程中加锁。此操作无论成功与否都会立即返回。  <a href="structresumef_1_1mutex__t.html#a1dd128870c1fdcc7261ef0fa63e12254">更多...</a><br /></td></tr>
+<tr class="separator:a1dd128870c1fdcc7261ef0fa63e12254"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15c6518dafb6c2cf52a0b0dbdd90ae7b"><td class="memTemplParams" colspan="2">template&lt;class _Rep , class _Period &gt; </td></tr>
+<tr class="memitem:a15c6518dafb6c2cf52a0b0dbdd90ae7b"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#a15c6518dafb6c2cf52a0b0dbdd90ae7b">try_lock_for</a> (const std::chrono::duration&lt; _Rep, _Period &gt; &amp;dt, void *unique_address)</td></tr>
+<tr class="memdesc:a15c6518dafb6c2cf52a0b0dbdd90ae7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">尝试在非协程中加锁，直到超时。如果不能立即获得锁，则反复尝试，直到获得锁或超时。故会阻塞当前协程  <a href="structresumef_1_1mutex__t.html#a15c6518dafb6c2cf52a0b0dbdd90ae7b">更多...</a><br /></td></tr>
+<tr class="separator:a15c6518dafb6c2cf52a0b0dbdd90ae7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec072ad5fd0d6b688a3866ee9f1dc791"><td class="memTemplParams" colspan="2">template&lt;class _Rep , class _Period &gt; </td></tr>
+<tr class="memitem:aec072ad5fd0d6b688a3866ee9f1dc791"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#aec072ad5fd0d6b688a3866ee9f1dc791">try_lock_until</a> (const std::chrono::time_point&lt; _Rep, _Period &gt; &amp;tp, void *unique_address)</td></tr>
+<tr class="memdesc:aec072ad5fd0d6b688a3866ee9f1dc791"><td class="mdescLeft">&#160;</td><td class="mdescRight">尝试在非协程中加锁，直到超时。如果不能立即获得锁，则反复尝试，直到获得锁或超时。故会阻塞当前协程  <a href="structresumef_1_1mutex__t.html#aec072ad5fd0d6b688a3866ee9f1dc791">更多...</a><br /></td></tr>
+<tr class="separator:aec072ad5fd0d6b688a3866ee9f1dc791"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc858a566d0884726740557f930ec7db"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#abc858a566d0884726740557f930ec7db">unlock</a> (void *unique_address) const</td></tr>
+<tr class="memdesc:abc858a566d0884726740557f930ec7db"><td class="mdescLeft">&#160;</td><td class="mdescRight">在非协程中解锁。立即返回。由于立即返回，也可在协程中如此使用：mtx.unlock(root_state())  <a href="structresumef_1_1mutex__t.html#abc858a566d0884726740557f930ec7db">更多...</a><br /></td></tr>
+<tr class="separator:abc858a566d0884726740557f930ec7db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a597d0ca4a0f0d9963d0578afb5aa1ecf"><td class="memItemLeft" align="right" valign="top"><a id="a597d0ca4a0f0d9963d0578afb5aa1ecf"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#a597d0ca4a0f0d9963d0578afb5aa1ecf">mutex_t</a> (std::adopt_lock_t) noexcept</td></tr>
+<tr class="memdesc:a597d0ca4a0f0d9963d0578afb5aa1ecf"><td class="mdescLeft">&#160;</td><td class="mdescRight">构造一个无效的mutex_t。 <br /></td></tr>
+<tr class="separator:a597d0ca4a0f0d9963d0578afb5aa1ecf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:ae2aecf303188c9a8122e3fde4fb525fd"><td class="memTemplParams" colspan="2">template&lt;class... _Mtxs&gt; </td></tr>
+<tr class="memitem:ae2aecf303188c9a8122e3fde4fb525fd"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="structresumef_1_1future__t.html">future_t</a>&lt; <a class="el" href="structresumef_1_1batch__unlock__t.html">batch_unlock_t</a>&lt; _Mtxs... &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#ae2aecf303188c9a8122e3fde4fb525fd">lock</a> (_Mtxs &amp;... mtxs)</td></tr>
+<tr class="memdesc:ae2aecf303188c9a8122e3fde4fb525fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中，无死锁的批量加锁。不会阻塞当前线程。直到获得所有锁之前，会阻塞当前协程。  <a href="structresumef_1_1mutex__t.html#ae2aecf303188c9a8122e3fde4fb525fd">更多...</a><br /></td></tr>
+<tr class="separator:ae2aecf303188c9a8122e3fde4fb525fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7f95d070a020cfeaf99684a06c5fd47"><td class="memTemplParams" colspan="2">template&lt;class... _Mtxs&gt; </td></tr>
+<tr class="memitem:ae7f95d070a020cfeaf99684a06c5fd47"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="structresumef_1_1future__t.html">future_t</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#ae7f95d070a020cfeaf99684a06c5fd47">lock</a> (<a class="el" href="structresumef_1_1adopt__manual__unlock__t.html">adopt_manual_unlock_t</a> manual_unlock_tag, _Mtxs &amp;... mtxs)</td></tr>
+<tr class="memdesc:ae7f95d070a020cfeaf99684a06c5fd47"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中，无死锁的批量加锁。不会阻塞当前线程。直到获得所有锁之前，会阻塞当前协程。  <a href="structresumef_1_1mutex__t.html#ae7f95d070a020cfeaf99684a06c5fd47">更多...</a><br /></td></tr>
+<tr class="separator:ae7f95d070a020cfeaf99684a06c5fd47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0bc0948ed9eab5e41518ff9c1a6327a3"><td class="memTemplParams" colspan="2">template&lt;class... _Mtxs&gt; </td></tr>
+<tr class="memitem:a0bc0948ed9eab5e41518ff9c1a6327a3"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="structresumef_1_1future__t.html">future_t</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#a0bc0948ed9eab5e41518ff9c1a6327a3">unlock</a> (_Mtxs &amp;... mtxs)</td></tr>
+<tr class="memdesc:a0bc0948ed9eab5e41518ff9c1a6327a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中批量解锁。如果可能，使用unlock(root_state(), mtxs...)来替代。  <a href="structresumef_1_1mutex__t.html#a0bc0948ed9eab5e41518ff9c1a6327a3">更多...</a><br /></td></tr>
+<tr class="separator:a0bc0948ed9eab5e41518ff9c1a6327a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7ba090cf3188eaa738d4e37a4c6ab7a"><td class="memTemplParams" colspan="2">template&lt;class... _Mtxs&gt; </td></tr>
+<tr class="memitem:ad7ba090cf3188eaa738d4e37a4c6ab7a"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="structresumef_1_1batch__unlock__t.html">batch_unlock_t</a>&lt; _Mtxs... &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#ad7ba090cf3188eaa738d4e37a4c6ab7a">lock</a> (void *unique_address, _Mtxs &amp;... mtxs)</td></tr>
+<tr class="memdesc:ad7ba090cf3188eaa738d4e37a4c6ab7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">在非协程中，无死锁的批量加锁。会阻塞当前线程，直到获得所有锁为止。  <a href="structresumef_1_1mutex__t.html#ad7ba090cf3188eaa738d4e37a4c6ab7a">更多...</a><br /></td></tr>
+<tr class="separator:ad7ba090cf3188eaa738d4e37a4c6ab7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfbfd653a04d3c3b3d88a5bdcaba4664"><td class="memTemplParams" colspan="2">template&lt;class... _Mtxs&gt; </td></tr>
+<tr class="memitem:abfbfd653a04d3c3b3d88a5bdcaba4664"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#abfbfd653a04d3c3b3d88a5bdcaba4664">lock</a> (<a class="el" href="structresumef_1_1adopt__manual__unlock__t.html">adopt_manual_unlock_t</a> manual_unlock_tag, void *unique_address, _Mtxs &amp;... mtxs)</td></tr>
+<tr class="memdesc:abfbfd653a04d3c3b3d88a5bdcaba4664"><td class="mdescLeft">&#160;</td><td class="mdescRight">在非协程中，无死锁的批量加锁。会阻塞当前线程，直到获得所有锁为止。  <a href="structresumef_1_1mutex__t.html#abfbfd653a04d3c3b3d88a5bdcaba4664">更多...</a><br /></td></tr>
+<tr class="separator:abfbfd653a04d3c3b3d88a5bdcaba4664"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28defd5d64173ef3114a419f945adb3d"><td class="memTemplParams" colspan="2">template&lt;class... _Mtxs&gt; </td></tr>
+<tr class="memitem:a28defd5d64173ef3114a419f945adb3d"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1mutex__t.html#a28defd5d64173ef3114a419f945adb3d">unlock</a> (void *unique_address, _Mtxs &amp;... mtxs)</td></tr>
+<tr class="memdesc:a28defd5d64173ef3114a419f945adb3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">在非协程中批量解锁。立即返回。由于立即返回，也可在协程中如此使用：unlock(root_state(), mtxs...)  <a href="structresumef_1_1mutex__t.html#a28defd5d64173ef3114a419f945adb3d">更多...</a><br /></td></tr>
+<tr class="separator:a28defd5d64173ef3114a419f945adb3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><p>支持递归的锁。 </p>
+<p>锁被本协程所在的跟协程所拥有。支持在跟协程下的所有协程里递归加锁。 </p>
+</div><h2 class="groupheader">成员函数说明</h2>
+<a id="a15c654948f47113fc92223a811d60090"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15c654948f47113fc92223a811d60090">&#9670;&nbsp;</a></span>lock() <span class="overload">[1/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">awaiter resumef::mutex_t::lock </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中加锁，如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。 </p>
+<dl class="section return"><dt>返回</dt><dd>[co_await] batch_unlock_t </dd></dl>
+
+</div>
+</div>
+<a id="ae2aecf303188c9a8122e3fde4fb525fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2aecf303188c9a8122e3fde4fb525fd">&#9670;&nbsp;</a></span>lock() <span class="overload">[2/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class... _Mtxs&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structresumef_1_1future__t.html">future_t</a>&lt;<a class="el" href="structresumef_1_1batch__unlock__t.html">batch_unlock_t</a>&lt;_Mtxs...&gt; &gt; resumef::mutex_t::lock </td>
+          <td>(</td>
+          <td class="paramtype">_Mtxs &amp;...&#160;</td>
+          <td class="paramname"><em>mtxs</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中，无死锁的批量加锁。不会阻塞当前线程。直到获得所有锁之前，会阻塞当前协程。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mtxs...</td><td>需要获得的锁列表。 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>[co_await] batch_unlock_t </dd></dl>
+
+</div>
+</div>
+<a id="aad074e28785741eb1615d3126da6088a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad074e28785741eb1615d3126da6088a">&#9670;&nbsp;</a></span>lock() <span class="overload">[3/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">manual_awaiter resumef::mutex_t::lock </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structresumef_1_1adopt__manual__unlock__t.html">adopt_manual_unlock_t</a>&#160;</td>
+          <td class="paramname"><em>manual_unlock_tag</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中加锁，如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。 </p>
+<p>需要随后调用unlock()函数解锁。lock()/unlock()调用必须在同一个跟协程下配对调用。 </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">manual_unlock_tag</td><td>提示手工解锁 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>[co_await] void </dd></dl>
+
+</div>
+</div>
+<a id="ae7f95d070a020cfeaf99684a06c5fd47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7f95d070a020cfeaf99684a06c5fd47">&#9670;&nbsp;</a></span>lock() <span class="overload">[4/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class... _Mtxs&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structresumef_1_1future__t.html">future_t</a> resumef::mutex_t::lock </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structresumef_1_1adopt__manual__unlock__t.html">adopt_manual_unlock_t</a>&#160;</td>
+          <td class="paramname"><em>manual_unlock_tag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">_Mtxs &amp;...&#160;</td>
+          <td class="paramname"><em>mtxs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中，无死锁的批量加锁。不会阻塞当前线程。直到获得所有锁之前，会阻塞当前协程。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">manual_unlock_tag</td><td>提示手工解锁 </td></tr>
+    <tr><td class="paramname">mtxs...</td><td>需要获得的锁列表。 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>[co_await] void </dd></dl>
+
+</div>
+</div>
+<a id="abfbfd653a04d3c3b3d88a5bdcaba4664"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfbfd653a04d3c3b3d88a5bdcaba4664">&#9670;&nbsp;</a></span>lock() <span class="overload">[5/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class... _Mtxs&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void resumef::mutex_t::lock </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structresumef_1_1adopt__manual__unlock__t.html">adopt_manual_unlock_t</a>&#160;</td>
+          <td class="paramname"><em>manual_unlock_tag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>unique_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">_Mtxs &amp;...&#160;</td>
+          <td class="paramname"><em>mtxs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在非协程中，无死锁的批量加锁。会阻塞当前线程，直到获得所有锁为止。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">manual_unlock_tag</td><td>提示手工解锁 </td></tr>
+    <tr><td class="paramname">unique_address</td><td>代表获得锁的拥有者。 </td></tr>
+    <tr><td class="paramname">mtxs...</td><td>需要获得的锁列表。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3442f7c56bed34e086bd5bd41e4a9c5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3442f7c56bed34e086bd5bd41e4a9c5a">&#9670;&nbsp;</a></span>lock() <span class="overload">[6/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void resumef::mutex_t::lock </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>unique_address</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>在非协程中加锁。如果不能立即获得锁，则反复尝试，直到获得锁。故会阻塞当前协程 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">unique_address</td><td>代表获得锁的拥有者。此地址应当与随后的unlock()的地址一致。<br  />
+一般做法，是申明一个跟当前线程关联的局部变量，以此局部变量的地址为参数。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad7ba090cf3188eaa738d4e37a4c6ab7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7ba090cf3188eaa738d4e37a4c6ab7a">&#9670;&nbsp;</a></span>lock() <span class="overload">[7/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class... _Mtxs&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structresumef_1_1batch__unlock__t.html">batch_unlock_t</a>&lt;_Mtxs...&gt; resumef::mutex_t::lock </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>unique_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">_Mtxs &amp;...&#160;</td>
+          <td class="paramname"><em>mtxs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在非协程中，无死锁的批量加锁。会阻塞当前线程，直到获得所有锁为止。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">unique_address</td><td>代表获得锁的拥有者。 </td></tr>
+    <tr><td class="paramname">mtxs...</td><td>需要获得的锁列表。 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>batch_unlock_t </dd></dl>
+
+</div>
+</div>
+<a id="a9f086f150094d041b0c4372a8de504de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f086f150094d041b0c4372a8de504de">&#9670;&nbsp;</a></span>operator co_await()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">awaiter resumef::mutex_t::operator co_await </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中加锁。 </p>
+<dl class="section see"><dt>参见</dt><dd>等同调用 co_await <a class="el" href="structresumef_1_1mutex__t.html#a15c654948f47113fc92223a811d60090" title="在协程中加锁，如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。">lock()</a>。 </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>[co_await] batch_unlock_t </dd></dl>
+
+</div>
+</div>
+<a id="a2844d5df6562c153bc5b32d1720efb30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2844d5df6562c153bc5b32d1720efb30">&#9670;&nbsp;</a></span>try_lock() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">try_awaiter resumef::mutex_t::try_lock </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>尝试在协程中加锁。此操作无论成功与否都会立即返回，不会有协程切换。 </p>
+<p>如果加锁成功，则需要调用co_await <a class="el" href="structresumef_1_1mutex__t.html#a430ec9f4b9bb1c5711b6ba7ef3a1ad99" title="在协程中解锁。此操作立即返回，不会有协程切换。">unlock()</a>解锁。或者使用unlock(root_state())解锁。<br  />
+如果加锁失败，且要循环尝试加锁，则最好调用co_await yield()让出一次调度。否则，可能造成本调度器死循环。 </p><dl class="section return"><dt>返回</dt><dd>[co_await] bool </dd></dl>
+
+</div>
+</div>
+<a id="a1dd128870c1fdcc7261ef0fa63e12254"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1dd128870c1fdcc7261ef0fa63e12254">&#9670;&nbsp;</a></span>try_lock() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool resumef::mutex_t::try_lock </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>unique_address</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>尝试在非协程中加锁。此操作无论成功与否都会立即返回。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">unique_address</td><td>代表获得锁的拥有者。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="afca20661d92d6acac34b324cab774310"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afca20661d92d6acac34b324cab774310">&#9670;&nbsp;</a></span>try_lock_for() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class _Rep , class _Period &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">timeout_awaiter resumef::mutex_t::try_lock_for </td>
+          <td>(</td>
+          <td class="paramtype">const std::chrono::duration&lt; _Rep, _Period &gt; &amp;&#160;</td>
+          <td class="paramname"><em>dt</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中尝试加锁，直到超时。如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dt</td><td>超时时长 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>[co_await] bool </dd></dl>
+
+</div>
+</div>
+<a id="a15c6518dafb6c2cf52a0b0dbdd90ae7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15c6518dafb6c2cf52a0b0dbdd90ae7b">&#9670;&nbsp;</a></span>try_lock_for() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class _Rep , class _Period &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool resumef::mutex_t::try_lock_for </td>
+          <td>(</td>
+          <td class="paramtype">const std::chrono::duration&lt; _Rep, _Period &gt; &amp;&#160;</td>
+          <td class="paramname"><em>dt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>unique_address</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>尝试在非协程中加锁，直到超时。如果不能立即获得锁，则反复尝试，直到获得锁或超时。故会阻塞当前协程 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dt</td><td>超时时长 </td></tr>
+    <tr><td class="paramname">unique_address</td><td>代表获得锁的拥有者。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ada9a310ff364fa8b1ee78dc2f799a8a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada9a310ff364fa8b1ee78dc2f799a8a5">&#9670;&nbsp;</a></span>try_lock_until() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class _Rep , class _Period &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">timeout_awaiter resumef::mutex_t::try_lock_until </td>
+          <td>(</td>
+          <td class="paramtype">const std::chrono::time_point&lt; _Rep, _Period &gt; &amp;&#160;</td>
+          <td class="paramname"><em>tp</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中尝试加锁，直到超时。如果不能立即获得锁，则阻塞当前协程。但不会阻塞当前线程。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tp</td><td>超时时刻 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>[co_await] bool </dd></dl>
+
+</div>
+</div>
+<a id="aec072ad5fd0d6b688a3866ee9f1dc791"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec072ad5fd0d6b688a3866ee9f1dc791">&#9670;&nbsp;</a></span>try_lock_until() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class _Rep , class _Period &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool resumef::mutex_t::try_lock_until </td>
+          <td>(</td>
+          <td class="paramtype">const std::chrono::time_point&lt; _Rep, _Period &gt; &amp;&#160;</td>
+          <td class="paramname"><em>tp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>unique_address</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>尝试在非协程中加锁，直到超时。如果不能立即获得锁，则反复尝试，直到获得锁或超时。故会阻塞当前协程 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tp</td><td>超时时刻 </td></tr>
+    <tr><td class="paramname">unique_address</td><td>代表获得锁的拥有者。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a430ec9f4b9bb1c5711b6ba7ef3a1ad99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a430ec9f4b9bb1c5711b6ba7ef3a1ad99">&#9670;&nbsp;</a></span>unlock() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unlock_awaiter resumef::mutex_t::unlock </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中解锁。此操作立即返回，不会有协程切换。 </p>
+<dl class="section return"><dt>返回</dt><dd>[co_await] void </dd></dl>
+
+</div>
+</div>
+<a id="a0bc0948ed9eab5e41518ff9c1a6327a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0bc0948ed9eab5e41518ff9c1a6327a3">&#9670;&nbsp;</a></span>unlock() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class... _Mtxs&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structresumef_1_1future__t.html">future_t</a> resumef::mutex_t::unlock </td>
+          <td>(</td>
+          <td class="paramtype">_Mtxs &amp;...&#160;</td>
+          <td class="paramname"><em>mtxs</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中批量解锁。如果可能，使用unlock(root_state(), mtxs...)来替代。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mtxs...</td><td>需要解锁的锁列表。 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>[co_await] void </dd></dl>
+
+</div>
+</div>
+<a id="abc858a566d0884726740557f930ec7db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc858a566d0884726740557f930ec7db">&#9670;&nbsp;</a></span>unlock() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void resumef::mutex_t::unlock </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>unique_address</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>在非协程中解锁。立即返回。由于立即返回，也可在协程中如此使用：mtx.unlock(root_state()) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">unique_address</td><td>代表获得锁的拥有者。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a28defd5d64173ef3114a419f945adb3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28defd5d64173ef3114a419f945adb3d">&#9670;&nbsp;</a></span>unlock() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class... _Mtxs&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void resumef::mutex_t::unlock </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>unique_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">_Mtxs &amp;...&#160;</td>
+          <td class="paramname"><em>mtxs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在非协程中批量解锁。立即返回。由于立即返回，也可在协程中如此使用：unlock(root_state(), mtxs...) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">unique_address</td><td>代表获得锁的拥有者。 </td></tr>
+    <tr><td class="paramname">mtxs...</td><td>需要解锁的锁列表。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/>该结构体的文档由以下文件生成:<ul>
+<li>librf/src/<a class="el" href="mutex__v2_8h_source.html">mutex_v2.h</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者 &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.17
+</small></address>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.17"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>librf: resumef::channel_t&lt; _Ty, _Optional, _OptimizationThread &gt; 模板结构体 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">librf
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.17 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>resumef</b></li><li class="navelem"><a class="el" href="structresumef_1_1channel__t.html">channel_t</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="structresumef_1_1channel__t-members.html">所有成员列表</a>  </div>
+  <div class="headertitle">
+<div class="title">resumef::channel_t&lt; _Ty, _Optional, _OptimizationThread &gt; 模板结构体 参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>可传递数据的模板信号量。  
+ <a href="structresumef_1_1channel__t.html#details">更多...</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:ac94d5fa13a6c1f5cc5d3ee3e50fa4232"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1channel__t.html#ac94d5fa13a6c1f5cc5d3ee3e50fa4232">channel_t</a> (size_t cache_size=1)</td></tr>
+<tr class="memdesc:ac94d5fa13a6c1f5cc5d3ee3e50fa4232"><td class="mdescLeft">&#160;</td><td class="mdescRight">构造函数。  <a href="structresumef_1_1channel__t.html#ac94d5fa13a6c1f5cc5d3ee3e50fa4232">更多...</a><br /></td></tr>
+<tr class="separator:ac94d5fa13a6c1f5cc5d3ee3e50fa4232"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a747f2db122ec920e6c253591729138ac"><td class="memItemLeft" align="right" valign="top"><a id="a747f2db122ec920e6c253591729138ac"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1channel__t.html#a747f2db122ec920e6c253591729138ac">capacity</a> () const noexcept</td></tr>
+<tr class="memdesc:a747f2db122ec920e6c253591729138ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">获得缓存数量。 <br /></td></tr>
+<tr class="separator:a747f2db122ec920e6c253591729138ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9143771fbfda1d5996e89abc0eb2771e"><td class="memItemLeft" align="right" valign="top">read_awaiter&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1channel__t.html#a9143771fbfda1d5996e89abc0eb2771e">operator co_await</a> () const noexcept</td></tr>
+<tr class="memdesc:a9143771fbfda1d5996e89abc0eb2771e"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中从channel_t里读取一个数据。  <a href="structresumef_1_1channel__t.html#a9143771fbfda1d5996e89abc0eb2771e">更多...</a><br /></td></tr>
+<tr class="separator:a9143771fbfda1d5996e89abc0eb2771e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ad0246bbfc50513d5a97227905f73c5"><td class="memItemLeft" align="right" valign="top">read_awaiter&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1channel__t.html#a4ad0246bbfc50513d5a97227905f73c5">read</a> () const noexcept</td></tr>
+<tr class="memdesc:a4ad0246bbfc50513d5a97227905f73c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中从channel_t里读取一个数据  <a href="structresumef_1_1channel__t.html#a4ad0246bbfc50513d5a97227905f73c5">更多...</a><br /></td></tr>
+<tr class="separator:a4ad0246bbfc50513d5a97227905f73c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8554b84ad37f013471f2c5d2da745887"><td class="memTemplParams" colspan="2">template&lt;class U &gt; </td></tr>
+<tr class="memitem:a8554b84ad37f013471f2c5d2da745887"><td class="memTemplItemLeft" align="right" valign="top">write_awaiter&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1channel__t.html#a8554b84ad37f013471f2c5d2da745887">operator&lt;&lt;</a> (U &amp;&amp;val) const noexcept(std::is_move_constructible_v&lt; U &gt;)</td></tr>
+<tr class="memdesc:a8554b84ad37f013471f2c5d2da745887"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中向channel_t里写入一个数据。  <a href="structresumef_1_1channel__t.html#a8554b84ad37f013471f2c5d2da745887">更多...</a><br /></td></tr>
+<tr class="separator:a8554b84ad37f013471f2c5d2da745887"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a603d7e9a7e0d621292b5a3c340aaadc9"><td class="memTemplParams" colspan="2">template&lt;class U &gt; </td></tr>
+<tr class="memitem:a603d7e9a7e0d621292b5a3c340aaadc9"><td class="memTemplItemLeft" align="right" valign="top">write_awaiter&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1channel__t.html#a603d7e9a7e0d621292b5a3c340aaadc9">write</a> (U &amp;&amp;val) const noexcept(std::is_move_constructible_v&lt; U &gt;)</td></tr>
+<tr class="memdesc:a603d7e9a7e0d621292b5a3c340aaadc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">在协程中向channel_t里写入一个数据。  <a href="structresumef_1_1channel__t.html#a603d7e9a7e0d621292b5a3c340aaadc9">更多...</a><br /></td></tr>
+<tr class="separator:a603d7e9a7e0d621292b5a3c340aaadc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><h3>template&lt;class _Ty = bool, bool _Optional = !std::is_trivial_v&lt;_Ty&gt;, bool _OptimizationThread = false&gt;<br />
+struct resumef::channel_t&lt; _Ty, _Optional, _OptimizationThread &gt;</h3>
+
+<p>可传递数据的模板信号量。 </p>
+<dl class="section remark"><dt>备注</dt><dd>不支持数据类型为void的特例化。 </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">_Ty</td><td>传递的数据类型。要求此类型至少支持移动构造和移动赋值。 </td></tr>
+    <tr><td class="paramname">_Optional</td><td>内部是否采用std::optional&lt;&gt;来存数据。<br  />
+默认不是POD类型则采用std::optional&lt;&gt;。如果channel缓存的元素不能凭空产生，或者产生代价较大，则推荐将此参数设置为true，从而减小不必要的开销。 </td></tr>
+    <tr><td class="paramname">_OptimizationThread</td><td>针对多线程优化。目前此算法提升效率不稳定，需要自行根据实际情况决定。 </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><h2 class="groupheader">构造及析构函数说明</h2>
+<a id="ac94d5fa13a6c1f5cc5d3ee3e50fa4232"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac94d5fa13a6c1f5cc5d3ee3e50fa4232">&#9670;&nbsp;</a></span>channel_t()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class _Ty  = bool, bool _Optional = !std::is_trivial_v&lt;_Ty&gt;, bool _OptimizationThread = false&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structresumef_1_1channel__t.html">resumef::channel_t</a>&lt; _Ty, _Optional, _OptimizationThread &gt;::<a class="el" href="structresumef_1_1channel__t.html">channel_t</a> </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>cache_size</em> = <code>1</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>构造函数。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cache_size</td><td>缓存的数量。0 表示内部无缓存。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">成员函数说明</h2>
+<a id="a9143771fbfda1d5996e89abc0eb2771e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9143771fbfda1d5996e89abc0eb2771e">&#9670;&nbsp;</a></span>operator co_await()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class _Ty  = bool, bool _Optional = !std::is_trivial_v&lt;_Ty&gt;, bool _OptimizationThread = false&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">read_awaiter <a class="el" href="structresumef_1_1channel__t.html">resumef::channel_t</a>&lt; _Ty, _Optional, _OptimizationThread &gt;::operator co_await </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中从channel_t里读取一个数据。 </p>
+<dl class="section see"><dt>参见</dt><dd>参考read()函数 </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>[co_await] value_type </dd></dl>
+
+</div>
+</div>
+<a id="a8554b84ad37f013471f2c5d2da745887"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8554b84ad37f013471f2c5d2da745887">&#9670;&nbsp;</a></span>operator&lt;&lt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class _Ty  = bool, bool _Optional = !std::is_trivial_v&lt;_Ty&gt;, bool _OptimizationThread = false&gt; </div>
+<div class="memtemplate">
+template&lt;class U &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">write_awaiter <a class="el" href="structresumef_1_1channel__t.html">resumef::channel_t</a>&lt; _Ty, _Optional, _OptimizationThread &gt;::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">U &amp;&amp;&#160;</td>
+          <td class="paramname"><em>val</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中向channel_t里写入一个数据。 </p>
+<dl class="section see"><dt>参见</dt><dd>参考write()函数 </dd></dl>
+
+</div>
+</div>
+<a id="a4ad0246bbfc50513d5a97227905f73c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ad0246bbfc50513d5a97227905f73c5">&#9670;&nbsp;</a></span>read()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class _Ty  = bool, bool _Optional = !std::is_trivial_v&lt;_Ty&gt;, bool _OptimizationThread = false&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">read_awaiter <a class="el" href="structresumef_1_1channel__t.html">resumef::channel_t</a>&lt; _Ty, _Optional, _OptimizationThread &gt;::read </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中从channel_t里读取一个数据 </p>
+<p>如果没有写入数据，则会阻塞协程。 </p><dl class="section remark"><dt>备注</dt><dd>无缓冲的时候，先读后写，不再抛channel_exception异常。这是跟channel_v1的区别。<br  />
+在非协程中也可以使用。如果不能立即读取成功，则会阻塞线程。<br  />
+但如此用法并不能获得读取的结果，仅仅用作同步手段。 </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>[co_await] value_type </dd></dl>
+
+</div>
+</div>
+<a id="a603d7e9a7e0d621292b5a3c340aaadc9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a603d7e9a7e0d621292b5a3c340aaadc9">&#9670;&nbsp;</a></span>write()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class _Ty  = bool, bool _Optional = !std::is_trivial_v&lt;_Ty&gt;, bool _OptimizationThread = false&gt; </div>
+<div class="memtemplate">
+template&lt;class U &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">write_awaiter <a class="el" href="structresumef_1_1channel__t.html">resumef::channel_t</a>&lt; _Ty, _Optional, _OptimizationThread &gt;::write </td>
+          <td>(</td>
+          <td class="paramtype">U &amp;&amp;&#160;</td>
+          <td class="paramname"><em>val</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在协程中向channel_t里写入一个数据。 </p>
+<p>在没有读操作等待时，且数据缓冲区满的情况下，则会阻塞协程。 </p><dl class="section remark"><dt>备注</dt><dd>在非协程中也可以使用。如果不能立即写入成功，则会阻塞线程。 </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val</td><td>写入的数据。必须是可以成功构造_Ty(val)的类型。 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>[co_await] void </dd></dl>
+
+</div>
+</div>
+<hr/>该结构体的文档由以下文件生成:<ul>
+<li>librf/src/<a class="el" href="channel__v2_8h_source.html">channel_v2.h</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者 &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.17
+</small></address>
+</body>
+</html>

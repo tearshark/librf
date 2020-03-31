@@ -92,7 +92,7 @@ namespace resumef
 		std::unique_ptr<task_base_t> del_switch(state_base_t* sptr);
 		void add_switch(std::unique_ptr<task_base_t> task);
 
-		friend struct local_scheduler;
+		friend struct local_scheduler_t;
 	protected:
 		scheduler_t();
 	public:
@@ -109,32 +109,32 @@ namespace resumef
 
 	/**
 	 * @brief 创建一个线程相关的调度器。
-	 * @details 如果线程之前已经创建了调度器，则第一个调度器会跟线程绑定，此后local_scheduler不会创建更多的调度器。\n
-	 * 否则，local_scheduler会创建一个调度器，并绑定到创建local_scheduler的线程上。\n
-	 * 如果local_scheduler成功创建了一个调度器，则在local_scheduler生命周期结束后，会销毁创建的调度器，并解绑线程。\n
-	 * 典型用法，是在非主线程里，开始运行协程之前，申明一个local_scheduler的局部变量。
+	 * @details 如果线程之前已经创建了调度器，则第一个调度器会跟线程绑定，此后local_scheduler_t不会创建更多的调度器。\n
+	 * 否则，local_scheduler_t会创建一个调度器，并绑定到创建local_scheduler_t的线程上。\n
+	 * 如果local_scheduler_t成功创建了一个调度器，则在local_scheduler_t生命周期结束后，会销毁创建的调度器，并解绑线程。\n
+	 * 典型用法，是在非主线程里，开始运行协程之前，申明一个local_scheduler_t的局部变量。
 	 */
-	struct local_scheduler
+	struct local_scheduler_t
 	{
 		/**
 		 * @brief 尽可能的创建一个线程相关的调度器。
 		 */
-		local_scheduler();
+		local_scheduler_t();
 
 		/**
 		 * @brief 将指定的调度器绑定到当前线程上。
 		 */
-		local_scheduler(scheduler_t & sch);
+		local_scheduler_t(scheduler_t & sch);
 
 		/**
-		 * @brief 如果当前线程绑定的调度器由local_scheduler所创建，则会销毁调度器，并解绑线程。
+		 * @brief 如果当前线程绑定的调度器由local_scheduler_t所创建，则会销毁调度器，并解绑线程。
 		 */
-		~local_scheduler();
+		~local_scheduler_t();
 
-		local_scheduler(local_scheduler&& right_) = delete;
-		local_scheduler& operator = (local_scheduler&& right_) = delete;
-		local_scheduler(const local_scheduler&) = delete;
-		local_scheduler& operator = (const local_scheduler&) = delete;
+		local_scheduler_t(local_scheduler_t&& right_) = delete;
+		local_scheduler_t& operator = (local_scheduler_t&& right_) = delete;
+		local_scheduler_t(const local_scheduler_t&) = delete;
+		local_scheduler_t& operator = (const local_scheduler_t&) = delete;
 	private:
 		scheduler_t* _scheduler_ptr;
 	};

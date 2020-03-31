@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.17"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>librf: resumef::scheduler_t结构体 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">librf
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.17 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>resumef</b></li><li class="navelem"><a class="el" href="structresumef_1_1scheduler__t.html">scheduler_t</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="structresumef_1_1scheduler__t-members.html">所有成员列表</a>  </div>
+  <div class="headertitle">
+<div class="title">resumef::scheduler_t结构体 参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>协程调度器。  
+ <a href="structresumef_1_1scheduler__t.html#details">更多...</a></p>
+
+<p>继承自 enable_shared_from_this&lt; scheduler_t &gt; .</p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a8b396c23730b15afd345328b96dbe1cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1scheduler__t.html#a8b396c23730b15afd345328b96dbe1cc">run_one_batch</a> ()</td></tr>
+<tr class="memdesc:a8b396c23730b15afd345328b96dbe1cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">运行一批准备妥当的协程。  <a href="structresumef_1_1scheduler__t.html#a8b396c23730b15afd345328b96dbe1cc">更多...</a><br /></td></tr>
+<tr class="separator:a8b396c23730b15afd345328b96dbe1cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4ef2589ef2ce0335107d579b9e244a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1scheduler__t.html#ae4ef2589ef2ce0335107d579b9e244a8">run_until_notask</a> ()</td></tr>
+<tr class="memdesc:ae4ef2589ef2ce0335107d579b9e244a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">循环运行所有的协程，直到所有协程都运行完成。  <a href="structresumef_1_1scheduler__t.html#ae4ef2589ef2ce0335107d579b9e244a8">更多...</a><br /></td></tr>
+<tr class="separator:ae4ef2589ef2ce0335107d579b9e244a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a449d34ba6a8e28284f2b02089cb7dcec"><td class="memTemplParams" colspan="2">template&lt;class _Ty &gt; </td></tr>
+<tr class="memitem:a449d34ba6a8e28284f2b02089cb7dcec"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1scheduler__t.html#a449d34ba6a8e28284f2b02089cb7dcec">operator+</a> (_Ty &amp;&amp;coro)</td></tr>
+<tr class="memdesc:a449d34ba6a8e28284f2b02089cb7dcec"><td class="mdescLeft">&#160;</td><td class="mdescRight">将一个协程加入到调度器里开始运行。  <a href="structresumef_1_1scheduler__t.html#a449d34ba6a8e28284f2b02089cb7dcec">更多...</a><br /></td></tr>
+<tr class="separator:a449d34ba6a8e28284f2b02089cb7dcec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d22640803eb9397cb844e532f4c8585"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1scheduler__t.html#a9d22640803eb9397cb844e532f4c8585">empty</a> () const</td></tr>
+<tr class="memdesc:a9d22640803eb9397cb844e532f4c8585"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断所有协程是否运行完毕。  <a href="structresumef_1_1scheduler__t.html#a9d22640803eb9397cb844e532f4c8585">更多...</a><br /></td></tr>
+<tr class="separator:a9d22640803eb9397cb844e532f4c8585"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d369882e156db4efc1a1693acfc0e22"><td class="memItemLeft" align="right" valign="top"><a id="a1d369882e156db4efc1a1693acfc0e22"></a>
+<a class="el" href="structresumef_1_1timer__manager.html">timer_manager</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1scheduler__t.html#a1d369882e156db4efc1a1693acfc0e22">timer</a> () const noexcept</td></tr>
+<tr class="memdesc:a1d369882e156db4efc1a1693acfc0e22"><td class="mdescLeft">&#160;</td><td class="mdescRight">获得定时管理器。 <br /></td></tr>
+<tr class="separator:a1d369882e156db4efc1a1693acfc0e22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><p>协程调度器。 </p>
+<p>librf的设计原则之一，就是要将协程绑定在固定的调度器里执行。 通过控制调度器运行的线程和时机，从而控制协程所在的线程和运行时机。 </p>
+</div><h2 class="groupheader">成员函数说明</h2>
+<a id="a9d22640803eb9397cb844e532f4c8585"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d22640803eb9397cb844e532f4c8585">&#9670;&nbsp;</a></span>empty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool resumef::scheduler_t::empty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>判断所有协程是否运行完毕。 </p>
+<dl class="retval"><dt>返回值</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">bool</td><td>以下条件全部满足，返回true：<br  />
+1、所有协程运行完毕<br  />
+2、没有正在准备执行的state<br  />
+3、定时管理器的empty()返回true。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a449d34ba6a8e28284f2b02089cb7dcec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a449d34ba6a8e28284f2b02089cb7dcec">&#9670;&nbsp;</a></span>operator+()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class _Ty &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void resumef::scheduler_t::operator+ </td>
+          <td>(</td>
+          <td class="paramtype">_Ty &amp;&amp;&#160;</td>
+          <td class="paramname"><em>coro</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>将一个协程加入到调度器里开始运行。 </p>
+<p>推荐使用go或者GO这两个宏来启动协程。<br  />
+go用于启动future_t&lt;&gt;/generator_t&lt;&gt;；<br  />
+GO用于启动一个所有变量按值捕获的lambda。 </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">coro</td><td>协程对象。future_t&lt;&gt;，generator_t&lt;&gt;，或者一个调用后返回future_t&lt;&gt;/generator_t&lt;&gt;的函数对象。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a8b396c23730b15afd345328b96dbe1cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b396c23730b15afd345328b96dbe1cc">&#9670;&nbsp;</a></span>run_one_batch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void resumef::scheduler_t::run_one_batch </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>运行一批准备妥当的协程。 </p>
+<p>这是协程调度器提供的主要接口。同一个调度器非线程安全，不可重入。<br  />
+调用者要保证此函数始终在同一个线程里调用。 </p>
+
+</div>
+</div>
+<a id="ae4ef2589ef2ce0335107d579b9e244a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4ef2589ef2ce0335107d579b9e244a8">&#9670;&nbsp;</a></span>run_until_notask()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void resumef::scheduler_t::run_until_notask </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>循环运行所有的协程，直到所有协程都运行完成。 </p>
+<p>通常用于测试代码。 </p>
+
+</div>
+</div>
+<hr/>该结构体的文档由以下文件生成:<ul>
+<li>librf/src/<a class="el" href="scheduler_8h_source.html">scheduler.h</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者 &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.17
+</small></address>
+</body>
+</html>

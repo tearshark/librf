@@ -179,7 +179,7 @@ static void resumable_mutex_lock_range()
 	//不同的线程里加锁也需要是线程安全的
 	std::thread push_th([&]
 	{
-		local_scheduler __ls__;
+		local_scheduler_t __ls__;
 
 		go resumable_mutex_range_push(10, mtxA, mtxB, mtxC);
 		go resumable_mutex_range_push(11, mtxA, mtxC, mtxB);

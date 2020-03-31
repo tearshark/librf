@@ -1,25 +1,7 @@
-# librf 2.9.3
+# librf 2.9.7
 
 ### librf  - 协程库
  * librf是一个基于C++ Coroutines提案 ‘Stackless Resumable Functions’编写的非对称stackless协程库。
-
-2020-03-26 更新：
-
-	兼容xcode 11.2.1。
-2020-03-18 更新：
-
-	更新event/mutex/when_all/when_any实现。至此，2.x版本完整恢复1.x版本的所有功能。
-	版本号提升至 2.8.0。
-	3.0之前，只打算做修复BUG相关的工作。
-	3.0的目标，是根据executor的设计，重写scheduler代码。
-2020-03-08 更新：
-
-	更新channel实现，效率提高了近三倍。
-	channel的新的实现方法，为event/mutex指明了新的修改方向。
-2020-02-16 更新：
-
-	更新调度器算法，深入应用Coroutines的特性，以期获得更高调度性能。
-	不再支持C++14。
 
 支持以下平台和编译器:
 
@@ -39,6 +21,33 @@ librf有以下特点：
 
 	email: tearshark@163.net
 	QQ交流群: 296561497
+
+
+
+2020-03-31 更新：
+
+	使用Doxygen自动生成文档，并完善文档内容。
+	支持cmake。(目前仅VS2019测试通过)。
+
+2020-03-26 更新：
+
+	兼容xcode 11.2.1。
+2020-03-18 更新：
+
+	更新event/mutex/when_all/when_any实现。至此，2.x版本完整恢复1.x版本的所有功能。
+	版本号提升至 2.8.0。
+	3.0之前，只打算做修复BUG相关的工作。
+	3.0的目标，是根据executor的设计，重写scheduler代码。
+2020-03-08 更新：
+
+	更新channel实现，效率提高了近三倍。
+	channel的新的实现方法，为event/mutex指明了新的修改方向。
+2020-02-16 更新：
+
+	更新调度器算法，深入应用Coroutines的特性，以期获得更高调度性能。
+	不再支持C++14。
+
+
 
 
  * 注一：doc目录下有作者搜集的一些关于C++协程的资料

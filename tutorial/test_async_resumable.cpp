@@ -34,7 +34,7 @@ auto yield_switch(intptr_t coro) -> resumef::generator_t<intptr_t>
 
 void resumable_switch(intptr_t coro, size_t idx)
 {
-	resumef::local_scheduler ls;
+	resumef::local_scheduler_t ls;
 
 	auto start = std::chrono::steady_clock::now();
 	

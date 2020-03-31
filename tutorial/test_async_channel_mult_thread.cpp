@@ -77,7 +77,7 @@ void resumable_main_channel_mult_thread()
 	{
 		write_th[i] = std::thread([&]
 		{
-			local_scheduler my_scheduler;
+			local_scheduler_t my_scheduler;
 			go test_channel_producer(c, READ_BATCH * READ_THREAD / WRITE_THREAD);
 			this_scheduler()->run_until_notask();
 
@@ -95,7 +95,7 @@ void resumable_main_channel_mult_thread()
 	{
 		read_th[i] = std::thread([&]
 		{
-			local_scheduler my_scheduler;
+			local_scheduler_t my_scheduler;
 			go test_channel_consumer(c, READ_BATCH);
 			this_scheduler()->run_until_notask();
 
