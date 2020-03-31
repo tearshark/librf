@@ -64,7 +64,7 @@ void resumable_main_resumable()
 
 /*
 	std::thread works[32];
-	for (size_t w = 1; w <= _countof(works); ++w)
+	for (size_t w = 1; w <= std::size(works); ++w)
 	{
 		for (size_t idx = 0; idx < w; ++idx)
 			works[idx] = std::thread(&resumable_switch, 1000, idx);

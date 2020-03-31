@@ -21,7 +21,7 @@ inline namespace channel_v2
 	 * 默认不是POD类型则采用std::optional<>。如果channel缓存的元素不能凭空产生，或者产生代价较大，则推荐将此参数设置为true，从而减小不必要的开销。
 	 * @param _OptimizationThread 针对多线程优化。目前此算法提升效率不稳定，需要自行根据实际情况决定。
 	 */
-	template<class _Ty = bool, bool _Optional = !std::is_pod_v<_Ty>, bool _OptimizationThread = false>
+	template<class _Ty = bool, bool _Optional = !std::is_trivial_v<_Ty>, bool _OptimizationThread = false>
 	struct channel_t
 	{
 		static_assert((std::is_copy_constructible_v<_Ty>&& std::is_copy_assignable_v<_Ty>) ||

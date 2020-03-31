@@ -86,7 +86,7 @@ static void test_wait_all_timeout()
 	event_v2::event_t evts[10];
 
 	std::vector<std::thread> vtt;
-	for(size_t i = 0; i < _countof(evts); ++i)
+	for(size_t i = 0; i < std::size(evts); ++i)
 	{
 		go resumable_wait_timeout(evts[i], 100ms, (int)i);
 		vtt.emplace_back(async_set_event_one(evts[i], 1ms * (50 + i * 10)));

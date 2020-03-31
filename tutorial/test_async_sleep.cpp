@@ -45,7 +45,7 @@ void test_wait_all_events_with_signal_by_sleep()
 	};
 
 	srand((int)time(nullptr));
-	for (size_t i = 0; i < _countof(evts); ++i)
+	for (size_t i = 0; i < std::size(evts); ++i)
 	{
 		go[&, i]() -> future_t<>
 		{

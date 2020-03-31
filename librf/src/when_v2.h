@@ -254,10 +254,24 @@ namespace resumef
 #ifndef DOXYGEN_SKIP_PROPERTY
 inline namespace when_v2
 {
+#else
+	/**
+	 * @brief 目前不知道怎么在doxygen里面能搜集到全局函数的文档。故用一个结构体来欺骗doxygen。
+	 * @details 其下的所有成员函数，均是全局函数。
+	 */
+	struct when_{
 #endif
 
+	/**
+	 * @brief 等待所有的可等待对象完成，不定参数版。
+	 * @param sch 当前协程的调度器。
+	 * @param args... 所有的可等待对象。要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
+	 * @retval [co_await] std::tuple<...>。每个可等待对象的返回值，逐个存入到std::tuple<...>里面。void 返回值，存的是std::ignore。
+	 */
 	template<_WhenTaskT... _Awaitable
+#ifndef DOXYGEN_SKIP_PROPERTY
 		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
+#endif	//DOXYGEN_SKIP_PROPERTY
 	>
 	auto when_all(scheduler_t& sch, _Awaitable&&... args)
 		-> detail::when_future_t<std::tuple<detail::awaitor_result_t<_Awaitable>...> >
@@ -270,8 +284,17 @@ inline namespace when_v2
 		return awaitor;
 	}
 
+	/**
+	 * @brief 等待所有的可等待对象完成，迭代器版。
+	 * @param sch 当前协程的调度器。
+	 * @param begin 可等待对象容器的起始迭代器。迭代器指向的，要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
+	 * @param end 可等待对象容器的结束迭代器。
+	 * @retval [co_await] std::vector<>。每个可等待对象的返回值，逐个存入到std::vector<>里面。void 返回值，存的是std::ignore。
+	 */
 	template<_WhenIterT _Iter
+#ifndef DOXYGEN_SKIP_PROPERTY
 		COMMA_RESUMEF_ENABLE_IF(detail::is_when_task_iter_v<_Iter>)
+#endif	//DOXYGEN_SKIP_PROPERTY
 	>
 	auto when_all(scheduler_t& sch, _Iter begin, _Iter end)
 		-> detail::when_future_t<std::vector<detail::awaitor_result_t<decltype(*std::declval<_Iter>())> > >
@@ -286,26 +309,51 @@ inline namespace when_v2
 		return awaitor;
 	}
 
+	/**
+	 * @brief 等待所有的可等待对象完成，容器版。
+	 * @param sch 当前协程的调度器。
+	 * @param cont 存访可等待对象的容器。容器内存放的，要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
+	 * @retval [co_await] std::vector<>。每个可等待对象的返回值，逐个存入到std::vector<>里面。void 返回值，存的是std::ignore。
+	 */
 	template<_ContainerT _Cont
+#ifndef DOXYGEN_SKIP_PROPERTY
 		COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
+#endif	//DOXYGEN_SKIP_PROPERTY
 	>
 	decltype(auto) when_all(scheduler_t& sch, _Cont& cont)
 	{
 		return when_all(sch, std::begin(cont), std::end(cont));
 	}
 
+	/**
+	 * @brief 等待所有的可等待对象完成，不定参数版。
+	 * @details 当前协程的调度器通过current_scheduler()宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
+	 * @param args... 所有的可等待对象。要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
+	 * @retval [co_await] std::tuple<...>。每个可等待对象的返回值，逐个存入到std::tuple<...>里面。void 返回值，存的是std::ignore。
+	 */
 	template<_WhenTaskT... _Awaitable
+#ifndef DOXYGEN_SKIP_PROPERTY
 		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
+#endif	//DOXYGEN_SKIP_PROPERTY
 	>
-	auto when_all(_Awaitable&&... awaitor)
+	auto when_all(_Awaitable&&... args)
 		-> future_t<std::tuple<detail::awaitor_result_t<_Awaitable>...>>
 	{
 		scheduler_t* sch = current_scheduler();
-		co_return co_await when_all(*sch, std::forward<_Awaitable>(awaitor)...);
+		co_return co_await when_all(*sch, std::forward<_Awaitable>(args)...);
 	}
 
+	/**
+	 * @brief 等待所有的可等待对象完成，迭代器版。
+	 * @details 当前协程的调度器通过current_scheduler()宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
+	 * @param begin 可等待对象容器的起始迭代器。迭代器指向的，要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
+	 * @param end 可等待对象容器的结束迭代器。
+	 * @retval [co_await] std::vector<>。每个可等待对象的返回值，逐个存入到std::vector<>里面。void 返回值，存的是std::ignore。
+	 */
 	template<_WhenIterT _Iter
+#ifndef DOXYGEN_SKIP_PROPERTY
 		COMMA_RESUMEF_ENABLE_IF(detail::is_when_task_iter_v<_Iter>)
+#endif	//DOXYGEN_SKIP_PROPERTY
 	>
 	auto when_all(_Iter begin, _Iter end)
 		-> future_t<std::vector<detail::awaitor_result_t<decltype(*begin)>>>
@@ -314,8 +362,16 @@ inline namespace when_v2
 		co_return co_await when_all(*sch, begin, end);
 	}
 
+	/**
+	 * @brief 等待所有的可等待对象完成，容器版。
+	 * @details 当前协程的调度器通过current_scheduler()宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
+	 * @param cont 存访可等待对象的容器。容器内存放的，要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
+	 * @retval [co_await] std::vector<>。每个可等待对象的返回值，逐个存入到std::vector<>里面。void 返回值，存的是std::ignore。
+	 */
 	template<_ContainerT _Cont
+#ifndef DOXYGEN_SKIP_PROPERTY
 		COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
+#endif	//DOXYGEN_SKIP_PROPERTY
 	>
 	auto when_all(_Cont&& cont)
 		-> future_t<std::vector<detail::awaitor_result_t<decltype(*std::begin(cont))>>>
@@ -325,8 +381,16 @@ inline namespace when_v2
 
 
 
+	/**
+	 * @brief 等待任一的可等待对象完成，不定参数版。
+	 * @param sch 当前协程的调度器。
+	 * @param args... 所有的可等待对象。要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
+	 * @retval [co_await] std::pair<intptr_t, std::any>。第一个值指示哪个对象完成了，第二个值存访的对应的返回数据。
+	 */
 	template<_WhenTaskT... _Awaitable
+#ifndef DOXYGEN_SKIP_PROPERTY
 		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
+#endif	//DOXYGEN_SKIP_PROPERTY
 	>
 	auto when_any(scheduler_t& sch, _Awaitable&&... args)
 		-> detail::when_future_t<when_any_pair>
@@ -340,8 +404,17 @@ inline namespace when_v2
 		return awaitor;
 	}
 
+	/**
+	 * @brief 等待任一的可等待对象完成，迭代器版。
+	 * @param sch 当前协程的调度器。
+	 * @param begin 可等待对象容器的起始迭代器。迭代器指向的，要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
+	 * @param end 可等待对象容器的结束迭代器。
+	 * @retval [co_await] std::pair<intptr_t, std::any>。第一个值指示哪个对象完成了，第二个值存访的对应的返回数据。
+	 */
 	template<_WhenIterT _Iter
+#ifndef DOXYGEN_SKIP_PROPERTY
 		COMMA_RESUMEF_ENABLE_IF(detail::is_when_task_iter_v<_Iter>)
+#endif	//DOXYGEN_SKIP_PROPERTY
 	>
 	auto when_any(scheduler_t& sch, _Iter begin, _Iter end)
 		-> detail::when_future_t<when_any_pair>
@@ -353,26 +426,52 @@ inline namespace when_v2
 		return awaitor;
 	}
 
+	/**
+	 * @brief 等待任一的可等待对象完成，容器版。
+	 * @param sch 当前协程的调度器。
+	 * @param cont 存访可等待对象的容器。容器内存放的，要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
+	 * @retval [co_await] std::pair<intptr_t, std::any>。第一个值指示哪个对象完成了，第二个值存访的对应的返回数据。
+	 */
 	template<_ContainerT _Cont
+#ifndef DOXYGEN_SKIP_PROPERTY
 		COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
+#endif	//DOXYGEN_SKIP_PROPERTY
 	>
-	decltype(auto) when_any(scheduler_t& sch, _Cont& cont)
+	auto when_any(scheduler_t& sch, _Cont& cont)
+		-> detail::when_future_t<when_any_pair>
 	{
 		return when_any(sch, std::begin(cont), std::end(cont));
 	}
 
+	/**
+	 * @brief 等待任一的可等待对象完成，不定参数版。
+	 * @details 当前协程的调度器通过current_scheduler()宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
+	 * @param args... 所有的可等待对象。要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
+	 * @retval [co_await] std::pair<intptr_t, std::any>。第一个值指示哪个对象完成了，第二个值存访的对应的返回数据。
+	 */
 	template<_WhenTaskT... _Awaitable
+#ifndef DOXYGEN_SKIP_PROPERTY
 		COMMA_RESUMEF_ENABLE_IF(std::conjunction_v<detail::is_when_task<_Awaitable>...>)
+#endif	//DOXYGEN_SKIP_PROPERTY
 	>
-	auto when_any(_Awaitable&&... awaitor) 
+	auto when_any(_Awaitable&&... args)
 		-> future_t<when_any_pair>
 	{
 		scheduler_t* sch = current_scheduler();
-		co_return co_await when_any(*sch, std::forward<_Awaitable>(awaitor)...);
+		co_return co_await when_any(*sch, std::forward<_Awaitable>(args)...);
 	}
 
+	/**
+	 * @brief 等待任一的可等待对象完成，迭代器版。
+	 * @details 当前协程的调度器通过current_scheduler()宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
+	 * @param begin 可等待对象容器的起始迭代器。迭代器指向的，要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
+	 * @param end 可等待对象容器的结束迭代器。
+	 * @retval [co_await] std::pair<intptr_t, std::any>。第一个值指示哪个对象完成了，第二个值存访的对应的返回数据。
+	 */
 	template<_WhenIterT _Iter
+#ifndef DOXYGEN_SKIP_PROPERTY
 		COMMA_RESUMEF_ENABLE_IF(detail::is_when_task_iter_v<_Iter>)
+#endif	//DOXYGEN_SKIP_PROPERTY
 	>
 	auto when_any(_Iter begin, _Iter end) 
 		-> future_t<when_any_pair>
@@ -381,10 +480,19 @@ inline namespace when_v2
 		co_return co_await when_any(*sch, begin, end);
 	}
 
+	/**
+	 * @brief 等待任一的可等待对象完成，容器版。
+	 * @details 当前协程的调度器通过current_scheduler()宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
+	 * @param cont 存访可等待对象的容器。容器内存放的，要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
+	 * @retval [co_await] std::pair<intptr_t, std::any>。第一个值指示哪个对象完成了，第二个值存访的对应的返回数据。
+	 */
 	template<_ContainerT _Cont
+#ifndef DOXYGEN_SKIP_PROPERTY
 		COMMA_RESUMEF_ENABLE_IF(traits::is_container_v<_Cont>)
+#endif	//DOXYGEN_SKIP_PROPERTY
 	>
 	auto when_any(_Cont&& cont)
+		-> future_t<when_any_pair>
 	{
 		return when_any(std::begin(cont), std::end(cont));
 	}
