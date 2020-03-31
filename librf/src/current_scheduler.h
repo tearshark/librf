@@ -36,6 +36,15 @@ namespace resumef
 		 * @note 本函数是resumef名字空间下的全局函数。由于doxygen使用上的问题，将之归纳到 get_current_scheduler_awaitor 类下。
 		 */
 		static get_current_scheduler_awaitor get_current_scheduler() noexcept;
+
+		/**
+		 * @brief 获得当前协程绑定的调度器。
+		 * @details 立即返回，没有协程切换和等待。\n
+		 * 这是一条宏函数，等同于 co_await get_current_scheduler()。
+		 * @return scheduler_t*
+		 * @note 由于doxygen使用上的问题，将之归纳到 get_current_scheduler_awaitor 类下。
+		 */
+		static scheduler_t* current_scheduler() noexcept;
 #endif	//DOXYGEN_SKIP_PROPERTY
 	};
 
@@ -79,12 +88,21 @@ namespace resumef
 	public:
 		/**
 		 * @brief 获得当前协程的跟state指针。
-		 * @details 立即返回，没有协程切换和等待。
+		 * @details 立即返回，没有协程切换和等待。\n
 		 * 推荐使用 root_state() 宏替代 co_await get_root_state()。
 		 * @return [co_await] state_base_t*
-		 * @note 本函数是resumef名字空间下的全局函数。由于doxygen使用上的问题，将之归纳到 get_current_scheduler_awaitor 类下。
+		 * @note 本函数是resumef名字空间下的全局函数。由于doxygen使用上的问题，将之归纳到 get_root_state_awaitor 类下。
 		 */
 		static get_root_state_awaitor get_root_state() noexcept;
+
+		/**
+		 * @brief 获得当前协程的跟state指针。
+		 * @details 立即返回，没有协程切换和等待。
+		 * 这是一条宏函数，等同于 co_await get_root_state()。
+		 * @return state_base_t*
+		 * @note 由于doxygen使用上的问题，将之归纳到 get_root_state_awaitor 类下。
+		 */
+		static state_base_t* root_state() noexcept;
 #endif	//DOXYGEN_SKIP_PROPERTY
 	};
 

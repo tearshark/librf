@@ -8,5 +8,6 @@ var searchData=
   ['counted_5fptr_3c_20detail_3a_3astate_5fevent_5ft_20_3e_11',['counted_ptr&lt; detail::state_event_t &gt;',['../structresumef_1_1counted__ptr.html',1,'resumef']]],
   ['counted_5fptr_3c_20detail_3a_3astate_5fmutex_5ft_20_3e_12',['counted_ptr&lt; detail::state_mutex_t &gt;',['../structresumef_1_1counted__ptr.html',1,'resumef']]],
   ['counted_5fptr_3c_20resumef_3a_3astate_5ft_20_3e_13',['counted_ptr&lt; resumef::state_t &gt;',['../structresumef_1_1counted__ptr.html',1,'resumef']]],
-  ['counted_5fptr_3c_20state_5ftype_20_3e_14',['counted_ptr&lt; state_type &gt;',['../structresumef_1_1counted__ptr.html',1,'resumef']]]
+  ['counted_5fptr_3c_20state_5ftype_20_3e_14',['counted_ptr&lt; state_type &gt;',['../structresumef_1_1counted__ptr.html',1,'resumef']]],
+  ['current_5fscheduler_15',['current_scheduler',['../structresumef_1_1get__current__scheduler__awaitor.html#a87bd06c80e5cc26bd8a3bb0025c6bb6a',1,'resumef::get_current_scheduler_awaitor']]]
 ];

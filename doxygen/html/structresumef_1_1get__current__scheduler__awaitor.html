@@ -81,10 +81,43 @@ $(function() {
 <tr class="memitem:ae47a1b255bffdfc2c7762f4d9cf9b3bf"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structresumef_1_1get__current__scheduler__awaitor.html">get_current_scheduler_awaitor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1get__current__scheduler__awaitor.html#ae47a1b255bffdfc2c7762f4d9cf9b3bf">get_current_scheduler</a> () noexcept</td></tr>
 <tr class="memdesc:ae47a1b255bffdfc2c7762f4d9cf9b3bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">获得当前协程绑定的调度器。  <a href="structresumef_1_1get__current__scheduler__awaitor.html#ae47a1b255bffdfc2c7762f4d9cf9b3bf">更多...</a><br /></td></tr>
 <tr class="separator:ae47a1b255bffdfc2c7762f4d9cf9b3bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87bd06c80e5cc26bd8a3bb0025c6bb6a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structresumef_1_1scheduler__t.html">scheduler_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1get__current__scheduler__awaitor.html#a87bd06c80e5cc26bd8a3bb0025c6bb6a">current_scheduler</a> () noexcept</td></tr>
+<tr class="memdesc:a87bd06c80e5cc26bd8a3bb0025c6bb6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">获得当前协程绑定的调度器。  <a href="structresumef_1_1get__current__scheduler__awaitor.html#a87bd06c80e5cc26bd8a3bb0025c6bb6a">更多...</a><br /></td></tr>
+<tr class="separator:a87bd06c80e5cc26bd8a3bb0025c6bb6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <div class="textblock"><p>获得本协程绑定的调度器的可等待对象。 </p>
 </div><h2 class="groupheader">成员函数说明</h2>
+<a id="a87bd06c80e5cc26bd8a3bb0025c6bb6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87bd06c80e5cc26bd8a3bb0025c6bb6a">&#9670;&nbsp;</a></span>current_scheduler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structresumef_1_1scheduler__t.html">scheduler_t</a>* resumef::get_current_scheduler_awaitor::current_scheduler </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获得当前协程绑定的调度器。 </p>
+<p>立即返回，没有协程切换和等待。<br  />
+这是一条宏函数，等同于 co_await <a class="el" href="structresumef_1_1get__current__scheduler__awaitor.html#ae47a1b255bffdfc2c7762f4d9cf9b3bf" title="获得当前协程绑定的调度器。">get_current_scheduler()</a>。 </p><dl class="section return"><dt>返回</dt><dd>scheduler_t* </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>由于doxygen使用上的问题，将之归纳到 <a class="el" href="structresumef_1_1get__current__scheduler__awaitor.html" title="获得本协程绑定的调度器的可等待对象。">get_current_scheduler_awaitor</a> 类下。 </dd></dl>
+
+</div>
+</div>
 <a id="ae47a1b255bffdfc2c7762f4d9cf9b3bf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae47a1b255bffdfc2c7762f4d9cf9b3bf">&#9670;&nbsp;</a></span>get_current_scheduler()</h2>
 
@@ -110,7 +143,7 @@ $(function() {
 
 <p>获得当前协程绑定的调度器。 </p>
 <p>立即返回，没有协程切换和等待。<br  />
-推荐使用 current_scheduler() 宏替代 co_await <a class="el" href="structresumef_1_1get__current__scheduler__awaitor.html#ae47a1b255bffdfc2c7762f4d9cf9b3bf" title="获得当前协程绑定的调度器。">get_current_scheduler()</a>。 </p><dl class="section return"><dt>返回</dt><dd>[co_await] scheduler_t* </dd></dl>
+推荐使用 <a class="el" href="structresumef_1_1get__current__scheduler__awaitor.html#a87bd06c80e5cc26bd8a3bb0025c6bb6a" title="获得当前协程绑定的调度器。">current_scheduler()</a> 宏替代 co_await <a class="el" href="structresumef_1_1get__current__scheduler__awaitor.html#ae47a1b255bffdfc2c7762f4d9cf9b3bf" title="获得当前协程绑定的调度器。">get_current_scheduler()</a>。 </p><dl class="section return"><dt>返回</dt><dd>[co_await] scheduler_t* </dd></dl>
 <dl class="section note"><dt>注解</dt><dd>本函数是resumef名字空间下的全局函数。由于doxygen使用上的问题，将之归纳到 <a class="el" href="structresumef_1_1get__current__scheduler__awaitor.html" title="获得本协程绑定的调度器的可等待对象。">get_current_scheduler_awaitor</a> 类下。 </dd></dl>
 
 </div>

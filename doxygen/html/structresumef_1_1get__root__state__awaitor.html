@@ -81,6 +81,9 @@ $(function() {
 <tr class="memitem:adffac6b1ec6065c68dc345aa6fff5e49"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structresumef_1_1get__root__state__awaitor.html">get_root_state_awaitor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1get__root__state__awaitor.html#adffac6b1ec6065c68dc345aa6fff5e49">get_root_state</a> () noexcept</td></tr>
 <tr class="memdesc:adffac6b1ec6065c68dc345aa6fff5e49"><td class="mdescLeft">&#160;</td><td class="mdescRight">获得当前协程的跟state指针。  <a href="structresumef_1_1get__root__state__awaitor.html#adffac6b1ec6065c68dc345aa6fff5e49">更多...</a><br /></td></tr>
 <tr class="separator:adffac6b1ec6065c68dc345aa6fff5e49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6ad15614c2597a714b84bfc3e369b8a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structresumef_1_1state__base__t.html">state_base_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1get__root__state__awaitor.html#ae6ad15614c2597a714b84bfc3e369b8a">root_state</a> () noexcept</td></tr>
+<tr class="memdesc:ae6ad15614c2597a714b84bfc3e369b8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">获得当前协程的跟state指针。  <a href="structresumef_1_1get__root__state__awaitor.html#ae6ad15614c2597a714b84bfc3e369b8a">更多...</a><br /></td></tr>
+<tr class="separator:ae6ad15614c2597a714b84bfc3e369b8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <div class="textblock"><p>获得本协程绑定的跟state指针的可等待对象。 </p>
@@ -109,8 +112,38 @@ $(function() {
 </div><div class="memdoc">
 
 <p>获得当前协程的跟state指针。 </p>
-<p>立即返回，没有协程切换和等待。 推荐使用 root_state() 宏替代 co_await <a class="el" href="structresumef_1_1get__root__state__awaitor.html#adffac6b1ec6065c68dc345aa6fff5e49" title="获得当前协程的跟state指针。">get_root_state()</a>。 </p><dl class="section return"><dt>返回</dt><dd>[co_await] state_base_t* </dd></dl>
-<dl class="section note"><dt>注解</dt><dd>本函数是resumef名字空间下的全局函数。由于doxygen使用上的问题，将之归纳到 <a class="el" href="structresumef_1_1get__current__scheduler__awaitor.html" title="获得本协程绑定的调度器的可等待对象。">get_current_scheduler_awaitor</a> 类下。 </dd></dl>
+<p>立即返回，没有协程切换和等待。<br  />
+推荐使用 <a class="el" href="structresumef_1_1get__root__state__awaitor.html#ae6ad15614c2597a714b84bfc3e369b8a" title="获得当前协程的跟state指针。">root_state()</a> 宏替代 co_await <a class="el" href="structresumef_1_1get__root__state__awaitor.html#adffac6b1ec6065c68dc345aa6fff5e49" title="获得当前协程的跟state指针。">get_root_state()</a>。 </p><dl class="section return"><dt>返回</dt><dd>[co_await] state_base_t* </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>本函数是resumef名字空间下的全局函数。由于doxygen使用上的问题，将之归纳到 <a class="el" href="structresumef_1_1get__root__state__awaitor.html" title="获得本协程绑定的跟state指针的可等待对象。">get_root_state_awaitor</a> 类下。 </dd></dl>
+
+</div>
+</div>
+<a id="ae6ad15614c2597a714b84bfc3e369b8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6ad15614c2597a714b84bfc3e369b8a">&#9670;&nbsp;</a></span>root_state()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structresumef_1_1state__base__t.html">state_base_t</a>* resumef::get_root_state_awaitor::root_state </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获得当前协程的跟state指针。 </p>
+<p>立即返回，没有协程切换和等待。 这是一条宏函数，等同于 co_await <a class="el" href="structresumef_1_1get__root__state__awaitor.html#adffac6b1ec6065c68dc345aa6fff5e49" title="获得当前协程的跟state指针。">get_root_state()</a>。 </p><dl class="section return"><dt>返回</dt><dd>state_base_t* </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>由于doxygen使用上的问题，将之归纳到 <a class="el" href="structresumef_1_1get__root__state__awaitor.html" title="获得本协程绑定的跟state指针的可等待对象。">get_root_state_awaitor</a> 类下。 </dd></dl>
 
 </div>
 </div>
