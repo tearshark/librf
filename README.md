@@ -7,6 +7,7 @@
 
 	Windows: 使用VS2017/VS2019/clang 9编译
 	Android: 使用NDK 20.1 自带的clang编译
+	Mac: 使用XCode 11.2.1 自带的apple-clang编译
 
 librf有以下特点：
 
