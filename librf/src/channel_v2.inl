@@ -71,12 +71,12 @@ namespace detail
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
-	template<class _Ty, class _Opty>
-	struct channel_impl_v2 : public std::enable_shared_from_this<channel_impl_v2<_Ty, _Opty>>
+	template<class _Ty, bool _Optional>
+	struct channel_impl_v2 : public std::enable_shared_from_this<channel_impl_v2<_Ty, _Optional>>
 	{
 		using value_type = _Ty;
-		using optional_type = _Opty;
-		using this_type = channel_impl_v2<value_type, optional_type>;
+		using optional_type = std::conditional_t<_Optional, std::optional<value_type>, value_type>;
+		using this_type = channel_impl_v2<value_type, _Optional>;
 
 		using state_read_t = state_channel_t<optional_type, this_type>;
 		using state_write_t = state_channel_t<value_type, this_type>;
@@ -113,8 +113,7 @@ namespace detail
 		static constexpr bool USE_RING_QUEUE = true;
 		static constexpr bool USE_LINK_QUEUE = true;
 
-		//using queue_type = std::conditional_t<USE_RING_QUEUE, ring_queue_spinlock<value_type, false, uint32_t>, std::deque<value_type>>;
-		using queue_type = std::conditional_t<USE_RING_QUEUE, ring_queue<value_type, false, uint32_t>, std::deque<value_type>>;
+		using queue_type = std::conditional_t<USE_RING_QUEUE, ring_queue<value_type, _Optional, uint32_t>, std::deque<value_type>>;
 		using read_queue_type = std::conditional_t<USE_LINK_QUEUE, intrusive_link_queue<state_read_t>, std::list<state_read_t*>>;
 		using write_queue_type = std::conditional_t<USE_LINK_QUEUE, intrusive_link_queue<state_write_t>, std::list<state_write_t*>>;
 
@@ -132,22 +131,22 @@ namespace detail
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
-	template<class _Ty, class _Opty>
-	channel_impl_v2<_Ty, _Opty>::channel_impl_v2(size_t cache_size)
+	template<class _Ty, bool _Optional>
+	channel_impl_v2<_Ty, _Optional>::channel_impl_v2(size_t cache_size)
 		: _max_counter(cache_size)
 		, _values(USE_RING_QUEUE ? cache_size : 0)
 	{
 	}
 
-	template<class _Ty, class _Opty>
-	inline bool channel_impl_v2<_Ty, _Opty>::try_read(optional_type& val)
+	template<class _Ty, bool _Optional>
+	inline bool channel_impl_v2<_Ty, _Optional>::try_read(optional_type& val)
 	{
 		scoped_lock<lock_type> lock_(this->_lock);
 		return try_read_nolock(val);
 	}
 
-	template<class _Ty, class _Opty>
-	bool channel_impl_v2<_Ty, _Opty>::try_read_nolock(optional_type& val)
+	template<class _Ty, bool _Optional>
+	bool channel_impl_v2<_Ty, _Optional>::try_read_nolock(optional_type& val)
 	{
 		if constexpr (USE_RING_QUEUE)
 		{
@@ -172,22 +171,22 @@ namespace detail
 		return awake_one_writer_(val);
 	}
 
-	template<class _Ty, class _Opty>
-	inline void channel_impl_v2<_Ty, _Opty>::add_read_list_nolock(state_read_t* state)
+	template<class _Ty, bool _Optional>
+	inline void channel_impl_v2<_Ty, _Optional>::add_read_list_nolock(state_read_t* state)
 	{
 		assert(state != nullptr);
 		_read_awakes.push_back(state);
 	}
 
-	template<class _Ty, class _Opty>
-	inline bool channel_impl_v2<_Ty, _Opty>::try_write(value_type& val)
+	template<class _Ty, bool _Optional>
+	inline bool channel_impl_v2<_Ty, _Optional>::try_write(value_type& val)
 	{
 		scoped_lock<lock_type> lock_(this->_lock);
 		return try_write_nolock(val);
 	}
 
-	template<class _Ty, class _Opty>
-	bool channel_impl_v2<_Ty, _Opty>::try_write_nolock(value_type& val)
+	template<class _Ty, bool _Optional>
+	bool channel_impl_v2<_Ty, _Optional>::try_write_nolock(value_type& val)
 	{
 		if constexpr (USE_RING_QUEUE)
 		{
@@ -211,15 +210,15 @@ namespace detail
 		return awake_one_reader_(val);
 	}
 
-	template<class _Ty, class _Opty>
-	inline void channel_impl_v2<_Ty, _Opty>::add_write_list_nolock(state_write_t* state)
+	template<class _Ty, bool _Optional>
+	inline void channel_impl_v2<_Ty, _Optional>::add_write_list_nolock(state_write_t* state)
 	{
 		assert(state != nullptr);
 		_write_awakes.push_back(state);
 	}
 
-	template<class _Ty, class _Opty>
-	auto channel_impl_v2<_Ty, _Opty>::try_pop_reader_()->state_read_t*
+	template<class _Ty, bool _Optional>
+	auto channel_impl_v2<_Ty, _Optional>::try_pop_reader_()->state_read_t*
 	{
 		if constexpr (USE_LINK_QUEUE)
 		{
@@ -237,8 +236,8 @@ namespace detail
 		}
 	}
 
-	template<class _Ty, class _Opty>
-	auto channel_impl_v2<_Ty, _Opty>::try_pop_writer_()->state_write_t*
+	template<class _Ty, bool _Optional>
+	auto channel_impl_v2<_Ty, _Optional>::try_pop_writer_()->state_write_t*
 	{
 		if constexpr (USE_LINK_QUEUE)
 		{
@@ -256,8 +255,8 @@ namespace detail
 		}
 	}
 
-	template<class _Ty, class _Opty>
-	void channel_impl_v2<_Ty, _Opty>::awake_one_reader_()
+	template<class _Ty, bool _Optional>
+	void channel_impl_v2<_Ty, _Optional>::awake_one_reader_()
 	{
 		state_read_t* state = try_pop_reader_();
 		if (state != nullptr)
@@ -278,8 +277,8 @@ namespace detail
 		}
 	}
 
-	template<class _Ty, class _Opty>
-	bool channel_impl_v2<_Ty, _Opty>::awake_one_reader_(value_type& val)
+	template<class _Ty, bool _Optional>
+	bool channel_impl_v2<_Ty, _Optional>::awake_one_reader_(value_type& val)
 	{
 		state_read_t* state = try_pop_reader_();
 		if (state != nullptr)
@@ -292,8 +291,8 @@ namespace detail
 		return false;
 	}
 
-	template<class _Ty, class _Opty>
-	void channel_impl_v2<_Ty, _Opty>::awake_one_writer_()
+	template<class _Ty, bool _Optional>
+	void channel_impl_v2<_Ty, _Optional>::awake_one_writer_()
 	{
 		state_write_t* state = try_pop_writer_();
 		if (state != nullptr)
@@ -314,8 +313,8 @@ namespace detail
 		}
 	}
 
-	template<class _Ty, class _Opty>
-	bool channel_impl_v2<_Ty, _Opty>::awake_one_writer_(optional_type& val)
+	template<class _Ty, bool _Optional>
+	bool channel_impl_v2<_Ty, _Optional>::awake_one_writer_(optional_type& val)
 	{
 		state_write_t* writer = try_pop_writer_();
 		if (writer != nullptr)

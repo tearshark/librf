@@ -30,7 +30,7 @@ struct move_only_type
 };
 
 //如果channel缓存的元素不能凭空产生，或者产生代价较大，则推荐第二个模板参数使用true。从而减小不必要的开销。
-using string_channel_t = channel_t<move_only_type<std::string>, false, true>;
+using string_channel_t = channel_t<move_only_type<std::string>>;
 
 //channel其实内部引用了一个channel实现体，故可以支持复制拷贝操作
 future_t<> test_channel_read(string_channel_t c)

@@ -131,7 +131,7 @@ namespace resumef
 		auto iter = this->_ready_task.find(sptr);
 		if (iter != this->_ready_task.end())
 		{
-			task_ptr = std::move(iter->second);
+			task_ptr = std::exchange(iter->second, nullptr);
 			this->_ready_task.erase(iter);
 		}
 

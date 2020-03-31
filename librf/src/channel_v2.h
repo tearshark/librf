@@ -5,7 +5,7 @@ namespace resumef
 #ifndef DOXYGEN_SKIP_PROPERTY
 namespace detail
 {
-	template<class _Ty, class _Opty>
+	template<class _Ty, bool _Optional>
 	struct channel_impl_v2;
 }	//namespace detail
 
@@ -97,7 +97,7 @@ inline namespace channel_v2
 		static constexpr bool optimization_for_multithreading = _OptimizationThread;
 
 		using optional_type = std::conditional_t<use_optional, std::optional<value_type>, value_type>;
-		using channel_type = detail::channel_impl_v2<value_type, optional_type>;
+		using channel_type = detail::channel_impl_v2<value_type, use_optional>;
 		using lock_type = typename channel_type::lock_type;
 
 		channel_t(const channel_t&) = default;
