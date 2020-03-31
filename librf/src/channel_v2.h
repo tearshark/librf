@@ -64,7 +64,7 @@ inline namespace channel_v2
 		 */
 		template<class U
 #ifndef DOXYGEN_SKIP_PROPERTY
-			COMMA_RESUMEF_ENABLE_IF(std::is_constructible_v<value_type, U&&>)
+			COMMA_RESUMEF_ENABLE_IF(std::is_constructible_v<_Ty, U&&>)
 #endif	//DOXYGEN_SKIP_PROPERTY
 		>
 #ifndef DOXYGEN_SKIP_PROPERTY
@@ -81,7 +81,7 @@ inline namespace channel_v2
 		 */
 		template<class U
 #ifndef DOXYGEN_SKIP_PROPERTY
-			COMMA_RESUMEF_ENABLE_IF(std::is_constructible_v<value_type, U&&>)
+			COMMA_RESUMEF_ENABLE_IF(std::is_constructible_v<_Ty, U&&>)
 #endif	//DOXYGEN_SKIP_PROPERTY
 		>
 #ifndef DOXYGEN_SKIP_PROPERTY

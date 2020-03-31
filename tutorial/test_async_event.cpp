@@ -69,7 +69,7 @@ static void test_wait_three()
 
 	go[&]() -> future_t<>
 	{
-		if (co_await event_t::wait_all(std::initializer_list{ evt1, evt2, evt3 }))
+		if (co_await event_t::wait_all(std::initializer_list<event_t>{ evt1, evt2, evt3 }))
 			std::cout << "all event signal!" << std::endl;
 		else
 			std::cout << "time out!" << std::endl;

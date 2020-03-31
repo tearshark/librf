@@ -153,7 +153,7 @@ namespace resumef
 #ifndef __clang__
 				constexpr
 #endif
-				(offsetof(state_future_t, _is_future) - offsetof(state_future_t, _has_value) == 1)
+				(_offset_of(state_future_t, _is_future) - _offset_of(state_future_t, _has_value) == 1)
 				return 0 != reinterpret_cast<const std::atomic<uint16_t> &>(_has_value).load(std::memory_order_acquire);
 			else
 				return _has_value.load(std::memory_order_acquire) != result_type::None || _is_future;
