@@ -1,0 +1,3 @@
+[submodule "modern_cb"]
+	path = modern_cb
+	url = https://github.com/tearshark/modern_cb.git
