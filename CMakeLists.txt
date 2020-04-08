@@ -78,6 +78,10 @@ add_library(${LIB_NAME} STATIC ${SRC})
 
 
 
+include_directories(
+${PROJECT_SOURCE_DIR}/modern_cb
+)
+
 aux_source_directory(${PROJECT_SOURCE_DIR}/tutorial TSRC)
 set(TSRC ${TSRC}
 ${PROJECT_SOURCE_DIR}/benchmark/benchmark_async_mem.cpp
