@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.14)
-PROJECT(librf)
+cmake_minimum_required(VERSION 3.10)
+project(librf)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set(CMAKE_CXX_FLAGS "-std=c++2a -fcoroutines-ts -stdlib=libc++")
@@ -8,7 +8,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	set(CMAKE_CXX_FLAGS "/std:c++latest /await /EHsc")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	set(CMAKE_CXX_FLAGS "-std=c++2a -fcoroutines-ts")
+	set(CMAKE_CXX_FLAGS "-std=c++2a -fcoroutines")
 endif()
 
 message(STATUS "C++ flags: ${CMAKE_CXX_FLAGS}")
@@ -90,5 +90,5 @@ ${PROJECT_SOURCE_DIR}/test_librf.cpp
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-add_executable(test ${TSRC})
-target_link_libraries(test ${LIB_NAME})
+add_executable(rf_tutorial ${TSRC})
+target_link_libraries(rf_tutorial ${LIB_NAME})

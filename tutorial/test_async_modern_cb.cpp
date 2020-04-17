@@ -45,7 +45,7 @@ auto tostring_async(_Input_t&& value, _Callable_t&& token)
 			callback(std::to_string(value));
 		}).detach();
 
-		MODERN_CALLBACK_RETURN();
+	MODERN_CALLBACK_RETURN();
 }
 
 //演示异步库有多个异步回调函数，只要按照Modern Callback范式去做回调，就不再需要写额外的代码，就可以适配到future+librf，以及更多的其他库
@@ -61,7 +61,7 @@ auto add_async(_Ty1&& val1, _Ty2&& val2, _Callable_t&& token)
 			callback(val1 + val2);
 		}).detach();
 
-		MODERN_CALLBACK_RETURN();
+	MODERN_CALLBACK_RETURN();
 }
 
 //演示异步库有多个异步回调函数，只要按照Modern Callback范式去做回调，就不再需要写额外的代码，就可以适配到future+librf，以及更多的其他库
@@ -83,7 +83,7 @@ auto muldiv_async(_Ty1&& val1, _Ty2&& val2, _Callable_t&& token)
 				callback(nullptr, v1, val1 / val2);
 		}).detach();
 
-		MODERN_CALLBACK_RETURN();
+	MODERN_CALLBACK_RETURN();
 }
 
 #include "use_future.h"
@@ -132,11 +132,9 @@ static void example_librf()
 
 			//muldiv_async函数可能会抛异常，取决于val是否是0
 			//异常将会带回到本协程里的代码，所以需要try-catch
-			auto ab = co_await muldiv_async(9, val, use_librf);
-			//C++17:
-			//auto [a, b] = co_await muldiv_async(9, val, use_librf);
+			auto [a, b] = co_await muldiv_async(9, val, use_librf);
 
-			std::string result = co_await tostring_async(std::get<0>(ab) + std::get<1>(ab), use_librf);
+			std::string result = co_await tostring_async(a + b, use_librf);
 
 			std::cout << result << std::endl;
 		}
