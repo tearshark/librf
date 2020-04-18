@@ -30,7 +30,7 @@ namespace resumef
 		template <typename _Uty>
 		_Uty&& await_transform(_Uty&& _Whatever) noexcept;
 		void set_exception(std::exception_ptr e);
-#ifdef __clang__
+#if defined(__clang__) || defined(__GNUC__)
 		void unhandled_exception();		//If the coroutine ends with an uncaught exception, it performs the following: 
 #endif
 		future_type get_return_object() noexcept;

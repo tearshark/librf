@@ -22,7 +22,8 @@ static future_t<> resumable_wait_event(const event_t & e)
 {
 	using namespace std::chrono;
 
-	if (co_await e.wait() == false)
+	auto result = co_await e.wait();
+	if (result == false)
 		std::cout << "time out!" << std::endl;
 	else
 		std::cout << "event signal!" << std::endl;
@@ -69,7 +70,8 @@ static void test_wait_three()
 
 	go[&]() -> future_t<>
 	{
-		if (co_await event_t::wait_all(std::initializer_list<event_t>{ evt1, evt2, evt3 }))
+		auto result = co_await event_t::wait_all(std::initializer_list<event_t>{ evt1, evt2, evt3 });
+		if (result)
 			std::cout << "all event signal!" << std::endl;
 		else
 			std::cout << "time out!" << std::endl;
@@ -125,7 +127,8 @@ static void test_wait_all()
 
 	go[&]() -> future_t<>
 	{
-		if (co_await event_t::wait_all(evts))
+		auto result = co_await event_t::wait_all(evts);
+		if (result)
 			std::cout << "all event signal!" << std::endl;
 		else
 			std::cout << "time out!" << std::endl;
@@ -153,7 +156,8 @@ static void test_wait_all_timeout()
 
 	go[&]() -> future_t<>
 	{
-		if (co_await event_t::wait_all_for(1000ms, evts))
+		auto result = co_await event_t::wait_all_for(1000ms, evts);
+		if (result)
 			std::cout << "all event signal!" << std::endl;
 		else
 			std::cout << "time out!" << std::endl;

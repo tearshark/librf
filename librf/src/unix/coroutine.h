@@ -52,7 +52,12 @@ template <class P> struct hash<coroutine_handle<P>>;
 #include <memory> // for hash<T*>
 #include <cstddef>
 #include <cassert>
+
+#if defined(__clang__)
 #include "clang_builtin.h"
+#elif defined(__GNUC__)
+#include "gcc_builtin.h"
+#endif
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #pragma GCC system_header
@@ -61,6 +66,9 @@ template <class P> struct hash<coroutine_handle<P>>;
 #ifndef _LIBCPP_HAS_NO_COROUTINES
 
 namespace std {
+#if defined(__GNUC__)
+	inline
+#endif
 	namespace experimental {
 
 		template <class _Tp, class = void>

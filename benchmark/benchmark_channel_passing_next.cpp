@@ -26,6 +26,20 @@ static future_t<> passing_next(channel_t<intptr_t> rd, channel_t<intptr_t> wr)
 	}
 }
 
+static future_t<> passing_loop_all(channel_t<intptr_t> head, channel_t<intptr_t> tail)
+{
+	for (int i = 0; i < LoopCount; ++i)
+	{
+		auto tstart = high_resolution_clock::now();
+
+		co_await(head << 0);
+		intptr_t value = co_await tail;
+
+		auto dt = duration_cast<duration<double>>(high_resolution_clock::now() - tstart).count();
+		std::cout << value << " cost time " << dt << "s" << std::endl;
+	}
+}
+
 void benchmark_main_channel_passing_next()
 {
 	channel_t<intptr_t> head{1};
@@ -39,6 +53,9 @@ void benchmark_main_channel_passing_next()
 		in = tail;
 	}
 
+#if defined(__GNUC__)
+	go passing_loop_all(head, tail);
+#else
 	GO
 	{
 		for (int i = 0; i < LoopCount; ++i)
@@ -52,6 +69,7 @@ void benchmark_main_channel_passing_next()
 			std::cout << value << " cost time " << dt << "s" << std::endl;
 		}
 	};
+#endif
 
 	this_scheduler()->run_until_notask();
 }

@@ -33,7 +33,7 @@
 #include <thread>
 #include <iostream>
 #include <assert.h>
-#if defined(__clang__)
+#if defined(__clang__) || defined(__GNUC__)
 #include "src/unix/coroutine.h"     //编译器内建的协程函数，MSVC和clang不一样
 #else
 #include <experimental/coroutine>

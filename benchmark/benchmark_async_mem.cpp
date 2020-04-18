@@ -9,7 +9,7 @@
 const size_t N = 2000000;
 const size_t LOOP_COUNT = 50;
 
-volatile size_t globalValue = 0;
+std::atomic<size_t> globalValue{0};
 
 void resumable_main_benchmark_mem(bool wait_key)
 {

@@ -475,7 +475,7 @@ namespace resumef
 				for (int cnt = rand() % (1 + _mutex.size()); cnt >= 0; --cnt)
 				{
 					std::this_thread::yield();	//还要考虑多线程里运行的情况
-					co_await ::resumef::yield();
+					co_await yield_awaitor{};
 				}
 			}
 			future_t<> _ReturnValue() const;
@@ -489,7 +489,7 @@ namespace resumef
 		};
 
 		template<class... _Mtxs>
-		struct [[nodiscard]] batch_unlock_t
+		struct batch_unlock_t
 		{
 			mutex_t::_MutexAwaitAssembleT _MAA;
 
@@ -534,13 +534,15 @@ namespace resumef
 			co_return std::move(unlock_guard);
 		}
 
+#ifndef __GNUC__
 		template<class... _Mtxs, typename>
 		inline future_t<> mutex_t::lock(adopt_manual_unlock_t, _Mtxs&... mtxs)
 		{
 			mutex_t::_MutexAwaitAssembleT _MAA{ root_state(), mtxs... };
 			co_await detail::mutex_lock_await_lock_impl::_Lock_range(_MAA);
 		}
-
+#endif
+		
 		template<class... _Mtxs, typename>
 		inline future_t<> mutex_t::unlock(_Mtxs&... mtxs)
 		{
