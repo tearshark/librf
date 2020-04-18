@@ -34,12 +34,8 @@ int main(int argc, const char* argv[])
 	(void)argc;
 	(void)argv;
 
-	//test_ring_queue_simple<resumef::ring_queue<int>>();
-	//test_ring_queue<resumef::ring_queue_spinlock<int, false, uint32_t>>();
-	//test_ring_queue<resumef::ring_queue_lockfree<int, uint64_t>>();
-
-	//resumable_main_channel();
-	//return 0;
+	resumable_main_mutex();
+	return 0;
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
