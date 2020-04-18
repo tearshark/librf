@@ -1,13 +1,17 @@
-# librf 2.9.7
+# librf 2.9.8
 
 ### librf  - 协程库
  * librf是一个基于C++ Coroutines提案 ‘Stackless Resumable Functions’编写的非对称stackless协程库。
 
 支持以下平台和编译器:
 
-	Windows: 使用VS2017/VS2019/clang 9编译
+	Windows: 使用VS2017/VS2019/clang 9 编译
 	Android: 使用NDK 20.1 自带的clang编译
 	Mac: 使用XCode 11.2.1 自带的apple-clang编译
+	Ubuntu: 使用GCC 10.0.1编译（2020-04-18：mutex ranged lock failed）
+	
+	注意：GCC 10.0.1在C++ Coroutines上存在很多BUG，并且缺少对应的头文件。
+	当前阶段不推荐使用。
 
 librf有以下特点：
 

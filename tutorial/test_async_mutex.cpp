@@ -157,8 +157,8 @@ static future_t<> resumable_mutex_range_push(size_t idx, mutex_t a, mutex_t b, m
 		assert(c.is_locked());
 
 		++g_counter;
-		//std::cout << "push:" << g_counter << " on " << idx << std::endl;
-		//co_await 5ms;
+		std::cout << "push:" << g_counter << " on " << idx << std::endl;
+		co_await 5ms;
 	}
 }
 
@@ -172,8 +172,8 @@ static future_t<> resumable_mutex_range_pop(size_t idx, mutex_t a, mutex_t b, mu
 		assert(c.is_locked());
 
 		--g_counter;
-		//std::cout << "pop :" << g_counter << " on " << idx << std::endl;
-		//co_await 5ms;
+		std::cout << "pop :" << g_counter << " on " << idx << std::endl;
+		co_await 5ms;
 	}
 }
 
@@ -203,13 +203,13 @@ static void resumable_mutex_lock_range()
 
 void resumable_main_mutex()
 {
-	std::cout << "begin resumable_mutex_synch()" << std::endl;
-	resumable_mutex_synch();
-	std::cout << std::endl;
+	//std::cout << "begin resumable_mutex_synch()" << std::endl;
+	//resumable_mutex_synch();
+	//std::cout << std::endl;
 
-	std::cout << "begin resumable_mutex_async()" << std::endl;
-	resumable_mutex_async();
-	std::cout << std::endl;
+	//std::cout << "begin resumable_mutex_async()" << std::endl;
+	//resumable_mutex_async();
+	//std::cout << std::endl;
 
 	std::cout << "begin resumable_mutex_lock_range()" << std::endl;
 	resumable_mutex_lock_range();
