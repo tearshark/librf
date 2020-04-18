@@ -104,7 +104,6 @@ struct LOCK_ASSEMBLE_NAME(lock_impl)
 	static auto _Lock_nonmember2(_LA& _LkN) ->decltype(_LkN._ReturnValue())
 	{
 		// lock 2 locks, without deadlock, special case for better codegen and reduced metaprogramming for common case
-#if defined(__GNUC__)
 		for (;;)
 		{
 			auto _Result__ = LOCK_ASSEMBLE_AWAIT(_Lock_attempt_small2(_LkN, 0, 1));
@@ -112,12 +111,6 @@ struct LOCK_ASSEMBLE_NAME(lock_impl)
 			_Result__ = LOCK_ASSEMBLE_AWAIT(_Lock_attempt_small2(_LkN, 1, 0));
 			if (!_Result__) break;
 		}
-#else
-		while (LOCK_ASSEMBLE_AWAIT(_Lock_attempt_small2(_LkN, 0, 1)) && 
-			LOCK_ASSEMBLE_AWAIT(_Lock_attempt_small2(_LkN, 1, 0)))
-		{ // keep trying
-		}
-#endif
 	}
 
 	template<_LockAssembleT _LA>

@@ -475,7 +475,7 @@ namespace resumef
 				for (int cnt = rand() % (1 + _mutex.size()); cnt >= 0; --cnt)
 				{
 					std::this_thread::yield();	//还要考虑多线程里运行的情况
-					co_await yield_awaitor{};
+					co_await yield();
 				}
 			}
 			future_t<> _ReturnValue() const;
