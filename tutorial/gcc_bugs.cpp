@@ -74,7 +74,7 @@ static future_t<> gcc_bugs_lambda_coroutines2_fixed(channel_t<intptr_t> head, ch
 	for (int i = 0; i < 100; ++i)
 	{
 		co_await(head << 0);
-		intptr_t value = co_await tail;
+		co_await tail;
 	}
 }
 #endif
@@ -100,7 +100,7 @@ static void gcc_bugs_lambda_coroutines2()
 
 
 template<class... _Mtxs>
-static future_t<> gcc_bugs_nameless_args(adopt_manual_unlock_t 
+static future_t<> gcc_bugs_nameless_args(adopt_manual_unlock_t
 #if GCC_FIX_BUGS
 	nameless
 #endif
@@ -109,9 +109,7 @@ static future_t<> gcc_bugs_nameless_args(adopt_manual_unlock_t
 #if GCC_FIX_BUGS
 	(void)nameless;
 #endif
-
-	mutex_t::_MutexAwaitAssembleT _MAA{ root_state(), mtxs... };
-	co_await detail::mutex_lock_await_lock_impl::_Lock_range(_MAA);
+	co_await mutex_t::lock(adopt_manual_unlock, mtxs...);
 }	//internal compiler error: Segmentation fault
 
 
