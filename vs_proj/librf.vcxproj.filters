@@ -243,6 +243,9 @@
     <ClInclude Include="..\librf\src\config.h">
       <Filter>librf\src</Filter>
     </ClInclude>
+    <ClInclude Include="..\librf\src\unix\gcc_builtin.h">
+      <Filter>librf\src\unix</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\librf\src\asio_task_1.12.0.inl">

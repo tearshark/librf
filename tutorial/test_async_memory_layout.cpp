@@ -7,6 +7,8 @@
 
 using namespace resumef;
 
+#ifndef __GNUC__	//GCC: 没有提供__builtin_coro_frame这样的内置函数
+
 template<class _Ctype>
 static void callback_get_long(int64_t a, int64_t b, _Ctype&& cb)
 {
@@ -51,7 +53,7 @@ future_t<int64_t> resumeable_get_long(int64_t x, int64_t y)
 	using promise_type = typename future_type::promise_type;
 	using state_type = typename future_type::state_type;
 
-	void* frame_ptr = __builtin_coro_frame();
+	void* frame_ptr = _coro_frame_ptr();
 	auto handler = coroutine_handle<promise_type>::from_address(frame_ptr);
 	promise_type* promise = &handler.promise();
 	state_type* state = handler.promise().get_state();
@@ -59,10 +61,10 @@ future_t<int64_t> resumeable_get_long(int64_t x, int64_t y)
 	std::cout << "  future size=" << sizeof(future_type) << " / " << _Align_size<future_type>() << std::endl;
 	std::cout << "  promise size=" << sizeof(promise_type) << " / " << _Align_size<promise_type>() << std::endl;
 	std::cout << "  state size=" << sizeof(state_type) << " / "<< _Align_size<state_type>() << std::endl;
-	std::cout << "  frame size=" << __builtin_coro_size() << ", alloc size=" << state->get_alloc_size() << std::endl;
+	std::cout << "  frame size=" << _coro_frame_size() << ", alloc size=" << state->get_alloc_size() << std::endl;
 
 	std::cout << "  frame ptr=" << frame_ptr << "," << (void*)&frame_ptr << std::endl;
-	std::cout << "  frame end=" << (void*)((char*)(frame_ptr)+__builtin_coro_size()) << std::endl;
+	std::cout << "  frame end=" << (void*)((char*)(frame_ptr)+_coro_frame_size()) << std::endl;
 	std::cout << "  promise ptr=" << promise << "," << (void*)&promise << std::endl;
 	std::cout << "  handle ptr=" << handler.address() << "," << (void*)&handler << std::endl;
 	std::cout << "  state ptr=" << state << "," << (void*)&state << std::endl;
@@ -90,7 +92,7 @@ future_t<> resumable_get_long_2(int64_t a, int64_t b, int64_t c)
 	using promise_type = typename future_type::promise_type;
 	using state_type = typename future_type::state_type;
 
-	void* frame_ptr = __builtin_coro_frame();
+	void* frame_ptr = _coro_frame_ptr();
 	auto handler = coroutine_handle<promise_type>::from_address(frame_ptr);
 	promise_type * promise = &handler.promise();
 	state_type * state = handler.promise().get_state();
@@ -98,10 +100,10 @@ future_t<> resumable_get_long_2(int64_t a, int64_t b, int64_t c)
 	std::cout << "  future size=" << sizeof(future_type) << " / " << _Align_size<future_type>() << std::endl;
 	std::cout << "  promise size=" << sizeof(promise_type) << " / " << _Align_size<promise_type>() << std::endl;
 	std::cout << "  state size=" << sizeof(state_type) << " / "<< _Align_size<state_type>() << std::endl;
-	std::cout << "  frame size=" << __builtin_coro_size() << ", alloc size=" << state->get_alloc_size() << std::endl;
+	std::cout << "  frame size=" << _coro_frame_size() << ", alloc size=" << state->get_alloc_size() << std::endl;
 
 	std::cout << "  frame ptr=" << frame_ptr << ","<< (void*)&frame_ptr << std::endl;
-	std::cout << "  frame end=" << (void *)((char*)(frame_ptr) + __builtin_coro_size()) << std::endl;
+	std::cout << "  frame end=" << (void *)((char*)(frame_ptr) + _coro_frame_size()) << std::endl;
 	std::cout << "  promise ptr=" << promise << "," << (void *)&promise << std::endl;
 	std::cout << "  handle ptr=" << handler.address() << "," << (void*)&handler << std::endl;
 	std::cout << "  state ptr=" << state << "," << (void*)&state << std::endl;
@@ -125,12 +127,15 @@ future_t<> resumable_get_long_2(int64_t a, int64_t b, int64_t c)
 
 	std::cout << __FUNCTION__ << " - end" << std::endl;
 }
+#endif //#ifndef __GNUC__
 
 void resumable_main_layout()
 {
 	std::cout << std::endl << __FUNCTION__ << " - begin" << std::endl;
 
+#ifndef __GNUC__	//GCC: 没有提供__builtin_coro_frame这样的内置函数
 	go resumable_get_long_2(1, 2, 5);
+#endif //#ifndef __GNUC__
 	resumef::this_scheduler()->run_until_notask();
 
 	std::cout << __FUNCTION__ << " - end" << std::endl;
