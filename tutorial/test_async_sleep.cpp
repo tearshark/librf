@@ -38,7 +38,8 @@ void test_wait_all_events_with_signal_by_sleep()
 
 	go[&]() -> future_t<>
 	{
-		if (co_await event_t::wait_all(evts))
+		auto result = co_await event_t::wait_all(evts);
+		if (result)
 			std::cout << "all event signal!" << std::endl;
 		else
 			std::cout << "time out!" << std::endl;

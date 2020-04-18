@@ -25,7 +25,7 @@ namespace resumef
 		 * @brief 在析构的时候自动解锁mutex_t的辅助类。
 		 */
 		template<class... _Mtxs>
-		struct [[nodiscard]] batch_unlock_t;
+		struct batch_unlock_t;
 
 		/**
 		 * @brief 支持递归的锁。

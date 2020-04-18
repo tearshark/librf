@@ -35,7 +35,8 @@ void test_wait_timeout_one()
 		intptr_t counter = 0;
 		for (;;)
 		{
-			if (co_await evt.wait_for(100ms))
+			auto result = co_await evt.wait_for(100ms);
+			if (result)
 				break;
 			++counter;
 			std::cout << ".";
@@ -137,7 +138,8 @@ void test_wait_timeout_all()
 		intptr_t counter = 0;
 		for (;;)
 		{
-			if (co_await event_t::wait_all_for(1500ms, evts))
+			auto result = co_await event_t::wait_all_for(1500ms, evts);
+			if (result)
 			{
 				std::cout << counter << std::endl;
 				std::cout << "all event signal!" << std::endl;

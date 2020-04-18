@@ -150,7 +150,7 @@ namespace resumef
 			//msvc认为是constexpr表达式(不写还给警告)，然而，clang不这么认为。
 			//放弃constexpr，反正合格的编译器都会优化掉这个if判断的。
 			if 
-#ifndef __clang__
+#ifdef _MSC_VER
 				constexpr
 #endif
 				(_offset_of(state_future_t, _is_future) - _offset_of(state_future_t, _has_value) == 1)

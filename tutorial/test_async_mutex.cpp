@@ -61,8 +61,12 @@ static future_t<> test_mutex_try_push(size_t idx)
 	for (size_t i = 0; i < N; ++i)
 	{
 		{
-			while (!co_await g_lock.try_lock())
+			for (;;)
+			{
+				auto result = co_await g_lock.try_lock();
+				if (result) break;
 				co_await yield();
+			}
 
 			++g_counter;
 			std::cout << "push:" << g_counter << " on " << idx << std::endl;
@@ -79,8 +83,12 @@ static future_t<> test_mutex_timeout_push(size_t idx)
 	for (size_t i = 0; i < N; ++i)
 	{
 		{
-			while (!co_await g_lock.try_lock_for(10ms))
+			for (;;)
+			{
+				auto result = co_await g_lock.try_lock_for(10ms);
+				if (result) break;
 				co_await yield();
+			}
 
 			++g_counter;
 			std::cout << "push:" << g_counter << " on " << idx << std::endl;

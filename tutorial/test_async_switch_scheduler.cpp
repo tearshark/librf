@@ -88,6 +88,18 @@ static future_t<> resumable_get_long_switch_scheduler(int64_t val, channel_t<boo
 	(void)c_done.write(true);
 }
 
+static future_t<> resumable_main_switch_scheduler_fix_gcc_bugs(std::thread & other, channel_t<bool> c_done)
+{
+	co_await c_done;		//第一次等待，等待run_in_thread准备好了
+
+	std::cout << "other thread = " << other.get_id();
+	std::cout << ", sch_in_thread = " << sch_in_thread << std::endl;
+
+	go resumable_get_long_switch_scheduler(1, c_done);	//开启另外一个协程
+	//co_await resumable_get_long(3, c_done);
+	co_await c_done;		//等待新的协程运行完毕，从而保证主线程的协程不会提早退出
+}
+
 void resumable_main_switch_scheduler()
 {
 	sch_in_main = this_scheduler();
@@ -98,6 +110,9 @@ void resumable_main_switch_scheduler()
 	channel_t<bool> c_done{ 1 };
 	std::thread other(&run_in_thread, std::ref(c_done));
 
+#if defined(__GNUC__)
+	go resumable_main_switch_scheduler_fix_gcc_bugs(other, c_done);
+#else
 	go[&other, c_done]()->future_t<>
 	{
 		co_await c_done;		//第一次等待，等待run_in_thread准备好了
@@ -108,7 +123,8 @@ void resumable_main_switch_scheduler()
 		go resumable_get_long_switch_scheduler(1, c_done);	//开启另外一个协程
 		//co_await resumable_get_long(3, c_done);
 		co_await c_done;		//等待新的协程运行完毕，从而保证主线程的协程不会提早退出
-	};
+	}; //GCC: internal compiler error: in captures_temporary, at cp/coroutines.cc:2716
+#endif
 
 	sch_in_main->run_until_notask();
 

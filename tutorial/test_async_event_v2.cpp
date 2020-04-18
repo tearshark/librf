@@ -29,7 +29,8 @@ static std::thread async_set_event_one(event_v2::event_t e, std::chrono::millise
 
 static future_t<> resumable_wait_event(event_v2::event_t e, int idx)
 {
-	if (co_await e)
+	auto result = co_await e;
+	if (result)
 		std::cout << "[" << idx << "]event signal!" << std::endl;
 	else
 		std::cout << "[" << idx << "]time out!" << std::endl;
@@ -37,7 +38,8 @@ static future_t<> resumable_wait_event(event_v2::event_t e, int idx)
 
 static future_t<> resumable_wait_timeout(event_v2::event_t e, milliseconds dt, int idx)
 {
-	if (co_await e.wait_for(dt))
+	auto result = co_await e.wait_for(dt);
+	if (result)
 		std::cout << "[" << idx << "]event signal!" << std::endl;
 	else
 		std::cout << "[" << idx << "]time out!" << std::endl;

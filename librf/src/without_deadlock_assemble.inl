@@ -19,7 +19,8 @@ struct LOCK_ASSEMBLE_NAME(lock_impl)
 		try {
 			for (; _Next != _Last; ++_Next)
 			{
-				if (!LOCK_ASSEMBLE_AWAIT(_LkN._Try_lock_ref(_LkN[_Next])))
+				auto _Result__ = LOCK_ASSEMBLE_AWAIT(_LkN._Try_lock_ref(_LkN[_Next]));
+				if (!_Result__)
 				{ // try_lock failed, backout
 					_Unlock_locks(_First, _Next, _LkN);
 					LOCK_ASSEMBLE_RETURN(_Next);
@@ -84,7 +85,8 @@ struct LOCK_ASSEMBLE_NAME(lock_impl)
 		// attempt to lock 2 locks, by first locking _Lk0, and then trying to lock _Lk1 returns whether to try again
 		LOCK_ASSEMBLE_AWAIT(_LkN._Lock_ref(_LkN[_Idx0]));
 		try {
-			if (LOCK_ASSEMBLE_AWAIT(_LkN._Try_lock_ref(_LkN[_Idx1])))
+			auto _Result__ = LOCK_ASSEMBLE_AWAIT(_LkN._Try_lock_ref(_LkN[_Idx1]));
+			if (_Result__)
 				LOCK_ASSEMBLE_RETURN(false);
 		}
 		catch (...) {
@@ -102,10 +104,20 @@ struct LOCK_ASSEMBLE_NAME(lock_impl)
 	static auto _Lock_nonmember2(_LA& _LkN) ->decltype(_LkN._ReturnValue())
 	{
 		// lock 2 locks, without deadlock, special case for better codegen and reduced metaprogramming for common case
+#if defined(__GNUC__)
+		for (;;)
+		{
+			auto _Result__ = LOCK_ASSEMBLE_AWAIT(_Lock_attempt_small2(_LkN, 0, 1));
+			if (!_Result__) break;
+			_Result__ = LOCK_ASSEMBLE_AWAIT(_Lock_attempt_small2(_LkN, 1, 0));
+			if (!_Result__) break;
+		}
+#else
 		while (LOCK_ASSEMBLE_AWAIT(_Lock_attempt_small2(_LkN, 0, 1)) && 
 			LOCK_ASSEMBLE_AWAIT(_Lock_attempt_small2(_LkN, 1, 0)))
 		{ // keep trying
 		}
+#endif
 	}
 
 	template<_LockAssembleT _LA>

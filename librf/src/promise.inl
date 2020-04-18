@@ -73,7 +73,7 @@ namespace resumef
         this->get_state()->set_exception(std::move(e));
 	}
 
-#ifdef __clang__
+#if defined(__clang__) || defined(__GNUC__)
 	template <typename _Ty>
 	inline void promise_impl_t<_Ty>::unhandled_exception()
 	{

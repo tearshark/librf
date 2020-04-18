@@ -160,7 +160,7 @@ namespace resumef
 				(void)e;
 				std::terminate();
 			}
-#ifdef __clang__
+#if defined(__clang__) || defined(__GNUC__)
 			void unhandled_exception()
 			{
 				std::terminate();
