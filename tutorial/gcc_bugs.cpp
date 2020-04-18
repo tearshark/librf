@@ -9,7 +9,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #include "librf.h"
 using namespace resumef;
 
-#define GCC_FIX_BUGS	0
+#define GCC_FIX_BUGS	1
 
 static future_t<> gcc_bugs_if_await(event_t e)
 {
