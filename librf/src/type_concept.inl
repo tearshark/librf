@@ -12,7 +12,7 @@ namespace resumef
 	template<typename T>
 	concept _AwaitorT = requires(T&& v)
 	{
-		{ v.await_ready() } ->bool;
+		{ v.await_ready() } ->std::same_as<bool>;
 		{ v.await_suspend(std::declval<std::experimental::coroutine_handle<promise_t<>>>()) };
 		{ v.await_resume() };
 		requires traits::is_valid_await_suspend_return_v<
@@ -38,8 +38,8 @@ namespace resumef
 	template<typename T>
 	concept _CallableT = std::invocable<T>;
 
-	template<typename T>
-	concept _GeneratorT = std::is_same_v<T, generator_t<_Ty>>;
+	//template<typename T>
+	//concept _GeneratorT = std::is_same_v<T, generator_t<T>>;
 
 	template<typename T>
 	concept _AwaitableT = requires(T&& v)
@@ -53,15 +53,15 @@ namespace resumef
 	template<typename T>
 	concept _IteratorT = requires(T&& u, T&& v)
 	{
-		{ ++u }->T;
-		{ u != v } ->bool;
+		{ ++u } ->std::common_with<T>;
+		{ u != v } ->std::same_as<bool>;
 		{ *u };
 	};
 
 	template<typename T, typename E>
 	concept _IteratorOfT = _IteratorT<T> && requires(T&& u)
 	{
-		{ *u } ->std::same_as<E&>;
+		{ *u } ->std::common_with<E&>;
 	};
 
 	template<typename T>
@@ -81,7 +81,8 @@ namespace resumef
 	template<typename T, typename E>
 	concept _ContainerOfT = _ContainerT<T> && requires(T&& v)
 	{
-		requires std::is_same_v<E, remove_cvref_t<decltype(*std::begin(v))>>;
+		{ *std::begin(v) } ->std::common_with<E&>;
+		//requires std::is_same_v<E, remove_cvref_t<decltype(*std::begin(v))>>;
 	};
 
 #define COMMA_RESUMEF_ENABLE_IF_TYPENAME() 
@@ -95,7 +96,7 @@ namespace resumef
 #define _HasStateT typename
 #define _FutureT typename
 #define _CallableT typename
-#define _GeneratorT typename
+//#define _GeneratorT typename
 #define _AwaitableT typename
 #define _WhenTaskT typename
 #define _IteratorT typename
@@ -119,7 +120,7 @@ concept _LockAssembleT = requires(T && v)
 	{ v[0] };
 	{ v._Lock_ref(v[0]) };
 	{ v._Try_lock_ref(v[0]) };
-	{ v._Unlock_ref(v[0]) } ->void;
+	{ v._Unlock_ref(v[0]) } ->std::same_as<void>;
 	{ v._Yield() };
 	{ v._ReturnValue() };
 	{ v._ReturnValue(0) };
