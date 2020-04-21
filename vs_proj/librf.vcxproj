@@ -193,6 +193,7 @@
     <ClCompile Include="..\librf\src\timer.cpp" />
     <ClCompile Include="..\librf\src\when_v2.cpp" />
     <ClCompile Include="..\test_librf.cpp" />
+    <ClCompile Include="..\tutorial\gcc_bugs.cpp" />
     <ClCompile Include="..\tutorial\test_async_cb.cpp" />
     <ClCompile Include="..\tutorial\test_async_channel.cpp" />
     <ClCompile Include="..\tutorial\test_async_channel_mult_thread.cpp" />

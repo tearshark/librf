@@ -2,9 +2,9 @@
 
 #ifndef RESUMEF_INLINE_STATE
 #if defined(__clang__) || defined(_MSC_VER)
-/* #undef RESUMEF_INLINE_STATE */
+#define RESUMEF_INLINE_STATE 1
 #else
-/* #undef RESUMEF_INLINE_STATE */
+#define RESUMEF_INLINE_STATE 1
 #endif	//defined(__clang__) || defined(_MSC_VER)
 #endif	//RESUMEF_INLINE_STATE
 
@@ -14,9 +14,9 @@
 
 #ifndef RESUMEF_ENABLE_CONCEPT
 #ifdef __cpp_lib_concepts
-/* #undef RESUMEF_ENABLE_CONCEPT */
+#define RESUMEF_ENABLE_CONCEPT 0
 #else
-/* #undef RESUMEF_ENABLE_CONCEPT */
+#define RESUMEF_ENABLE_CONCEPT 0
 #endif	//#ifdef __cpp_lib_concepts
 #endif	//#ifndef RESUMEF_ENABLE_CONCEPT
 
