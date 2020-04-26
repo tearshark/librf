@@ -28,9 +28,11 @@ extern "C" void* __builtin_coro_promise(void* addr, int alignment, bool from_pro
 
 extern "C" size_t __builtin_coro_size();
 extern "C" void* __builtin_coro_frame();
+extern "C" void* __builtin_coro_noop();
 extern "C" void* __builtin_coro_free(void* coro_frame);
 #pragma intrinsic(__builtin_coro_size)
 #pragma intrinsic(__builtin_coro_frame)
+#pragma intrinsic(__builtin_coro_noop)
 #pragma intrinsic(__builtin_coro_free)
 
 extern "C" void* __builtin_coro_id(int align, void* promise, void* fnaddr, void* parts);
