@@ -321,18 +321,3 @@ namespace resumef
 
 #pragma pop_macro("new")
 #pragma pack(pop)
-
-#ifndef DOXYGEN_SKIP_PROPERTY
-
-namespace std {
-	namespace experimental {
-		
-		template <typename _Ty, typename _Alloc, typename... Args>
-		struct coroutine_traits<resumef::generator_t<_Ty, _Alloc>, Args...>
-		{
-			typedef typename resumef::generator_t<_Ty, _Alloc>::promise_type promise_type;
-		};
-	}
-} // namespace std::experimental
-
-#endif	//DOXYGEN_SKIP_PROPERTY
