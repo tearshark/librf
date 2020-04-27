@@ -92,6 +92,7 @@ static void gcc_bugs_lambda_coroutines2()
 		{
 			co_await(head << 0);
 			intptr_t value = co_await tail;
+			(void)value;
 		}
 	};	//internal compiler error: in captures_temporary, at cp/coroutines.cc:2716
 #endif
