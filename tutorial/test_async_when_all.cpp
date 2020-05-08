@@ -138,12 +138,101 @@ void test_when_all()
 	this_scheduler()->run_until_notask();
 }
 
+void test_when_any_mix()
+{
+	using namespace std::chrono;
+
+	event_t evt;
+
+	GO
+	{
+		auto vals = co_await when_any(
+			[]() ->future_t<int>
+			{
+				auto dt = rand() % 200;
+				co_await sleep_for(1ms * dt);
+				co_return dt;
+			},
+			evt.wait(),
+			sleep_for(100ms)
+			);
+
+		if (vals.first == 0)
+			std::cout << "first done! value is " << resumef::any_cast<int>(vals.second) << std::endl;
+		else
+			std::cout << "any done! index is " << vals.first << std::endl;
+	};
+	
+	GO
+	{
+		auto dt = rand() % 120;
+		co_await sleep_for(1ms * dt);
+		evt.signal();
+	};
+
+	this_scheduler()->run_until_notask();
+}
+
+//这能模拟golang的select吗?
+void test_when_select()
+{
+	using namespace std::chrono;
+
+	channel_t<int> ch1, ch2;
+
+	GO
+	{
+		auto vals = co_await when_any(
+			sleep_for(60ms),
+			[=]() ->future_t<int>
+			{
+				int val = co_await ch1;
+				co_return val;
+			},
+			[=]() ->future_t<int>
+			{
+				int val = co_await ch2;
+				co_return val;
+			}
+			);
+
+		if (vals.first == 0)
+			std::cout << "time out!" << std::endl;
+		else
+			std::cout << "index is " << vals.first << ", value is " << resumef::any_cast<int>(vals.second) << std::endl;
+	};
+
+	GO
+	{
+		auto dt = rand() % 120;
+		co_await sleep_for(1ms * dt);
+		ch1 << (int)dt;
+	};
+
+	GO
+	{
+		auto dt = rand() % 120;
+		co_await sleep_for(1ms * dt);
+		ch2 << (int)dt;
+	};
+
+	this_scheduler()->run_until_notask();
+}
+
 void resumable_main_when_all()
 {
 	srand((uint32_t)time(nullptr));
 
 	test_when_any();
 	std::cout << std::endl;
+	
 	test_when_all();
+	std::cout << std::endl;
+
+	for(int i = 0; i < 10; ++i)
+		test_when_any_mix();
+
+	for (int i = 0; i < 10; ++i)
+		test_when_select();
 }
 
