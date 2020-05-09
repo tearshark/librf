@@ -206,14 +206,14 @@ void test_when_select()
 	{
 		auto dt = rand() % 120;
 		co_await sleep_for(1ms * dt);
-		ch1 << (int)dt;
+		co_await (ch1 << (int)dt);
 	};
 
 	GO
 	{
 		auto dt = rand() % 120;
 		co_await sleep_for(1ms * dt);
-		ch2 << (int)dt;
+		co_await (ch2 << (int)dt);
 	};
 
 	this_scheduler()->run_until_notask();
