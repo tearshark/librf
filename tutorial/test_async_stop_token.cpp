@@ -68,7 +68,7 @@ static void test_get_long_with_stop(int64_t val)
 			int64_t result = co_await async_get_long_with_stop(val);
 			std::cout << result << std::endl;
 		}
-		catch (std::logic_error& e)
+		catch (const std::logic_error& e)
 		{
 			std::cout << e.what() << std::endl;
 		}

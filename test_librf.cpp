@@ -35,7 +35,7 @@ int main(int argc, const char* argv[])
 	(void)argc;
 	(void)argv;
 
-	//resumable_main_stop_token();
+	//resumable_main_mutex();
 	//return 0;
 
 	//if (argc > 1)

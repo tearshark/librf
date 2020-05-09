@@ -164,6 +164,7 @@ namespace resumef
 			template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 			{
+				(void)cb;
 				detail::event_v2_impl* evt = _event;
 				scoped_lock<detail::event_v2_impl::lock_type> lock_(evt->_lock);
 
@@ -267,6 +268,7 @@ namespace resumef
 			template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 			{
+				(void)cb;
 				using ref_lock_type = std::reference_wrapper<detail::event_v2_impl::lock_type>;
 				std::vector<ref_lock_type> lockes;
 				lockes.reserve(std::distance(_begin, _end));
@@ -394,6 +396,7 @@ namespace resumef
 			template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 			{
+				(void)cb;
 				intptr_t count = std::distance(_begin, _end);
 
 				using ref_lock_type = std::reference_wrapper<detail::event_v2_impl::lock_type>;

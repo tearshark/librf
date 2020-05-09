@@ -46,9 +46,7 @@ future_t<> RunEchoSession(tcp::socket socket)
 	std::array<char, BUF_SIZE> buffer;
 	for(;;)
 	{
-#ifndef __clang__
 		try
-#endif
 		{
 			bytes_transferred += co_await socket.async_read_some(asio::buffer(buffer.data() + bytes_transferred, buffer.size() - bytes_transferred), rf_task);
 			if (bytes_transferred >= buffer.size())
@@ -59,13 +57,11 @@ future_t<> RunEchoSession(tcp::socket socket)
 				g_echo_count.fetch_add(1, std::memory_order_release);
 			}
 		}
-#ifndef __clang__
 		catch (std::exception & e)
 		{
 			std::cerr << e.what() << std::endl;
 			break;
 		}
-#endif
 	}
 }
 
@@ -80,19 +76,15 @@ void AcceptConnections(tcp::acceptor & acceptor, uarray<tcp::socket, _N> & socke
 			{
 				for (;;)
 				{
-#ifndef __clang__
 					try
-#endif
 					{
 						co_await acceptor.async_accept(socketes.c[idx], rf_task);
 						go RunEchoSession(std::move(socketes.c[idx]));
 					}
-#ifndef __clang__
 					catch (std::exception & e)
 					{
 						std::cerr << e.what() << std::endl;
 					}
-#endif
 				}
 			};
 		}
@@ -154,9 +146,7 @@ future_t<> RunPipelineEchoClient(asio::io_service & ios, tcp::resolver::iterator
 {
 	std::shared_ptr<tcp::socket> sptr = std::make_shared<tcp::socket>(ios);
 
-#ifndef __clang__
 	try
-#endif
 	{
 		co_await asio::async_connect(*sptr, ep, rf_task);
 
@@ -166,28 +156,22 @@ future_t<> RunPipelineEchoClient(asio::io_service & ios, tcp::resolver::iterator
 			for (auto & c : write_buff_)
 				c = 'A' + rand() % 52;
 
-#ifndef __clang__
 			try
-#endif
 			{
 				for (;;)
 				{
 					co_await asio::async_write(*sptr, asio::buffer(write_buff_), rf_task);
 				}
 			}
-#ifndef __clang__
 			catch (std::exception & e)
 			{
 				std::cerr << e.what() << std::endl;
 			}
-#endif
 		};
 
 		GO
 		{
-#ifndef __clang__
 			try
-#endif
 			{
 				std::array<char, BUF_SIZE> read_buff_;
 				for (;;)
@@ -195,20 +179,16 @@ future_t<> RunPipelineEchoClient(asio::io_service & ios, tcp::resolver::iterator
 					co_await sptr->async_read_some(asio::buffer(read_buff_), rf_task);
 				}
 			}
-#ifndef __clang__
 			catch (std::exception & e)
 			{
 				std::cerr << e.what() << std::endl;
 			}
-#endif
 		};
 	}
-#ifndef __clang__
 	catch (std::exception & e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-#endif
 }
 
 #if _HAS_CXX17
@@ -220,9 +200,7 @@ future_t<> RunPingPongEchoClient(asio::io_service & ios, tcp::resolver::iterator
 	std::array<char, BUF_SIZE> read_buff_;
 	std::array<char, BUF_SIZE> write_buff_;
 
-#ifndef __clang__
 	try
-#endif
 	{
 		co_await asio::async_connect(socket_, ep, rf_task);
 
@@ -237,12 +215,10 @@ future_t<> RunPingPongEchoClient(asio::io_service & ios, tcp::resolver::iterator
 			);
 		}
 	}
-#ifndef __clang__
 	catch (std::exception & e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-#endif
 }
 
 void resumable_main_benchmark_asio_client_with_rf(intptr_t nNum)

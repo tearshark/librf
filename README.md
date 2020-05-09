@@ -5,7 +5,7 @@
 
 支持以下平台和编译器:
 
-	Windows: 使用VS2017/VS2019/clang 9 编译
+	Windows: 使用VS2017/VS2019编译(clang在兼容msvc模式下不支持异常，不再支持clang)
 	Android: 使用NDK 20.1 自带的clang编译
 	Mac: 使用XCode 11.2.1 自带的apple-clang编译
 	Ubuntu: 使用GCC 10.0.1/clang 9 编译（2020-04-18：mutex ranged lock failed）

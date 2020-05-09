@@ -51,14 +51,11 @@ future_t<> test_signal_exception()
 {
 	for (intptr_t i = 10; i >= 0; --i)
 	{
-#ifndef __clang__
 		try
-#endif
 		{
 			auto r = co_await async_signal_exception2(i);
 			std::cout << "result is " << r << std::endl;
 		}
-#ifndef __clang__
 		catch (const std::exception& e)
 		{
 			std::cout << "exception signal : " << e.what() << std::endl;
@@ -67,7 +64,6 @@ future_t<> test_signal_exception()
 		{
 			std::cout << "exception signal : who knows?" << std::endl;
 		}
-#endif
 	}
 }
 

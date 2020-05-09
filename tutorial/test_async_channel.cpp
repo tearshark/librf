@@ -39,9 +39,7 @@ future_t<> test_channel_read(string_channel_t c)
 
 	for (size_t i = 0; i < 10; ++i)
 	{
-#ifndef __clang__
 		try
-#endif
 		{
 			//auto val = co_await c.read();
 			auto val = co_await c;		//第二种从channel读出数据的方法。利用重载operator co_await()，而不是c是一个awaitable_t。
@@ -49,13 +47,11 @@ future_t<> test_channel_read(string_channel_t c)
 			std::cout << val.value << ":";
 			std::cout << std::endl;
 		}
-#ifndef __clang__
 		catch (resumef::channel_exception& e)
 		{
 			//MAX_CHANNEL_QUEUE=0,并且先读后写，会触发read_before_write异常
 			std::cout << e.what() << std::endl;
 		}
-#endif
 
 		co_await sleep_for(50ms);
 	}

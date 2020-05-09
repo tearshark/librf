@@ -210,6 +210,7 @@ namespace resumef
 			template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 			{
+				(void)cb;
 				_PromiseT& promise = handler.promise();
 				auto* parent = promise.get_state();
 				_root = parent->get_root();
