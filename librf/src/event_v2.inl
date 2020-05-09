@@ -173,7 +173,9 @@ namespace resumef
 				_state = new detail::state_event_t(_event);
 				_event = nullptr;
 				(void)_state->on_await_suspend(handler);
-				cb();
+
+				if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
+					cb();
 
 				evt->add_wait_list(_state.get());
 
@@ -183,7 +185,7 @@ namespace resumef
 			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend(coroutine_handle<_PromiseT> handler)
 			{
-				return await_suspend2(handler, []{});
+				return await_suspend2(handler, nullptr);
 			}
 
 			bool await_resume() noexcept
@@ -289,7 +291,9 @@ namespace resumef
 
 				_state = new detail::state_event_t(_event);
 				(void)_state->on_await_suspend(handler);
-				cb();
+				
+				if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
+					cb();
 
 				for (auto iter = _begin; iter != _end; ++iter)
 				{
@@ -303,7 +307,7 @@ namespace resumef
 			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend(coroutine_handle<_PromiseT> handler)
 			{
-				return await_suspend2(handler, []{});
+				return await_suspend2(handler, nullptr);
 			}
 
 			intptr_t await_resume() noexcept
@@ -404,7 +408,9 @@ namespace resumef
 
 				_state = new detail::state_event_all_t(count, _value);
 				(void)_state->on_await_suspend(handler);
-				cb();
+				
+				if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
+					cb();
 
 				batch_lock_t<ref_lock_type> lock_(lockes);
 
@@ -435,7 +441,7 @@ namespace resumef
 			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 			bool await_suspend(coroutine_handle<_PromiseT> handler)
 			{
-				return await_suspend2(handler, []{});
+				return await_suspend2(handler, nullptr);
 			}
 
 			bool await_resume() noexcept

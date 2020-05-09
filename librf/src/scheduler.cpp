@@ -19,6 +19,7 @@ namespace resumef
 		"read_before_write",
 		"timer_canceled",
 		"not_await_lock",
+		"stop_requested",
 	};
 
 	char sz_future_error_buffer[256];

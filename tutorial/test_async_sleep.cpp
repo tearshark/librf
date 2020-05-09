@@ -24,7 +24,7 @@ future_t<> test_sleep_use_timer()
 		co_await sleep_until(system_clock::now() + 200ms);
 		std::cout << "timer after 200ms." << std::endl;
 	}
-	catch (timer_canceled_exception)
+	catch (canceled_exception)
 	{
 		std::cout << "timer canceled." << std::endl;
 	}

@@ -34,6 +34,12 @@ namespace resumef
 	template<class... _Mutexes>
 	using scoped_lock = std::scoped_lock<_Mutexes...>;
 
+	using stop_source = milk::concurrency::stop_source;
+	using stop_token = milk::concurrency::stop_token;
+	template<typename Callback>
+	using stop_callback = milk::concurrency::stop_callback<Callback>;
+	using milk::concurrency::nostopstate;
+
 	/**
 	 * @brief 版本号。
 	 */
@@ -73,6 +79,17 @@ namespace resumef
 		const size_t _ALIGN_REQ = sizeof(void*) * 2;
 		return std::is_empty_v<_Ty> ? 0 :
 			(sizeof(_Ty) + _ALIGN_REQ - 1) & ~(_ALIGN_REQ - 1);
+	}
+
+	template<class _Callable>
+	auto make_stop_callback(const stop_token& token, _Callable&& cb) ->std::unique_ptr<stop_callback<_Callable>>
+	{
+		return std::make_unique<stop_callback<_Callable>>(token, cb);
+	}
+	template<class _Callable>
+	auto make_stop_callback(stop_token&& token, _Callable&& cb) ->std::unique_ptr<stop_callback<_Callable>>
+	{
+		return std::make_unique<stop_callback<_Callable>>(std::move(token), cb);
 	}
 }
 

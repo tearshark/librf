@@ -34,7 +34,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>ClangCL</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -46,7 +46,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>ClangCL</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -213,6 +213,7 @@
     <ClCompile Include="..\tutorial\test_async_resumable.cpp" />
     <ClCompile Include="..\tutorial\test_async_routine.cpp" />
     <ClCompile Include="..\tutorial\test_async_sleep.cpp" />
+    <ClCompile Include="..\tutorial\test_async_stop_token.cpp" />
     <ClCompile Include="..\tutorial\test_async_suspend_always.cpp" />
     <ClCompile Include="..\tutorial\test_async_switch_scheduler.cpp" />
     <ClCompile Include="..\tutorial\test_async_timer.cpp" />
@@ -249,6 +250,7 @@
     <ClInclude Include="..\librf\src\sleep.h" />
     <ClInclude Include="..\librf\src\spinlock.h" />
     <ClInclude Include="..\librf\src\state.h" />
+    <ClInclude Include="..\librf\src\stop_token.hpp" />
     <ClInclude Include="..\librf\src\switch_scheduler.h" />
     <ClInclude Include="..\librf\src\timer.h" />
     <ClInclude Include="..\librf\src\unix\clang_builtin.h" />

@@ -15,6 +15,7 @@ namespace resumef
 		read_before_write,	///< 0容量的channel，先读后写
 		timer_canceled,		///< 定时器被意外取消
 		not_await_lock,		///< 没有在协程中使用co_await等待lock结果
+		stop_requested,		///< stop_source触发了
 
 		max__
 	};
@@ -67,11 +68,11 @@ namespace resumef
 	/**
 	 * @brief 定时器提前取消导致的异常。
 	 */
-	struct timer_canceled_exception : public std::logic_error
+	struct canceled_exception : public std::logic_error
 	{
 		error_code _error;
-		timer_canceled_exception(error_code fe)
-			: logic_error(get_error_string(fe, "timer canceled"))
+		canceled_exception(error_code fe)
+			: logic_error(get_error_string(fe, "canceled_exception"))
 			, _error(fe)
 		{
 		}

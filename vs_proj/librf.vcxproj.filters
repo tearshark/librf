@@ -130,6 +130,9 @@
     <ClCompile Include="..\tutorial\gcc_bugs.cpp">
       <Filter>tutorial</Filter>
     </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_stop_token.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\librf\librf.h">
@@ -251,6 +254,9 @@
     </ClInclude>
     <ClInclude Include="..\asio\asio_task.h">
       <Filter>asio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librf\src\stop_token.hpp">
+      <Filter>librf\src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

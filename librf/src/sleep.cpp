@@ -10,7 +10,7 @@ namespace resumef
 			[awaitable](bool cancellation_requested)
 			{
 				if (cancellation_requested)
-					awaitable.throw_exception(timer_canceled_exception{ error_code::timer_canceled });
+					awaitable.throw_exception(canceled_exception{ error_code::timer_canceled });
 				else
 					awaitable.set_value();
 			});

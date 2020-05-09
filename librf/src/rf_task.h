@@ -19,9 +19,22 @@ namespace resumef
 		task_t();
 		virtual ~task_t();
 
+		/// TODO : 存在BUG(2020/05/09)
+		const stop_source & get_stop_source();
+		/// TODO : 存在BUG(2020/05/09)
+		stop_token get_stop_token()
+		{
+			return get_stop_source().get_token();
+		}
+		/// TODO : 存在BUG(2020/05/09)
+		bool request_stop()
+		{
+			return get_stop_source().request_stop();
+		}
 	protected:
 		friend scheduler_t;
 		counted_ptr<state_base_t> _state;
+		stop_source _stop;
 	};
 #endif
 

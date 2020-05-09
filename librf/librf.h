@@ -38,6 +38,7 @@
 #else
 #include <experimental/coroutine>
 #endif
+#include "src/stop_token.hpp"
 
 #include "src/config.h"
 

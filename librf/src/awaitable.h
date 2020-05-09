@@ -51,6 +51,11 @@ namespace resumef
 			return future_type{ this->_state };
 		}
 
+		explicit operator bool() const noexcept
+		{
+			return _state.get() != nullptr;
+		}
+
 		/**
 		 * @brief 管理的state_t<>对象。
 		 */
