@@ -86,10 +86,10 @@ Public 成员函数</h2></td></tr>
 <tr class="memitem:ae4ef2589ef2ce0335107d579b9e244a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1scheduler__t.html#ae4ef2589ef2ce0335107d579b9e244a8">run_until_notask</a> ()</td></tr>
 <tr class="memdesc:ae4ef2589ef2ce0335107d579b9e244a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">循环运行所有的协程，直到所有协程都运行完成。  <a href="structresumef_1_1scheduler__t.html#ae4ef2589ef2ce0335107d579b9e244a8">更多...</a><br /></td></tr>
 <tr class="separator:ae4ef2589ef2ce0335107d579b9e244a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a449d34ba6a8e28284f2b02089cb7dcec"><td class="memTemplParams" colspan="2">template&lt;class _Ty &gt; </td></tr>
-<tr class="memitem:a449d34ba6a8e28284f2b02089cb7dcec"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1scheduler__t.html#a449d34ba6a8e28284f2b02089cb7dcec">operator+</a> (_Ty &amp;&amp;coro)</td></tr>
-<tr class="memdesc:a449d34ba6a8e28284f2b02089cb7dcec"><td class="mdescLeft">&#160;</td><td class="mdescRight">将一个协程加入到调度器里开始运行。  <a href="structresumef_1_1scheduler__t.html#a449d34ba6a8e28284f2b02089cb7dcec">更多...</a><br /></td></tr>
-<tr class="separator:a449d34ba6a8e28284f2b02089cb7dcec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afac99b67f0686e836fafb1e2f0bd41b7"><td class="memTemplParams" colspan="2">template&lt;class _Ty &gt; </td></tr>
+<tr class="memitem:afac99b67f0686e836fafb1e2f0bd41b7"><td class="memTemplItemLeft" align="right" valign="top">task_t *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structresumef_1_1scheduler__t.html#afac99b67f0686e836fafb1e2f0bd41b7">operator+</a> (_Ty &amp;&amp;coro)</td></tr>
+<tr class="memdesc:afac99b67f0686e836fafb1e2f0bd41b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">将一个协程加入到调度器里开始运行。  <a href="structresumef_1_1scheduler__t.html#afac99b67f0686e836fafb1e2f0bd41b7">更多...</a><br /></td></tr>
+<tr class="separator:afac99b67f0686e836fafb1e2f0bd41b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d22640803eb9397cb844e532f4c8585"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structresumef_1_1scheduler__t.html#a9d22640803eb9397cb844e532f4c8585">empty</a> () const</td></tr>
 <tr class="memdesc:a9d22640803eb9397cb844e532f4c8585"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断所有协程是否运行完毕。  <a href="structresumef_1_1scheduler__t.html#a9d22640803eb9397cb844e532f4c8585">更多...</a><br /></td></tr>
 <tr class="separator:a9d22640803eb9397cb844e532f4c8585"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -138,8 +138,8 @@ Public 成员函数</h2></td></tr>
 
 </div>
 </div>
-<a id="a449d34ba6a8e28284f2b02089cb7dcec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a449d34ba6a8e28284f2b02089cb7dcec">&#9670;&nbsp;</a></span>operator+()</h2>
+<a id="afac99b67f0686e836fafb1e2f0bd41b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afac99b67f0686e836fafb1e2f0bd41b7">&#9670;&nbsp;</a></span>operator+()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -150,7 +150,7 @@ template&lt;class _Ty &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void resumef::scheduler_t::operator+ </td>
+          <td class="memname">task_t* resumef::scheduler_t::operator+ </td>
           <td>(</td>
           <td class="paramtype">_Ty &amp;&amp;&#160;</td>
           <td class="paramname"><em>coro</em></td><td>)</td>
@@ -170,6 +170,13 @@ go用于启动future_t&lt;&gt;/generator_t&lt;&gt;；<br  />
 GO用于启动一个所有变量按值捕获的lambda。 </p><dl class="params"><dt>参数</dt><dd>
   <table class="params">
     <tr><td class="paramname">coro</td><td>协程对象。future_t&lt;&gt;，generator_t&lt;&gt;，或者一个调用后返回future_t&lt;&gt;/generator_t&lt;&gt;的函数对象。 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="retval"><dt>返回值</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">task_t*</td><td>返回代表一个新协程的协程任务类。<br  />
+</td></tr>
   </table>
   </dd>
 </dl>

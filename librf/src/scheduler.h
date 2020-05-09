@@ -13,7 +13,7 @@ namespace resumef
 		using state_sptr = counted_ptr<state_base_t>;
 		using state_vector = std::vector<state_sptr>;
 		using lock_type = spinlock;
-		using task_dictionary_type = std::unordered_map<state_base_t*, std::unique_ptr<task_base_t>>;
+		using task_dictionary_type = std::unordered_map<state_base_t*, std::unique_ptr<task_t>>;
 
 		mutable spinlock _lock_running;
 		state_vector _runing_states;
@@ -24,7 +24,7 @@ namespace resumef
 
 		timer_mgr_ptr _timer;
 
-		void new_task(task_base_t* task);
+		task_t* new_task(task_t* task);
 		//void cancel_all_task_();
 	public:
 		/**
@@ -48,6 +48,7 @@ namespace resumef
 		 * go用于启动future_t<>/generator_t<>；\n
 		 * GO用于启动一个所有变量按值捕获的lambda。
 		 * @param coro 协程对象。future_t<>，generator_t<>，或者一个调用后返回future_t<>/generator_t<>的函数对象。
+		 * @retval task_t* 返回代表一个新协程的协程任务类。\n
 		 */
 		template<class _Ty
 #ifndef DOXYGEN_SKIP_PROPERTY
@@ -57,12 +58,12 @@ namespace resumef
 #ifndef DOXYGEN_SKIP_PROPERTY
 		RESUMEF_REQUIRES(traits::is_callable_v<_Ty> || traits::is_future_v<_Ty> || traits::is_generator_v<_Ty>)
 #endif	//DOXYGEN_SKIP_PROPERTY
-		void operator + (_Ty&& coro)
+		task_t* operator + (_Ty&& coro)
 		{
 			if constexpr (traits::is_callable_v<_Ty>)
-				new_task(new ctx_task_t<_Ty>(coro));
+				return new_task(new task_ctx_impl_t<_Ty>(coro));
 			else
-				new_task(new task_t<_Ty>(coro));
+				return new_task(new task_impl_t<_Ty>(coro));
 		}
 
 		/**
@@ -89,8 +90,9 @@ namespace resumef
 #ifndef DOXYGEN_SKIP_PROPERTY
 		void add_generator(state_base_t* sptr);
 		void del_final(state_base_t* sptr);
-		std::unique_ptr<task_base_t> del_switch(state_base_t* sptr);
-		void add_switch(std::unique_ptr<task_base_t> task);
+		std::unique_ptr<task_t> del_switch(state_base_t* sptr);
+		void add_switch(std::unique_ptr<task_t> task);
+		task_t* find_task(state_base_t* sptr) const noexcept;
 
 		friend struct local_scheduler_t;
 	protected:

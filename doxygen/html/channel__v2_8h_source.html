@@ -76,7 +76,7 @@ $(function() {
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#ifndef DOXYGEN_SKIP_PROPERTY</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace </span>detail</div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;{</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">class</span> _Ty, <span class="keyword">class</span> _Opty&gt;</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">class</span> _Ty, <span class="keywordtype">bool</span> _Optional&gt;</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;    <span class="keyword">struct </span>channel_impl_v2;</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;}   <span class="comment">//namespace detail</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
@@ -103,7 +103,7 @@ $(function() {
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <span class="keyword">template</span>&lt;<span class="keyword">class </span>U</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#ifndef DOXYGEN_SKIP_PROPERTY</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            COMMA_RESUMEF_ENABLE_IF(std::is_constructible_v&lt;value_type, U&amp;&amp;&gt;)</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            COMMA_RESUMEF_ENABLE_IF(std::is_constructible_v&lt;_Ty, U&amp;&amp;&gt;)</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#endif  //DOXYGEN_SKIP_PROPERTY</span></div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        &gt;</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#ifndef DOXYGEN_SKIP_PROPERTY</span></div>
@@ -113,7 +113,7 @@ $(function() {
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keyword">template</span>&lt;<span class="keyword">class </span>U</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor">#ifndef DOXYGEN_SKIP_PROPERTY</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            COMMA_RESUMEF_ENABLE_IF(std::is_constructible_v&lt;value_type, U&amp;&amp;&gt;)</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            COMMA_RESUMEF_ENABLE_IF(std::is_constructible_v&lt;_Ty, U&amp;&amp;&gt;)</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">#endif  //DOXYGEN_SKIP_PROPERTY</span></div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        &gt;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#ifndef DOXYGEN_SKIP_PROPERTY</span></div>
@@ -129,7 +129,7 @@ $(function() {
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keyword">static</span> constexpr <span class="keywordtype">bool</span> optimization_for_multithreading = _OptimizationThread;</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <span class="keyword">using</span> optional_type = std::conditional_t&lt;use_optional, std::optional&lt;value_type&gt;, value_type&gt;;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <span class="keyword">using</span> channel_type = detail::channel_impl_v2&lt;value_type, optional_type&gt;;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <span class="keyword">using</span> channel_type = detail::channel_impl_v2&lt;value_type, use_optional&gt;;</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="keyword">using</span> lock_type = <span class="keyword">typename</span> channel_type::lock_type;</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <a class="code" href="structresumef_1_1channel__t.html">channel_t</a>(<span class="keyword">const</span> <a class="code" href="structresumef_1_1channel__t.html">channel_t</a>&amp;) = <span class="keywordflow">default</span>;</div>

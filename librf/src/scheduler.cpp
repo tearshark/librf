@@ -91,7 +91,7 @@ namespace resumef
 			th_scheduler_ptr = nullptr;
 	}
 
-	void scheduler_t::new_task(task_base_t * task)
+	task_t* scheduler_t::new_task(task_t * task)
 	{
 		state_base_t* sptr = task->_state.get();
 		sptr->set_scheduler(this);
@@ -106,6 +106,8 @@ namespace resumef
 		{
 			add_generator(sptr);
 		}
+
+		return task;
 	}
 
 	void scheduler_t::add_generator(state_base_t* sptr)
@@ -122,11 +124,11 @@ namespace resumef
 		this->_ready_task.erase(sptr);
 	}
 
-	std::unique_ptr<task_base_t> scheduler_t::del_switch(state_base_t* sptr)
+	std::unique_ptr<task_t> scheduler_t::del_switch(state_base_t* sptr)
 	{
 		scoped_lock<spinlock> __guard(_lock_ready);
 	
-		std::unique_ptr<task_base_t> task_ptr;
+		std::unique_ptr<task_t> task_ptr;
 
 		auto iter = this->_ready_task.find(sptr);
 		if (iter != this->_ready_task.end())
@@ -138,12 +140,22 @@ namespace resumef
 		return task_ptr;
 	}
 
-	void scheduler_t::add_switch(std::unique_ptr<task_base_t> task)
+	void scheduler_t::add_switch(std::unique_ptr<task_t> task)
 	{
 		state_base_t* sptr = task->_state.get();
 
 		scoped_lock<spinlock> __guard(_lock_ready);
 		this->_ready_task.emplace(sptr, std::move(task));
+	}
+
+	task_t* scheduler_t::find_task(state_base_t* sptr) const noexcept
+	{
+		scoped_lock<spinlock> __guard(_lock_ready);
+
+		auto iter = this->_ready_task.find(sptr);
+		if (iter != this->_ready_task.end())
+			return iter->second.get();
+		return nullptr;
 	}
 
 /*

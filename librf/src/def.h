@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#define LIB_RESUMEF_VERSION 20908 // 2.9.8
+#define LIB_RESUMEF_VERSION 20909 // 2.9.9
 
 namespace resumef
 {

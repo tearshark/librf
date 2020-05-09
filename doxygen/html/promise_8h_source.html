@@ -101,7 +101,7 @@ $(function() {
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        template &lt;typename _Uty&gt;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        _Uty&amp;&amp; await_transform(_Uty&amp;&amp; _Whatever) noexcept;</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        <span class="keywordtype">void</span> set_exception(std::exception_ptr e);</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#ifdef __clang__</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#if defined(__clang__) || defined(__GNUC__)</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        <span class="keywordtype">void</span> unhandled_exception();     <span class="comment">//If the coroutine ends with an uncaught exception, it performs the following: </span></div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        future_type get_return_object() noexcept;</div>

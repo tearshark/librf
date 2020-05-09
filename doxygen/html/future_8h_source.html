@@ -111,24 +111,6 @@ $(function() {
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        }</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    };</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;}</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#ifndef DOXYGEN_SKIP_PROPERTY</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">namespace </span>std {</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">namespace </span>experimental {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="comment">/*If the coroutine is defined as task&lt;float&gt; foo(std::string x, bool flag);, </span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">        then its Promise type is std::coroutine_traits&lt;task&lt;float&gt;, std::string, bool&gt;::promise_type.</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment">        If the coroutine is a non-static member function, such as task&lt;void&gt; my_class::method1(int x) const;, </span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">        its Promise type is std::coroutine_traits&lt;task&lt;void&gt;, const my_class&amp;, int&gt;::promise_type.</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">        */</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keyword">template</span> &lt;<span class="keyword">typename</span> _Ty, <span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keyword">struct </span>coroutine_traits&lt;resumef::future_t&lt;_Ty&gt;, Args...&gt;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        {</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            <span class="keyword">typedef</span> resumef::promise_t&lt;_Ty&gt; promise_type;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        };</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    }</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;} <span class="comment">// namespace std::experimental</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#endif  //DOXYGEN_SKIP_PROPERTY</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="astructresumef_1_1future__t_html"><div class="ttname"><a href="structresumef_1_1future__t.html">resumef::future_t</a></div><div class="ttdoc">用于resumef协程的返回值。</div><div class="ttdef"><b>Definition:</b> future.h:14</div></div>
 <div class="ttc" id="astructresumef_1_1counted__ptr_html"><div class="ttname"><a href="structresumef_1_1counted__ptr.html">resumef::counted_ptr&lt; state_type &gt;</a></div></div>

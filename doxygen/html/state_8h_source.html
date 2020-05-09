@@ -212,10 +212,10 @@ $(function() {
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;            <span class="comment">//msvc认为是constexpr表达式(不写还给警告)，然而，clang不这么认为。</span></div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;            <span class="comment">//放弃constexpr，反正合格的编译器都会优化掉这个if判断的。</span></div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;            <span class="keywordflow">if</span> </div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="preprocessor">#ifndef __clang__</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="preprocessor">#if defined(_MSC_VER) &amp;&amp; !defined(__clang__) &amp;&amp; !defined(__GNUC__)</span></div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;                constexpr</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;                (offsetof(<a class="code" href="structresumef_1_1state__future__t.html">state_future_t</a>, _is_future) - offsetof(<a class="code" href="structresumef_1_1state__future__t.html">state_future_t</a>, _has_value) == 1)</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;                (_offset_of(<a class="code" href="structresumef_1_1state__future__t.html">state_future_t</a>, _is_future) - _offset_of(<a class="code" href="structresumef_1_1state__future__t.html">state_future_t</a>, _has_value) == 1)</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;                <span class="keywordflow">return</span> 0 != <span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span>std::atomic&lt;uint16_t&gt; &amp;<span class="keyword">&gt;</span>(_has_value).load(std::memory_order_acquire);</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;            <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;                <span class="keywordflow">return</span> _has_value.load(std::memory_order_acquire) != result_type::None || _is_future;</div>

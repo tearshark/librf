@@ -20,6 +20,9 @@
     <Filter Include="benchmark">
       <UniqueIdentifier>{0fd1274a-193b-4d6a-b19e-58db935ed5c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="asio">
+      <UniqueIdentifier>{8b54e700-2c12-4fb3-b7b5-19502aa09f6a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\librf\src\rf_task.cpp">
@@ -135,9 +138,6 @@
     <ClInclude Include="..\librf\src\_awaker.h">
       <Filter>librf\src</Filter>
     </ClInclude>
-    <ClInclude Include="..\librf\src\asio_task.h">
-      <Filter>librf\src</Filter>
-    </ClInclude>
     <ClInclude Include="..\librf\src\channel.h">
       <Filter>librf\src</Filter>
     </ClInclude>
@@ -249,14 +249,11 @@
     <ClInclude Include="..\librf\src\unix\gcc_builtin.h">
       <Filter>librf\src\unix</Filter>
     </ClInclude>
+    <ClInclude Include="..\asio\asio_task.h">
+      <Filter>asio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\librf\src\asio_task_1.12.0.inl">
-      <Filter>librf\src</Filter>
-    </None>
-    <None Include="..\librf\src\asio_task_1.10.0.inl">
-      <Filter>librf\src</Filter>
-    </None>
     <None Include="..\librf\src\promise.inl">
       <Filter>librf\src</Filter>
     </None>
@@ -289,5 +286,11 @@
       <Filter>librf\src</Filter>
     </None>
     <None Include="..\config.h.in" />
+    <None Include="..\asio\asio_task_1.10.0.inl">
+      <Filter>asio</Filter>
+    </None>
+    <None Include="..\asio\asio_task_1.12.0.inl">
+      <Filter>asio</Filter>
+    </None>
   </ItemGroup>
 </Project>

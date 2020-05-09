@@ -1,6 +1,4 @@
-﻿
-#include "future.h"
-#include <memory>
+﻿#include <memory>
 
 #include "asio/detail/push_options.hpp"
 

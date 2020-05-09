@@ -2,7 +2,12 @@
 
 namespace resumef
 {
-	task_base_t::~task_base_t()
+	task_t::task_t()
+	{
+
+	}
+
+	task_t::~task_t()
 	{
 	}
 }
