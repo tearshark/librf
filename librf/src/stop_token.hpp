@@ -4,6 +4,8 @@
 * @ V1.0
 *************************************************/
 
+//librf注：暂时使用一个网友提供的stop_token实现。
+//等待C++20的stop_token被各个编译器都实现后，再使用STL里的stop_token来完成对应功能。
 #pragma once
 
 namespace milk
@@ -123,7 +125,6 @@ struct stop_state
     {
         if (state_.fetch_sub(klockAndTokenRefIncrement, std::memory_order_acq_rel) < kLockedAndZeroRef)
         {
-			clear_callback();
             delete this;
         }
     }
@@ -139,7 +140,6 @@ public:
         auto old_state = state_.fetch_sub(kTokenRefIncrement, std::memory_order_acq_rel);
         if (old_state < kZeroRef)
         {
-			clear_callback();
             delete this;
         }
     }
@@ -154,7 +154,6 @@ public:
         auto old_state = state_.fetch_sub(kSourceRefIncrement, std::memory_order_acq_rel);
         if (old_state < kZeroRef)
         {
-            clear_callback();
             delete this;
         }
     }
@@ -284,22 +283,6 @@ __check_state:
             }
         }
         remove_token_reference();
-    }
-
-    void clear_callback() noexcept
-    {
-		lock();
-        stop_callback_base* cb = head_;
-        head_ = nullptr;
-
-        while (cb)
-        {
-            stop_callback_base* tmp = cb->next;
-            cb->prev = nullptr;
-            cb->next = nullptr;
-            cb = tmp;
-        }
-        unlock();
     }
 
 };
@@ -474,14 +457,18 @@ public:
         return state_ != nullptr;
     }
 
-	void make_possible()
+	void make_sure_possible()
 	{
         if (state_ == nullptr)
         {
             details::stop_state* st = new details::stop_state();
             details::stop_state* tmp = nullptr;
             if (!std::atomic_compare_exchange_strong_explicit(
-                reinterpret_cast<std::atomic<details::stop_state*>*>(&state_), &tmp, st, std::memory_order_release, std::memory_order_acquire))
+                reinterpret_cast<std::atomic<details::stop_state*>*>(&state_),
+                &tmp, 
+                st, 
+                std::memory_order_release, 
+                std::memory_order_acquire))
             {
                 st->remove_source_reference();
             }
@@ -501,14 +488,6 @@ public:
     stop_token get_token() const noexcept
     {
         return stop_token{state_};
-    }
-
-    void clear_callback() const noexcept
-    {
-		if (state_)
-		{
-			state_->clear_callback();
-		}
     }
 
     void swap(stop_source& other) noexcept

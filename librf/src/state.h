@@ -11,7 +11,7 @@ namespace resumef
 	private:
 		std::atomic<intptr_t> _count{0};
 	public:
-		void lock()
+		void lock() noexcept
 		{
 			++_count;
 		}
@@ -38,16 +38,16 @@ namespace resumef
 		virtual bool has_handler() const  noexcept = 0;
 		virtual state_base_t* get_parent() const noexcept;
 
-		void set_scheduler(scheduler_t* sch)
+		void set_scheduler(scheduler_t* sch) noexcept
 		{
 			_scheduler = sch;
 		}
-		coroutine_handle<> get_handler() const
+		coroutine_handle<> get_handler() const noexcept
 		{
 			return _coro;
 		}
 
-		state_base_t* get_root() const noexcept
+		state_base_t* get_root() const
 		{
 			state_base_t* root = const_cast<state_base_t*>(this);
 			state_base_t* next = root->get_parent();
@@ -78,7 +78,7 @@ namespace resumef
 
 		bool switch_scheduler_await_suspend(scheduler_t* sch);
 
-		void set_initial_suspend(coroutine_handle<> handler)
+		void set_initial_suspend(coroutine_handle<> handler) noexcept
 		{
 			_coro = handler;
 		}
@@ -131,7 +131,7 @@ namespace resumef
 		static_assert(sizeof(std::atomic<initor_type>) == 1);
 		static_assert(alignof(std::atomic<initor_type>) == 1);
 	protected:
-		explicit state_future_t(bool awaitor)
+		explicit state_future_t(bool awaitor) noexcept
 		{
 #if RESUMEF_DEBUG_COUNTER
 			_id = ++g_resumef_state_id;
@@ -169,7 +169,7 @@ namespace resumef
 			return _alloc_size;
 		}
 
-		inline bool future_await_ready() noexcept
+		inline bool future_await_ready() const noexcept
 		{
 			//scoped_lock<lock_type> __guard(this->_mtx);
 			return _has_value.load(std::memory_order_acquire) != result_type::None;
@@ -221,7 +221,7 @@ namespace resumef
 		using state_future_t::lock_type;
 		using value_type = _Ty;
 	private:
-		explicit state_t(bool awaitor) :state_future_t(awaitor) {}
+		explicit state_t(bool awaitor) noexcept :state_future_t(awaitor) {}
 	public:
 		~state_t()
 		{
@@ -273,7 +273,7 @@ namespace resumef
 		using value_type = _Ty;
 		using reference_type = _Ty&;
 	private:
-		explicit state_t(bool awaitor) :state_future_t(awaitor) {}
+		explicit state_t(bool awaitor) noexcept :state_future_t(awaitor) {}
 	public:
 		~state_t()
 		{
@@ -310,7 +310,7 @@ namespace resumef
 		friend state_future_t;
 		using state_future_t::lock_type;
 	private:
-		explicit state_t(bool awaitor) :state_future_t(awaitor) {}
+		explicit state_t(bool awaitor) noexcept :state_future_t(awaitor) {}
 	public:
 		void future_await_resume();
 		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>

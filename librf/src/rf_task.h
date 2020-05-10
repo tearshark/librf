@@ -19,17 +19,39 @@ namespace resumef
 		task_t();
 		virtual ~task_t();
 
-		/// TODO : 存在BUG(2020/05/09)
+		/**
+		 * @brief 获取stop_source，第一次获取时，会生成一个有效的stop_source。
+		 * @return stop_source
+		 */
 		const stop_source & get_stop_source();
-		/// TODO : 存在BUG(2020/05/09)
+
+		/**
+		 * @brief 获取一个跟stop_source绑定的，新的stop_token。
+		 * @return stop_token
+		 */
 		stop_token get_stop_token()
 		{
 			return get_stop_source().get_token();
 		}
-		/// TODO : 存在BUG(2020/05/09)
+
+		/**
+		 * @brief 要求停止协程。
+		 * @return bool 返回操作成功与否。
+		 */
 		bool request_stop()
 		{
 			return get_stop_source().request_stop();
+		}
+
+		/**
+		 * @brief 要求停止协程。
+		 * @return bool 返回操作成功与否。
+		 */
+		bool request_stop_if_possible()
+		{
+			if (_stop.stop_possible())
+				return _stop.request_stop();
+			return false;
 		}
 	protected:
 		friend scheduler_t;

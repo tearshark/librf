@@ -30,8 +30,8 @@ namespace resumef
 		 */
 		void set_exception(std::exception_ptr e) const
 		{
-			this->_state->set_exception(std::move(e));
-			this->_state = nullptr;
+			counted_ptr<state_type> cp(std::move(this->_state));
+			cp->set_exception(std::move(e));
 		}
 
 		/**
@@ -82,6 +82,7 @@ namespace resumef
 	struct [[nodiscard]] awaitable_t : public awaitable_impl_t<_Ty>
 	{
 		using typename awaitable_impl_t<_Ty>::value_type;
+		using typename awaitable_impl_t<_Ty>::state_type;
 		using awaitable_impl_t<_Ty>::awaitable_impl_t;
 
 		/**
@@ -93,8 +94,8 @@ namespace resumef
 		template<class U>
 		void set_value(U&& value) const
 		{
-			this->_state->set_value(std::forward<U>(value));
-			this->_state = nullptr;
+			counted_ptr<state_type> cp(std::move(this->_state));
+			cp->set_value(std::forward<U>(value));
 		}
 	};
 
@@ -103,24 +104,26 @@ namespace resumef
 	struct [[nodiscard]] awaitable_t<_Ty&> : public awaitable_impl_t<_Ty&>
 	{
 		using typename awaitable_impl_t<_Ty&>::value_type;
+		using typename awaitable_impl_t<_Ty&>::state_type;
 		using awaitable_impl_t<_Ty&>::awaitable_impl_t;
 
 		void set_value(_Ty& value) const
 		{
-			this->_state->set_value(value);
-			this->_state = nullptr;
+			counted_ptr<state_type> cp(std::move(this->_state));
+			cp->set_value(value);
 		}
 	};
 
 	template<>
 	struct [[nodiscard]] awaitable_t<void> : public awaitable_impl_t<void>
 	{
+		using awaitable_impl_t<void>::state_type;
 		using awaitable_impl_t<void>::awaitable_impl_t;
 
 		void set_value() const
 		{
-			this->_state->set_value();
-			this->_state = nullptr;
+			counted_ptr<state_type> cp(std::move(this->_state));
+			cp->set_value();
 		}
 	};
 #endif	//DOXYGEN_SKIP_PROPERTY

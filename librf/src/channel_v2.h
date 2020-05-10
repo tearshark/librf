@@ -70,7 +70,7 @@ inline namespace channel_v2
 #ifndef DOXYGEN_SKIP_PROPERTY
 		RESUMEF_REQUIRES(std::is_constructible_v<_Ty, U&&>)
 #endif	//DOXYGEN_SKIP_PROPERTY
-		write_awaiter operator << (U&& val) const noexcept(std::is_move_constructible_v<U>);
+		write_awaiter operator << (U&& val) const noexcept(std::is_nothrow_move_constructible_v<U>);
 
 		/**
 		 * @brief 在协程中向channel_t里写入一个数据。
@@ -87,7 +87,7 @@ inline namespace channel_v2
 #ifndef DOXYGEN_SKIP_PROPERTY
 		RESUMEF_REQUIRES(std::is_constructible_v<_Ty, U&&>)
 #endif	//DOXYGEN_SKIP_PROPERTY
-		write_awaiter write(U&& val) const noexcept(std::is_move_constructible_v<U>);
+		write_awaiter write(U&& val) const noexcept(std::is_nothrow_move_constructible_v<U>);
 
 
 #ifndef DOXYGEN_SKIP_PROPERTY

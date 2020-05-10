@@ -8,8 +8,8 @@
 using namespace resumef;
 using namespace std::chrono;
 
-//token触发停止后，将不再调用cb
-template<class _Ctype>
+//_Ctype签名:void(bool, int64_t)
+template<class _Ctype, typename=std::enable_if_t<std::is_invocable_v<_Ctype, bool, int64_t>>>
 static void callback_get_long_with_stop(stop_token token, int64_t val, _Ctype&& cb)
 {
 	std::thread([val, token = std::move(token), cb = std::forward<_Ctype>(cb)]
@@ -17,11 +17,17 @@ static void callback_get_long_with_stop(stop_token token, int64_t val, _Ctype&& 
 			for (int i = 0; i < 10; ++i)
 			{
 				if (token.stop_requested())
+				{
+					cb(false, 0);
 					return;
+				}
 				std::this_thread::sleep_for(10ms);
 			}
 
-			cb(val * val);
+			//有可能未检测到token的停止要求
+			//如果使用stop_callback来停止，则务必保证检测到的退出要求是唯一的，且线程安全的
+			//否则，多次调用cb，会导致协程在半退出状态下，外部的awaitable_t管理的state获取跟root出现错误。
+			cb(true, val * val);
 		}).detach();
 }
 
@@ -29,24 +35,18 @@ static void callback_get_long_with_stop(stop_token token, int64_t val, _Ctype&& 
 static future_t<int64_t> async_get_long_with_stop(stop_token token, int64_t val)
 {
 	awaitable_t<int64_t> awaitable;
-	
-	//保证stopptr的生存期，与callback_get_long_with_cancel()的回调参数的生存期一致。
-	//如果token已经被取消，则传入的lambda会立即被调用，则awaitable将不能再set_value
-	auto stopptr = make_stop_callback(token, [awaitable]
+
+	//在这里通过stop_callback来处理退出，并将退出转化为error_code::stop_requested异常。
+	//则必然会存在线程竞争问题，导致协程提前于callback_get_long_with_stop的回调之前而退出。
+	//同时，callback_get_long_with_stop还未必一定能检测到退出要求----毕竟只是一个要求，而不是强制。
+
+	callback_get_long_with_stop(token, val, [awaitable](bool ok, int64_t val)
 	{
-		if (awaitable)
-			awaitable.throw_exception(canceled_exception(error_code::stop_requested));
+		if (ok)
+			awaitable.set_value(val);
+		else
+			awaitable.throw_exception(canceled_exception{error_code::stop_requested});
 	});
-
-	if (awaitable)	//处理已经被取消的情况
-	{
-		callback_get_long_with_stop(token, val, [awaitable, stopptr = std::move(stopptr)](int64_t val)
-		{
-			if (awaitable)
-				awaitable.set_value(val);
-		});
-	}
-
 	return awaitable.get_future();
 }
 
@@ -92,4 +92,6 @@ void resumable_main_stop_token()
 	srand((int)time(nullptr));
 	for (int i = 0; i < 10; ++i)
 		test_get_long_with_stop(i);
+
+	std::cout << "OK - stop_token!" << std::endl;
 }

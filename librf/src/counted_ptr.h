@@ -16,7 +16,7 @@ namespace resumef
 		/**
 		 * @brief 拷贝构造函数。
 		 */
-		counted_ptr(const counted_ptr& cp) : _p(cp._p)
+		counted_ptr(const counted_ptr& cp) noexcept : _p(cp._p)
 		{
 			_lock();
 		}
@@ -24,7 +24,7 @@ namespace resumef
 		/**
 		 * @brief 通过裸指针构造一个计数指针。
 		 */
-		counted_ptr(T* p) : _p(p)
+		counted_ptr(T* p) noexcept : _p(p)
 		{
 			_lock();
 		}
@@ -32,9 +32,8 @@ namespace resumef
 		/**
 		 * @brief 移动构造函数。
 		 */
-		counted_ptr(counted_ptr&& cp) noexcept
+		counted_ptr(counted_ptr&& cp) noexcept : _p(std::exchange(cp._p, nullptr))
 		{
-			std::swap(_p, cp._p);
 		}
 
 		/**
@@ -44,7 +43,7 @@ namespace resumef
 		{
 			if (&cp != this)
 			{
-				counted_ptr t = cp;
+				counted_ptr t(cp);
 				std::swap(_p, t._p);
 			}
 			return *this;
@@ -53,11 +52,19 @@ namespace resumef
 		/**
 		 * @brief 移动赋值函数。
 		 */
-		counted_ptr& operator=(counted_ptr&& cp) noexcept
+		counted_ptr& operator=(counted_ptr&& cp)
 		{
 			if (&cp != this)
+			{
 				std::swap(_p, cp._p);
+				cp._unlock();
+			}
 			return *this;
+		}
+
+		void swap(counted_ptr& cp) noexcept
+		{
+			std::swap(_p, cp._p);
 		}
 
 		/**
@@ -101,13 +108,13 @@ namespace resumef
 				t->unlock();
 			}
 		}
-		void _lock(T* p)
+		void _lock(T* p) noexcept
 		{
 			if (p != nullptr)
 				p->lock();
 			_p = p;
 		}
-		void _lock()
+		void _lock() noexcept
 		{
 			if (_p != nullptr)
 				_p->lock();
@@ -142,3 +149,11 @@ namespace resumef
 	}
 }
 
+namespace std
+{
+	template<typename T>
+	inline void swap(resumef::counted_ptr<T>& a, resumef::counted_ptr<T>& b) noexcept
+	{
+		a.swap(b);
+	}
+}

@@ -35,7 +35,7 @@ int main(int argc, const char* argv[])
 	(void)argc;
 	(void)argv;
 
-	//resumable_main_mutex();
+	//resumable_main_stop_token();
 	//return 0;
 
 	//if (argc > 1)
@@ -64,7 +64,7 @@ int main(int argc, const char* argv[])
 	resumable_main_sleep();
 	resumable_main_when_all();
 	resumable_main_switch_scheduler();
-	//resumable_main_stop_token();
+	resumable_main_stop_token();
 	std::cout << "ALL OK!" << std::endl;
 
 	benchmark_main_channel_passing_next();	//这是一个死循环测试
