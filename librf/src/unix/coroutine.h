@@ -116,11 +116,23 @@ namespace std {
 		};
 
 		// 17.12.3.6, comparison operators
-		constexpr bool operator==(coroutine_handle<> __x, coroutine_handle<> __y) noexcept {
+		inline bool operator==(coroutine_handle<> __x, coroutine_handle<> __y) noexcept {
 			return __x.address() == __y.address();
 		}
-		constexpr strong_ordering operator<=>(coroutine_handle<> __x, coroutine_handle<> __y) noexcept {
-			return __x.address() <=> __y.address();
+		inline bool operator!=(coroutine_handle<> __x, coroutine_handle<> __y) noexcept {
+			return __x.address() != __y.address();
+		}
+		inline bool operator<(coroutine_handle<> __x, coroutine_handle<> __y) noexcept {
+			return __x.address() < __y.address();
+		}
+		inline bool operator>(coroutine_handle<> __x, coroutine_handle<> __y) noexcept {
+			return __x.address() > __y.address();
+		}
+		inline bool operator<=(coroutine_handle<> __x, coroutine_handle<> __y) noexcept {
+			return __x.address() <= __y.address();
+		}
+		inline bool operator>=(coroutine_handle<> __x, coroutine_handle<> __y) noexcept {
+			return __x.address() >= __y.address();
 		}
 
 		template <typename _Promise>
