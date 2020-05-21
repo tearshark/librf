@@ -133,6 +133,9 @@
     <ClCompile Include="..\tutorial\test_async_stop_token.cpp">
       <Filter>tutorial</Filter>
     </ClCompile>
+    <ClCompile Include="..\tutorial\test_async_cinatra_client.cpp">
+      <Filter>tutorial</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\librf\librf.h">

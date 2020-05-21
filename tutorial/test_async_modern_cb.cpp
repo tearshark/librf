@@ -1,5 +1,5 @@
-﻿//依赖 https://github.com/tearshark/modern_cb.git 项目
-//依赖 https://github.com/tearshark/librf.git 项目
+﻿//依赖 https://github.com/tearshark/modern_cb 项目
+//依赖 https://github.com/tearshark/librf 项目
 
 #include <future>
 #include <string>

@@ -29,13 +29,14 @@ extern void benchmark_main_channel_passing_next();
 extern void resumable_main_benchmark_asio_server();
 extern void resumable_main_benchmark_asio_client(intptr_t nNum);
 
+extern void test_async_cinatra_client();
 
 int main(int argc, const char* argv[])
 {
 	(void)argc;
 	(void)argv;
 
-	//resumable_main_stop_token();
+	//test_async_cinatra_client();
 	//return 0;
 
 	//if (argc > 1)
