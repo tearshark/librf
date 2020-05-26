@@ -190,6 +190,12 @@
     </ClCompile>
     <ClCompile Include="..\benchmark\benchmark_async_mem.cpp" />
     <ClCompile Include="..\benchmark\benchmark_channel_passing_next.cpp" />
+    <ClCompile Include="..\benchmark\test_async_cinatra_client.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\librf\src\event_v1.cpp" />
     <ClCompile Include="..\librf\src\event_v2.cpp" />
     <ClCompile Include="..\librf\src\mutex_v1.cpp" />
@@ -205,12 +211,6 @@
     <ClCompile Include="..\tutorial\test_async_cb.cpp" />
     <ClCompile Include="..\tutorial\test_async_channel.cpp" />
     <ClCompile Include="..\tutorial\test_async_channel_mult_thread.cpp" />
-    <ClCompile Include="..\tutorial\test_async_cinatra_client.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\tutorial\test_async_dynamic_go.cpp" />
     <ClCompile Include="..\tutorial\test_async_event.cpp" />
     <ClCompile Include="..\tutorial\test_async_event_timeout.cpp" />
