@@ -151,6 +151,7 @@ static void example_librf()
 
 void resumable_main_modern_cb()
 {
+	std::cout << __FUNCTION__ << std::endl;
 	example_future();
 	example_librf();
 }

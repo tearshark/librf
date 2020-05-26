@@ -9,7 +9,7 @@ extern void resumable_main_sleep();
 extern void resumable_main_routine();
 extern void resumable_main_resumable();
 extern void resumable_main_mutex();
-extern void resumable_main_exception();
+extern void resumable_main_exception(bool bomb);
 extern void resumable_main_event();
 extern void resumable_main_event_v2();
 extern void resumable_main_event_timeout();
@@ -36,8 +36,8 @@ int main(int argc, const char* argv[])
 	(void)argc;
 	(void)argv;
 
-	//test_async_cinatra_client();
-	//return 0;
+	resumable_main_exception(false);
+	return 0;
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
@@ -51,7 +51,7 @@ int main(int argc, const char* argv[])
 	resumable_main_yield_return();
 	resumable_main_resumable();
 	resumable_main_routine();
-	resumable_main_exception();
+	resumable_main_exception(false);
 	resumable_main_dynamic_go();
 	resumable_main_multi_thread();
 	resumable_main_timer();

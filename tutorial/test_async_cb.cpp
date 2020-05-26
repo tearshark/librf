@@ -83,6 +83,7 @@ static future_t<std::string&> resumable_get_string(std::string& val)
 
 void resumable_main_cb()
 {
+	std::cout << __FUNCTION__ << std::endl;
 	//由于使用者可能不能明确的区分是resume function返回的awaitor还是awaitable function返回的awaitor
 	//导致均有可能加入到协程里去调度。
 	//所以，协程调度器应该需要能处理这种情况。

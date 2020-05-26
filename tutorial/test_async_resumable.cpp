@@ -53,6 +53,7 @@ void resumable_switch(intptr_t coro, size_t idx)
 
 void resumable_main_resumable()
 {
+	std::cout << __FUNCTION__ << std::endl;
 	resumable_switch(1, 99);
 
 	resumable_switch(1, 0);

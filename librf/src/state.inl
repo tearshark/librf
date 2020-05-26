@@ -111,7 +111,7 @@ namespace resumef
 			std::rethrow_exception(std::make_exception_ptr(future_exception{ error_code::not_ready }));
 			break;
 		case result_type::Exception:
-			std::rethrow_exception(std::move(this->_exception));
+			std::rethrow_exception(std::exchange(this->_exception, nullptr));
 			break;
 		default:
 			break;
