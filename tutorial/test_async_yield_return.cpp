@@ -73,6 +73,7 @@ auto test_yield_future() -> future_t<int64_t>
 
 void resumable_main_yield_return()
 {
+	std::cout << __FUNCTION__ << std::endl;
 	for (int i : test_yield_int())
 	{
 		std::cout << i << " had return" << std::endl;

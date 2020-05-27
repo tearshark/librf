@@ -50,6 +50,7 @@ future_t<> test_recursive_go()
 
 void resumable_main_suspend_always()
 {
+	std::cout << __FUNCTION__ << std::endl;
 	go test_recursive_await();
 	go test_recursive_go();
 	this_scheduler()->run_until_notask();

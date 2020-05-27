@@ -56,9 +56,9 @@ future_t<> test_signal_exception()
 			auto r = co_await async_signal_exception2(i);
 			std::cout << "result is " << r << std::endl;
 		}
-		catch (const std::exception& e)
+		catch (const std::exception& ex)
 		{
-			std::cout << "exception signal : " << e.what() << std::endl;
+			std::cout << "exception signal : " << ex.what() << std::endl;
 		}
 		catch (...)
 		{
@@ -76,13 +76,16 @@ future_t<> test_bomb_exception()
 	}
 }
 
-void resumable_main_exception()
+void resumable_main_exception(bool bomb)
 {
+	std::cout << __FUNCTION__ << std::endl;
 	go test_signal_exception();
 	this_scheduler()->run_until_notask();
 
 	std::cout << std::endl;
-
-	go test_bomb_exception();
-	this_scheduler()->run_until_notask();
+	if (bomb)
+	{
+		go test_bomb_exception();
+		this_scheduler()->run_until_notask();
+	}
 }

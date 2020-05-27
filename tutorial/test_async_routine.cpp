@@ -36,6 +36,7 @@ future_t<> test_routine_use_timer_2()
 
 void resumable_main_routine()
 {
+	std::cout << __FUNCTION__ << std::endl;
 	//go test_routine_use_timer_2();
 #ifndef __GNUC__	//GCC: 没有提供__builtin_coro_frame这样的内置函数
 	go test_routine_use_timer();
