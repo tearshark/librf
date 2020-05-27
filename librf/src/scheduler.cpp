@@ -175,14 +175,14 @@ namespace resumef
 	}
 */
 
-	void scheduler_t::run_one_batch()
+	bool scheduler_t::run_one_batch()
 	{
 		this->_timer->update();
 
 		{
 			scoped_lock<spinlock> __guard(_lock_running);
 			if (_runing_states.empty())
-				return;
+				return false;
 
 			std::swap(_cached_states, _runing_states);
 		}
@@ -191,15 +191,26 @@ namespace resumef
 			sptr->resume();
 
 		_cached_states.clear();
+		return true;
 	}
 
 	void scheduler_t::run_until_notask()
 	{
-		while (!this->empty())
+		for(;;)
 		{
-			this->run_one_batch();
-			std::this_thread::yield();
-		}
+			//介于网上有人做评测，导致单协程切换数据很难看，那就注释掉吧。
+			//std::this_thread::yield();
+
+			if (this->run_one_batch()) continue;	//当前运行了一个state，则认为还可能有任务未完成
+
+			{
+				scoped_lock<spinlock> __guard(_lock_ready);
+				if (!_ready_task.empty()) continue;	//当前还存在task，则必然还有任务未完成
+			}
+			if (!_timer->empty()) continue;			//定时器不为空，也需要等待定时器触发
+
+			break;
+		};
 	}
 
 	scheduler_t scheduler_t::g_scheduler;

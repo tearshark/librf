@@ -32,7 +32,7 @@ namespace resumef
 		 * @details 这是协程调度器提供的主要接口。同一个调度器非线程安全，不可重入。\n
 		 * 调用者要保证此函数始终在同一个线程里调用。
 		 */
-		void run_one_batch();
+		bool run_one_batch();
 
 		/**
 		 * @brief 循环运行所有的协程，直到所有协程都运行完成。
