@@ -98,7 +98,9 @@ namespace resumef
 		sptr->set_scheduler(this);
 
 		{
+#if !RESUMEF_DISABLE_MULT_THREAD
 			scoped_lock<spinlock> __guard(_lock_ready);
+#endif
 			_ready_task.emplace(sptr, task);
 		}
 
@@ -115,19 +117,25 @@ namespace resumef
 	{
 		assert(sptr != nullptr);
 
+#if !RESUMEF_DISABLE_MULT_THREAD
 		scoped_lock<spinlock> __guard(_lock_running);
+#endif
 		_runing_states.emplace_back(sptr);
 	}
 
 	void scheduler_t::del_final(state_base_t* sptr)
 	{
+#if !RESUMEF_DISABLE_MULT_THREAD
 		scoped_lock<spinlock> __guard(_lock_ready);
+#endif
 		this->_ready_task.erase(sptr);
 	}
 
 	std::unique_ptr<task_t> scheduler_t::del_switch(state_base_t* sptr)
 	{
+#if !RESUMEF_DISABLE_MULT_THREAD
 		scoped_lock<spinlock> __guard(_lock_ready);
+#endif
 	
 		std::unique_ptr<task_t> task_ptr;
 
@@ -145,13 +153,17 @@ namespace resumef
 	{
 		state_base_t* sptr = task->_state.get();
 
+#if !RESUMEF_DISABLE_MULT_THREAD
 		scoped_lock<spinlock> __guard(_lock_ready);
+#endif
 		this->_ready_task.emplace(sptr, std::move(task));
 	}
 
 	task_t* scheduler_t::find_task(state_base_t* sptr) const noexcept
 	{
+#if !RESUMEF_DISABLE_MULT_THREAD
 		scoped_lock<spinlock> __guard(_lock_ready);
+#endif
 
 		auto iter = this->_ready_task.find(sptr);
 		if (iter != this->_ready_task.end())
@@ -180,7 +192,9 @@ namespace resumef
 		this->_timer->update();
 
 		{
+#if !RESUMEF_DISABLE_MULT_THREAD
 			scoped_lock<spinlock> __guard(_lock_running);
+#endif
 			if (_runing_states.empty())
 				return false;
 
@@ -204,7 +218,9 @@ namespace resumef
 			if (this->run_one_batch()) continue;	//当前运行了一个state，则认为还可能有任务未完成
 
 			{
+#if !RESUMEF_DISABLE_MULT_THREAD
 				scoped_lock<spinlock> __guard(_lock_ready);
+#endif
 				if (!_ready_task.empty()) continue;	//当前还存在task，则必然还有任务未完成
 			}
 			if (!_timer->empty()) continue;			//定时器不为空，也需要等待定时器触发

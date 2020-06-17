@@ -50,6 +50,7 @@ endif()
 
 option(OPT_DEBUG_COUNTER "Debug objects count" OFF)
 option(OPT_KEEP_REAL_SIZE "Keep real size in queue" OFF)
+option(OPT_DISABLE_MULT_THREAD "Disable multi-threaded scheduler" OFF)
 
 #set(RESUMEF_USE_CUSTOM_SPINLOCK "std::mutex")
 
@@ -64,6 +65,9 @@ if(OPT_USE_CONCEPT)
 endif()
 if(OPT_KEEP_REAL_SIZE)
 	set(_WITH_LOCK_FREE_Q_KEEP_REAL_SIZE 1)
+endif()
+if(OPT_DISABLE_MULT_THREAD)
+	set(RESUMEF_DISABLE_MULT_THREAD 1)
 endif()
 
 configure_file(

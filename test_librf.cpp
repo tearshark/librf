@@ -36,8 +36,8 @@ int main(int argc, const char* argv[])
 	(void)argc;
 	(void)argv;
 
-	//resumable_main_exception(false);
-	//return 0;
+	resumable_main_resumable();
+	return 0;
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));

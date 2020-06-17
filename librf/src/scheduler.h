@@ -15,11 +15,15 @@ namespace resumef
 		using lock_type = spinlock;
 		using task_dictionary_type = std::unordered_map<state_base_t*, std::unique_ptr<task_t>>;
 
+#if !RESUMEF_DISABLE_MULT_THREAD
 		mutable spinlock _lock_running;
+#endif
 		state_vector _runing_states;
 		state_vector _cached_states;
 
+#if !RESUMEF_DISABLE_MULT_THREAD
 		mutable spinlock _lock_ready;
+#endif
 		task_dictionary_type _ready_task;
 
 		timer_mgr_ptr _timer;
@@ -75,7 +79,9 @@ namespace resumef
 		 */
 		bool empty() const
 		{
+#if !RESUMEF_DISABLE_MULT_THREAD
 			scoped_lock<spinlock, spinlock> __guard(_lock_ready, _lock_running);
+#endif
 			return _ready_task.empty() && _runing_states.empty() && _timer->empty();
 		}
 
