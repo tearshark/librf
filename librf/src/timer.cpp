@@ -25,9 +25,13 @@ namespace resumef
 
 	void timer_manager::clear()
 	{
+#if !RESUMEF_DISABLE_MULT_THREAD
 		std::unique_lock<spinlock> __lock(_added_mtx);
+#endif
 		auto _atimer = std::move(_added_timers);
+#if !RESUMEF_DISABLE_MULT_THREAD
 		__lock.unlock();
+#endif
 
 		for (auto& sptr : _atimer)
 			call_target_(sptr, true);
@@ -42,7 +46,9 @@ namespace resumef
 		assert(sptr);
 		assert(sptr->st == timer_target::State::Invalid);
 
+#if !RESUMEF_DISABLE_MULT_THREAD
 		scoped_lock<spinlock> __lock(_added_mtx);
+#endif
 #if _DEBUG
 		assert(sptr->_manager == nullptr);
 		sptr->_manager = this;
@@ -69,13 +75,17 @@ namespace resumef
 	void timer_manager::update()
 	{
 		{
+#if !RESUMEF_DISABLE_MULT_THREAD
 			std::unique_lock<spinlock> __lock(_added_mtx);
+#endif
 
-			if (_added_timers.size() > 0)
+			if (unlikely(_added_timers.size() > 0))
 			{
 				auto _atimer = std::move(_added_timers);
 				_added_timers.reserve(128);
+#if !RESUMEF_DISABLE_MULT_THREAD
 				__lock.unlock();
+#endif
 
 				for (auto& sptr : _atimer)
 				{
@@ -93,7 +103,7 @@ namespace resumef
 			}
 		}
 
-		if (_runing_timers.size() > 0)
+		if (unlikely(_runing_timers.size() > 0))
 		{
 			auto now_ = clock_type::now();
 

@@ -57,20 +57,20 @@ namespace resumef
 
 	void state_generator_t::resume()
 	{
-		if (_coro)
+		if (likely(_coro))
 		{
 			_coro.resume();
-			if (_coro.done())
+			if (likely(!_coro.done()))
+			{
+				_scheduler->add_generator(this);
+			}
+			else
 			{
 				coroutine_handle<> handler = _coro;
 				_coro = nullptr;
 				_scheduler->del_final(this);
 
 				handler.destroy();
-			}
-			else
-			{
-				_scheduler->add_generator(this);
 			}
 		}
 	}

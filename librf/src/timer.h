@@ -139,7 +139,9 @@ namespace resumef
 			return add_(std::make_shared<timer_target>(tp_, std::forward<_Cb>(cb_)));
 		}
 	private:
+#if !RESUMEF_DISABLE_MULT_THREAD
 		spinlock _added_mtx;
+#endif
 		timer_vector_type	_added_timers;
 		timer_map_type		_runing_timers;
 

@@ -12,7 +12,9 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 if (UNIX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+	find_package(mimalloc 1.4 REQUIRED)
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -pthread")
 endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -112,4 +114,9 @@ ${PROJECT_SOURCE_DIR}/test_librf.cpp
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 add_executable(rf_tutorial ${TSRC})
-target_link_libraries(rf_tutorial ${LIB_NAME})
+
+if (UNIX)
+	target_link_libraries(rf_tutorial ${LIB_NAME} mimalloc)
+else()
+	target_link_libraries(rf_tutorial ${LIB_NAME})
+endif()

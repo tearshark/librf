@@ -113,24 +113,6 @@ namespace resumef
 		return task;
 	}
 
-	void scheduler_t::add_generator(state_base_t* sptr)
-	{
-		assert(sptr != nullptr);
-
-#if !RESUMEF_DISABLE_MULT_THREAD
-		scoped_lock<spinlock> __guard(_lock_running);
-#endif
-		_runing_states.emplace_back(sptr);
-	}
-
-	void scheduler_t::del_final(state_base_t* sptr)
-	{
-#if !RESUMEF_DISABLE_MULT_THREAD
-		scoped_lock<spinlock> __guard(_lock_ready);
-#endif
-		this->_ready_task.erase(sptr);
-	}
-
 	std::unique_ptr<task_t> scheduler_t::del_switch(state_base_t* sptr)
 	{
 #if !RESUMEF_DISABLE_MULT_THREAD
@@ -147,28 +129,6 @@ namespace resumef
 		}
 
 		return task_ptr;
-	}
-
-	void scheduler_t::add_switch(std::unique_ptr<task_t> task)
-	{
-		state_base_t* sptr = task->_state.get();
-
-#if !RESUMEF_DISABLE_MULT_THREAD
-		scoped_lock<spinlock> __guard(_lock_ready);
-#endif
-		this->_ready_task.emplace(sptr, std::move(task));
-	}
-
-	task_t* scheduler_t::find_task(state_base_t* sptr) const noexcept
-	{
-#if !RESUMEF_DISABLE_MULT_THREAD
-		scoped_lock<spinlock> __guard(_lock_ready);
-#endif
-
-		auto iter = this->_ready_task.find(sptr);
-		if (iter != this->_ready_task.end())
-			return iter->second.get();
-		return nullptr;
 	}
 
 /*
@@ -195,7 +155,7 @@ namespace resumef
 #if !RESUMEF_DISABLE_MULT_THREAD
 			scoped_lock<spinlock> __guard(_lock_running);
 #endif
-			if (_runing_states.empty())
+			if (likely(_runing_states.empty()))
 				return false;
 
 			std::swap(_cached_states, _runing_states);
@@ -215,15 +175,15 @@ namespace resumef
 			//介于网上有人做评测，导致单协程切换数据很难看，那就注释掉吧。
 			//std::this_thread::yield();
 
-			if (this->run_one_batch()) continue;	//当前运行了一个state，则认为还可能有任务未完成
+			if (likely(this->run_one_batch())) continue;	//当前运行了一个state，则认为还可能有任务未完成
 
 			{
 #if !RESUMEF_DISABLE_MULT_THREAD
 				scoped_lock<spinlock> __guard(_lock_ready);
 #endif
-				if (!_ready_task.empty()) continue;	//当前还存在task，则必然还有任务未完成
+				if (likely(!_ready_task.empty())) continue;	//当前还存在task，则必然还有任务未完成
 			}
-			if (!_timer->empty()) continue;			//定时器不为空，也需要等待定时器触发
+			if (unlikely(!_timer->empty())) continue;			//定时器不为空，也需要等待定时器触发
 
 			break;
 		};
