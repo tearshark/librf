@@ -20,17 +20,17 @@
    ​	本来无意搞性能测试的，因为librf的初衷和设计目标，就不是为了性能。然而，随着C++ Coroutines进入C++ 20标准，类似的协程库也越来越多。得益于C++ Coroutines的优良设计，他们的这些协程库都把性能放在首要位置进行宣传。裹挟着我也不得不进行一番性能调优，以及测试。
 
    以下数据全是平局每个操作的时间开销。
-   
+
    | 编译器 | 操作系统     | [mimalloc](https://github.com/microsoft/mimalloc) | 多线程 | 创建*1 | 切换*1 | 创建*1000 | 切换*1000 | 创建*30000 | 切换*30000 |
    | :----: | :----------- | :-----------------------------------------------: | :----: | :----: | :----: | :-------: | :-------: | :--------: | :--------: |
-   | clang  | Windows10    |                        ON                         |  OFF   | 500 ns | 17 ns  |  101 ns   |   11 ns   |   90 ns    |   12 ns    |
-   | clang  | Windows10    |                        ON                         |   ON   | 500 ns | 37 ns  |  116 ns   |   18 ns   |   103 ns   |   20 ns    |
-   | clang  | Windows10    |                        OFF                        |  OFF   | 800 ns | 16 ns  |  208 ns   |   11 ns   |   186 ns   |   15 ns    |
-   | clang  | Windows10    |                        OFF                        |   ON   | 900 ns | 37 ns  |  240 ns   |   18 ns   |   203 ns   |   23 ns    |
-   | clang  | Ubuntu 20.04 |                        ON                         |  OFF   | 400 ns | 15 ns  |  112 ns   |   11 ns   |   108 ns   |   12 ns    |
-   | clang  | Ubuntu 20.04 |                        ON                         |   ON   | 500 ns | 31 ns  |  111 ns   |   16 ns   |   109 ns   |   17 ns    |
-   | clang  | Ubuntu 20.04 |                        OFF                        |  OFF   | 400 ns | 15 ns  |  133 ns   |   13 ns   |   149 ns   |   15 ns    |
-   | clang  | Ubuntu 20.04 |                        OFF                        |   ON   | 500 ns | 30 ns  |  140 ns   |   17 ns   |   141 ns   |   19 ns    |
+   | clang  | Windows10    |                        ON                         |  OFF   | 500 ns | 17 ns  |  101 ns   | **11 ns** |   90 ns    |   12 ns    |
+   | clang  | Windows10    |                      **ON**                       | **ON** | 500 ns | 37 ns  |  116 ns   | **18 ns** |   103 ns   |   20 ns    |
+   | clang  | Windows10    |                        OFF                        |  OFF   | 800 ns | 16 ns  |  208 ns   | **11 ns** |   186 ns   |   15 ns    |
+   | clang  | Windows10    |                        OFF                        |   ON   | 900 ns | 37 ns  |  240 ns   | **18 ns** |   203 ns   |   23 ns    |
+   | clang  | Ubuntu 20.04 |                        ON                         |  OFF   | 400 ns | 15 ns  |  112 ns   | **11 ns** |   108 ns   |   12 ns    |
+   | clang  | Ubuntu 20.04 |                      **ON**                       | **ON** | 500 ns | 31 ns  |  111 ns   | **16 ns** |   109 ns   |   17 ns    |
+   | clang  | Ubuntu 20.04 |                        OFF                        |  OFF   | 400 ns | 15 ns  |  133 ns   | **13 ns** |   149 ns   |   15 ns    |
+   | clang  | Ubuntu 20.04 |                        OFF                        |   ON   | 500 ns | 30 ns  |  140 ns   | **17 ns** |   141 ns   |   19 ns    |
 
    (测试环境：I7 8700K OC 4.3GHz，频率由于酷睿原因不是特别稳定)
 
@@ -47,7 +47,9 @@
    创建*30000：创建 30000 个协程的平均开销；
 
    切换*30000：在具有 30000 个协程的时候，切换 3000000 次的平均开销；
-   
+
+   加粗的字，表示那一项应该是常规状态下的状态，具有较大参考价值。
+
    <br>
 
 * librf有以下特点：
