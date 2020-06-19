@@ -101,7 +101,7 @@ namespace resumef
 	private:
 		void _unlock()
 		{
-			if (_p != nullptr)
+			if (likely(_p != nullptr))
 			{
 				auto t = _p;
 				_p = nullptr;

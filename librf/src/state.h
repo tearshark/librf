@@ -13,11 +13,11 @@ namespace resumef
 	public:
 		void lock() noexcept
 		{
-			++_count;
+			_count.fetch_add(1, std::memory_order_acq_rel);
 		}
 		void unlock()
 		{
-			if (--_count == 0)
+			if (unlikely(_count.fetch_sub(1, std::memory_order_acq_rel) == 1))
 			{
 				destroy_deallocate();
 			}
