@@ -20,7 +20,7 @@ namespace resumef
 		switch_scheduler_awaitor& operator = (const switch_scheduler_awaitor&) = default;
 		switch_scheduler_awaitor& operator = (switch_scheduler_awaitor&&) = default;
 
-		bool await_ready() noexcept
+		bool await_ready() const noexcept
 		{
 			return false;
 		}
@@ -41,7 +41,7 @@ namespace resumef
 			return false;
 		}
 
-		void await_resume() noexcept
+		void await_resume() const noexcept
 		{
 		}
 

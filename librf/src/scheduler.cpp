@@ -58,7 +58,7 @@ namespace resumef
 		}
 	}
 
-	local_scheduler_t::local_scheduler_t(scheduler_t& sch)
+	local_scheduler_t::local_scheduler_t(scheduler_t& sch) noexcept
 	{
 		if (th_scheduler_ptr == nullptr)
 		{

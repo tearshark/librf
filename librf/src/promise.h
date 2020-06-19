@@ -17,7 +17,7 @@ namespace resumef
 		using promise_type = promise_t<value_type>;
 		using future_type = future_t<value_type>;
 
-		promise_impl_t() noexcept {}
+		promise_impl_t() noexcept = default;
 		promise_impl_t(promise_impl_t&& _Right) noexcept = default;
 		promise_impl_t& operator = (promise_impl_t&& _Right) noexcept = default;
 		promise_impl_t(const promise_impl_t&) = delete;

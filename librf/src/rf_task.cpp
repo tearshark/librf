@@ -2,7 +2,7 @@
 
 namespace resumef
 {
-	task_t::task_t()
+	task_t::task_t() noexcept
 		: _stop(nostopstate)
 	{
 	}

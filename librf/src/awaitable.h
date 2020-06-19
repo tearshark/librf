@@ -17,11 +17,11 @@ namespace resumef
 		using lock_type = typename state_type::lock_type;
 		using _Alloc_char = typename state_type::_Alloc_char;
 
-		awaitable_impl_t() {}
-		awaitable_impl_t(const awaitable_impl_t&) = default;
-		awaitable_impl_t(awaitable_impl_t&&) = default;
+		awaitable_impl_t() noexcept = default;
+		awaitable_impl_t(const awaitable_impl_t&) noexcept = default;
+		awaitable_impl_t(awaitable_impl_t&&) noexcept = default;
 
-		awaitable_impl_t& operator = (const awaitable_impl_t&) = default;
+		awaitable_impl_t& operator = (const awaitable_impl_t&) noexcept = default;
 		awaitable_impl_t& operator = (awaitable_impl_t&&) = default;
 
 		/**
@@ -46,7 +46,7 @@ namespace resumef
 		/**
 		 * @brief 获得与之关联的future_t<>对象，作为可等待函数(awaitable function)的返回值。
 		 */
-		future_type get_future() noexcept
+		future_type get_future() const noexcept
 		{
 			return future_type{ this->_state };
 		}

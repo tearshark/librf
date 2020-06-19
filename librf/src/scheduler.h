@@ -132,7 +132,7 @@ namespace resumef
 		/**
 		 * @brief 将指定的调度器绑定到当前线程上。
 		 */
-		local_scheduler_t(scheduler_t & sch);
+		local_scheduler_t(scheduler_t & sch) noexcept;
 
 		/**
 		 * @brief 如果当前线程绑定的调度器由local_scheduler_t所创建，则会销毁调度器，并解绑线程。

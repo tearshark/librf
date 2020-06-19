@@ -16,7 +16,7 @@ namespace resumef
 	 */
 	struct task_t
 	{
-		task_t();
+		task_t() noexcept;
 		virtual ~task_t();
 
 		/**
@@ -47,7 +47,7 @@ namespace resumef
 		 * @brief 要求停止协程。
 		 * @return bool 返回操作成功与否。
 		 */
-		bool request_stop_if_possible()
+		bool request_stop_if_possible() const
 		{
 			if (_stop.stop_possible())
 				return _stop.request_stop();
@@ -73,7 +73,7 @@ namespace resumef
 		using value_type = typename future_type::value_type;
 		using state_type = state_t<value_type>;
 
-		task_impl_t() = default;
+		task_impl_t() noexcept = default;
 		task_impl_t(future_type& f)
 		{
 			initialize(f);
@@ -92,7 +92,7 @@ namespace resumef
 		using future_type = generator_t<value_type>;
 		using state_type = state_generator_t;
 
-		task_impl_t() = default;
+		task_impl_t() noexcept = default;
 		task_impl_t(future_type& f)
 		{
 			initialize(f);

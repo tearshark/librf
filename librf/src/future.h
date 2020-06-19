@@ -23,13 +23,13 @@ namespace resumef
 
 		future_t(counted_ptr<state_type> _st) noexcept
 			:_state(std::move(_st)) {}
-		future_t(const future_t&) = default;
-		future_t(future_t&&) = default;
+		future_t(const future_t&) noexcept = default;
+		future_t(future_t&&) noexcept = default;
 
-		future_t& operator = (const future_t&) = default;
+		future_t& operator = (const future_t&) noexcept = default;
 		future_t& operator = (future_t&&) = default;
 
-		bool await_ready() noexcept
+		bool await_ready() const noexcept
 		{
 			return _state->future_await_ready();
 		}
@@ -40,7 +40,7 @@ namespace resumef
 			_state->future_await_suspend(handler);
 		}
 
-		value_type await_resume()
+		value_type await_resume() const
 		{
 			return _state->future_await_resume();
 		}
