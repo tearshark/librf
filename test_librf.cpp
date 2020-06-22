@@ -36,8 +36,8 @@ int main(int argc, const char* argv[])
 	(void)argc;
 	(void)argv;
 
-	resumable_main_resumable();
-	return 0;
+	//resumable_main_resumable();
+	//return 0;
 
 	//if (argc > 1)
 	//	resumable_main_benchmark_asio_client(atoi(argv[1]));
@@ -68,7 +68,7 @@ int main(int argc, const char* argv[])
 	resumable_main_stop_token();
 	std::cout << "ALL OK!" << std::endl;
 
-	benchmark_main_channel_passing_next();	//这是一个死循环测试
+	benchmark_main_channel_passing_next();
 
 	return 0;
 }

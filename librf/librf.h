@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <cstddef>
 #include <type_traits>
 #include <atomic>
@@ -31,8 +32,7 @@
 #include <functional>
 #include <optional>
 #include <thread>
-#include <iostream>
-#include <assert.h>
+#include <cassert>
 //#include <mimalloc-override.h>
 //#include <mimalloc-new-delete.h>
 #if defined(__clang__) || defined(__GNUC__)

@@ -11,26 +11,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS "-std=c++2a -fcoroutines -fconcepts-diagnostics-depth=8")
 endif()
 
-if (UNIX)
-	find_package(mimalloc 1.4 REQUIRED)
-
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -pthread")
-endif()
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	set(CMAKE_CXX_FLAGS_MINSIZEREL     "/W4 /GS- /Gm- /Ox /Ob2 /Oy /Oi /Os /GT /EHsc /Zc:inline")
-	set(CMAKE_CXX_FLAGS_RELEASE        "/W4 /GS- /Gm- /Ox /Ob2 /Oy /Oi /Os /GT /EHsc /Zc:inline")
-else()
-	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -ggdb")
-	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG")
-	endif()
-endif()
-
-
-message(STATUS "Compiler: ${CMAKE_CXX_COMPILER_ID}")
-message(STATUS "C++ flags: ${CMAKE_CXX_FLAGS}")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	option(OPT_INLINE_STATE "Enable Inline state" ON)
@@ -53,6 +33,30 @@ endif()
 option(OPT_DEBUG_COUNTER "Debug objects count" OFF)
 option(OPT_KEEP_REAL_SIZE "Keep real size in queue" OFF)
 option(OPT_DISABLE_MULT_THREAD "Disable multi-threaded scheduler" OFF)
+option(OPT_USE_MIMALLOC "Use mimalloc" OFF)
+
+if (UNIX)
+	if(OPT_USE_MIMALLOC)
+		find_package(mimalloc 1.4 REQUIRED)
+	endif()
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -pthread")
+endif()
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	set(CMAKE_CXX_FLAGS_MINSIZEREL     "/W4 /GS- /Gm- /Ox /Ob2 /Oy /Oi /Os /GT /EHsc /Zc:inline")
+	set(CMAKE_CXX_FLAGS_RELEASE        "/W4 /GS- /Gm- /Ox /Ob2 /Oy /Oi /Os /GT /EHsc /Zc:inline")
+else()
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -ggdb")
+	else()
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG")
+	endif()
+endif()
+
+
+message(STATUS "Compiler: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "C++ flags: ${CMAKE_CXX_FLAGS}")
 
 #set(RESUMEF_USE_CUSTOM_SPINLOCK "std::mutex")
 
@@ -115,8 +119,10 @@ ${PROJECT_SOURCE_DIR}/test_librf.cpp
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 add_executable(rf_tutorial ${TSRC})
 
-if (UNIX)
-	target_link_libraries(rf_tutorial ${LIB_NAME} mimalloc)
+if(OPT_USE_MIMALLOC)
+	set(LIB_MIMALLOC, "mimalloc")
 else()
-	target_link_libraries(rf_tutorial ${LIB_NAME})
+	set(LIB_MIMALLOC, "")
 endif()
+
+target_link_libraries(rf_tutorial ${LIB_NAME} ${LIB_MIMALLOC})
