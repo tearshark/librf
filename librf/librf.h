@@ -44,6 +44,10 @@
 
 #include "src/config.h"
 
+#if RESUMEF_DEBUG_COUNTER
+#include <iostream>
+#endif
+
 #include "src/def.h"
 #include "src/macro_def.inl"
 #include "src/counted_ptr.h"
