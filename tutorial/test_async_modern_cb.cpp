@@ -16,6 +16,13 @@ void tostring_async_originalism(_Input_t&& value, _Callable_t&& token)
 			callback(std::to_string(value));
 		}).detach();
 }
+void tostring_async_originalism2(int value, std::function<void(std::string)>&& token, double mu)
+{
+	std::thread([callback = std::move(token), value, mu]
+		{
+			callback(std::to_string(value * mu));
+		}).detach();
+}
 
 //使用原旨主义的方式扩展异步方法来支持future
 template<typename _Input_t>
@@ -87,6 +94,9 @@ auto muldiv_async(_Ty1&& val1, _Ty2&& val2, _Callable_t&& token)
 }
 
 #include "use_future.h"
+#if TEST_ASYNC_CALLBACK
+#include "async_call.hpp"
+#endif
 
 static void example_future()
 {
@@ -113,6 +123,11 @@ static void example_future()
 
 	std::future<std::string> f2 = tostring_async(6.0f, std_future);
 	std::cout << f2.get() << std::endl;
+
+#if TEST_ASYNC_CALLBACK
+	std::future<std::string> f3 = async_call(&tostring_async_originalism2, 99, placeholder::_cb(std_future), 2.0);
+	std::cout << f3.get() << std::endl;
+#endif
 }
 
 #include "librf.h"
@@ -133,8 +148,12 @@ static void example_librf()
 			auto [a, b] = co_await muldiv_async(9, val, use_librf);
 
 			std::string result = co_await tostring_async(a + b, use_librf);
-
 			std::cout << result << std::endl;
+
+#if TEST_ASYNC_CALLBACK
+			result = co_await async_call(&tostring_async_originalism2, 99, placeholder::_cb(use_librf), 2.0);
+			std::cout << result << std::endl;
+#endif
 		}
 		catch (const std::exception & e)
 		{
