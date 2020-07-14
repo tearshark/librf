@@ -35,7 +35,7 @@ namespace resumef
 		inline void await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 		{
 			_PromiseT& promise = handler.promise();
-			auto* _state = promise.get_state();
+			auto _state = promise.ref_state();
 			_state->promise_final_suspend(handler);
 		}
 		inline void await_resume() noexcept
@@ -70,14 +70,14 @@ namespace resumef
 	template <typename _Ty>
 	inline void promise_impl_t<_Ty>::set_exception(std::exception_ptr e)
 	{
-        this->get_state()->set_exception(std::move(e));
+        this->ref_state()->set_exception(std::move(e));
 	}
 
 #if defined(__clang__) || defined(__GNUC__)
 	template <typename _Ty>
 	inline void promise_impl_t<_Ty>::unhandled_exception()
 	{
-		this->get_state()->set_exception(std::current_exception());
+		this->ref_state()->set_exception(std::current_exception());
 	}
 #endif
 
@@ -111,6 +111,18 @@ namespace resumef
 #else
 		return _state.get();
 #endif
+	}
+
+	// 如果去掉了调度器，则ref_state()实现为返回counted_ptr<>，以便于处理一些意外情况
+	//template <typename _Ty>
+	//auto promise_impl_t<_Ty>::ref_state() noexcept -> counted_ptr<state_type>
+	//{
+	//	return { get_state() };
+	//}
+	template <typename _Ty>
+	auto promise_impl_t<_Ty>::ref_state() noexcept -> state_type*
+	{
+		return get_state();
 	}
 
 	template <typename _Ty>
@@ -172,38 +184,38 @@ namespace resumef
 	template<class U>
 	inline void promise_t<_Ty>::return_value(U&& val)
 	{
-        this->get_state()->set_value(std::forward<U>(val));
+        this->ref_state()->set_value(std::forward<U>(val));
 	}
 
 	template<class _Ty>
 	template<class U>
 	inline suspend_always promise_t<_Ty>::yield_value(U&& val)
 	{
-        this->get_state()->promise_yield_value(this, std::forward<U>(val));
+        this->ref_state()->promise_yield_value(this, std::forward<U>(val));
 		return {};
 	}
 
 	template<class _Ty>
 	inline void promise_t<_Ty&>::return_value(_Ty& val)
 	{
-		this->get_state()->set_value(val);
+		this->ref_state()->set_value(val);
 	}
 
 	template<class _Ty>
 	inline suspend_always promise_t<_Ty&>::yield_value(_Ty& val)
 	{
-		this->get_state()->promise_yield_value(this, val);
+		this->ref_state()->promise_yield_value(this, val);
 		return {};
 	}
 
 	inline void promise_t<void>::return_void()
 	{
-        this->get_state()->set_value();
+        this->ref_state()->set_value();
 	}
 
 	inline suspend_always promise_t<void>::yield_value()
 	{
-        this->get_state()->promise_yield_value(this);
+        this->ref_state()->promise_yield_value(this);
 		return {};
 	}
 }

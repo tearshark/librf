@@ -24,6 +24,9 @@ namespace resumef
 		promise_impl_t& operator = (const promise_impl_t&) = delete;
 
 		auto get_state() noexcept->state_type*;
+		// 如果去掉了调度器，则ref_state()实现为返回counted_ptr<>，以便于处理一些意外情况
+		// auto ref_state() noexcept->counted_ptr<state_type>;
+		auto ref_state() noexcept->state_type*;
 
 		suspend_on_initial initial_suspend() noexcept;
 		suspend_on_final final_suspend() noexcept;

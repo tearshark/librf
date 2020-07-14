@@ -158,11 +158,13 @@ namespace resumef
 			void set_exception(std::exception_ptr e)
 			{
 				(void)e;
+				//ref_state()->set_exception(std::move(e));
 				std::terminate();
 			}
 #if defined(__clang__) || defined(__GNUC__)
 			void unhandled_exception()
 			{
+				//this->ref_state()->set_exception(std::current_exception());
 				std::terminate();
 			}
 #endif
@@ -192,6 +194,14 @@ namespace resumef
 #else
 				return _state.get();
 #endif
+			}
+			//counted_ptr<state_type> ref_state() noexcept
+			//{
+			//	return { get_state() };
+			//}
+			state_type* ref_state() noexcept
+			{
+				return get_state();
 			}
 
 			using _Alloc_char = typename std::allocator_traits<_Alloc>::template rebind_alloc<char>;
