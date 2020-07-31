@@ -9,6 +9,7 @@
 
 using namespace resumef;
 
+#if !defined(__GNUC__)
 void test_when_any()
 {
 	using namespace std::chrono;
@@ -218,9 +219,11 @@ void test_when_select()
 
 	this_scheduler()->run_until_notask();
 }
+#endif
 
 void resumable_main_when_all()
 {
+#if !defined(__GNUC__)
 	srand((uint32_t)time(nullptr));
 
 	test_when_any();
@@ -234,5 +237,6 @@ void resumable_main_when_all()
 
 	for (int i = 0; i < 10; ++i)
 		test_when_select();
+#endif
 }
 
