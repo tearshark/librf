@@ -183,19 +183,16 @@ namespace resumef
 		}
 	}
 
-	inline namespace mutex_v2
+	mutex_t::mutex_t()
+		: _mutex(std::make_shared<detail::mutex_v2_impl>())
 	{
-		mutex_t::mutex_t()
-			: _mutex(std::make_shared<detail::mutex_v2_impl>())
-		{
-		}
+	}
 
-		mutex_t::mutex_t(std::adopt_lock_t) noexcept
-		{
-		}
+	mutex_t::mutex_t(std::adopt_lock_t) noexcept
+	{
+	}
 
-		mutex_t::~mutex_t() noexcept
-		{
-		}
+	mutex_t::~mutex_t() noexcept
+	{
 	}
 }

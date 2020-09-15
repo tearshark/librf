@@ -86,14 +86,14 @@ namespace resumef
 			<_Ty,
 				std::void_t<
 					decltype(std::declval<_Ty>().await_ready())
-					, decltype(std::declval<_Ty>().await_suspend(std::declval<std::experimental::coroutine_handle<promise_t<>>>()))
+					, decltype(std::declval<_Ty>().await_suspend(std::declval<std::coroutine_handle<promise_t<>>>()))
 					, decltype(std::declval<_Ty>().await_resume())
 				>
 			>
 			: std::bool_constant<
 				std::is_constructible_v<bool, decltype(std::declval<_Ty>().await_ready())>
 				&& is_valid_await_suspend_return_v<
-					decltype(std::declval<_Ty>().await_suspend(std::declval<std::experimental::coroutine_handle<promise_t<>>>()))
+					decltype(std::declval<_Ty>().await_suspend(std::declval<std::coroutine_handle<promise_t<>>>()))
 				>
 			>
 		{};

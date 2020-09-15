@@ -1,12 +1,15 @@
 cmake_minimum_required(VERSION 3.10)
-project(librf)
+project(librf VERSION 3.0)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set(CMAKE_CXX_FLAGS "-std=c++2a -fcoroutines-ts -stdlib=libc++")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 	set(CMAKE_CXX_FLAGS "-std=c++2a -fcoroutines-ts")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	set(CMAKE_CXX_FLAGS "/std:c++latest /await /EHsc")
+	set(CMAKE_CXX_FLAGS "/std:c++latest /EHsc")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS "-std=c++2a -fcoroutines -fconcepts-diagnostics-depth=8")
 endif()
@@ -20,14 +23,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	option(OPT_INLINE_STATE "Enable Inline state" ON)
 else()
 	option(OPT_INLINE_STATE "Enable Inline state" OFF)
-endif()
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	option(OPT_USE_CONCEPT "Use conecpt instead of enable_if" ON)
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	option(OPT_USE_CONCEPT "Use conecpt instead of enable_if" ON)
-else()
-	option(OPT_USE_CONCEPT "Use conecpt instead of enable_if" OFF)
 endif()
 
 option(OPT_DEBUG_COUNTER "Debug objects count" OFF)
@@ -44,8 +39,8 @@ if (UNIX)
 endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	set(CMAKE_CXX_FLAGS_MINSIZEREL     "/W4 /GS- /Gm- /Ox /Ob2 /Oy /Oi /Os /GT /EHsc /Zc:inline")
-	set(CMAKE_CXX_FLAGS_RELEASE        "/W4 /GS- /Gm- /Ox /Ob2 /Oy /Oi /Os /GT /EHsc /Zc:inline")
+	set(CMAKE_CXX_FLAGS_MINSIZEREL     "/W4 /WX /MP /GS- /Gm- /Ox /Ob2 /Oy /Oi /Os /GT /EHsc /Zc:inline")
+	set(CMAKE_CXX_FLAGS_RELEASE        "/W4 /WX /MP /GS- /Gm- /Ox /Ob2 /Oy /Oi /Os /GT /EHsc /Zc:inline")
 else()
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -ggdb")
@@ -66,9 +61,6 @@ endif()
 if(OPT_DEBUG_COUNTER)
 	set(RESUMEF_DEBUG_COUNTER 1)
 endif()
-if(OPT_USE_CONCEPT)
-	set(RESUMEF_ENABLE_CONCEPT 1)
-endif()
 if(OPT_KEEP_REAL_SIZE)
 	set(_WITH_LOCK_FREE_Q_KEEP_REAL_SIZE 1)
 endif()
@@ -86,10 +78,8 @@ ${PROJECT_SOURCE_DIR}/librf
 )
 
 set(SRC 
-${PROJECT_SOURCE_DIR}/librf/src/event_v1.cpp
 ${PROJECT_SOURCE_DIR}/librf/src/event_v2.cpp
-${PROJECT_SOURCE_DIR}/librf/src/mutex_v1.cpp
-${PROJECT_SOURCE_DIR}/librf/src/mutex_v2.cpp
+#${PROJECT_SOURCE_DIR}/librf/src/mutex_v2.cpp
 ${PROJECT_SOURCE_DIR}/librf/src/rf_task.cpp
 ${PROJECT_SOURCE_DIR}/librf/src/scheduler.cpp
 ${PROJECT_SOURCE_DIR}/librf/src/sleep.cpp
@@ -99,9 +89,8 @@ ${PROJECT_SOURCE_DIR}/librf/src/when_v2.cpp
 )
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
-set(LIB_NAME librf)
-#add_library(${LIB_NAME} SHARED ${SRC})
-add_library(${LIB_NAME} STATIC ${SRC})
+#add_library(librf SHARED ${SRC})
+add_library(librf STATIC ${SRC})
 
 
 
@@ -117,7 +106,6 @@ ${PROJECT_SOURCE_DIR}/test_librf.cpp
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-add_executable(rf_tutorial ${TSRC})
 
 if(OPT_USE_MIMALLOC)
 	set(LIB_MIMALLOC, "mimalloc")
@@ -125,4 +113,4 @@ else()
 	set(LIB_MIMALLOC, "")
 endif()
 
-target_link_libraries(rf_tutorial ${LIB_NAME} ${LIB_MIMALLOC})
+add_subdirectory(tutorial)

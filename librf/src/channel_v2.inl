@@ -333,8 +333,6 @@ namespace detail
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
-inline namespace channel_v2
-{
 	template<class _Ty, bool _Optional, bool _OptimizationThread>
 	struct [[nodiscard]] channel_t<_Ty, _Optional, _OptimizationThread>::read_awaiter
 	{
@@ -488,7 +486,7 @@ inline namespace channel_v2
 	}
 
 	template<class _Ty, bool _Optional, bool _OptimizationThread>
-	template<class U COMMA_RESUMEF_ENABLE_IF_TYPENAME()> RESUMEF_REQUIRES(std::is_constructible_v<_Ty, U&&>)
+	template<class U> requires(std::is_constructible_v<_Ty, U&&>)
 	typename channel_t<_Ty, _Optional, _OptimizationThread>::write_awaiter
 		channel_t<_Ty, _Optional, _OptimizationThread>::write(U&& val) const noexcept(std::is_nothrow_move_constructible_v<U>)
 	{
@@ -496,12 +494,11 @@ inline namespace channel_v2
 	}
 
 	template<class _Ty, bool _Optional, bool _OptimizationThread>
-	template<class U COMMA_RESUMEF_ENABLE_IF_TYPENAME()> RESUMEF_REQUIRES(std::is_constructible_v<_Ty, U&&>)
+	template<class U> requires(std::is_constructible_v<_Ty, U&&>)
 	typename channel_t<_Ty, _Optional, _OptimizationThread>::write_awaiter
 		channel_t<_Ty, _Optional, _OptimizationThread>::operator << (U&& val) const noexcept(std::is_nothrow_move_constructible_v<U>)
 	{
 		return write_awaiter{ _chan.get(), std::forward<U>(val) };
 	}
 
-}	//namespace channel_v2
 }	//namespace resumef

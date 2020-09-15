@@ -186,19 +186,16 @@ namespace resumef
 		}
 	}
 
-	inline namespace event_v2
+	event_t::event_t(bool initially)
+		:_event(std::make_shared<detail::event_v2_impl>(initially))
 	{
-		event_t::event_t(bool initially)
-			:_event(std::make_shared<detail::event_v2_impl>(initially))
-		{
-		}
+	}
 
-		event_t::event_t(std::adopt_lock_t)
-		{
-		}
+	event_t::event_t(std::adopt_lock_t)
+	{
+	}
 
-		event_t::~event_t()
-		{
-		}
+	event_t::~event_t()
+	{
 	}
 }

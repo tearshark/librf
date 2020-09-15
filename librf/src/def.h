@@ -27,9 +27,9 @@ namespace resumef
 #endif	//DOXYGEN_SKIP_PROPERTY
 
 	template<typename _PromiseT = void>
-	using coroutine_handle = std::experimental::coroutine_handle<_PromiseT>;
-	using suspend_always = std::experimental::suspend_always;
-	using suspend_never = std::experimental::suspend_never;
+	using coroutine_handle = std::coroutine_handle<_PromiseT>;
+	using suspend_always = std::suspend_always;
+	using suspend_never = std::suspend_never;
 
 	template<class... _Mutexes>
 	using scoped_lock = std::scoped_lock<_Mutexes...>;

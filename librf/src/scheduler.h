@@ -54,14 +54,8 @@ namespace resumef
 		 * @param coro 协程对象。future_t<>，generator_t<>，或者一个调用后返回future_t<>/generator_t<>的函数对象。
 		 * @retval task_t* 返回代表一个新协程的协程任务类。\n
 		 */
-		template<class _Ty
-#ifndef DOXYGEN_SKIP_PROPERTY
-			COMMA_RESUMEF_ENABLE_IF(traits::is_callable_v<_Ty> || traits::is_future_v<_Ty> || traits::is_generator_v<_Ty>)
-#endif	//DOXYGEN_SKIP_PROPERTY
-		>
-#ifndef DOXYGEN_SKIP_PROPERTY
-		RESUMEF_REQUIRES(traits::is_callable_v<_Ty> || traits::is_future_v<_Ty> || traits::is_generator_v<_Ty>)
-#endif	//DOXYGEN_SKIP_PROPERTY
+		template<class _Ty>
+		requires(traits::is_callable_v<_Ty> || traits::is_future_v<_Ty> || traits::is_generator_v<_Ty>)
 		task_t* operator + (_Ty&& coro)
 		{
 			if constexpr (traits::is_callable_v<_Ty>)

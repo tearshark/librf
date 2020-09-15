@@ -12,14 +12,6 @@
 /* #undef RESUMEF_DEBUG_COUNTER */
 #endif	//RESUMEF_DEBUG_COUNTER
 
-#ifndef RESUMEF_ENABLE_CONCEPT
-#ifdef __cpp_lib_concepts
-#define RESUMEF_ENABLE_CONCEPT 1
-#else
-#define RESUMEF_ENABLE_CONCEPT 1
-#endif	//#ifdef __cpp_lib_concepts
-#endif	//#ifndef RESUMEF_ENABLE_CONCEPT
-
 #ifndef _WITH_LOCK_FREE_Q_KEEP_REAL_SIZE
 /* #undef _WITH_LOCK_FREE_Q_KEEP_REAL_SIZE */
 #endif	//_WITH_LOCK_FREE_Q_KEEP_REAL_SIZE

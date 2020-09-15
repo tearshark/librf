@@ -84,12 +84,12 @@ namespace resumef
 
 			inline void add_timeout_timer(std::chrono::system_clock::time_point tp)
 			{
-				this->_thandler = this->_scheduler->timer()->add_handler(tp, 
+				this->_thandler = this->_scheduler->timer()->add_handler(tp,
 					[st = counted_ptr<state_event_base_t>{ this }](bool canceld)
-					{
-						if (!canceld)
-							st->on_timeout();
-					});
+				{
+					if (!canceld)
+						st->on_timeout();
+				});
 			}
 
 			//为侵入式单向链表提供的next指针
@@ -131,370 +131,367 @@ namespace resumef
 		};
 	}
 
-	inline namespace event_v2
+	inline void event_t::signal_all() const noexcept
 	{
-		inline void event_t::signal_all() const noexcept
+		_event->signal_all();
+	}
+
+	inline void event_t::signal() const noexcept
+	{
+		_event->signal();
+	}
+
+	inline void event_t::reset() const noexcept
+	{
+		_event->reset();
+	}
+
+	struct [[nodiscard]] event_t::awaiter
+	{
+		awaiter(detail::event_v2_impl* evt) noexcept
+			: _event(evt)
 		{
-			_event->signal_all();
 		}
 
-		inline void event_t::signal() const noexcept
+		bool await_ready() noexcept
 		{
-			_event->signal();
+			scoped_lock<detail::event_v2_impl::lock_type> lock_(_event->_lock);
+			return _event->try_wait_one();
 		}
 
-		inline void event_t::reset() const noexcept
+		template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 		{
-			_event->reset();
+			(void)cb;
+			detail::event_v2_impl* evt = _event;
+			scoped_lock<detail::event_v2_impl::lock_type> lock_(evt->_lock);
+
+			if (evt->try_wait_one())
+				return false;
+
+			_state = new detail::state_event_t(_event);
+			_event = nullptr;
+			(void)_state->on_await_suspend(handler);
+
+			if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
+				cb();
+
+			evt->add_wait_list(_state.get());
+
+			return true;
 		}
 
-		struct [[nodiscard]] event_t::awaiter
+		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
-			awaiter(detail::event_v2_impl* evt) noexcept
-				: _event(evt)
+			return await_suspend2(handler, nullptr);
+		}
+
+		bool await_resume() noexcept
+		{
+			return _event != nullptr;
+		}
+
+	protected:
+		detail::event_v2_impl* _event;
+		counted_ptr<detail::state_event_t> _state;
+	};
+
+	inline event_t::awaiter event_t::operator co_await() const noexcept
+	{
+		return { _event.get() };
+	}
+
+	inline event_t::awaiter event_t::wait() const noexcept
+	{
+		return { _event.get() };
+	}
+
+	template<class _Btype>
+	struct event_t::timeout_awaitor_impl : public _Btype
+	{
+		template<class... Args>
+		timeout_awaitor_impl(clock_type::time_point tp, Args&&... args) noexcept(std::is_nothrow_constructible_v<_Btype, Args&&...>)
+			: _Btype(std::forward<Args>(args)...)
+			, _tp(tp)
+		{}
+		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		bool await_suspend(coroutine_handle<_PromiseT> handler)
+		{
+			if (!_Btype::await_suspend2(handler, [this]
+				{
+					this->_state->add_timeout_timer(_tp);
+				}))
+				return false;
+				return true;
+		}
+	protected:
+		clock_type::time_point _tp;
+	};
+
+	struct [[nodiscard]] event_t::timeout_awaiter : timeout_awaitor_impl<awaiter>
+	{
+		using timeout_awaitor_impl<awaiter>::timeout_awaitor_impl;
+	};
+
+	template<class _Rep, class _Period>
+	inline event_t::timeout_awaiter event_t::wait_for(const std::chrono::duration<_Rep, _Period>& dt) const noexcept
+	{
+		clock_type::time_point tp2 = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
+		return { tp2, _event.get() };
+	}
+
+	template<class _Clock, class _Duration>
+	inline event_t::timeout_awaiter event_t::wait_until(const std::chrono::time_point<_Clock, _Duration>& tp) const noexcept
+	{
+		clock_type::time_point tp2 = std::chrono::time_point_cast<clock_type::duration>(tp);
+		return { tp2, _event.get() };
+	}
+
+
+	template<class _Iter>
+	struct [[nodiscard]] event_t::any_awaiter
+	{
+		any_awaiter(_Iter begin, _Iter end) noexcept
+			: _begin(begin)
+			, _end(end)
+		{
+		}
+
+		bool await_ready() noexcept
+		{
+			return _begin == _end;
+		}
+
+		template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
+		{
+			(void)cb;
+			using ref_lock_type = std::reference_wrapper<detail::event_v2_impl::lock_type>;
+			std::vector<ref_lock_type> lockes;
+			lockes.reserve(std::distance(_begin, _end));
+
+			for (auto iter = _begin; iter != _end; ++iter)
 			{
+				detail::event_v2_impl* evt = (*iter)._event.get();
+				lockes.emplace_back(std::ref(evt->_lock));
 			}
 
-			bool await_ready() noexcept
-			{
-				scoped_lock<detail::event_v2_impl::lock_type> lock_(_event->_lock);
-				return _event->try_wait_one();
-			}
+			batch_lock_t<ref_lock_type> lock_(lockes);
 
-			template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
+			for (auto iter = _begin; iter != _end; ++iter)
 			{
-				(void)cb;
-				detail::event_v2_impl* evt = _event;
-				scoped_lock<detail::event_v2_impl::lock_type> lock_(evt->_lock);
-
+				detail::event_v2_impl* evt = (*iter)._event.get();
 				if (evt->try_wait_one())
+				{
+					_event = evt;
 					return false;
+				}
+			}
 
-				_state = new detail::state_event_t(_event);
-				_event = nullptr;
-				(void)_state->on_await_suspend(handler);
+			_state = new detail::state_event_t(_event);
+			(void)_state->on_await_suspend(handler);
 
-				if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
-					cb();
+			if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
+				cb();
 
+			for (auto iter = _begin; iter != _end; ++iter)
+			{
+				detail::event_v2_impl* evt = (*iter)._event.get();
 				evt->add_wait_list(_state.get());
-
-				return true;
 			}
 
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
-			{
-				return await_suspend2(handler, nullptr);
-			}
-
-			bool await_resume() noexcept
-			{
-				return _event != nullptr;
-			}
-
-		protected:
-			detail::event_v2_impl* _event;
-			counted_ptr<detail::state_event_t> _state;
-		};
-
-		inline event_t::awaiter event_t::operator co_await() const noexcept
-		{
-			return { _event.get() };
+			return true;
 		}
 
-		inline event_t::awaiter event_t::wait() const noexcept
+		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
-			return { _event.get() };
+			return await_suspend2(handler, nullptr);
 		}
 
-		template<class _Btype>
-		struct event_t::timeout_awaitor_impl : public _Btype
+		intptr_t await_resume() noexcept
 		{
-			template<class... Args>
-			timeout_awaitor_impl(clock_type::time_point tp, Args&&... args) noexcept(std::is_nothrow_constructible_v<_Btype, Args&&...>)
-				: _Btype(std::forward<Args>(args)...)
-				, _tp(tp)
-			{}
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			if (_begin == _end)
+				return 0;
+			if (_event == nullptr)
+				return -1;
+
+			intptr_t idx = 0;
+			for (auto iter = _begin; iter != _end; ++iter, ++idx)
 			{
-				if (!_Btype::await_suspend2(handler, [this]
-					{
-						this->_state->add_timeout_timer(_tp);
-					}))
-					return false;
-				return true;
+				detail::event_v2_impl* evt = (*iter)._event.get();
+				if (evt == _event)
+					return idx;
 			}
-		protected:
-			clock_type::time_point _tp;
-		};
 
-		struct [[nodiscard]] event_t::timeout_awaiter : timeout_awaitor_impl<awaiter>
-		{
-			using timeout_awaitor_impl<awaiter>::timeout_awaitor_impl;
-		};
+			return -1;
+		}
+	protected:
+		detail::event_v2_impl* _event = nullptr;
+		counted_ptr<detail::state_event_t> _state;
+		_Iter _begin;
+		_Iter _end;
+	};
 
-		template<class _Rep, class _Period>
-		inline event_t::timeout_awaiter event_t::wait_for(const std::chrono::duration<_Rep, _Period>& dt) const noexcept
+	template<class _Iter>
+	requires(_IteratorOfT<_Iter, event_t>)
+	auto event_t::wait_any(_Iter begin_, _Iter end_) ->event_t::any_awaiter<_Iter>
+	{
+		return { begin_, end_ };
+	}
+
+	template<class _Cont>
+	requires(_ContainerOfT<_Cont, event_t>)
+	auto event_t::wait_any(const _Cont& cnt_) ->event_t::any_awaiter<decltype(std::begin(cnt_))>
+	{
+		return { std::begin(cnt_), std::end(cnt_) };
+	}
+
+
+
+	template<class _Iter>
+	struct [[nodiscard]] event_t::timeout_any_awaiter : timeout_awaitor_impl<any_awaiter<_Iter>>
+	{
+		using timeout_awaitor_impl<any_awaiter<_Iter>>::timeout_awaitor_impl;
+	};
+
+	template<class _Rep, class _Period, class _Iter>
+	requires(_IteratorOfT<_Iter, event_t>)
+	auto event_t::wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
+		->event_t::timeout_any_awaiter<_Iter>
+	{
+		clock_type::time_point tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
+		return { tp, begin_, end_ };
+	}
+
+	template<class _Rep, class _Period, class _Cont>
+	requires(_ContainerOfT<_Cont, event_t>)
+	auto event_t::wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, const _Cont& cnt_)
+		->event_t::timeout_any_awaiter<decltype(std::begin(cnt_))>
+	{
+		clock_type::time_point tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
+		return { tp, std::begin(cnt_), std::end(cnt_) };
+	}
+
+
+
+	template<class _Iter>
+	struct [[nodiscard]] event_t::all_awaiter
+	{
+		all_awaiter(_Iter begin, _Iter end) noexcept
+			: _begin(begin)
+			, _end(end)
 		{
-			clock_type::time_point tp2 = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
-			return { tp2, _event.get() };
 		}
 
-		template<class _Clock, class _Duration>
-		inline event_t::timeout_awaiter event_t::wait_until(const std::chrono::time_point<_Clock, _Duration>& tp) const noexcept
+		bool await_ready() noexcept
 		{
-			clock_type::time_point tp2 = std::chrono::time_point_cast<clock_type::duration>(tp);
-			return { tp2, _event.get() };
+			_value = _begin == _end;
+			return _value;
 		}
 
-
-		template<class _Iter>
-		struct [[nodiscard]] event_t::any_awaiter
+		template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 		{
-			any_awaiter(_Iter begin, _Iter end) noexcept
-				: _begin(begin)
-				, _end(end)
+			(void)cb;
+			intptr_t count = std::distance(_begin, _end);
+
+			using ref_lock_type = std::reference_wrapper<detail::event_v2_impl::lock_type>;
+			std::vector<ref_lock_type> lockes;
+			lockes.reserve(count);
+
+			for (auto iter = _begin; iter != _end; ++iter)
 			{
+				detail::event_v2_impl* evt = (*iter)._event.get();
+				lockes.push_back(evt->_lock);
 			}
 
-			bool await_ready() noexcept
-			{
-				return _begin == _end;
-			}
+			_state = new detail::state_event_all_t(count, _value);
+			(void)_state->on_await_suspend(handler);
 
-			template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
-			{
-				(void)cb;
-				using ref_lock_type = std::reference_wrapper<detail::event_v2_impl::lock_type>;
-				std::vector<ref_lock_type> lockes;
-				lockes.reserve(std::distance(_begin, _end));
+			if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
+				cb();
 
-				for (auto iter = _begin; iter != _end; ++iter)
+			batch_lock_t<ref_lock_type> lock_(lockes);
+
+			for (auto iter = _begin; iter != _end; ++iter)
+			{
+				detail::event_v2_impl* evt = (*iter)._event.get();
+				if (evt->try_wait_one())
 				{
-					detail::event_v2_impl* evt = (*iter)._event.get();
-					lockes.emplace_back(std::ref(evt->_lock));
+					_state->_counter.fetch_sub(1, std::memory_order_acq_rel);
 				}
-
-				batch_lock_t<ref_lock_type> lock_(lockes);
-
-				for (auto iter = _begin; iter != _end; ++iter)
+				else
 				{
-					detail::event_v2_impl* evt = (*iter)._event.get();
-					if (evt->try_wait_one())
-					{
-						_event = evt;
-						return false;
-					}
-				}
-
-				_state = new detail::state_event_t(_event);
-				(void)_state->on_await_suspend(handler);
-				
-				if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
-					cb();
-
-				for (auto iter = _begin; iter != _end; ++iter)
-				{
-					detail::event_v2_impl* evt = (*iter)._event.get();
 					evt->add_wait_list(_state.get());
 				}
-
-				return true;
 			}
 
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			if (_state->_counter.load(std::memory_order_relaxed) == 0)
 			{
-				return await_suspend2(handler, nullptr);
+				_state = nullptr;
+				_value = true;
+
+				return false;
 			}
 
-			intptr_t await_resume() noexcept
-			{
-				if (_begin == _end)
-					return 0;
-				if (_event == nullptr)
-					return -1;
-
-				intptr_t idx = 0;
-				for (auto iter = _begin; iter != _end; ++iter, ++idx)
-				{
-					detail::event_v2_impl* evt = (*iter)._event.get();
-					if (evt == _event)
-						return idx;
-				}
-
-				return -1;
-			}
-		protected:
-			detail::event_v2_impl* _event = nullptr;
-			counted_ptr<detail::state_event_t> _state;
-			_Iter _begin;
-			_Iter _end;
-		};
-
-		template<class _Iter COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
-		RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
-		auto event_t::wait_any(_Iter begin_, _Iter end_) ->event_t::any_awaiter<_Iter>
-		{
-			return { begin_, end_ };
+			return true;
 		}
 
-		template<class _Cont COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
-		RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-		auto event_t::wait_any(const _Cont& cnt_) ->event_t::any_awaiter<decltype(std::begin(cnt_))>
+		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
-			return { std::begin(cnt_), std::end(cnt_) };
+			return await_suspend2(handler, nullptr);
 		}
 
-
-
-		template<class _Iter>
-		struct [[nodiscard]] event_t::timeout_any_awaiter : timeout_awaitor_impl<any_awaiter<_Iter>>
+		bool await_resume() noexcept
 		{
-			using timeout_awaitor_impl<any_awaiter<_Iter>>::timeout_awaitor_impl;
-		};
-
-		template<class _Rep, class _Period, class _Iter COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
-		RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
-		auto event_t::wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_) 
-			->event_t::timeout_any_awaiter<_Iter>
-		{
-			clock_type::time_point tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
-			return { tp, begin_, end_ };
+			return _value;
 		}
+	protected:
+		_Iter _begin;
+		_Iter _end;
+		counted_ptr<detail::state_event_all_t> _state;
+		bool _value = false;
+	};
 
-		template<class _Rep, class _Period, class _Cont COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
-		RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-		auto event_t::wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, const _Cont& cnt_)
-			->event_t::timeout_any_awaiter<decltype(std::begin(cnt_))>
-		{
-			clock_type::time_point tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
-			return { tp, std::begin(cnt_), std::end(cnt_) };
-		}
+	template<class _Iter>
+	requires(_IteratorOfT<_Iter, event_t>)
+	auto event_t::wait_all(_Iter begin_, _Iter end_) ->all_awaiter<_Iter>
+	{
+		return { begin_, end_ };
+	}
 
-
-
-		template<class _Iter>
-		struct [[nodiscard]] event_t::all_awaiter
-		{
-			all_awaiter(_Iter begin, _Iter end) noexcept
-				: _begin(begin)
-				, _end(end)
-			{
-			}
-
-			bool await_ready() noexcept
-			{
-				_value = _begin == _end;
-				return _value;
-			}
-
-			template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
-			{
-				(void)cb;
-				intptr_t count = std::distance(_begin, _end);
-
-				using ref_lock_type = std::reference_wrapper<detail::event_v2_impl::lock_type>;
-				std::vector<ref_lock_type> lockes;
-				lockes.reserve(count);
-
-				for (auto iter = _begin; iter != _end; ++iter)
-				{
-					detail::event_v2_impl* evt = (*iter)._event.get();
-					lockes.push_back(evt->_lock);
-				}
-
-				_state = new detail::state_event_all_t(count, _value);
-				(void)_state->on_await_suspend(handler);
-				
-				if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
-					cb();
-
-				batch_lock_t<ref_lock_type> lock_(lockes);
-
-				for (auto iter = _begin; iter != _end; ++iter)
-				{
-					detail::event_v2_impl* evt = (*iter)._event.get();
-					if (evt->try_wait_one())
-					{
-						_state->_counter.fetch_sub(1, std::memory_order_acq_rel);
-					}
-					else
-					{
-						evt->add_wait_list(_state.get());
-					}
-				}
-
-				if (_state->_counter.load(std::memory_order_relaxed) == 0)
-				{
-					_state = nullptr;
-					_value = true;
-
-					return false;
-				}
-
-				return true;
-			}
-
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
-			{
-				return await_suspend2(handler, nullptr);
-			}
-
-			bool await_resume() noexcept
-			{
-				return _value;
-			}
-		protected:
-			_Iter _begin;
-			_Iter _end;
-			counted_ptr<detail::state_event_all_t> _state;
-			bool _value = false;
-		};
-
-		template<class _Iter COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
-		RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
-		auto event_t::wait_all(_Iter begin_, _Iter end_) ->all_awaiter<_Iter>
-		{
-			return { begin_, end_ };
-		}
-
-		template<class _Cont COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
-		RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-		auto event_t::wait_all(const _Cont& cnt_) ->all_awaiter<decltype(std::begin(cnt_))>
-		{
-			return { std::begin(cnt_), std::end(cnt_) };
-		}
+	template<class _Cont>
+	requires(_ContainerOfT<_Cont, event_t>)
+	auto event_t::wait_all(const _Cont& cnt_) ->all_awaiter<decltype(std::begin(cnt_))>
+	{
+		return { std::begin(cnt_), std::end(cnt_) };
+	}
 
 
-		template<class _Iter>
-		struct [[nodiscard]] event_t::timeout_all_awaiter : timeout_awaitor_impl<all_awaiter<_Iter>>
-		{
-			using timeout_awaitor_impl<all_awaiter<_Iter>>::timeout_awaitor_impl;
-		};
+	template<class _Iter>
+	struct [[nodiscard]] event_t::timeout_all_awaiter : timeout_awaitor_impl<all_awaiter<_Iter>>
+	{
+		using timeout_awaitor_impl<all_awaiter<_Iter>>::timeout_awaitor_impl;
+	};
 
-		template<class _Rep, class _Period, class _Iter COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
-		RESUMEF_REQUIRES(_IteratorOfT<_Iter, event_t>)
-		auto event_t::wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
-			->event_t::timeout_all_awaiter<_Iter>
-		{
-			clock_type::time_point tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
-			return { tp, begin_, end_ };
-		}
+	template<class _Rep, class _Period, class _Iter>
+	requires(_IteratorOfT<_Iter, event_t>)
+	auto event_t::wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
+		->event_t::timeout_all_awaiter<_Iter>
+	{
+		clock_type::time_point tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
+		return { tp, begin_, end_ };
+	}
 
-		template<class _Rep, class _Period, class _Cont COMMA_RESUMEF_ENABLE_IF_TYPENAME()>
-		RESUMEF_REQUIRES(_ContainerOfT<_Cont, event_t>)
-		auto event_t::wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, const _Cont& cnt_)
-			->event_t::timeout_all_awaiter<decltype(std::begin(cnt_))>
-		{
-			clock_type::time_point tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
-			return { tp, std::begin(cnt_), std::end(cnt_) };
-		}
+	template<class _Rep, class _Period, class _Cont>
+	requires(_ContainerOfT<_Cont, event_t>)
+	auto event_t::wait_all_for(const std::chrono::duration<_Rep, _Period>& dt, const _Cont& cnt_)
+		->event_t::timeout_all_awaiter<decltype(std::begin(cnt_))>
+	{
+		clock_type::time_point tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
+		return { tp, std::begin(cnt_), std::end(cnt_) };
 	}
 }

@@ -1,22 +1,17 @@
 #pragma once
 
-#if RESUMEF_ENABLE_CONCEPT
 #include <concepts>
-#endif
 
 namespace resumef
 {
-
-#if RESUMEF_ENABLE_CONCEPT
-
 	template<typename T>
 	concept _AwaitorT = requires(T&& v)
 	{
 		{ v.await_ready() } ->std::same_as<bool>;
-		{ v.await_suspend(std::declval<std::experimental::coroutine_handle<promise_t<>>>()) };
+		{ v.await_suspend(std::declval<std::coroutine_handle<promise_t<>>>()) };
 		{ v.await_resume() };
 		requires traits::is_valid_await_suspend_return_v<
-			decltype(v.await_suspend(std::declval<std::experimental::coroutine_handle<promise_t<>>>()))
+			decltype(v.await_suspend(std::declval<std::coroutine_handle<promise_t<>>>()))
 		>;
 	};
 
@@ -85,49 +80,20 @@ namespace resumef
 		//requires std::is_same_v<E, remove_cvref_t<decltype(*std::begin(v))>>;
 	};
 
-#define COMMA_RESUMEF_ENABLE_IF_TYPENAME() 
-#define COMMA_RESUMEF_ENABLE_IF(...) 
-#define RESUMEF_ENABLE_IF(...) 
 #define RESUMEF_REQUIRES(...) requires __VA_ARGS__
 
-#else
-
-#define _AwaitorT typename
-#define _HasStateT typename
-#define _FutureT typename
-#define _CallableT typename
-//#define _GeneratorT typename
-#define _AwaitableT typename
-#define _WhenTaskT typename
-#define _IteratorT typename
-#define _IteratorOfT typename
-#define _WhenIterT typename
-#define _ContainerT typename
-#define _ContainerOfT typename
-
-#define COMMA_RESUMEF_ENABLE_IF_TYPENAME() ,typename _EnableIf
-#define COMMA_RESUMEF_ENABLE_IF(...) ,typename=std::enable_if_t<__VA_ARGS__>
-#define RESUMEF_ENABLE_IF(...) typename=std::enable_if_t<__VA_ARGS__>
-#define RESUMEF_REQUIRES(...) 
-
-#endif
-
-#if RESUMEF_ENABLE_CONCEPT
-template<typename T>
-concept _LockAssembleT = requires(T && v)
-{
-	{ v.size() };
-	{ v[0] };
-	{ v._Lock_ref(v[0]) };
-	{ v._Try_lock_ref(v[0]) };
-	{ v._Unlock_ref(v[0]) } ->std::same_as<void>;
-	{ v._Yield() };
-	{ v._ReturnValue() };
-	{ v._ReturnValue(0) };
-	requires std::is_integral_v<decltype(v.size())>;
-};
-#else
-#define _LockAssembleT typename
-#endif
+	template<typename T>
+	concept _LockAssembleT = requires(T && v)
+	{
+		{ v.size() };
+		{ v[0] };
+		{ v._Lock_ref(v[0]) };
+		{ v._Try_lock_ref(v[0]) };
+		{ v._Unlock_ref(v[0]) } ->std::same_as<void>;
+		{ v._Yield() };
+		{ v._ReturnValue() };
+		{ v._ReturnValue(0) };
+		requires std::is_integral_v<decltype(v.size())>;
+	};
 
 }

@@ -17,9 +17,9 @@ namespace resumef
 			void on_cancel() noexcept;
 			bool on_notify(mutex_v2_impl* eptr);
 			bool on_timeout();
-			
+
 			void add_timeout_timer(std::chrono::system_clock::time_point tp);
-			
+
 			inline void on_await_suspend(coroutine_handle<> handler, scheduler_t* sch, state_base_t* root) noexcept
 			{
 				this->_scheduler = sch;
@@ -124,464 +124,464 @@ namespace resumef
 #undef LOCK_ASSEMBLE_RETURN
 	}
 
-	inline namespace mutex_v2
+	template<>
+	struct [[nodiscard]] batch_unlock_t<mutex_t>
 	{
-		template<>
-		struct [[nodiscard]] batch_unlock_t<mutex_t>
+		typedef std::shared_ptr<detail::mutex_v2_impl> mutex_impl_ptr;
+
+		batch_unlock_t()
+			: _owner(nullptr)
+		{}
+
+		//此函数，应该在try_lock()获得锁后使用
+		//或者在协程里，由awaiter使用
+		batch_unlock_t(std::adopt_lock_t, void* sch, mutex_impl_ptr mtx)
+			: _mutex(std::move(mtx))
+			, _owner(sch)
+		{}
+
+		batch_unlock_t(std::adopt_lock_t, void* sch, const mutex_t& mtx)
+			: batch_unlock_t(std::adopt_lock, sch, mtx._mutex)
+		{}
+
+		/*
+					//此函数，适合在非协程里使用
+					batch_unlock_t(void* sch, mutex_impl_ptr mtx)
+						: _mutex(std::move(mtx))
+						, _owner(sch)
+					{
+						if (_mutex != nullptr)
+							_mutex->lock_until_succeed(sch);
+					}
+
+					batch_unlock_t(void* sch, const mutex_t& mtx)
+						: batch_unlock_t(sch, mtx._mutex)
+					{}
+		*/
+
+		~batch_unlock_t()
 		{
-			typedef std::shared_ptr<detail::mutex_v2_impl> mutex_impl_ptr;
-
-			batch_unlock_t() 
-				: _owner(nullptr)
-			{}
-
-			//此函数，应该在try_lock()获得锁后使用
-			//或者在协程里，由awaiter使用
-			batch_unlock_t(std::adopt_lock_t, void* sch, mutex_impl_ptr mtx)
-				: _mutex(std::move(mtx))
-				, _owner(sch)
-			{}
-
-			batch_unlock_t(std::adopt_lock_t, void* sch, const mutex_t& mtx)
-				: batch_unlock_t(std::adopt_lock, sch, mtx._mutex)
-			{}
-
-/*
-			//此函数，适合在非协程里使用
-			batch_unlock_t(void* sch, mutex_impl_ptr mtx)
-				: _mutex(std::move(mtx))
-				, _owner(sch)
-			{
-				if (_mutex != nullptr)
-					_mutex->lock_until_succeed(sch);
-			}
-
-			batch_unlock_t(void* sch, const mutex_t& mtx)
-				: batch_unlock_t(sch, mtx._mutex)
-			{}
-*/
-
-			~batch_unlock_t()
-			{
-				if (_mutex != nullptr)
-					_mutex->unlock(_owner);
-			}
-
-			inline void unlock() noexcept
-			{
-				if (_mutex != nullptr)
-				{
-					_mutex->unlock(_owner);
-					_mutex = nullptr;
-				}
-			}
-
-			batch_unlock_t(const batch_unlock_t&) = delete;
-			batch_unlock_t& operator = (const batch_unlock_t&) = delete;
-			batch_unlock_t(batch_unlock_t&& _Right) = default;
-			batch_unlock_t& operator = (batch_unlock_t&& _Right) = default;
-		private:
-			mutex_impl_ptr _mutex;
-			void* _owner;
-		};
-
-		struct mutex_t::lock_awaiter
-		{
-			lock_awaiter(detail::mutex_v2_impl* mtx) noexcept
-				: _mutex(mtx)
-			{
-				assert(_mutex != nullptr);
-			}
-
-			~lock_awaiter() noexcept(false)
-			{
-				assert(_mutex == nullptr);
-				if (_mutex != nullptr)
-				{
-					throw mutex_exception(error_code::not_await_lock);
-				}
-			}
-
-			bool await_ready() noexcept
-			{
-				return false;
-			}
-
-			template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
-			{
-				(void)cb;
-				_PromiseT& promise = handler.promise();
-				auto* parent = promise.get_state();
-				_root = parent->get_root();
-				assert(_root != nullptr);
-				assert(_root->get_parent() == nullptr);
-
-				scoped_lock<detail::mutex_v2_impl::lock_type> lock_(_mutex->_lock);
-				if (_mutex->try_lock_lockless(_root))
-					return false;
-
-				_state = new detail::state_mutex_t(_mutex);
-				_state->on_await_suspend(handler, parent->get_scheduler(), _root);
-				
-				if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
-					cb();
-
-				_mutex->add_wait_list_lockless(_state.get());
-
-				return true;
-			}
-		protected:
-			detail::mutex_v2_impl* _mutex;
-			counted_ptr<detail::state_mutex_t> _state;
-			state_base_t* _root = nullptr;
-		};
-
-		struct [[nodiscard]] mutex_t::awaiter : public lock_awaiter
-		{
-			using lock_awaiter::lock_awaiter;
-
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
-			{
-				return await_suspend2(handler, nullptr);
-			}
-			batch_unlock_t<mutex_t> await_resume() noexcept
-			{
-				mutex_impl_ptr mtx = _mutex ? _mutex->shared_from_this() : nullptr;
-				_mutex = nullptr;
-
-				return { std::adopt_lock, _root, mtx };
-			}
-		};
-
-		inline mutex_t::awaiter mutex_t::operator co_await() const noexcept
-		{
-			return { _mutex.get() };
+			if (_mutex != nullptr)
+				_mutex->unlock(_owner);
 		}
 
-		inline mutex_t::awaiter mutex_t::lock() const noexcept
+		inline void unlock() noexcept
 		{
-			return { _mutex.get() };
-		}
-
-		struct mutex_t::manual_awaiter : public lock_awaiter
-		{
-			using lock_awaiter::lock_awaiter;
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			if (_mutex != nullptr)
 			{
-				return await_suspend2(handler, nullptr);
-			}
-			void await_resume() noexcept
-			{
+				_mutex->unlock(_owner);
 				_mutex = nullptr;
 			}
-		};
-
-		inline mutex_t::manual_awaiter mutex_t::lock(adopt_manual_unlock_t) const noexcept
-		{
-			return { _mutex.get() };
 		}
 
-		inline bool mutex_t::is_locked() const
+		batch_unlock_t(const batch_unlock_t&) = delete;
+		batch_unlock_t& operator = (const batch_unlock_t&) = delete;
+		batch_unlock_t(batch_unlock_t&& _Right) = default;
+		batch_unlock_t& operator = (batch_unlock_t&& _Right) = default;
+	private:
+		mutex_impl_ptr _mutex;
+		void* _owner;
+	};
+
+	struct mutex_t::lock_awaiter
+	{
+		lock_awaiter(detail::mutex_v2_impl* mtx) noexcept
+			: _mutex(mtx)
 		{
-			return _mutex->owner() != nullptr;
+			assert(_mutex != nullptr);
 		}
 
-		struct [[nodiscard]] mutex_t::try_awaiter
+		~lock_awaiter() noexcept(false)
 		{
-			try_awaiter(detail::mutex_v2_impl* mtx) noexcept
-				: _mutex(mtx)
+			assert(_mutex == nullptr);
+			if (_mutex != nullptr)
 			{
-				assert(_mutex != nullptr);
+				throw mutex_exception(error_code::not_await_lock);
 			}
-			~try_awaiter() noexcept(false)
-			{
-				assert(_mutex == nullptr);
-				if (_mutex != nullptr)
-				{
-					throw mutex_exception(error_code::not_await_lock);
-				}
-			}
+		}
 
-			bool await_ready() noexcept
-			{
+		bool await_ready() noexcept
+		{
+			return false;
+		}
+
+		template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
+		{
+			(void)cb;
+			_PromiseT& promise = handler.promise();
+			auto* parent = promise.get_state();
+			_root = parent->get_root();
+			assert(_root != nullptr);
+			assert(_root->get_parent() == nullptr);
+
+			scoped_lock<detail::mutex_v2_impl::lock_type> lock_(_mutex->_lock);
+			if (_mutex->try_lock_lockless(_root))
 				return false;
-			}
 
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
+			_state = new detail::state_mutex_t(_mutex);
+			_state->on_await_suspend(handler, parent->get_scheduler(), _root);
+
+			if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
+				cb();
+
+			_mutex->add_wait_list_lockless(_state.get());
+
+			return true;
+		}
+	protected:
+		detail::mutex_v2_impl* _mutex;
+		counted_ptr<detail::state_mutex_t> _state;
+		state_base_t* _root = nullptr;
+	};
+
+	struct [[nodiscard]] mutex_t::awaiter : public lock_awaiter
+	{
+		using lock_awaiter::lock_awaiter;
+
+		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		bool await_suspend(coroutine_handle<_PromiseT> handler)
+		{
+			return await_suspend2(handler, nullptr);
+		}
+		batch_unlock_t<mutex_t> await_resume() noexcept
+		{
+			mutex_impl_ptr mtx = _mutex ? _mutex->shared_from_this() : nullptr;
+			_mutex = nullptr;
+
+			return { std::adopt_lock, _root, mtx };
+		}
+	};
+
+	inline mutex_t::awaiter mutex_t::operator co_await() const noexcept
+	{
+		return { _mutex.get() };
+	}
+
+	inline mutex_t::awaiter mutex_t::lock() const noexcept
+	{
+		return { _mutex.get() };
+	}
+
+	struct mutex_t::manual_awaiter : public lock_awaiter
+	{
+		using lock_awaiter::lock_awaiter;
+		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		bool await_suspend(coroutine_handle<_PromiseT> handler)
+		{
+			return await_suspend2(handler, nullptr);
+		}
+		void await_resume() noexcept
+		{
+			_mutex = nullptr;
+		}
+	};
+
+	inline mutex_t::manual_awaiter mutex_t::lock(adopt_manual_unlock_t) const noexcept
+	{
+		return { _mutex.get() };
+	}
+
+	inline bool mutex_t::is_locked() const
+	{
+		return _mutex->owner() != nullptr;
+	}
+
+	struct [[nodiscard]] mutex_t::try_awaiter
+	{
+		try_awaiter(detail::mutex_v2_impl* mtx) noexcept
+			: _mutex(mtx)
+		{
+			assert(_mutex != nullptr);
+		}
+		~try_awaiter() noexcept(false)
+		{
+			assert(_mutex == nullptr);
+			if (_mutex != nullptr)
 			{
-				_PromiseT& promise = handler.promise();
-				auto* parent = promise.get_state();
-				if (!_mutex->try_lock(parent->get_root()))
-					_mutex = nullptr;
-
-				return false;
+				throw mutex_exception(error_code::not_await_lock);
 			}
+		}
 
-			bool await_resume() noexcept
-			{
-				detail::mutex_v2_impl* mtx = _mutex;
+		bool await_ready() noexcept
+		{
+			return false;
+		}
+
+		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		bool await_suspend(coroutine_handle<_PromiseT> handler)
+		{
+			_PromiseT& promise = handler.promise();
+			auto* parent = promise.get_state();
+			if (!_mutex->try_lock(parent->get_root()))
 				_mutex = nullptr;
-				return mtx != nullptr;
-			}
-		protected:
-			detail::mutex_v2_impl* _mutex;
-		};
 
-		inline mutex_t::try_awaiter mutex_t::try_lock() const noexcept
-		{
-			return { _mutex.get() };
+			return false;
 		}
 
-		struct [[nodiscard]] mutex_t::unlock_awaiter
+		bool await_resume() noexcept
 		{
-			unlock_awaiter(detail::mutex_v2_impl* mtx) noexcept
-				: _mutex(mtx)
-			{
-				assert(_mutex != nullptr);
-			}
-			~unlock_awaiter() noexcept(false)
-			{
-				assert(_mutex == nullptr);
-				if (_mutex != nullptr)
-				{
-					throw mutex_exception(error_code::not_await_lock);
-				}
-			}
+			detail::mutex_v2_impl* mtx = _mutex;
+			_mutex = nullptr;
+			return mtx != nullptr;
+		}
+	protected:
+		detail::mutex_v2_impl* _mutex;
+	};
 
-			bool await_ready() noexcept
-			{
-				return false;
-			}
+	inline mutex_t::try_awaiter mutex_t::try_lock() const noexcept
+	{
+		return { _mutex.get() };
+	}
 
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-			bool await_suspend(coroutine_handle<_PromiseT> handler)
-			{
-				_PromiseT& promise = handler.promise();
-				auto* parent = promise.get_state();
-				_mutex->unlock(parent->get_root());
-
-				return false;
-			}
-
-			void await_resume() noexcept
-			{
-				_mutex = nullptr;
-			}
-		protected:
-			detail::mutex_v2_impl* _mutex;
-		};
-
-		inline mutex_t::unlock_awaiter mutex_t::unlock() const noexcept
+	struct [[nodiscard]] mutex_t::unlock_awaiter
+	{
+		unlock_awaiter(detail::mutex_v2_impl* mtx) noexcept
+			: _mutex(mtx)
 		{
-			return { _mutex.get() };
+			assert(_mutex != nullptr);
+		}
+		~unlock_awaiter() noexcept(false)
+		{
+			assert(_mutex == nullptr);
+			if (_mutex != nullptr)
+			{
+				throw mutex_exception(error_code::not_await_lock);
+			}
 		}
 
-
-
-
-		struct [[nodiscard]] mutex_t::timeout_awaiter : public event_t::timeout_awaitor_impl<lock_awaiter>
+		bool await_ready() noexcept
 		{
-			using event_t::timeout_awaitor_impl<lock_awaiter>::timeout_awaitor_impl;
-			bool await_resume() noexcept
-			{
-				detail::mutex_v2_impl* mtx = this->_mutex;
-				this->_mutex = nullptr;
-				return mtx != nullptr;
-			}
-		};
-
-		template <class _Rep, class _Period>
-		inline mutex_t::timeout_awaiter mutex_t::try_lock_until(const std::chrono::time_point<_Rep, _Period>& tp) const noexcept
-		{
-			return { tp, _mutex.get() };
+			return false;
 		}
 
-		template <class _Rep, class _Period>
-		inline mutex_t::timeout_awaiter mutex_t::try_lock_for(const std::chrono::duration<_Rep, _Period>& dt) const noexcept
+		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
-			auto tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
-			return { tp, _mutex.get() };
+			_PromiseT& promise = handler.promise();
+			auto* parent = promise.get_state();
+			_mutex->unlock(parent->get_root());
+
+			return false;
 		}
 
-
-		inline void mutex_t::lock(void* unique_address) const
+		void await_resume() noexcept
 		{
-			assert(unique_address != nullptr);
-			_mutex->lock_until_succeed(unique_address);
+			_mutex = nullptr;
 		}
+	protected:
+		detail::mutex_v2_impl* _mutex;
+	};
 
-		inline bool mutex_t::try_lock(void* unique_address) const
+	inline mutex_t::unlock_awaiter mutex_t::unlock() const noexcept
+	{
+		return { _mutex.get() };
+	}
+
+
+
+
+	struct [[nodiscard]] mutex_t::timeout_awaiter : public event_t::timeout_awaitor_impl<lock_awaiter>
+	{
+		using event_t::timeout_awaitor_impl<lock_awaiter>::timeout_awaitor_impl;
+		bool await_resume() noexcept
 		{
-			assert(unique_address != nullptr);
-			return _mutex->try_lock(unique_address);
+			detail::mutex_v2_impl* mtx = this->_mutex;
+			this->_mutex = nullptr;
+			return mtx != nullptr;
 		}
+	};
 
-		template <class _Rep, class _Period>
-		inline bool mutex_t::try_lock_for(const std::chrono::duration<_Rep, _Period>& dt, void* unique_address)
-		{
-			assert(unique_address != nullptr);
-			return _mutex->try_lock_until(clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt), unique_address);
-		}
+	template <class _Rep, class _Period>
+	inline mutex_t::timeout_awaiter mutex_t::try_lock_until(const std::chrono::time_point<_Rep, _Period>& tp) const noexcept
+	{
+		return { tp, _mutex.get() };
+	}
 
-		template <class _Rep, class _Period>
-		inline bool mutex_t::try_lock_until(const std::chrono::time_point<_Rep, _Period>& tp, void* unique_address)
-		{
-			assert(unique_address != nullptr);
-			return _mutex->try_lock_until(std::chrono::time_point_cast<clock_type::time_point>(tp), unique_address);
-		}
-
-		inline void mutex_t::unlock(void* unique_address) const
-		{
-			assert(unique_address != nullptr);
-			_mutex->unlock(unique_address);
-		}
+	template <class _Rep, class _Period>
+	inline mutex_t::timeout_awaiter mutex_t::try_lock_for(const std::chrono::duration<_Rep, _Period>& dt) const noexcept
+	{
+		auto tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
+		return { tp, _mutex.get() };
+	}
 
 
+	inline void mutex_t::lock(void* unique_address) const
+	{
+		assert(unique_address != nullptr);
+		_mutex->lock_until_succeed(unique_address);
+	}
 
-		struct mutex_t::_MutexAwaitAssembleT
-		{
-		public:
-			std::vector<mutex_t> _mutex;
-			void* _owner;
+	inline bool mutex_t::try_lock(void* unique_address) const
+	{
+		assert(unique_address != nullptr);
+		return _mutex->try_lock(unique_address);
+	}
 
-			template<class... _Mtxs>
-			_MutexAwaitAssembleT(void* unique_address, _Mtxs&... mtxs)
-				: _mutex({ mtxs... })
-				, _owner(unique_address)
-			{}
-			size_t size() const
-			{
-				return _mutex.size();
-			}
-			mutex_t& operator[](int _Idx)
-			{
-				return _mutex[_Idx];
-			}
-			auto _Lock_ref(mutex_t& _LkN) const
-			{
-				return _LkN.lock(adopt_manual_unlock);
-			}
-			auto _Try_lock_ref(mutex_t& _LkN) const
-			{
-				return _LkN.try_lock();
-			}
-			void _Unlock_ref(mutex_t& _LkN) const
-			{
-				_LkN.unlock(_owner);
-			}
-			future_t<> _Yield() const
-			{
-				for (int cnt = rand() % (1 + _mutex.size()); cnt >= 0; --cnt)
-				{
-					std::this_thread::yield();	//还要考虑多线程里运行的情况
-					co_await yield();
-				}
-			}
-			future_t<> _ReturnValue() const;
-			template<class U>
-			future_t<U> _ReturnValue(U v) const;
+	template <class _Rep, class _Period>
+	inline bool mutex_t::try_lock_for(const std::chrono::duration<_Rep, _Period>& dt, void* unique_address)
+	{
+		assert(unique_address != nullptr);
+		return _mutex->try_lock_until(clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt), unique_address);
+	}
 
-			_MutexAwaitAssembleT(const _MutexAwaitAssembleT&) = default;
-			_MutexAwaitAssembleT& operator = (const _MutexAwaitAssembleT&) = default;
-			_MutexAwaitAssembleT(_MutexAwaitAssembleT&& _Right) = default;
-			_MutexAwaitAssembleT& operator = (_MutexAwaitAssembleT&& _Right) = default;
-		};
+	template <class _Rep, class _Period>
+	inline bool mutex_t::try_lock_until(const std::chrono::time_point<_Rep, _Period>& tp, void* unique_address)
+	{
+		assert(unique_address != nullptr);
+		return _mutex->try_lock_until(std::chrono::time_point_cast<clock_type::time_point>(tp), unique_address);
+	}
+
+	inline void mutex_t::unlock(void* unique_address) const
+	{
+		assert(unique_address != nullptr);
+		_mutex->unlock(unique_address);
+	}
+
+
+
+	struct mutex_t::_MutexAwaitAssembleT
+	{
+	public:
+		std::vector<mutex_t> _mutex;
+		void* _owner;
 
 		template<class... _Mtxs>
-		struct batch_unlock_t
+		_MutexAwaitAssembleT(void* unique_address, _Mtxs&... mtxs)
+			: _mutex({ mtxs... })
+			, _owner(unique_address)
+		{}
+		size_t size() const
 		{
-			mutex_t::_MutexAwaitAssembleT _MAA;
-
-			template<class... U>
-			batch_unlock_t(std::adopt_lock_t, void* sch, U&&... mtxs)
-				: _MAA(sch, std::forward<U>(mtxs)...)
-			{}
-
-			~batch_unlock_t()
+			return _mutex.size();
+		}
+		mutex_t& operator[](int _Idx)
+		{
+			return _mutex[_Idx];
+		}
+		auto _Lock_ref(mutex_t& _LkN) const
+		{
+			return _LkN.lock(adopt_manual_unlock);
+		}
+		auto _Try_lock_ref(mutex_t& _LkN) const
+		{
+			return _LkN.try_lock();
+		}
+		void _Unlock_ref(mutex_t& _LkN) const
+		{
+			_LkN.unlock(_owner);
+		}
+		future_t<> _Yield() const
+		{
+			for (int cnt = rand() % (1 + _mutex.size()); cnt >= 0; --cnt)
 			{
-				if (_MAA._owner != nullptr)
-				{
-					for (mutex_t& mtx : _MAA._mutex)
-						mtx.unlock(_MAA._owner);
-				}
+				std::this_thread::yield();	//还要考虑多线程里运行的情况
+				co_await yield();
 			}
+		}
+		/*
+					future_t<> _ReturnValue() const;
+					template<class U>
+					future_t<U> _ReturnValue(U v) const;
+		*/
 
-			inline void unlock() noexcept
+		/*
+					_MutexAwaitAssembleT(const _MutexAwaitAssembleT&) = default;
+					_MutexAwaitAssembleT& operator = (const _MutexAwaitAssembleT&) = default;
+					_MutexAwaitAssembleT(_MutexAwaitAssembleT&& _Right) = default;
+					_MutexAwaitAssembleT& operator = (_MutexAwaitAssembleT&& _Right) = default;
+		*/
+	};
+
+	template<class... _Mtxs>
+	struct batch_unlock_t
+	{
+		mutex_t::_MutexAwaitAssembleT _MAA;
+
+		template<class... U>
+		batch_unlock_t(std::adopt_lock_t, void* sch, U&&... mtxs)
+			: _MAA(sch, std::forward<U>(mtxs)...)
+		{}
+
+		~batch_unlock_t()
+		{
+			if (_MAA._owner != nullptr)
 			{
-				if (_MAA._owner != nullptr)
-				{
-					for (mutex_t& mtx : _MAA._mutex)
-						mtx.unlock(_MAA._owner);
-					_MAA._owner = nullptr;
-				}
+				for (mutex_t& mtx : _MAA._mutex)
+					mtx.unlock(_MAA._owner);
 			}
-
-			batch_unlock_t(const batch_unlock_t&) = delete;
-			batch_unlock_t& operator = (const batch_unlock_t&) = delete;
-			batch_unlock_t(batch_unlock_t&& _Right) = default;
-			batch_unlock_t& operator = (batch_unlock_t&& _Right) = default;
-		};
-
-		template<class... _Mtxs>
-		batch_unlock_t()->batch_unlock_t<_Mtxs...>;
-
-		template<class... _Mtxs, typename>
-		inline future_t<batch_unlock_t<_Mtxs...>> mutex_t::lock(_Mtxs&... mtxs)
-		{
-			batch_unlock_t<_Mtxs...> unlock_guard{ std::adopt_lock, root_state(), mtxs... };
-			co_await detail::mutex_lock_await_lock_impl::_Lock_range(unlock_guard._MAA);
-			co_return std::move(unlock_guard);
 		}
 
-		template<class... _Mtxs, typename>
-		inline future_t<> mutex_t::lock(adopt_manual_unlock_t _noused, _Mtxs&... mtxs)
+		inline void unlock() noexcept
 		{
-			(void)_noused;	//GCC: 这个参数不起一个名字，会导致GCC编译器内部错误。
-			mutex_t::_MutexAwaitAssembleT _MAA{ root_state(), mtxs... };
-			co_await detail::mutex_lock_await_lock_impl::_Lock_range(_MAA);
-		}
-		
-		template<class... _Mtxs, typename>
-		inline future_t<> mutex_t::unlock(_Mtxs&... mtxs)
-		{
-			void* unique_address = root_state();
-
-			(mtxs.unlock(unique_address), ...);
+			if (_MAA._owner != nullptr)
+			{
+				for (mutex_t& mtx : _MAA._mutex)
+					mtx.unlock(_MAA._owner);
+				_MAA._owner = nullptr;
+			}
 		}
 
-		template<class... _Mtxs, typename>
-		inline batch_unlock_t<_Mtxs...> mutex_t::lock(void* unique_address, _Mtxs&... mtxs)
-		{
-			assert(unique_address != nullptr);
+		batch_unlock_t(const batch_unlock_t&) = delete;
+		batch_unlock_t& operator = (const batch_unlock_t&) = delete;
+		batch_unlock_t(batch_unlock_t&& _Right) = default;
+		batch_unlock_t& operator = (batch_unlock_t&& _Right) = default;
+	};
 
-			detail::_MutexAddressAssembleT _MAA{ unique_address, mtxs... };
-			detail::scoped_lock_range_lock_impl::_Lock_range(_MAA);
-			
-			batch_unlock_t<_Mtxs...> su{ std::adopt_lock, unique_address };
-			su._MAA._mutex = std::move(_MAA._mutex);
-			return su;
-		}
+	template<class... _Mtxs>
+	batch_unlock_t()->batch_unlock_t<_Mtxs...>;
 
-		template<class... _Mtxs, typename>
-		inline void mutex_t::lock(adopt_manual_unlock_t, void* unique_address, _Mtxs&... mtxs)
-		{
-			assert(unique_address != nullptr);
+	template<class... _Mtxs, typename>
+	inline future_t<batch_unlock_t<_Mtxs...>> mutex_t::lock(_Mtxs&... mtxs)
+	{
+		batch_unlock_t<_Mtxs...> unlock_guard{ std::adopt_lock, root_state(), mtxs... };
+		co_await detail::mutex_lock_await_lock_impl::_Lock_range(unlock_guard._MAA);
+		co_return std::move(unlock_guard);
+	}
 
-			detail::_MutexAddressAssembleT _MAA{ unique_address, mtxs... };
-			detail::scoped_lock_range_lock_impl::_Lock_range(_MAA);
-		}
+	template<class... _Mtxs, typename>
+	inline future_t<> mutex_t::lock(adopt_manual_unlock_t _noused, _Mtxs&... mtxs)
+	{
+		(void)_noused;	//GCC: 这个参数不起一个名字，会导致GCC编译器内部错误。
+		mutex_t::_MutexAwaitAssembleT _MAA{ root_state(), mtxs... };
+		co_await detail::mutex_lock_await_lock_impl::_Lock_range(_MAA);
+	}
 
-		template<class... _Mtxs, typename>
-		inline void mutex_t::unlock(void* unique_address, _Mtxs&... mtxs)
-		{
-			assert(unique_address != nullptr);
+	template<class... _Mtxs, typename>
+	inline future_t<> mutex_t::unlock(_Mtxs&... mtxs)
+	{
+		void* unique_address = root_state();
 
-			(mtxs.unlock(unique_address), ...);
-		}
+		(mtxs.unlock(unique_address), ...);
+	}
+
+	template<class... _Mtxs, typename>
+	inline batch_unlock_t<_Mtxs...> mutex_t::lock(void* unique_address, _Mtxs&... mtxs)
+	{
+		assert(unique_address != nullptr);
+
+		detail::_MutexAddressAssembleT _MAA{ unique_address, mtxs... };
+		detail::scoped_lock_range_lock_impl::_Lock_range(_MAA);
+
+		batch_unlock_t<_Mtxs...> su{ std::adopt_lock, unique_address };
+		su._MAA._mutex = std::move(_MAA._mutex);
+		return su;
+	}
+
+	template<class... _Mtxs, typename>
+	inline void mutex_t::lock(adopt_manual_unlock_t, void* unique_address, _Mtxs&... mtxs)
+	{
+		assert(unique_address != nullptr);
+
+		detail::_MutexAddressAssembleT _MAA{ unique_address, mtxs... };
+		detail::scoped_lock_range_lock_impl::_Lock_range(_MAA);
+	}
+
+	template<class... _Mtxs, typename>
+	inline void mutex_t::unlock(void* unique_address, _Mtxs&... mtxs)
+	{
+		assert(unique_address != nullptr);
+
+		(mtxs.unlock(unique_address), ...);
 	}
 }
-

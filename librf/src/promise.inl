@@ -68,18 +68,10 @@ namespace resumef
 	}
 
 	template <typename _Ty>
-	inline void promise_impl_t<_Ty>::set_exception(std::exception_ptr e)
-	{
-        this->ref_state()->set_exception(std::move(e));
-	}
-
-#if defined(__clang__) || defined(__GNUC__)
-	template <typename _Ty>
 	inline void promise_impl_t<_Ty>::unhandled_exception()
 	{
 		this->ref_state()->set_exception(std::current_exception());
 	}
-#endif
 
 	template <typename _Ty>
 	inline future_t<_Ty> promise_impl_t<_Ty>::get_return_object() noexcept

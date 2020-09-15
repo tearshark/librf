@@ -32,10 +32,7 @@ namespace resumef
 		suspend_on_final final_suspend() noexcept;
 		template <typename _Uty>
 		_Uty&& await_transform(_Uty&& _Whatever) noexcept;
-		void set_exception(std::exception_ptr e);
-#if defined(__clang__) || defined(__GNUC__)
 		void unhandled_exception();		//If the coroutine ends with an uncaught exception, it performs the following: 
-#endif
 		future_type get_return_object() noexcept;
 		void cancellation_requested() noexcept;
 

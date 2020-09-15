@@ -9,8 +9,6 @@ namespace detail
 	struct channel_impl_v2;
 }	//namespace detail
 
-inline namespace channel_v2
-{
 #endif	//DOXYGEN_SKIP_PROPERTY
 
 	/**
@@ -62,14 +60,8 @@ inline namespace channel_v2
 		 * @brief 在协程中向channel_t里写入一个数据。
 		 * @see 参考write()函数
 		 */
-		template<class U
-#ifndef DOXYGEN_SKIP_PROPERTY
-			COMMA_RESUMEF_ENABLE_IF(std::is_constructible_v<_Ty, U&&>)
-#endif	//DOXYGEN_SKIP_PROPERTY
-		>
-#ifndef DOXYGEN_SKIP_PROPERTY
-		RESUMEF_REQUIRES(std::is_constructible_v<_Ty, U&&>)
-#endif	//DOXYGEN_SKIP_PROPERTY
+		template<class U>
+		requires(std::is_constructible_v<_Ty, U&&>)
 		write_awaiter operator << (U&& val) const noexcept(std::is_nothrow_move_constructible_v<U>);
 
 		/**
@@ -79,14 +71,8 @@ inline namespace channel_v2
 		 * @param val 写入的数据。必须是可以成功构造_Ty(val)的类型。
 		 * @return [co_await] void
 		 */
-		template<class U
-#ifndef DOXYGEN_SKIP_PROPERTY
-			COMMA_RESUMEF_ENABLE_IF(std::is_constructible_v<_Ty, U&&>)
-#endif	//DOXYGEN_SKIP_PROPERTY
-		>
-#ifndef DOXYGEN_SKIP_PROPERTY
-		RESUMEF_REQUIRES(std::is_constructible_v<_Ty, U&&>)
-#endif	//DOXYGEN_SKIP_PROPERTY
+		template<class U>
+		requires(std::is_constructible_v<_Ty, U&&>)
 		write_awaiter write(U&& val) const noexcept(std::is_nothrow_move_constructible_v<U>);
 
 
@@ -123,5 +109,4 @@ inline namespace channel_v2
 	 */
 	using semaphore_t = channel_t<bool, false, true>;
 
-}	//namespace channel_v2
 }	//namespace resumef
