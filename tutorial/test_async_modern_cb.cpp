@@ -174,3 +174,9 @@ void resumable_main_modern_cb()
 	example_future();
 	example_librf();
 }
+
+int main()
+{
+	resumable_main_modern_cb();
+	return 0;
+}

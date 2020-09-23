@@ -89,3 +89,9 @@ void resumable_main_exception(bool bomb)
 		this_scheduler()->run_until_notask();
 	}
 }
+
+int main()
+{
+	resumable_main_exception(true);
+	return 0;
+}

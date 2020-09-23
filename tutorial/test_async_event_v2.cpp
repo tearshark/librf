@@ -9,7 +9,7 @@ using namespace resumef;
 using namespace std::chrono;
 
 //非协程的逻辑线程，或异步代码，可以通过event_t通知到协程，并且不会阻塞协程所在的线程。
-static std::thread async_set_event_all(const event_v2::event_t & e, std::chrono::milliseconds dt)
+static std::thread async_set_event_all(const event_t & e, std::chrono::milliseconds dt)
 {
 	return std::thread([=]
 	{
@@ -18,7 +18,7 @@ static std::thread async_set_event_all(const event_v2::event_t & e, std::chrono:
 	});
 }
 
-static std::thread async_set_event_one(event_v2::event_t e, std::chrono::milliseconds dt)
+static std::thread async_set_event_one(event_t e, std::chrono::milliseconds dt)
 {
 	return std::thread([=]
 	{
@@ -27,7 +27,7 @@ static std::thread async_set_event_one(event_v2::event_t e, std::chrono::millise
 	});
 }
 
-static future_t<> resumable_wait_event(event_v2::event_t e, int idx)
+static future_t<> resumable_wait_event(event_t e, int idx)
 {
 	auto result = co_await e;
 	if (result)
@@ -36,7 +36,7 @@ static future_t<> resumable_wait_event(event_v2::event_t e, int idx)
 		std::cout << "[" << idx << "]time out!" << std::endl;
 }
 
-static future_t<> resumable_wait_timeout(event_v2::event_t e, milliseconds dt, int idx)
+static future_t<> resumable_wait_timeout(event_t e, milliseconds dt, int idx)
 {
 	auto result = co_await e.wait_for(dt);
 	if (result)
@@ -47,7 +47,7 @@ static future_t<> resumable_wait_timeout(event_v2::event_t e, milliseconds dt, i
 
 static void test_notify_all()
 {
-	event_v2::event_t evt;
+	event_t evt;
 	go resumable_wait_event(evt, 0);
 	go resumable_wait_event(evt, 1);
 	go resumable_wait_event(evt, 2);
@@ -63,7 +63,7 @@ static void test_notify_one()
 	using namespace std::chrono;
 
 	{
-		event_v2::event_t evt;
+		event_t evt;
 		go resumable_wait_event(evt, 10);
 		go resumable_wait_event(evt, 11);
 		go resumable_wait_event(evt, 12);
@@ -85,7 +85,7 @@ static void test_wait_all_timeout()
 
 	srand((int)time(nullptr));
 
-	event_v2::event_t evts[10];
+	event_t evts[10];
 
 	std::vector<std::thread> vtt;
 	for(size_t i = 0; i < std::size(evts); ++i)
@@ -110,4 +110,10 @@ void resumable_main_event_v2()
 
 	test_wait_all_timeout();
 	std::cout << std::endl;
+}
+
+int main()
+{
+	resumable_main_event_v2();
+	return 0;
 }

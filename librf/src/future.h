@@ -13,9 +13,10 @@ namespace resumef
 	template<class _Ty>
 	struct [[nodiscard]] future_t
 	{
+		using promise_type = promise_t<_Ty>;
+
 		using value_type = _Ty;
 		using state_type = state_t<value_type>;
-		using promise_type = promise_t<value_type>;
 		using future_type = future_t<value_type>;
 		using lock_type = typename state_type::lock_type;
 
@@ -34,13 +35,13 @@ namespace resumef
 			return _state->future_await_ready();
 		}
 
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT/*, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>*/>
 		void await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			_state->future_await_suspend(handler);
 		}
 
-		value_type await_resume() const
+		_Ty await_resume() const
 		{
 			return _state->future_await_resume();
 		}

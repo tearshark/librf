@@ -59,3 +59,9 @@ void resumable_main_dynamic_go()
 {
 	test_dynamic_go();
 }
+
+int main()
+{
+	resumable_main_dynamic_go();
+	return 0;
+}

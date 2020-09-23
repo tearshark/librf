@@ -76,3 +76,9 @@ void resumable_main_resumable()
 	}
 */
 }
+
+int main()
+{
+	resumable_main_resumable();
+	return 0;
+}

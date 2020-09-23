@@ -214,3 +214,9 @@ void resumable_main_mutex()
 	std::cout << "begin resumable_mutex_lock_range()" << std::endl;
 	resumable_mutex_lock_range();
 }
+
+int main()
+{
+	resumable_main_mutex();
+	return 0;
+}

@@ -1,6 +1,15 @@
 ﻿#pragma once
 
-#define LIB_RESUMEF_VERSION 20910 // 2.9.10
+#define LIB_RESUMEF_VERSION 30000 // 3.0.0
+
+namespace std
+{
+	using experimental::coroutine_traits;
+    using experimental::coroutine_handle;
+    using experimental::suspend_if;
+    using experimental::suspend_always;
+    using experimental::suspend_never;
+}
 
 namespace resumef
 {
@@ -8,9 +17,7 @@ namespace resumef
 	struct scheduler_t;
 
 	template<class _Ty = void>
-	struct [[nodiscard]] future_t;
-
-	using future_vt [[deprecated]] = future_t<>;
+	struct future_t;
 
 	template <typename _Ty = std::nullptr_t, typename _Alloc = std::allocator<char>>
 	struct generator_t;

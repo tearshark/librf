@@ -140,3 +140,9 @@ void resumable_main_layout()
 
 	std::cout << __FUNCTION__ << " - end" << std::endl;
 }
+
+int main()
+{
+	resumable_main_layout();
+	return 0;
+}

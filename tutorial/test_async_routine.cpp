@@ -43,3 +43,9 @@ void resumable_main_routine()
 #endif //#ifndef __GNUC__
 	this_scheduler()->run_until_notask();
 }
+
+int main()
+{
+	resumable_main_routine();
+	return 0;
+}

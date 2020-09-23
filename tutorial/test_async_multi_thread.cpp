@@ -86,3 +86,9 @@ void resumable_main_multi_thread()
 	//但本范例不应该有协程存在，仅演示不要忽略了主调度器
 	scheduler_t::g_scheduler.run_until_notask();
 }
+
+int main()
+{
+	resumable_main_multi_thread();
+	return 0;
+}

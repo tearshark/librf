@@ -479,18 +479,15 @@ namespace resumef
 				co_await yield();
 			}
 		}
-		/*
-					future_t<> _ReturnValue() const;
-					template<class U>
-					future_t<U> _ReturnValue(U v) const;
-		*/
 
-		/*
-					_MutexAwaitAssembleT(const _MutexAwaitAssembleT&) = default;
-					_MutexAwaitAssembleT& operator = (const _MutexAwaitAssembleT&) = default;
-					_MutexAwaitAssembleT(_MutexAwaitAssembleT&& _Right) = default;
-					_MutexAwaitAssembleT& operator = (_MutexAwaitAssembleT&& _Right) = default;
-		*/
+		future_t<> _ReturnValue() const;
+		template<class U>
+		future_t<U> _ReturnValue(U v) const;
+
+		_MutexAwaitAssembleT(const _MutexAwaitAssembleT&) = default;
+		_MutexAwaitAssembleT& operator = (const _MutexAwaitAssembleT&) = default;
+		_MutexAwaitAssembleT(_MutexAwaitAssembleT&& _Right) = default;
+		_MutexAwaitAssembleT& operator = (_MutexAwaitAssembleT&& _Right) = default;
 	};
 
 	template<class... _Mtxs>

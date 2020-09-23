@@ -92,3 +92,9 @@ test_loop_sleep<5>		->		0000016B847726C0
 test_loop_sleep<6>		->		0000016B847726C0
 test_loop_sleep<7>		->		0000016B847726C0
 */
+
+int main()
+{
+	resumable_main_suspend_always();
+	return 0;
+}

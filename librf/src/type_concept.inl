@@ -80,8 +80,6 @@ namespace resumef
 		//requires std::is_same_v<E, remove_cvref_t<decltype(*std::begin(v))>>;
 	};
 
-#define RESUMEF_REQUIRES(...) requires __VA_ARGS__
-
 	template<typename T>
 	concept _LockAssembleT = requires(T && v)
 	{

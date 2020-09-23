@@ -73,3 +73,9 @@ void resumable_main_sleep()
 	test_wait_all_events_with_signal_by_sleep();
 	std::cout << std::endl;
 }
+
+int main()
+{
+	resumable_main_sleep();
+	return 0;
+}

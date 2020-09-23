@@ -194,3 +194,9 @@ void resumable_main_event()
 	test_wait_all_timeout();
 	std::cout << std::endl;
 }
+
+int main()
+{
+	resumable_main_event();
+	return 0;
+}

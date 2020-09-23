@@ -31,7 +31,8 @@ static future_t<int64_t> async_get_long(int64_t val)
 
 static future_t<int64_t> wait_get_long(int64_t val)
 {
-	co_return co_await async_get_long(val);
+	val = co_await async_get_long(val);
+	co_return val;
 }
 
 //这种情况下，会生成对应的 frame-context，一个promise_type被内嵌在frame-context里
@@ -102,4 +103,10 @@ void resumable_main_cb()
 
 	go loop_get_long(3);
 	this_scheduler()->run_until_notask();
+}
+
+int main()
+{
+	resumable_main_cb();
+	return 0;
 }

@@ -240,3 +240,8 @@ void resumable_main_when_all()
 #endif
 }
 
+int main()
+{
+	resumable_main_when_all();
+	return 0;
+}

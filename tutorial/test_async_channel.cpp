@@ -181,3 +181,9 @@ void resumable_main_channel()
 	test_channel_performance_double_thread(100);
 	test_channel_performance_double_thread(1000);
 }
+
+int main()
+{
+	resumable_main_channel();
+	return 0;
+}

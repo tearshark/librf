@@ -1,62 +1,10 @@
 ﻿
 namespace resumef
 {
-	/*
-	Note: the awaiter object is part of coroutine state (as a temporary whose lifetime crosses a suspension point) 
-	and is destroyed before the co_await expression finishes. 
-	It can be used to maintain per-operation state as required by some async I/O APIs without resorting to additional heap allocations. 
-	*/
 
-	struct suspend_on_initial
-	{
-		inline bool await_ready() noexcept
-		{
-			return false;
-		}
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-		inline void await_suspend(coroutine_handle<_PromiseT> handler) noexcept
-		{
-			_PromiseT& promise = handler.promise();
-			auto* _state = promise.get_state();
-			_state->promise_initial_suspend(handler);
-		}
-		inline void await_resume() noexcept
-		{
-		}
-	};
-
-	struct suspend_on_final
-	{
-		inline bool await_ready() noexcept
-		{
-			return false;
-		}
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
-		inline void await_suspend(coroutine_handle<_PromiseT> handler) noexcept
-		{
-			_PromiseT& promise = handler.promise();
-			auto _state = promise.ref_state();
-			_state->promise_final_suspend(handler);
-		}
-		inline void await_resume() noexcept
-		{
-		}
-	};
-
-	template <typename _Ty>
-	inline suspend_on_initial promise_impl_t<_Ty>::initial_suspend() noexcept
-	{
-        return {};
-	}
-
-	template <typename _Ty>
-	inline suspend_on_final promise_impl_t<_Ty>::final_suspend() noexcept
-	{
-        return {};
-	}
-
-	template <typename _Ty>
-	template <typename _Uty>
+/*
+	template<typename _Ty>
+	template<typename _Uty>
 	_Uty&& promise_impl_t<_Ty>::await_transform(_Uty&& _Whatever) noexcept
 	{
 		if constexpr (traits::has_state_v<_Uty>)
@@ -66,24 +14,7 @@ namespace resumef
 
 		return std::forward<_Uty>(_Whatever);
 	}
-
-	template <typename _Ty>
-	inline void promise_impl_t<_Ty>::unhandled_exception()
-	{
-		this->ref_state()->set_exception(std::current_exception());
-	}
-
-	template <typename _Ty>
-	inline future_t<_Ty> promise_impl_t<_Ty>::get_return_object() noexcept
-	{
-        return { this->get_state() };
-	}
-
-	template <typename _Ty>
-	inline void promise_impl_t<_Ty>::cancellation_requested() noexcept
-	{
-
-	}
+*/
 
 	template <typename _Ty>
 	auto promise_impl_t<_Ty>::get_state() noexcept -> state_type*
@@ -117,6 +48,7 @@ namespace resumef
 		return get_state();
 	}
 
+/*
 	template <typename _Ty>
 	void* promise_impl_t<_Ty>::operator new(size_t _Size)
 	{
@@ -125,11 +57,10 @@ namespace resumef
 		size_t _State_size = _Align_size<state_type>();
 		assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
 
-		/*If allocation fails, the coroutine throws std::bad_alloc,
-		unless the Promise type defines the member function Promise::get_return_object_on_allocation_failure().
-		If that member function is defined, allocation uses the nothrow form of operator new and on allocation failure,
-		the coroutine immediately returns the object obtained from Promise::get_return_object_on_allocation_failure() to the caller.
-		*/
+		//If allocation fails, the coroutine throws std::bad_alloc,
+		//unless the Promise type defines the member function Promise::get_return_object_on_allocation_failure().
+		//If that member function is defined, allocation uses the nothrow form of operator new and on allocation failure,
+		//the coroutine immediately returns the object obtained from Promise::get_return_object_on_allocation_failure() to the caller.
 		char* ptr = _Al.allocate(_Size + _State_size);
 		char* _Rptr = ptr + _State_size;
 #if RESUMEF_DEBUG_COUNTER
@@ -171,44 +102,6 @@ namespace resumef
 		return _Al.deallocate(reinterpret_cast<char*>(_Ptr), _Size);
 #endif
 	}
-
-	template<class _Ty>
-	template<class U>
-	inline void promise_t<_Ty>::return_value(U&& val)
-	{
-        this->ref_state()->set_value(std::forward<U>(val));
-	}
-
-	template<class _Ty>
-	template<class U>
-	inline suspend_always promise_t<_Ty>::yield_value(U&& val)
-	{
-        this->ref_state()->promise_yield_value(this, std::forward<U>(val));
-		return {};
-	}
-
-	template<class _Ty>
-	inline void promise_t<_Ty&>::return_value(_Ty& val)
-	{
-		this->ref_state()->set_value(val);
-	}
-
-	template<class _Ty>
-	inline suspend_always promise_t<_Ty&>::yield_value(_Ty& val)
-	{
-		this->ref_state()->promise_yield_value(this, val);
-		return {};
-	}
-
-	inline void promise_t<void>::return_void()
-	{
-        this->ref_state()->set_value();
-	}
-
-	inline suspend_always promise_t<void>::yield_value()
-	{
-        this->ref_state()->promise_yield_value(this);
-		return {};
-	}
+*/
 }
 

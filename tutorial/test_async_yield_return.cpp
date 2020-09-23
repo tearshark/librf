@@ -88,3 +88,9 @@ void resumable_main_yield_return()
 	go test_yield_future();
 	this_scheduler()->run_until_notask();
 }
+
+int main()
+{
+	resumable_main_yield_return();
+	return 0;
+}

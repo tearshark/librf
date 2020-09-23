@@ -112,3 +112,9 @@ void resumable_main_channel_mult_thread()
 
 	std::cout << "OK: counter = " << gcounter.load() << std::endl;
 }
+
+int main()
+{
+	resumable_main_channel_mult_thread();
+	return 0;
+}

@@ -5,11 +5,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set(CMAKE_CXX_FLAGS "-std=c++2a -fcoroutines-ts -stdlib=libc++")
+	#set(CMAKE_CXX_FLAGS "-std=c++2a -fcoroutines-ts -stdlib=libc++")
+	set(CMAKE_CXX_FLAGS "/std:c++latest /EHsc")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 	set(CMAKE_CXX_FLAGS "-std=c++2a -fcoroutines-ts")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	set(CMAKE_CXX_FLAGS "/std:c++latest /EHsc")
+	set(CMAKE_CXX_FLAGS "/std:c++latest /await /EHsc")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS "-std=c++2a -fcoroutines -fconcepts-diagnostics-depth=8")
 endif()
@@ -79,7 +80,7 @@ ${PROJECT_SOURCE_DIR}/librf
 
 set(SRC 
 ${PROJECT_SOURCE_DIR}/librf/src/event_v2.cpp
-#${PROJECT_SOURCE_DIR}/librf/src/mutex_v2.cpp
+${PROJECT_SOURCE_DIR}/librf/src/mutex_v2.cpp
 ${PROJECT_SOURCE_DIR}/librf/src/rf_task.cpp
 ${PROJECT_SOURCE_DIR}/librf/src/scheduler.cpp
 ${PROJECT_SOURCE_DIR}/librf/src/sleep.cpp

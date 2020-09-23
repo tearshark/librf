@@ -132,3 +132,9 @@ void resumable_main_switch_scheduler()
 	sch_in_thread.store(nullptr, std::memory_order_release);
 	other.join();
 }
+
+int main()
+{
+	resumable_main_switch_scheduler();
+	return 0;
+}

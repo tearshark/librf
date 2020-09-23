@@ -33,3 +33,9 @@ void resumable_main_timer()
 
 	th2.stop();	//but th2 is invalid
 }
+
+int main()
+{
+	resumable_main_timer();
+	return 0;
+}
