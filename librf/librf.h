@@ -33,7 +33,33 @@
 #include <optional>
 #include <thread>
 #include <cassert>
+
+#ifdef __cpp_impl_coroutine
+#include <coroutine>
+#ifdef _MSC_VER
+extern "C" size_t _coro_frame_size();
+extern "C" void* _coro_frame_ptr();
+extern "C" void _coro_init_block();
+extern "C" void* _coro_resume_addr();
+extern "C" void _coro_init_frame(void*);
+extern "C" void _coro_save(size_t);
+extern "C" void _coro_suspend(size_t);
+extern "C" void _coro_cancel();
+extern "C" void _coro_resume_block();
+
+#pragma intrinsic(_coro_frame_size)
+#pragma intrinsic(_coro_frame_ptr)
+#pragma intrinsic(_coro_init_block)
+#pragma intrinsic(_coro_resume_addr)
+#pragma intrinsic(_coro_init_frame)
+#pragma intrinsic(_coro_save)
+#pragma intrinsic(_coro_suspend)
+#pragma intrinsic(_coro_cancel)
+#pragma intrinsic(_coro_resume_block)
+#endif
+#else
 #include <experimental/coroutine>
+#endif
 
 #include "src/stop_token.hpp"
 

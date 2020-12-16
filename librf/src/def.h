@@ -2,6 +2,7 @@
 
 #define LIB_RESUMEF_VERSION 30000 // 3.0.0
 
+#ifndef __cpp_impl_coroutine
 namespace std
 {
 	using experimental::coroutine_traits;
@@ -10,6 +11,7 @@ namespace std
     using experimental::suspend_always;
     using experimental::suspend_never;
 }
+#endif
 
 namespace resumef
 {

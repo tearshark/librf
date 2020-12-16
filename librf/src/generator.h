@@ -161,7 +161,7 @@ namespace resumef
 				//ref_state()->set_exception(std::move(e));
 				std::terminate();
 			}
-#if defined(__clang__) || defined(__GNUC__)
+#if defined(__cpp_impl_coroutine) || defined(__clang__) || defined(__GNUC__)
 			void unhandled_exception()
 			{
 				//this->ref_state()->set_exception(std::current_exception());
