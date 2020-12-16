@@ -109,16 +109,10 @@
     <ClCompile Include="..\librf\src\event_v2.cpp">
       <Filter>librf\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\librf\src\event_v1.cpp">
-      <Filter>librf\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\tutorial\test_async_event_v2.cpp">
       <Filter>tutorial</Filter>
     </ClCompile>
     <ClCompile Include="..\librf\src\when_v2.cpp">
-      <Filter>librf\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\librf\src\mutex_v1.cpp">
       <Filter>librf\src</Filter>
     </ClCompile>
     <ClCompile Include="..\librf\src\mutex_v2.cpp">
@@ -126,9 +120,6 @@
     </ClCompile>
     <ClCompile Include="..\test_librf.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tutorial\gcc_bugs.cpp">
-      <Filter>tutorial</Filter>
     </ClCompile>
     <ClCompile Include="..\tutorial\test_async_stop_token.cpp">
       <Filter>tutorial</Filter>
@@ -204,9 +195,6 @@
     <ClInclude Include="..\librf\src\unix\clang_builtin.h">
       <Filter>librf\src\unix</Filter>
     </ClInclude>
-    <ClInclude Include="..\librf\src\event_v1.h">
-      <Filter>librf\src</Filter>
-    </ClInclude>
     <ClInclude Include="..\librf\src\event_v2.h">
       <Filter>librf\src</Filter>
     </ClInclude>
@@ -222,9 +210,6 @@
     <ClInclude Include="..\tutorial\test_ring_queue.h">
       <Filter>tutorial</Filter>
     </ClInclude>
-    <ClInclude Include="..\librf\src\channel_v1.h">
-      <Filter>librf\src</Filter>
-    </ClInclude>
     <ClInclude Include="..\librf\src\channel_v2.h">
       <Filter>librf\src</Filter>
     </ClInclude>
@@ -238,9 +223,6 @@
       <Filter>librf\src</Filter>
     </ClInclude>
     <ClInclude Include="..\librf\src\when_v2.h">
-      <Filter>librf\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\librf\src\mutex_v1.h">
       <Filter>librf\src</Filter>
     </ClInclude>
     <ClInclude Include="..\librf\src\mutex_v2.h">
@@ -299,6 +281,9 @@
       <Filter>asio</Filter>
     </None>
     <None Include="..\asio\asio_task_1.12.0.inl">
+      <Filter>asio</Filter>
+    </None>
+    <None Include="..\asio\asio_task_1.12.2.inl">
       <Filter>asio</Filter>
     </None>
   </ItemGroup>

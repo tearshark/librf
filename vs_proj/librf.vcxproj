@@ -112,6 +112,7 @@
       <CppLanguageStandard>c++1y</CppLanguageStandard>
       <DisableSpecificWarnings>4834;4505</DisableSpecificWarnings>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -193,9 +194,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\librf\src\event_v1.cpp" />
     <ClCompile Include="..\librf\src\event_v2.cpp" />
-    <ClCompile Include="..\librf\src\mutex_v1.cpp" />
     <ClCompile Include="..\librf\src\mutex_v2.cpp" />
     <ClCompile Include="..\librf\src\rf_task.cpp" />
     <ClCompile Include="..\librf\src\scheduler.cpp" />
@@ -204,7 +203,6 @@
     <ClCompile Include="..\librf\src\timer.cpp" />
     <ClCompile Include="..\librf\src\when_v2.cpp" />
     <ClCompile Include="..\test_librf.cpp" />
-    <ClCompile Include="..\tutorial\gcc_bugs.cpp" />
     <ClCompile Include="..\tutorial\test_async_cb.cpp" />
     <ClCompile Include="..\tutorial\test_async_channel.cpp" />
     <ClCompile Include="..\tutorial\test_async_channel_mult_thread.cpp" />
@@ -233,19 +231,16 @@
     <ClInclude Include="..\librf\librf_macro.h" />
     <ClInclude Include="..\librf\src\awaitable.h" />
     <ClInclude Include="..\librf\src\channel.h" />
-    <ClInclude Include="..\librf\src\channel_v1.h" />
     <ClInclude Include="..\librf\src\channel_v2.h" />
     <ClInclude Include="..\librf\src\config.h" />
     <ClInclude Include="..\librf\src\counted_ptr.h" />
     <ClInclude Include="..\librf\src\current_scheduler.h" />
     <ClInclude Include="..\librf\src\def.h" />
     <ClInclude Include="..\librf\src\event.h" />
-    <ClInclude Include="..\librf\src\event_v1.h" />
     <ClInclude Include="..\librf\src\event_v2.h" />
     <ClInclude Include="..\librf\src\future.h" />
     <ClInclude Include="..\librf\src\generator.h" />
     <ClInclude Include="..\librf\src\intrusive_link_queue.h" />
-    <ClInclude Include="..\librf\src\mutex_v1.h" />
     <ClInclude Include="..\librf\src\mutex_v2.h" />
     <ClInclude Include="..\librf\src\promise.h" />
     <ClInclude Include="..\librf\src\mutex.h" />
@@ -273,6 +268,7 @@
   <ItemGroup>
     <None Include="..\asio\asio_task_1.10.0.inl" />
     <None Include="..\asio\asio_task_1.12.0.inl" />
+    <None Include="..\asio\asio_task_1.12.2.inl" />
     <None Include="..\config.h.in" />
     <None Include="..\librf\src\channel_v2.inl" />
     <None Include="..\librf\src\event_v2.inl" />

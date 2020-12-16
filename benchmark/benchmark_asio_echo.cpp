@@ -42,7 +42,8 @@ future_t<> RunEchoSession(tcp::socket socket)
 	{
 		try
 		{
-			bytes_transferred += co_await socket.async_read_some(asio::buffer(buffer.data() + bytes_transferred, buffer.size() - bytes_transferred), rf_task);
+			bytes_transferred += co_await socket.async_read_some(
+				asio::buffer(buffer.data() + bytes_transferred, buffer.size() - bytes_transferred), rf_task);
 			if (bytes_transferred >= buffer.size())
 			{
 				co_await asio::async_write(socket, asio::buffer(buffer, buffer.size()), rf_task);
