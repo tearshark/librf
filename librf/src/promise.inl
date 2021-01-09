@@ -48,7 +48,6 @@ namespace resumef
 		return get_state();
 	}
 
-/*
 	template <typename _Ty>
 	void* promise_impl_t<_Ty>::operator new(size_t _Size)
 	{
@@ -102,6 +101,5 @@ namespace resumef
 		return _Al.deallocate(reinterpret_cast<char*>(_Ptr), _Size);
 #endif
 	}
-*/
 }
 

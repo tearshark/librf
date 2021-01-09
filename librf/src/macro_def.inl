@@ -31,3 +31,17 @@
 #define unlikely(x) x
 #endif // unlikely
 #endif // defined(__clang__) || defined(__GNUC__)
+
+#ifdef RESUMEF_USE_SHARD_LIBRARY
+#  if _WIN32
+#    ifdef RESUMEF_DYNAMIC_EXPORTS
+#      define LIBRF_API __declspec(dllexport)
+#    else //RESUMEF_DYNAMIC_EXPORTS
+#      define LIBRF_API __declspec(dllimport)
+#    endif //RESUMEF_DYNAMIC_EXPORTS
+#  else //_WIN32
+#    define LIBRF_API __attribute__((visibility("default")))
+#  endif //_WIN32
+#else //RESUMEF_USE_SHARD_LIBRARY
+#  define LIBRF_API
+#endif //RESUMEF_USE_SHARD_LIBRARY

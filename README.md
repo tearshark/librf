@@ -1,7 +1,7 @@
 # librf 2.9.10
 
 ### librf  - 协程库
- * librf是一个基于C++ Coroutines提案 ‘Stackless Resumable Functions’编写的非对称stackless协程库。
+ * librf是一个基于C++20 coroutines编写的无栈协程库。
 
 支持以下平台和编译器:
 

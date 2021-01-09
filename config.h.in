@@ -4,7 +4,7 @@
 #if defined(__clang__) || defined(_MSC_VER)
 #cmakedefine RESUMEF_INLINE_STATE @RESUMEF_INLINE_STATE@
 #else
-#cmakedefine RESUMEF_INLINE_STATE @RESUMEF_INLINE_STATE@
+#cmakedefine RESUMEF_INLINE_STATE 0
 #endif	//defined(__clang__) || defined(_MSC_VER)
 #endif	//RESUMEF_INLINE_STATE
 
@@ -21,3 +21,5 @@
 #endif	//RESUMEF_DISABLE_MULT_THREAD
 
 #cmakedefine RESUMEF_USE_CUSTOM_SPINLOCK @RESUMEF_USE_CUSTOM_SPINLOCK@
+
+#cmakedefine RESUMEF_USE_SHARD_LIBRARY @RESUMEF_USE_SHARD_LIBRARY@

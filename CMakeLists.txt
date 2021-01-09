@@ -54,6 +54,7 @@ option(OPT_DEBUG_COUNTER "Debug objects count" OFF)
 option(OPT_KEEP_REAL_SIZE "Keep real size in queue" OFF)
 option(OPT_DISABLE_MULT_THREAD "Disable multi-threaded scheduler" OFF)
 option(OPT_USE_MIMALLOC "Use mimalloc" OFF)
+option(OPT_DYNAMIC_LIBRARY "Use shared library" OFF)
 
 if (UNIX)
 	if(OPT_USE_MIMALLOC)
@@ -91,6 +92,10 @@ endif()
 if(OPT_DISABLE_MULT_THREAD)
 	set(RESUMEF_DISABLE_MULT_THREAD 1)
 endif()
+if(OPT_DYNAMIC_LIBRARY)
+	set(RESUMEF_USE_SHARD_LIBRARY 1)
+	add_compile_definitions("-DRESUMEF_DYNAMIC_EXPORTS=1")
+endif()
 
 configure_file(
 ${PROJECT_SOURCE_DIR}/config.h.in
@@ -119,8 +124,11 @@ ${PROJECT_SOURCE_DIR}/librf/src/when_v2.cpp
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
-#add_library(librf SHARED ${SRC})
-add_library(librf STATIC ${SRC})
+if(OPT_DYNAMIC_LIBRARY)
+	add_library(librf SHARED ${SRC})
+else()
+	add_library(librf STATIC ${SRC})
+endif()
 
 
 include_directories(
