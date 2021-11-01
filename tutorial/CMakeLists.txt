@@ -6,5 +6,5 @@ foreach(TUTORIAL_FILE_PATH ${TUTORIAL_FILES})
     message(STATUS "Generating test target: ${TUTORIAL_FILE_NAME}")
 
     add_executable(${TUTORIAL_FILE_NAME} ${TUTORIAL_FILE_PATH})
-    target_link_libraries(${TUTORIAL_FILE_NAME} PRIVATE fmt::fmt-header-only PUBLIC librf ${LIB_MIMALLOC})
+    target_link_libraries(${TUTORIAL_FILE_NAME} PUBLIC librf ${LIB_MIMALLOC})
 endforeach(TUTORIAL_FILE_PATH)

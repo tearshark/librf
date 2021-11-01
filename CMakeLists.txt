@@ -102,10 +102,6 @@ ${PROJECT_SOURCE_DIR}/config.h.in
 ${PROJECT_SOURCE_DIR}/librf/src/config.h
 )
 
-#{fmt}
-add_definitions(-DFMT_HEADER_ONLY=1)
-find_package(fmt)
-
 include_directories(
 ${PROJECT_SOURCE_DIR}/librf
 )

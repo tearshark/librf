@@ -2,7 +2,6 @@
 #include <chrono>
 #include <iostream>
 #include <string>
-#include <fmt/format.h>
 
 #include "librf.h"
 
@@ -16,14 +15,10 @@ void dump(size_t idx, std::string name, T start, T end, intptr_t count)
 
 	auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
 
-	fmt::print("{:>2}:{:<30}{:<10}{:>16} ns{:>8} ns/op{:>10} w/cps\n", idx, name, count, ns, ns / count, count * 100ll * 1000ll / ns);
-
-/*
 	std::cout << idx << ":" << name << "    ";
 	std::cout << count << "      " << ns << " ns      ";
 	std::cout << (ns / count) << " ns/op" << "    ";
 	std::cout << (count * 100ll * 1000ll / ns) << "w/cps" << std::endl;
-*/
 
 	lock_console.unlock();
 }
