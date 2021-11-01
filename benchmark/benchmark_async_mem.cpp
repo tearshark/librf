@@ -1,4 +1,4 @@
-
+﻿
 #include <chrono>
 #include <iostream>
 #include <string>
@@ -17,7 +17,7 @@ void resumable_main_benchmark_mem(bool wait_key)
 	
 	for (size_t i = 0; i < N; ++i)
 	{
-		go[=]()->resumef::generator_t<size_t>
+		go[=]()->librf::generator_t<size_t>
 		{
 			for (size_t k = 0; k < LOOP_COUNT; ++k)
 			{
@@ -28,7 +28,7 @@ void resumable_main_benchmark_mem(bool wait_key)
 		};
 	}
 
-	resumef::this_scheduler()->run_until_notask();
+	librf::this_scheduler()->run_until_notask();
 	if (wait_key)
 	{
 		std::cout << "press any key to continue." << std::endl;
@@ -38,3 +38,9 @@ void resumable_main_benchmark_mem(bool wait_key)
 
 //clang : 平均 210字节
 //msvc : 平均600字节
+
+int main()
+{
+	resumable_main_benchmark_mem(false);
+	return 0;
+}

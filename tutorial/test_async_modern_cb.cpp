@@ -130,7 +130,7 @@ static void example_future()
 #endif
 }
 
-#include "librf.h"
+#include "librf/librf.h"
 #include "use_librf.h"
 
 static void example_librf()
@@ -165,7 +165,7 @@ static void example_librf()
 		}
 	};
 
-	resumef::this_scheduler()->run_until_notask();
+	librf::this_scheduler()->run_until_notask();
 }
 
 void resumable_main_modern_cb()

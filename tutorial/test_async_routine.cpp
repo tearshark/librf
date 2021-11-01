@@ -1,21 +1,21 @@
-
+ï»¿
 #include <chrono>
 #include <iostream>
 #include <string>
 #include <thread>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 
-#ifndef __GNUC__	//GCC: Ã»ÓĞÌá¹©__builtin_coro_frameÕâÑùµÄÄÚÖÃº¯Êı
+#ifndef __GNUC__	//GCC: æ²¡æœ‰æä¾›__builtin_coro_frameè¿™æ ·çš„å†…ç½®å‡½æ•°
 future_t<> test_routine_use_timer()
 {
 	using namespace std::chrono;
 
 	for (size_t i = 0; i < 3; ++i)
 	{
-		co_await resumef::sleep_for(100ms);
+		co_await librf::sleep_for(100ms);
 		std::cout << "timer after 100ms" << std::endl;
 		std::cout << "1:frame=" << _coro_frame_ptr() << std::endl;
 	}
@@ -38,7 +38,7 @@ void resumable_main_routine()
 {
 	std::cout << __FUNCTION__ << std::endl;
 	//go test_routine_use_timer_2();
-#ifndef __GNUC__	//GCC: Ã»ÓĞÌá¹©__builtin_coro_frameÕâÑùµÄÄÚÖÃº¯Êı
+#ifndef __GNUC__	//GCC: æ²¡æœ‰æä¾›__builtin_coro_frameè¿™æ ·çš„å†…ç½®å‡½æ•°
 	go test_routine_use_timer();
 #endif //#ifndef __GNUC__
 	this_scheduler()->run_until_notask();

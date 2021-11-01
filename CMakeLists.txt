@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.10)
+﻿cmake_minimum_required(VERSION 3.10)
 project(librf VERSION 3.0)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 set(LIBRF_COMPILER_SETTING )
 if(WIN32)
@@ -98,45 +98,38 @@ if(OPT_DYNAMIC_LIBRARY)
 endif()
 
 configure_file(
-${PROJECT_SOURCE_DIR}/config.h.in
-${PROJECT_SOURCE_DIR}/librf/src/config.h
+	${CMAKE_SOURCE_DIR}/config.h.in
+	${CMAKE_SOURCE_DIR}/include/librf/src/config.h
 )
 
-include_directories(
-${PROJECT_SOURCE_DIR}/librf
-)
 
-set(SRC 
-${PROJECT_SOURCE_DIR}/librf/src/event_v2.cpp
-${PROJECT_SOURCE_DIR}/librf/src/mutex_v2.cpp
-${PROJECT_SOURCE_DIR}/librf/src/rf_task.cpp
-${PROJECT_SOURCE_DIR}/librf/src/scheduler.cpp
-${PROJECT_SOURCE_DIR}/librf/src/sleep.cpp
-${PROJECT_SOURCE_DIR}/librf/src/state.cpp
-${PROJECT_SOURCE_DIR}/librf/src/timer.cpp
-${PROJECT_SOURCE_DIR}/librf/src/when_v2.cpp
-)
+file(GLOB_RECURSE HEADER_FILES ${CMAKE_SOURCE_DIR}/include/*.*)
+file(GLOB_RECURSE SOURCE_FILES ${CMAKE_SOURCE_DIR}/source/*.*)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 if(OPT_DYNAMIC_LIBRARY)
-	add_library(librf SHARED ${SRC})
+	add_library(${PROJECT_NAME} SHARED
+		${HEADER_FILES}
+		${SOURCE_FILES}
+	)
 else()
-	add_library(librf STATIC ${SRC})
+	add_library(${PROJECT_NAME} STATIC
+		${HEADER_FILES}
+		${SOURCE_FILES}
+	)
 endif()
 
 
-include_directories(
-${PROJECT_SOURCE_DIR}/modern_cb
+target_include_directories(${PROJECT_NAME}
+	PUBLIC
+	${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-#aux_source_directory(${PROJECT_SOURCE_DIR}/tutorial TSRC)
-#set(TSRC ${TSRC}
-#${PROJECT_SOURCE_DIR}/benchmark/benchmark_async_mem.cpp
-#${PROJECT_SOURCE_DIR}/benchmark/benchmark_channel_passing_next.cpp
-#${PROJECT_SOURCE_DIR}/test_librf.cpp
-#)
+include_directories(
+	${CMAKE_SOURCE_DIR}/modern_cb
+)
 
 if(OPT_USE_MIMALLOC)
 	set(LIB_MIMALLOC, "mimalloc")
@@ -145,3 +138,4 @@ else()
 endif()
 
 add_subdirectory(tutorial)
+#add_subdirectory(benchmark)

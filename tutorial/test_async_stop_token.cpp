@@ -3,9 +3,9 @@
 #include <string>
 #include <thread>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 using namespace std::chrono;
 
 //_Ctype签名:void(bool, int64_t)

@@ -8,7 +8,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 #include <iostream>
 #include "librf.h"
-using namespace resumef;
+using namespace librf;
 
 #define GCC_FIX_BUGS	1
 

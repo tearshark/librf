@@ -9,3 +9,6 @@
 /vs_proj/Release
 /vs_proj/Debug
 private
+bin
+out
+/CMakeSettings.json

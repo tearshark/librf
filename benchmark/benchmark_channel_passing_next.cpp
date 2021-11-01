@@ -8,7 +8,7 @@
 
 #include "librf.h"
 
-using namespace resumef;
+using namespace librf;
 using namespace std::chrono;
 using namespace std::literals;
 
@@ -72,4 +72,10 @@ void benchmark_main_channel_passing_next()
 #endif
 
 	this_scheduler()->run_until_notask();
+}
+
+int main()
+{
+	benchmark_main_channel_passing_next();
+	return 0;
 }

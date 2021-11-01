@@ -1,12 +1,12 @@
-
+﻿
 #include <chrono>
 #include <iostream>
 #include <string>
 #include <thread>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 
 future_t<> test_loop_sleep(size_t _N, const char * ch)
 {
@@ -14,7 +14,7 @@ future_t<> test_loop_sleep(size_t _N, const char * ch)
 
 	for (size_t i = 0; i < _N; ++i)
 	{
-		co_await resumef::sleep_for(100ms);
+		co_await librf::sleep_for(100ms);
 		std::cout << ch;
 	}
 	std::cout << std::endl;

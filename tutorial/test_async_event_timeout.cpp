@@ -3,13 +3,13 @@
 #include <string>
 #include <thread>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 
 future_t<> resumalbe_set_event(const event_t & e, std::chrono::milliseconds dt)
 {
-	co_await resumef::sleep_for(dt);
+	co_await librf::sleep_for(dt);
 	e.signal();
 	std::cout << "+";
 }

@@ -3,9 +3,9 @@
 #include <string>
 #include <thread>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 
 template<class _Ctype>
 static void callback_get_long(int64_t val, _Ctype&& cb)

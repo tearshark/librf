@@ -30,7 +30,7 @@ namespace asio {
 		{
 		public:
 			using result_type_t = T;
-			using state_type = resumef::state_t<result_type_t>;
+			using state_type = librf::state_t<result_type_t>;
 
 			template<typename Allocator>
 			promise_handler(const rf_task_t<Allocator> &)
@@ -55,7 +55,7 @@ namespace asio {
 				}
 			}
 
-			resumef::counted_ptr<state_type> state_;
+			librf::counted_ptr<state_type> state_;
 		};
 
 		template<>
@@ -63,7 +63,7 @@ namespace asio {
 		{
 		public:
 			using result_type_t = void;
-			using state_type = resumef::state_t<result_type_t>;
+			using state_type = librf::state_t<result_type_t>;
 
 			template<typename Allocator>
 			promise_handler(const rf_task_t<Allocator> &)
@@ -88,7 +88,7 @@ namespace asio {
 				}
 			}
 
-			resumef::counted_ptr<state_type> state_;
+			librf::counted_ptr<state_type> state_;
 		};
 
 	}  // namespace detail
@@ -97,15 +97,15 @@ namespace asio {
 	class async_result<detail::promise_handler<T> >
 	{
 	public:
-		typedef resumef::future_t<T> type;
+		typedef librf::future_t<T> type;
 
 		explicit async_result(detail::promise_handler<T> & h)
 			: task_(std::move(h.state_))
 		{ }
 
-		resumef::future_t<T> get() { return std::move(task_); }
+		librf::future_t<T> get() { return std::move(task_); }
 	private:
-		resumef::future_t<T> task_;
+		librf::future_t<T> task_;
 	};
 
 	// Handler type specialisation for zero arg.

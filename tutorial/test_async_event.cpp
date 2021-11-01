@@ -3,9 +3,9 @@
 #include <string>
 #include <thread>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 
 //非协程的逻辑线程，或异步代码，可以通过event_t通知到协程，并且不会阻塞协程所在的线程。
 static std::thread async_set_event(const event_t & e, std::chrono::milliseconds dt)

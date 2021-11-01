@@ -3,9 +3,9 @@
 #include <string>
 #include <thread>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 
 #ifndef __GNUC__	//GCC: 没有提供__builtin_coro_frame这样的内置函数
 
@@ -34,7 +34,7 @@ future_t<int64_t> awaitable_get_long(int64_t a, int64_t b)
 	//编译失败。因为这个函数不是"可恢复函数(resumeable function)"，仅仅是"可等待函数(awaitable function)"
 	//void* frame_ptr = _coro_frame_ptr();
 
-	resumef::awaitable_t<int64_t> awaitable;
+	librf::awaitable_t<int64_t> awaitable;
 	callback_get_long(a, b, [awaitable](int64_t val)
 	{
 		awaitable.set_value(val);
@@ -136,7 +136,7 @@ void resumable_main_layout()
 #ifndef __GNUC__	//GCC: 没有提供__builtin_coro_frame这样的内置函数
 	go resumable_get_long_2(1, 2, 5);
 #endif //#ifndef __GNUC__
-	resumef::this_scheduler()->run_until_notask();
+	librf::this_scheduler()->run_until_notask();
 
 	std::cout << __FUNCTION__ << " - end" << std::endl;
 }

@@ -3,9 +3,9 @@
 #include <string>
 #include <thread>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 
 static scheduler_t* sch_in_main = nullptr;
 static std::atomic<scheduler_t*> sch_in_thread = nullptr;

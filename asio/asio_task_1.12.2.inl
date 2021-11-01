@@ -5,7 +5,7 @@
 namespace asio {
 
 	/**
-	 * @brief 用于指示asio相关异步函数，返回resumef::future_t<>的类型，从而变成支持 librf 的协程函数。
+	 * @brief 用于指示asio相关异步函数，返回librf::future_t<>的类型，从而变成支持 librf 的协程函数。
 	 */
 	template <typename Executor = executor>
 	struct rf_task_t
@@ -14,7 +14,7 @@ namespace asio {
 	};
 
 	/**
-	 * @brief 用于指示asio相关异步函数，返回resumef::future_t<>的常量，从而变成支持 librf 的协程函数。
+	 * @brief 用于指示asio相关异步函数，返回librf::future_t<>的常量，从而变成支持 librf 的协程函数。
 	 */
 	constexpr rf_task_t<> rf_task;
 
@@ -25,14 +25,14 @@ namespace asio {
 		{
 		public:
 			typedef _Result result_type;
-			typedef ::resumef::state_t<result_type> state_type;
+			typedef ::librf::state_t<result_type> state_type;
 
 			promise_handler_base(const rf_task_t<Executor>&)
-				: state_(::resumef::state_future_t::_Alloc_state<state_type>(true))
+				: state_(::librf::state_future_t::_Alloc_state<state_type>(true))
 			{
 			}
 
-			::resumef::counted_ptr<state_type> state_;
+			::librf::counted_ptr<state_type> state_;
 			promise_handler_base(promise_handler_base &&) = default;
 			promise_handler_base(const promise_handler_base &) = default;
 			promise_handler_base & operator = (promise_handler_base &&) = default;
@@ -178,8 +178,8 @@ namespace asio {
 		typedef librf::promise_handler<Executor, Args...> completion_handler_type;
 		typedef typename completion_handler_type::result_type result_type;
 
-		typedef ::resumef::state_t<result_type> state_type;
-		typedef ::resumef::future_t<result_type> return_type;
+		typedef ::librf::state_t<result_type> state_type;
+		typedef ::librf::future_t<result_type> return_type;
 
 		async_result(completion_handler_type& hander)
 			: state_(hander.state_)
@@ -190,7 +190,7 @@ namespace asio {
 			return this->state_;
 		}
 	private:
-		::resumef::counted_ptr<state_type> state_;
+		::librf::counted_ptr<state_type> state_;
 	};
 
 }  // namespace asio

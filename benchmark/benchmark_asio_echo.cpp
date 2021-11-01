@@ -1,4 +1,4 @@
-
+﻿
 #include <iostream>
 
 #include "librf.h"
@@ -10,7 +10,7 @@
 using namespace asio;
 using namespace asio::ip;
 
-using namespace resumef;
+using namespace librf;
 
 template<class _Ty, size_t _Size>
 union uarray
@@ -107,7 +107,7 @@ void StartPrintEchoCount()
 
 void RunOneBenchmark(bool bMain)
 {
-	resumef::local_scheduler_t ls;
+	librf::local_scheduler_t ls;
 
 	asio::io_service io_service;
 	tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), 3456));

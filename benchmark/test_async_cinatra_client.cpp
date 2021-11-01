@@ -7,7 +7,7 @@
 #include "librf.h"
 #include "use_librf.h"
 
-using namespace resumef;
+using namespace librf;
 using namespace cinatra;
 
 void test_async_cinatra_client()
@@ -54,5 +54,5 @@ void test_async_cinatra_client()
 	};
 #endif
 
-	resumef::this_scheduler()->run_until_notask();
+	librf::this_scheduler()->run_until_notask();
 }

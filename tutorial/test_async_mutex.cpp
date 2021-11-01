@@ -4,9 +4,9 @@
 #include <thread>
 #include <deque>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 using namespace std::chrono;
 
 static mutex_t g_lock;

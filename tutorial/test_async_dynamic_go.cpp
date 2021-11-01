@@ -1,9 +1,9 @@
-
+﻿
 #include <chrono>
 #include <iostream>
 #include <string>
 
-#include "librf.h"
+#include "librf/librf.h"
 
 
 static const int M = 10;
@@ -13,11 +13,11 @@ std::array<std::array<std::array<int32_t, M>, M>, 3> dynamic_cells;
 
 void test_dynamic_go()
 {
-	auto co_star = [](int j) -> resumef::future_t<int>
+	auto co_star = [](int j) -> librf::future_t<int>
 	{
 		for (int i = 0; i < M; ++i)
 		{
-			go[=]() -> resumef::generator_t<int>
+			go[=]() -> librf::generator_t<int>
 			{
 				for (int k = 0; k < M; ++k)
 				{
@@ -40,7 +40,7 @@ void test_dynamic_go()
 	go co_star(1);
 	go co_star(2);
 
-	resumef::this_scheduler()->run_until_notask();
+	librf::this_scheduler()->run_until_notask();
 
 	std::cout << "dynamic_go_count = " << dynamic_go_count << std::endl;
 	for (auto & j : dynamic_cells)

@@ -1,9 +1,9 @@
-
+﻿
 #include <chrono>
 #include <iostream>
 #include <string>
 
-#include "librf.h"
+#include "librf/librf.h"
 
 
 static std::mutex lock_console;
@@ -26,7 +26,7 @@ void dump(size_t idx, std::string name, T start, T end, intptr_t count)
 static const intptr_t N = 3000000;
 //static const int N = 10;
 
-auto yield_switch(intptr_t coro) -> resumef::generator_t<intptr_t>
+auto yield_switch(intptr_t coro) -> librf::generator_t<intptr_t>
 {
 	for (intptr_t i = N / coro; i > 0; --i)
 		co_yield i;
@@ -35,7 +35,7 @@ auto yield_switch(intptr_t coro) -> resumef::generator_t<intptr_t>
 
 void resumable_switch(intptr_t coro, size_t idx)
 {
-	resumef::local_scheduler_t ls;
+	librf::local_scheduler_t ls;
 
 	auto start = std::chrono::steady_clock::now();
 	
@@ -46,7 +46,7 @@ void resumable_switch(intptr_t coro, size_t idx)
 	auto middle = std::chrono::steady_clock::now();
 	dump(idx, "BenchmarkCreate_" + std::to_string(coro), start, middle, coro);
 
-	resumef::this_scheduler()->run_until_notask();
+	librf::this_scheduler()->run_until_notask();
 
 	auto end = std::chrono::steady_clock::now();
 	dump(idx, "BenchmarkSwitch_" + std::to_string(coro), middle, end, N);

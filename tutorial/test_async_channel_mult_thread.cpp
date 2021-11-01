@@ -1,4 +1,4 @@
-//验证channel是否线程安全
+﻿//验证channel是否线程安全
 
 #include <chrono>
 #include <iostream>
@@ -7,9 +7,9 @@
 #include <deque>
 #include <mutex>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 
 using namespace std::chrono;
 static std::mutex cout_mutex;

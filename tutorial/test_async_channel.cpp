@@ -5,9 +5,9 @@
 #include <deque>
 #include <mutex>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 using namespace std::chrono;
 
 const size_t MAX_CHANNEL_QUEUE = 1;		//0, 1, 5, 10, -1
@@ -47,7 +47,7 @@ future_t<> test_channel_read(string_channel_t c)
 			std::cout << val.value << ":";
 			std::cout << std::endl;
 		}
-		catch (resumef::channel_exception& e)
+		catch (librf::channel_exception& e)
 		{
 			//MAX_CHANNEL_QUEUE=0,并且先读后写，会触发read_before_write异常
 			std::cout << e.what() << std::endl;

@@ -1,13 +1,13 @@
-
+ï»¿
 #include <chrono>
 #include <iostream>
 #include <string>
 #include <thread>
 #include <inttypes.h>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 
 #if !defined(__GNUC__)
 void test_when_any()
@@ -41,7 +41,7 @@ void test_when_any()
 			});
 
 		if (vals.first == 0)
-			std::cout << "first done! value is " << resumef::any_cast<int>(vals.second) << std::endl;
+			std::cout << "first done! value is " << librf::any_cast<int>(vals.second) << std::endl;
 		else
 			std::cout << "any done! index is " << vals.first << std::endl;
 
@@ -62,7 +62,7 @@ void test_when_any()
 		//vals = co_await when_any(std::begin(v), std::end(v));
 		vals = co_await when_any(v);
 
-		std::cout << "any range done! index is " << vals.first << ", valus is " << resumef::any_cast<int>(vals.second) << std::endl;
+		std::cout << "any range done! index is " << vals.first << ", valus is " << librf::any_cast<int>(vals.second) << std::endl;
 	};
 	this_scheduler()->run_until_notask();
 }
@@ -159,7 +159,7 @@ void test_when_any_mix()
 			);
 
 		if (vals.first == 0)
-			std::cout << "first done! value is " << resumef::any_cast<int>(vals.second) << std::endl;
+			std::cout << "first done! value is " << librf::any_cast<int>(vals.second) << std::endl;
 		else
 			std::cout << "any done! index is " << vals.first << std::endl;
 	};
@@ -174,7 +174,7 @@ void test_when_any_mix()
 	this_scheduler()->run_until_notask();
 }
 
-//ÕâÄÜÄ£ÄâgolangµÄselectÂğ?
+//è¿™èƒ½æ¨¡æ‹Ÿgolangçš„selectå—?
 void test_when_select()
 {
 	using namespace std::chrono;
@@ -200,7 +200,7 @@ void test_when_select()
 		if (vals.first == 0)
 			std::cout << "time out!" << std::endl;
 		else
-			std::cout << "index is " << vals.first << ", value is " << resumef::any_cast<int>(vals.second) << std::endl;
+			std::cout << "index is " << vals.first << ", value is " << librf::any_cast<int>(vals.second) << std::endl;
 	};
 
 	GO

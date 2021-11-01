@@ -3,9 +3,9 @@
 #include <string>
 #include <thread>
 
-#include "librf.h"
+#include "librf/librf.h"
 
-using namespace resumef;
+using namespace librf;
 static std::mutex cout_mutex;
 
 //这是一个重度计算任务，只能单开线程来避免主线程被阻塞
