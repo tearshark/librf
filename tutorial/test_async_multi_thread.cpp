@@ -87,8 +87,10 @@ void resumable_main_multi_thread()
 	scheduler_t::g_scheduler.run_until_notask();
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_multi_thread();
 	return 0;
 }
+#endif

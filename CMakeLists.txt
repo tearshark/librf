@@ -139,6 +139,15 @@ endif()
 
 if(CMAKE_ENABLE_UNIT_TEST)
 	add_subdirectory(tutorial)
+
+	aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/tutorial ALL_TUTORIAL_FILES)
+	add_executable(test_librf
+		${CMAKE_CURRENT_SOURCE_DIR}/test_librf.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/benchmark/benchmark_async_mem.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/benchmark/benchmark_channel_passing_next.cpp
+		${ALL_TUTORIAL_FILES})
+	target_link_libraries(test_librf PUBLIC librf)
+
 	#add_subdirectory(benchmark)
 endif()
 

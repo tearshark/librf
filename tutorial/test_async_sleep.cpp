@@ -74,8 +74,10 @@ void resumable_main_sleep()
 	std::cout << std::endl;
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_sleep();
 	return 0;
 }
+#endif

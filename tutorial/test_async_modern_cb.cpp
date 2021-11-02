@@ -175,8 +175,10 @@ void resumable_main_modern_cb()
 	example_librf();
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_modern_cb();
 	return 0;
 }
+#endif

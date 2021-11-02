@@ -93,11 +93,11 @@ namespace librf
 		}
 
 #ifndef DOXYGEN_SKIP_PROPERTY
-		LIBRF_API void add_generator(state_base_t* sptr);
-		LIBRF_API void del_final(state_base_t* sptr);
+		void add_generator(state_base_t* sptr);
+		void del_final(state_base_t* sptr);
 		LIBRF_API std::unique_ptr<task_t> del_switch(state_base_t* sptr);
-		LIBRF_API void add_switch(std::unique_ptr<task_t> task);
-		LIBRF_API task_t* find_task(state_base_t* sptr) const noexcept;
+		void add_switch(std::unique_ptr<task_t> task);
+		task_t* find_task(state_base_t* sptr) const noexcept;
 
 		friend struct local_scheduler_t;
 	protected:

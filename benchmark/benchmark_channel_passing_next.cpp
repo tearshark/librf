@@ -6,7 +6,7 @@
 #include <deque>
 #include <mutex>
 
-#include "librf.h"
+#include "librf/librf.h"
 
 using namespace librf;
 using namespace std::chrono;
@@ -74,8 +74,10 @@ void benchmark_main_channel_passing_next()
 	this_scheduler()->run_until_notask();
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	benchmark_main_channel_passing_next();
 	return 0;
 }
+#endif

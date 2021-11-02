@@ -4,7 +4,7 @@
 #include <string>
 #include <thread>
 
-#include "librf.h"
+#include "librf/librf.h"
 
 const size_t N = 5000000;
 const size_t LOOP_COUNT = 50;
@@ -39,8 +39,10 @@ void resumable_main_benchmark_mem(bool wait_key)
 //clang : 平均 210字节
 //msvc : 平均600字节
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_benchmark_mem(false);
 	return 0;
 }
+#endif

@@ -44,8 +44,10 @@ void resumable_main_routine()
 	this_scheduler()->run_until_notask();
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_routine();
 	return 0;
 }
+#endif

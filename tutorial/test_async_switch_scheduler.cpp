@@ -133,8 +133,10 @@ void resumable_main_switch_scheduler()
 	other.join();
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_switch_scheduler();
 	return 0;
 }
+#endif

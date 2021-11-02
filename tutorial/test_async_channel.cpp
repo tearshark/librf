@@ -182,8 +182,10 @@ void resumable_main_channel()
 	test_channel_performance_double_thread(1000);
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_channel();
 	return 0;
 }
+#endif

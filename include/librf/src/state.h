@@ -60,7 +60,7 @@ namespace librf
 		}
 		scheduler_t* get_scheduler() const
 		{
-			return get_root()->_scheduler;
+			return _scheduler ? _scheduler : get_root()->_scheduler;
 		}
 	};
 	

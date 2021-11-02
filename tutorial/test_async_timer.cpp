@@ -34,8 +34,10 @@ void resumable_main_timer()
 	th2.stop();	//but th2 is invalid
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_timer();
 	return 0;
 }
+#endif

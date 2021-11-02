@@ -96,8 +96,10 @@ void resumable_main_stop_token()
 	std::cout << "OK - stop_token!" << std::endl;
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_stop_token();
 	return 0;
 }
+#endif

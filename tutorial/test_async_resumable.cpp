@@ -78,8 +78,10 @@ void resumable_main_resumable()
 */
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_resumable();
 	return 0;
 }
+#endif

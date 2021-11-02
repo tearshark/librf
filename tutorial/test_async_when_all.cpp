@@ -240,8 +240,10 @@ void resumable_main_when_all()
 #endif
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_when_all();
 	return 0;
 }
+#endif

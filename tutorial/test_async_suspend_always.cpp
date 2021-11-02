@@ -93,8 +93,10 @@ test_loop_sleep<6>		->		0000016B847726C0
 test_loop_sleep<7>		->		0000016B847726C0
 */
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_suspend_always();
 	return 0;
 }
+#endif

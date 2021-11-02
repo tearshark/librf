@@ -215,8 +215,10 @@ void resumable_main_mutex()
 	resumable_mutex_lock_range();
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_mutex();
 	return 0;
 }
+#endif

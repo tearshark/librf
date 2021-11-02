@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "../../cinatra/include/cinatra.hpp"
-#include "librf.h"
+#include "librf/librf.h"
 #include "use_librf.h"
 
 using namespace librf;

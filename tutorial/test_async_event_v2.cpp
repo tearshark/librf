@@ -112,8 +112,10 @@ void resumable_main_event_v2()
 	std::cout << std::endl;
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_event_v2();
 	return 0;
 }
+#endif

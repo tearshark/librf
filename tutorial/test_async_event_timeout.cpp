@@ -183,8 +183,10 @@ void resumable_main_event_timeout()
 	std::cout << std::endl;
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_event_timeout();
 	return 0;
 }
+#endif

@@ -7,4 +7,7 @@ foreach(BENCHMARK_FILE_PATH ${BENCHMARK_FILES})
 
     add_executable(${BENCHMARK_FILE_NAME} ${BENCHMARK_FILE_PATH})
     target_link_libraries(${BENCHMARK_FILE_NAME} PUBLIC librf)
+    target_compile_definitions(${TUTORIAL_FILE_NAME}
+        PRIVATE LIBRF_TUTORIAL_STAND_ALONE=1
+    )
 endforeach(BENCHMARK_FILE_PATH)

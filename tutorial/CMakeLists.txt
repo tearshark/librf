@@ -7,4 +7,7 @@ foreach(TUTORIAL_FILE_PATH ${TUTORIAL_FILES})
 
     add_executable(${TUTORIAL_FILE_NAME} ${TUTORIAL_FILE_PATH})
     target_link_libraries(${TUTORIAL_FILE_NAME} PUBLIC librf)
+    target_compile_definitions(${TUTORIAL_FILE_NAME}
+        PRIVATE LIBRF_TUTORIAL_STAND_ALONE=1
+    )
 endforeach(TUTORIAL_FILE_PATH)

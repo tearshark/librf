@@ -141,8 +141,10 @@ void resumable_main_layout()
 	std::cout << __FUNCTION__ << " - end" << std::endl;
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_layout();
 	return 0;
 }
+#endif

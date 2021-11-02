@@ -90,8 +90,10 @@ void resumable_main_exception(bool bomb)
 	}
 }
 
+#if LIBRF_TUTORIAL_STAND_ALONE
 int main()
 {
 	resumable_main_exception(true);
 	return 0;
 }
+#endif
