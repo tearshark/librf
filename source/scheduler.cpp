@@ -24,7 +24,7 @@ namespace librf
 
 	char sz_future_error_buffer[256];
 
-	const char * get_error_string(error_code fe, const char * classname)
+	LIBRF_API const char * get_error_string(error_code fe, const char * classname)
 	{
 		if (classname)
 		{
@@ -40,12 +40,12 @@ namespace librf
 	thread_local scheduler_t * th_scheduler_ptr = nullptr;
 
 	//获得当前线程下的调度器
-	scheduler_t * this_scheduler()
+	LIBRF_API scheduler_t * this_scheduler()
 	{
 		return th_scheduler_ptr ? th_scheduler_ptr : &scheduler_t::g_scheduler;
 	}
 
-	local_scheduler_t::local_scheduler_t()
+	LIBRF_API local_scheduler_t::local_scheduler_t()
 	{
 		if (th_scheduler_ptr == nullptr)
 		{
@@ -58,7 +58,7 @@ namespace librf
 		}
 	}
 
-	local_scheduler_t::local_scheduler_t(scheduler_t& sch) noexcept
+	LIBRF_API local_scheduler_t::local_scheduler_t(scheduler_t& sch) noexcept
 	{
 		if (th_scheduler_ptr == nullptr)
 		{
@@ -68,14 +68,14 @@ namespace librf
 		_scheduler_ptr = nullptr;
 	}
 
-	local_scheduler_t::~local_scheduler_t()
+	LIBRF_API local_scheduler_t::~local_scheduler_t()
 	{
 		if (th_scheduler_ptr == _scheduler_ptr)
 			th_scheduler_ptr = nullptr;
 		delete _scheduler_ptr;
 	}
 
-	scheduler_t::scheduler_t()
+	LIBRF_API scheduler_t::scheduler_t()
 		: _timer(std::make_shared<timer_manager>())
 	{
 		_runing_states.reserve(1024);
@@ -85,14 +85,14 @@ namespace librf
 			th_scheduler_ptr = this;
 	}
 
-	scheduler_t::~scheduler_t()
+	LIBRF_API scheduler_t::~scheduler_t()
 	{
 		//cancel_all_task_();
 		if (th_scheduler_ptr == this)
 			th_scheduler_ptr = nullptr;
 	}
 
-	task_t* scheduler_t::new_task(task_t * task)
+	LIBRF_API task_t* scheduler_t::new_task(task_t * task)
 	{
 		state_base_t* sptr = task->_state.get();
 		sptr->set_scheduler(this);
@@ -113,7 +113,7 @@ namespace librf
 		return task;
 	}
 
-	std::unique_ptr<task_t> scheduler_t::del_switch(state_base_t* sptr)
+	LIBRF_API std::unique_ptr<task_t> scheduler_t::del_switch(state_base_t* sptr)
 	{
 #if !RESUMEF_DISABLE_MULT_THREAD
 		scoped_lock<spinlock> __guard(_lock_ready);
@@ -147,7 +147,7 @@ namespace librf
 	}
 */
 
-	bool scheduler_t::run_one_batch()
+	LIBRF_API bool scheduler_t::run_one_batch()
 	{
 		this->_timer->update();
 
@@ -168,7 +168,7 @@ namespace librf
 		return true;
 	}
 
-	void scheduler_t::run_until_notask()
+	LIBRF_API void scheduler_t::run_until_notask()
 	{
 		for(;;)
 		{
@@ -189,5 +189,5 @@ namespace librf
 		};
 	}
 
-	scheduler_t scheduler_t::g_scheduler;
+	LIBRF_API scheduler_t scheduler_t::g_scheduler;
 }

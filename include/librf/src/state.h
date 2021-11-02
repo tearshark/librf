@@ -30,13 +30,13 @@ namespace librf
 		//		二、没有co_await操作，直接加入到了调度器里，则_coro在初始时为nullptr。调度器需要特殊处理此种情况。
 		coroutine_handle<> _coro;
 
-		virtual ~state_base_t();
+		LIBRF_API virtual ~state_base_t();
 	private:
-		virtual void destroy_deallocate();
+		LIBRF_API virtual void destroy_deallocate();
 	public:
 		virtual void resume() = 0;
 		virtual bool has_handler() const  noexcept = 0;
-		virtual state_base_t* get_parent() const noexcept;
+		LIBRF_API virtual state_base_t* get_parent() const noexcept;
 
 		void set_scheduler(scheduler_t* sch) noexcept
 		{
@@ -70,13 +70,13 @@ namespace librf
 	struct state_generator_t : public state_base_t
 	{
 	private:
-		virtual void destroy_deallocate() override;
+		LIBRF_API virtual void destroy_deallocate() override;
 		state_generator_t() = default;
 	public:
-		virtual void resume() override;
-		virtual bool has_handler() const  noexcept override;
+		LIBRF_API virtual void resume() override;
+		LIBRF_API virtual bool has_handler() const  noexcept override;
 
-		bool switch_scheduler_await_suspend(scheduler_t* sch);
+		LIBRF_API bool switch_scheduler_await_suspend(scheduler_t* sch);
 
 		void set_initial_suspend(coroutine_handle<> handler) noexcept
 		{
@@ -89,7 +89,7 @@ namespace librf
 			return new(_Ptr) state_generator_t();
 		}
 #endif
-		static state_generator_t* _Alloc_state();
+		LIBRF_API static state_generator_t* _Alloc_state();
 	};
 
 	/**
@@ -139,10 +139,10 @@ namespace librf
 			_is_future = !awaitor;
 		}
 	public:
-		virtual void destroy_deallocate() override;
-		virtual void resume() override;
-		virtual bool has_handler() const  noexcept override;
-		virtual state_base_t* get_parent() const noexcept override;
+		LIBRF_API virtual void destroy_deallocate() override;
+		LIBRF_API virtual void resume() override;
+		LIBRF_API virtual bool has_handler() const  noexcept override;
+		LIBRF_API virtual state_base_t* get_parent() const noexcept override;
 
 		inline bool is_ready() const noexcept
 		{
@@ -177,7 +177,7 @@ namespace librf
 		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 		void future_await_suspend(coroutine_handle<_PromiseT> handler);
 
-		bool switch_scheduler_await_suspend(scheduler_t* sch);
+		LIBRF_API bool switch_scheduler_await_suspend(scheduler_t* sch);
 
 		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 		void promise_initial_suspend(coroutine_handle<_PromiseT> handler);
@@ -312,12 +312,12 @@ namespace librf
 	private:
 		explicit state_t(bool awaitor) noexcept :state_future_t(awaitor) {}
 	public:
-		void future_await_resume();
+		LIBRF_API void future_await_resume();
 		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 		void promise_yield_value(_PromiseT* promise);
 
-		void set_exception(std::exception_ptr e);
-		void set_value();
+		LIBRF_API void set_exception(std::exception_ptr e);
+		LIBRF_API void set_value();
 
 		template<class _Exp>
 		inline void throw_exception(_Exp e)

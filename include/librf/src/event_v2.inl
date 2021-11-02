@@ -8,8 +8,8 @@ namespace librf
 
 		struct event_v2_impl : public std::enable_shared_from_this<event_v2_impl>
 		{
-			event_v2_impl(bool initially) noexcept;
-			~event_v2_impl();
+			LIBRF_API event_v2_impl(bool initially) noexcept;
+			LIBRF_API ~event_v2_impl();
 
 			bool is_signaled() const noexcept
 			{
@@ -19,8 +19,8 @@ namespace librf
 			{
 				_counter.store(0, std::memory_order_release);
 			}
-			void signal_all() noexcept;
-			void signal() noexcept;
+			LIBRF_API void signal_all() noexcept;
+			LIBRF_API void signal() noexcept;
 
 		public:
 			static constexpr bool USE_SPINLOCK = true;
@@ -62,8 +62,8 @@ namespace librf
 
 		struct state_event_base_t : public state_base_t
 		{
-			virtual void resume() override;
-			virtual bool has_handler() const  noexcept override;
+			LIBRF_API virtual void resume() override;
+			LIBRF_API virtual bool has_handler() const  noexcept override;
 
 			virtual void on_cancel() noexcept = 0;
 			virtual bool on_notify(event_v2_impl* eptr) = 0;
@@ -103,9 +103,9 @@ namespace librf
 				: _value(&val)
 			{}
 
-			virtual void on_cancel() noexcept override;
-			virtual bool on_notify(event_v2_impl* eptr) override;
-			virtual bool on_timeout() override;
+			LIBRF_API virtual void on_cancel() noexcept override;
+			LIBRF_API virtual bool on_notify(event_v2_impl* eptr) override;
+			LIBRF_API virtual bool on_timeout() override;
 		protected:
 			//_value引用awaitor保存的值，这样可以尽可能减少创建state的可能。而不必进入没有state就没有value实体被用于返回。
 			//在调用on_notify()或on_timeout()任意之一后，置为nullptr。
@@ -121,9 +121,9 @@ namespace librf
 				, _value(&val)
 			{}
 
-			virtual void on_cancel() noexcept override;
-			virtual bool on_notify(event_v2_impl* eptr) override;
-			virtual bool on_timeout() override;
+			LIBRF_API virtual void on_cancel() noexcept override;
+			LIBRF_API virtual bool on_notify(event_v2_impl* eptr) override;
+			LIBRF_API virtual bool on_timeout() override;
 
 			std::atomic<intptr_t> _counter;
 		protected:

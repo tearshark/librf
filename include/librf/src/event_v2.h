@@ -23,18 +23,18 @@ namespace librf
 			* @brief 构造一个事件。
 			* @param initially 初始是否触发一次信号。
 			*/
-		event_t(bool initially = false);
+		LIBRF_API event_t(bool initially = false);
 
 		/**
 			* @brief 构造一个无效的事件。
 			* @details 如果用于后续保存另外一个事件，则应当使用此构造函数，便于节省一次不必要的内部初始化。
 			*/
-		event_t(std::adopt_lock_t);
+		LIBRF_API event_t(std::adopt_lock_t);
 
 		/**
 			* @brief 采用shared_ptr<>来保存内部的事件实现。故不必担心正在被等待的协程，因为事件提前销毁而出现异常。
 			*/
-		~event_t();
+		LIBRF_API ~event_t();
 
 		/**
 			* @brief 向所有正在等待的协程触发一次信号。

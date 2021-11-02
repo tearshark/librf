@@ -22,14 +22,14 @@ namespace librf
 	{
 		struct state_when_t : public state_base_t
 		{
-			state_when_t(intptr_t counter_);
+			LIBRF_API state_when_t(intptr_t counter_);
 
-			virtual void resume() override;
-			virtual bool has_handler() const  noexcept override;
+			LIBRF_API virtual void resume() override;
+			LIBRF_API virtual bool has_handler() const  noexcept override;
 
-			void on_cancel() noexcept;
-			bool on_notify_one();
-			bool on_timeout();
+			LIBRF_API void on_cancel() noexcept;
+			LIBRF_API bool on_notify_one();
+			LIBRF_API bool on_timeout();
 
 			//将自己加入到通知链表里
 			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>

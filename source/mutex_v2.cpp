@@ -4,7 +4,7 @@ namespace librf
 {
 	namespace detail
 	{
-		void state_mutex_t::resume()
+		LIBRF_API void state_mutex_t::resume()
 		{
 			coroutine_handle<> handler = _coro;
 			if (handler)
@@ -15,18 +15,18 @@ namespace librf
 			}
 		}
 
-		bool state_mutex_t::has_handler() const  noexcept
+		LIBRF_API bool state_mutex_t::has_handler() const  noexcept
 		{
 			return (bool)_coro;
 		}
 		
-		state_base_t* state_mutex_t::get_parent() const noexcept
+		LIBRF_API state_base_t* state_mutex_t::get_parent() const noexcept
 		{
 			return _root;
 		}
 
 
-		void state_mutex_t::on_cancel() noexcept
+		LIBRF_API void state_mutex_t::on_cancel() noexcept
 		{
 			mutex_v2_impl** oldValue = _value.load(std::memory_order_acquire);
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
@@ -38,7 +38,7 @@ namespace librf
 			}
 		}
 
-		bool state_mutex_t::on_notify(mutex_v2_impl* eptr)
+		LIBRF_API bool state_mutex_t::on_notify(mutex_v2_impl* eptr)
 		{
 			assert(eptr != nullptr);
 
@@ -57,7 +57,7 @@ namespace librf
 			return false;
 		}
 
-		bool state_mutex_t::on_timeout()
+		LIBRF_API bool state_mutex_t::on_timeout()
 		{
 			mutex_v2_impl** oldValue = _value.load(std::memory_order_acquire);
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
@@ -74,7 +74,7 @@ namespace librf
 			return false;
 		}
 
-		void state_mutex_t::add_timeout_timer(std::chrono::system_clock::time_point tp)
+		LIBRF_API void state_mutex_t::add_timeout_timer(std::chrono::system_clock::time_point tp)
 		{
 			this->_thandler = this->_scheduler->timer()->add_handler(tp,
 				[st = counted_ptr<state_mutex_t>{ this }](bool canceld)
@@ -86,7 +86,7 @@ namespace librf
 
 
 
-		void mutex_v2_impl::lock_until_succeed(void* sch)
+		LIBRF_API void mutex_v2_impl::lock_until_succeed(void* sch)
 		{
 			assert(sch != nullptr);
 
@@ -98,7 +98,7 @@ namespace librf
 			}
 		}
 
-		bool mutex_v2_impl::try_lock(void* sch)
+		LIBRF_API bool mutex_v2_impl::try_lock(void* sch)
 		{
 			assert(sch != nullptr);
 
@@ -106,7 +106,7 @@ namespace librf
 			return try_lock_lockless(sch);
 		}
 
-		bool mutex_v2_impl::try_lock_until(clock_type::time_point tp, void* sch)
+		LIBRF_API bool mutex_v2_impl::try_lock_until(clock_type::time_point tp, void* sch)
 		{
 			assert(sch != nullptr);
 
@@ -119,7 +119,7 @@ namespace librf
 			return false;
 		}
 
-		bool mutex_v2_impl::try_lock_lockless(void* sch) noexcept
+		LIBRF_API bool mutex_v2_impl::try_lock_lockless(void* sch) noexcept
 		{
 			assert(sch != nullptr);
 
@@ -138,7 +138,7 @@ namespace librf
 			return false;
 		}
 
-		bool mutex_v2_impl::unlock(void* sch)
+		LIBRF_API bool mutex_v2_impl::unlock(void* sch)
 		{
 			assert(sch != nullptr);
 
@@ -175,7 +175,7 @@ namespace librf
 			return false;
 		}
 
-		void mutex_v2_impl::add_wait_list_lockless(state_mutex_t* state)
+		LIBRF_API void mutex_v2_impl::add_wait_list_lockless(state_mutex_t* state)
 		{
 			assert(state != nullptr);
 
@@ -183,16 +183,16 @@ namespace librf
 		}
 	}
 
-	mutex_t::mutex_t()
+	LIBRF_API mutex_t::mutex_t()
 		: _mutex(std::make_shared<detail::mutex_v2_impl>())
 	{
 	}
 
-	mutex_t::mutex_t(std::adopt_lock_t) noexcept
+	LIBRF_API mutex_t::mutex_t(std::adopt_lock_t) noexcept
 	{
 	}
 
-	mutex_t::~mutex_t() noexcept
+	LIBRF_API mutex_t::~mutex_t() noexcept
 	{
 	}
 }

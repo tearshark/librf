@@ -3,6 +3,11 @@
 namespace librf
 {
 	/**
+	 * @brief 获得当前线程下的调度器。
+	 */
+	LIBRF_API scheduler_t* this_scheduler();
+
+	/**
 	 * @brief 协程调度器。
 	 * @details librf的设计原则之一，就是要将协程绑定在固定的调度器里执行。
 	 * 通过控制调度器运行的线程和时机，从而控制协程所在的线程和运行时机。
@@ -28,7 +33,7 @@ namespace librf
 
 		timer_mgr_ptr _timer;
 
-		task_t* new_task(task_t* task);
+		LIBRF_API task_t* new_task(task_t* task);
 		//void cancel_all_task_();
 	public:
 		/**
@@ -36,13 +41,13 @@ namespace librf
 		 * @details 这是协程调度器提供的主要接口。同一个调度器非线程安全，不可重入。\n
 		 * 调用者要保证此函数始终在同一个线程里调用。
 		 */
-		bool run_one_batch();
+		LIBRF_API bool run_one_batch();
 
 		/**
 		 * @brief 循环运行所有的协程，直到所有协程都运行完成。
 		 * @details 通常用于测试代码。
 		 */
-		void run_until_notask();
+		LIBRF_API void run_until_notask();
 
 		//void break_all();
 
@@ -88,24 +93,24 @@ namespace librf
 		}
 
 #ifndef DOXYGEN_SKIP_PROPERTY
-		void add_generator(state_base_t* sptr);
-		void del_final(state_base_t* sptr);
-		std::unique_ptr<task_t> del_switch(state_base_t* sptr);
-		void add_switch(std::unique_ptr<task_t> task);
-		task_t* find_task(state_base_t* sptr) const noexcept;
+		LIBRF_API void add_generator(state_base_t* sptr);
+		LIBRF_API void del_final(state_base_t* sptr);
+		LIBRF_API std::unique_ptr<task_t> del_switch(state_base_t* sptr);
+		LIBRF_API void add_switch(std::unique_ptr<task_t> task);
+		LIBRF_API task_t* find_task(state_base_t* sptr) const noexcept;
 
 		friend struct local_scheduler_t;
 	protected:
-		scheduler_t();
+		LIBRF_API scheduler_t();
 	public:
-		~scheduler_t();
+		LIBRF_API ~scheduler_t();
 
 		scheduler_t(scheduler_t&& right_) = delete;
 		scheduler_t& operator = (scheduler_t&& right_) = delete;
 		scheduler_t(const scheduler_t&) = delete;
 		scheduler_t& operator = (const scheduler_t&) = delete;
 
-		static scheduler_t g_scheduler;
+		LIBRF_API static scheduler_t g_scheduler;
 #endif	//DOXYGEN_SKIP_PROPERTY
 	};
 
@@ -121,17 +126,17 @@ namespace librf
 		/**
 		 * @brief 尽可能的创建一个线程相关的调度器。
 		 */
-		local_scheduler_t();
+		LIBRF_API local_scheduler_t();
 
 		/**
 		 * @brief 将指定的调度器绑定到当前线程上。
 		 */
-		local_scheduler_t(scheduler_t & sch) noexcept;
+		LIBRF_API local_scheduler_t(scheduler_t & sch) noexcept;
 
 		/**
 		 * @brief 如果当前线程绑定的调度器由local_scheduler_t所创建，则会销毁调度器，并解绑线程。
 		 */
-		~local_scheduler_t();
+		LIBRF_API ~local_scheduler_t();
 
 		local_scheduler_t(local_scheduler_t&& right_) = delete;
 		local_scheduler_t& operator = (local_scheduler_t&& right_) = delete;

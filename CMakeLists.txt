@@ -54,7 +54,8 @@ option(OPT_DEBUG_COUNTER "Debug objects count" OFF)
 option(OPT_KEEP_REAL_SIZE "Keep real size in queue" OFF)
 option(OPT_DISABLE_MULT_THREAD "Disable multi-threaded scheduler" OFF)
 option(OPT_USE_MIMALLOC "Use mimalloc" OFF)
-option(OPT_DYNAMIC_LIBRARY "Use shared library" OFF)
+option(OPT_DYNAMIC_LIBRARY "Use shared library" ON)
+option(CMAKE_ENABLE_UNIT_TEST "Enable unit test" OFF)
 
 if (UNIX)
 	if(OPT_USE_MIMALLOC)
@@ -92,10 +93,6 @@ endif()
 if(OPT_DISABLE_MULT_THREAD)
 	set(RESUMEF_DISABLE_MULT_THREAD 1)
 endif()
-if(OPT_DYNAMIC_LIBRARY)
-	set(RESUMEF_USE_SHARD_LIBRARY 1)
-	add_compile_definitions("-DRESUMEF_DYNAMIC_EXPORTS=1")
-endif()
 
 configure_file(
 	${CMAKE_SOURCE_DIR}/config.h.in
@@ -107,6 +104,7 @@ file(GLOB_RECURSE HEADER_FILES ${CMAKE_SOURCE_DIR}/include/*.*)
 file(GLOB_RECURSE SOURCE_FILES ${CMAKE_SOURCE_DIR}/source/*.*)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 if(OPT_DYNAMIC_LIBRARY)
@@ -114,21 +112,22 @@ if(OPT_DYNAMIC_LIBRARY)
 		${HEADER_FILES}
 		${SOURCE_FILES}
 	)
+	target_compile_definitions(${PROJECT_NAME}
+		PRIVATE LIBRF_DYNAMIC_EXPORTS=1
+	)
 else()
 	add_library(${PROJECT_NAME} STATIC
 		${HEADER_FILES}
 		${SOURCE_FILES}
 	)
+	target_compile_definitions(${PROJECT_NAME}
+		PRIVATE LIBRF_USE_STATIC_LIBRARY=1
+	)
 endif()
-
 
 target_include_directories(${PROJECT_NAME}
 	PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-include_directories(
-	${CMAKE_SOURCE_DIR}/modern_cb
 )
 
 if(OPT_USE_MIMALLOC)
@@ -137,5 +136,15 @@ else()
 	set(LIB_MIMALLOC, "")
 endif()
 
-add_subdirectory(tutorial)
-#add_subdirectory(benchmark)
+if(CMAKE_ENABLE_UNIT_TEST)
+	include_directories(
+		${CMAKE_SOURCE_DIR}/modern_cb
+	)
+
+	add_subdirectory(tutorial)
+	#add_subdirectory(benchmark)
+endif()
+
+
+include(${CMAKE_SOURCE_DIR}/cmake/install.cmake)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/librf DESTINATION include)

@@ -4,7 +4,7 @@ namespace librf
 {
 	namespace detail
 	{
-		void state_event_base_t::resume()
+		LIBRF_API void state_event_base_t::resume()
 		{
 			coroutine_handle<> handler = _coro;
 			if (handler)
@@ -15,12 +15,12 @@ namespace librf
 			}
 		}
 
-		bool state_event_base_t::has_handler() const  noexcept
+		LIBRF_API bool state_event_base_t::has_handler() const  noexcept
 		{
 			return (bool)_coro;
 		}
 
-		void state_event_t::on_cancel() noexcept
+		LIBRF_API void state_event_t::on_cancel() noexcept
 		{
 			event_v2_impl** oldValue = _value.load(std::memory_order_acquire);
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
@@ -32,7 +32,7 @@ namespace librf
 			}
 		}
 
-		bool state_event_t::on_notify(event_v2_impl* eptr)
+		LIBRF_API bool state_event_t::on_notify(event_v2_impl* eptr)
 		{
 			event_v2_impl** oldValue = _value.load(std::memory_order_acquire);
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
@@ -49,7 +49,7 @@ namespace librf
 			return false;
 		}
 
-		bool state_event_t::on_timeout()
+		LIBRF_API bool state_event_t::on_timeout()
 		{
 			event_v2_impl** oldValue = _value.load(std::memory_order_acquire);
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
@@ -69,7 +69,7 @@ namespace librf
 
 
 
-		void state_event_all_t::on_cancel() noexcept
+		LIBRF_API void state_event_all_t::on_cancel() noexcept
 		{
 			intptr_t oldValue = _counter.load(std::memory_order_acquire);
 			if (oldValue >= 0 && _counter.compare_exchange_strong(oldValue, -1, std::memory_order_acq_rel))
@@ -81,7 +81,7 @@ namespace librf
 			}
 		}
 
-		bool state_event_all_t::on_notify(event_v2_impl*)
+		LIBRF_API bool state_event_all_t::on_notify(event_v2_impl*)
 		{
 			intptr_t oldValue = _counter.load(std::memory_order_acquire);
 			if (oldValue <= 0) return false;
@@ -102,7 +102,7 @@ namespace librf
 			return oldValue >= 1;
 		}
 
-		bool state_event_all_t::on_timeout()
+		LIBRF_API bool state_event_all_t::on_timeout()
 		{
 			intptr_t oldValue = _counter.load(std::memory_order_acquire);
 			if (oldValue >= 0 && _counter.compare_exchange_strong(oldValue, -1, std::memory_order_acq_rel))
@@ -121,7 +121,7 @@ namespace librf
 
 
 
-		event_v2_impl::event_v2_impl(bool initially) noexcept
+		LIBRF_API event_v2_impl::event_v2_impl(bool initially) noexcept
 			: _counter(initially ? 1 : 0)
 		{
 		}
@@ -153,12 +153,12 @@ namespace librf
 			list.clear();
 		}
 
-		event_v2_impl::~event_v2_impl()
+		LIBRF_API event_v2_impl::~event_v2_impl()
 		{
 			clear_list(_wait_awakes);
 		}
 
-		void event_v2_impl::signal_all() noexcept
+		LIBRF_API void event_v2_impl::signal_all() noexcept
 		{
 			scoped_lock<lock_type> lock_(_lock);
 
@@ -171,7 +171,7 @@ namespace librf
 			}
 		}
 
-		void event_v2_impl::signal() noexcept
+		LIBRF_API void event_v2_impl::signal() noexcept
 		{
 			scoped_lock<lock_type> lock_(_lock);
 
@@ -186,16 +186,16 @@ namespace librf
 		}
 	}
 
-	event_t::event_t(bool initially)
+	LIBRF_API event_t::event_t(bool initially)
 		:_event(std::make_shared<detail::event_v2_impl>(initially))
 	{
 	}
 
-	event_t::event_t(std::adopt_lock_t)
+	LIBRF_API event_t::event_t(std::adopt_lock_t)
 	{
 	}
 
-	event_t::~event_t()
+	LIBRF_API event_t::~event_t()
 	{
 	}
 }

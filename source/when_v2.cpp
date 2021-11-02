@@ -4,12 +4,12 @@ namespace librf
 {
 	namespace detail
 	{
-		state_when_t::state_when_t(intptr_t counter_)
+		LIBRF_API state_when_t::state_when_t(intptr_t counter_)
 			:_counter(counter_)
 		{
 		}
 
-		void state_when_t::resume()
+		LIBRF_API void state_when_t::resume()
 		{
 			coroutine_handle<> handler = _coro;
 			if (handler)
@@ -20,12 +20,12 @@ namespace librf
 			}
 		}
 
-		bool state_when_t::has_handler() const  noexcept
+		LIBRF_API bool state_when_t::has_handler() const  noexcept
 		{
 			return (bool)_coro;
 		}
 
-		void state_when_t::on_cancel() noexcept
+		LIBRF_API void state_when_t::on_cancel() noexcept
 		{
 			scoped_lock<lock_type> lock_(_lock);
 
@@ -33,7 +33,7 @@ namespace librf
 			this->_coro = nullptr;
 		}
 
-		bool state_when_t::on_notify_one()
+		LIBRF_API bool state_when_t::on_notify_one()
 		{
 			scoped_lock<lock_type> lock_(_lock);
 
@@ -48,7 +48,7 @@ namespace librf
 			return false;
 		}
 
-		bool state_when_t::on_timeout()
+		LIBRF_API bool state_when_t::on_timeout()
 		{
 			scoped_lock<lock_type> lock_(_lock);
 

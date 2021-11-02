@@ -14,7 +14,7 @@ namespace librf
 	 * @return [co_await] void
 	 * @throw timer_canceled_exception 如果定时器被取消，则抛此异常。
 	 */
-	future_t<> sleep_until_(std::chrono::system_clock::time_point tp_, scheduler_t& scheduler_);
+	LIBRF_API future_t<> sleep_until_(std::chrono::system_clock::time_point tp_, scheduler_t& scheduler_);
 
 	/**
 	 * @brief 协程专用的睡眠功能。

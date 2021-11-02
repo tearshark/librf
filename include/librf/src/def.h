@@ -53,12 +53,6 @@ namespace librf
 	 * @brief 版本号。
 	 */
 	constexpr size_t _Version = LIB_RESUMEF_VERSION;
-
-	/**
-	 * @brief 获得当前线程下的调度器。
-	 */
-	scheduler_t* this_scheduler();
-
 }
 
 #ifndef DOXYGEN_SKIP_PROPERTY
@@ -101,7 +95,5 @@ namespace librf
 		return std::make_unique<stop_callback<_Callable>>(std::move(token), cb);
 	}
 }
-
-#include "exception.inl"
 
 #endif	//DOXYGEN_SKIP_PROPERTY

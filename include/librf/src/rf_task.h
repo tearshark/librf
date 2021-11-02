@@ -16,14 +16,14 @@ namespace librf
 	 */
 	struct task_t
 	{
-		task_t() noexcept;
-		virtual ~task_t();
+		LIBRF_API task_t() noexcept;
+		LIBRF_API virtual ~task_t();
 
 		/**
 		 * @brief 获取stop_source，第一次获取时，会生成一个有效的stop_source。
 		 * @return stop_source
 		 */
-		const stop_source & get_stop_source();
+		LIBRF_API const stop_source & get_stop_source();
 
 		/**
 		 * @brief 获取一个跟stop_source绑定的，新的stop_token。

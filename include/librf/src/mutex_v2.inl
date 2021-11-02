@@ -10,15 +10,15 @@ namespace librf
 				: _value(&val)
 			{}
 
-			virtual void resume() override;
-			virtual bool has_handler() const  noexcept override;
-			virtual state_base_t* get_parent() const noexcept override;
+			LIBRF_API virtual void resume() override;
+			LIBRF_API virtual bool has_handler() const  noexcept override;
+			LIBRF_API virtual state_base_t* get_parent() const noexcept override;
 
-			void on_cancel() noexcept;
-			bool on_notify(mutex_v2_impl* eptr);
-			bool on_timeout();
+			LIBRF_API void on_cancel() noexcept;
+			LIBRF_API bool on_notify(mutex_v2_impl* eptr);
+			LIBRF_API bool on_timeout();
 
-			void add_timeout_timer(std::chrono::system_clock::time_point tp);
+			LIBRF_API void add_timeout_timer(std::chrono::system_clock::time_point tp);
 
 			inline void on_await_suspend(coroutine_handle<> handler, scheduler_t* sch, state_base_t* root) noexcept
 			{
@@ -44,10 +44,10 @@ namespace librf
 				return _owner.load(std::memory_order_relaxed);
 			}
 
-			bool try_lock(void* sch);					//内部加锁
-			bool try_lock_until(clock_type::time_point tp, void* sch);	//内部加锁
-			bool unlock(void* sch);						//内部加锁
-			void lock_until_succeed(void* sch);			//内部加锁
+			LIBRF_API bool try_lock(void* sch);						//内部加锁
+			LIBRF_API bool try_lock_until(clock_type::time_point tp, void* sch);	//内部加锁
+			LIBRF_API bool unlock(void* sch);						//内部加锁
+			LIBRF_API void lock_until_succeed(void* sch);			//内部加锁
 		public:
 			static constexpr bool USE_SPINLOCK = true;
 
@@ -55,8 +55,8 @@ namespace librf
 			using state_mutex_ptr = counted_ptr<state_mutex_t>;
 			using wait_queue_type = std::list<state_mutex_ptr>;
 
-			bool try_lock_lockless(void* sch) noexcept;			//内部不加锁，加锁由外部来进行
-			void add_wait_list_lockless(state_mutex_t* state);	//内部不加锁，加锁由外部来进行
+			LIBRF_API bool try_lock_lockless(void* sch) noexcept;			//内部不加锁，加锁由外部来进行
+			LIBRF_API void add_wait_list_lockless(state_mutex_t* state);	//内部不加锁，加锁由外部来进行
 
 			lock_type _lock;									//保证访问本对象是线程安全的
 		private:

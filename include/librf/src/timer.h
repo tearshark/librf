@@ -94,8 +94,8 @@ namespace librf
 		typedef std::multimap<clock_type::time_point, timer_target_ptr> timer_map_type;
 #endif
 	public:
-		timer_manager();
-		~timer_manager();
+		LIBRF_API timer_manager();
+		LIBRF_API ~timer_manager();
 
 		template<class _Rep, class _Period, class _Cb>
 		timer_target_ptr add(const std::chrono::duration<_Rep, _Period> & dt_, _Cb && cb_)
@@ -118,14 +118,14 @@ namespace librf
 			return{ this, add(tp_, std::forward<_Cb>(cb_)) };
 		}
 
-		bool stop(const timer_target_ptr & sptr);
+		LIBRF_API bool stop(const timer_target_ptr & sptr);
 
 		inline bool empty() const
 		{
 			return _runing_timers.empty() && _added_timers.empty();
 		}
-		void clear();
-		void update();
+		LIBRF_API void clear();
+		LIBRF_API void update();
 
 #ifndef DOXYGEN_SKIP_PROPERTY
 		template<class _Cb>
@@ -145,8 +145,8 @@ namespace librf
 		timer_vector_type	_added_timers;
 		timer_map_type		_runing_timers;
 
-		timer_target_ptr add_(const timer_target_ptr & sptr);
-		static void call_target_(const timer_target_ptr & sptr, bool canceld);
+		LIBRF_API timer_target_ptr add_(const timer_target_ptr & sptr);
+		LIBRF_API static void call_target_(const timer_target_ptr & sptr, bool canceld);
 #endif
 	};
 

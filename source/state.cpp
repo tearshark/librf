@@ -2,21 +2,21 @@
 
 namespace librf
 {
-	state_base_t::~state_base_t()
+	LIBRF_API state_base_t::~state_base_t()
 	{
 	}
 	
-	void state_base_t::destroy_deallocate()
+	LIBRF_API void state_base_t::destroy_deallocate()
 	{
 		delete this;
 	}
 	
-	state_base_t* state_base_t::get_parent() const noexcept
+	LIBRF_API state_base_t* state_base_t::get_parent() const noexcept
 	{
 		return nullptr;
 	}
 
-	void state_future_t::destroy_deallocate()
+	LIBRF_API void state_future_t::destroy_deallocate()
 	{
 		size_t _Size = this->_alloc_size;
 #if RESUMEF_DEBUG_COUNTER
@@ -28,7 +28,7 @@ namespace librf
 		return _Al.deallocate(reinterpret_cast<char*>(this), _Size);
 	}
 
-	state_generator_t* state_generator_t::_Alloc_state()
+	LIBRF_API state_generator_t* state_generator_t::_Alloc_state()
 	{
 		_Alloc_char _Al;
 		size_t _Size = _Align_size<state_generator_t>();
@@ -39,7 +39,7 @@ namespace librf
 		return new(_Ptr) state_generator_t();
 	}
 
-	void state_generator_t::destroy_deallocate()
+	LIBRF_API void state_generator_t::destroy_deallocate()
 	{
 		size_t _Size = _Align_size<state_generator_t>();
 #if RESUMEF_INLINE_STATE
@@ -55,7 +55,7 @@ namespace librf
 		return _Al.deallocate(reinterpret_cast<char*>(this), _Size);
 	}
 
-	void state_generator_t::resume()
+	LIBRF_API void state_generator_t::resume()
 	{
 		if (likely(_coro))
 		{
@@ -75,12 +75,12 @@ namespace librf
 		}
 	}
 
-	bool state_generator_t::has_handler() const noexcept
+	LIBRF_API bool state_generator_t::has_handler() const noexcept
 	{
 		return (bool)_coro;
 	}
 	
-	bool state_generator_t::switch_scheduler_await_suspend(scheduler_t* sch)
+	LIBRF_API bool state_generator_t::switch_scheduler_await_suspend(scheduler_t* sch)
 	{
 		assert(sch != nullptr);
 
@@ -102,12 +102,12 @@ namespace librf
 		return true;
 	}
 
-	state_base_t* state_future_t::get_parent() const noexcept
+	LIBRF_API state_base_t* state_future_t::get_parent() const noexcept
 	{
 		return _parent;
 	}
 
-	void state_future_t::resume()
+	LIBRF_API void state_future_t::resume()
 	{
 		std::unique_lock<lock_type> __guard(_mtx);
 
@@ -146,13 +146,13 @@ namespace librf
 		}
 	}
 
-	bool state_future_t::has_handler() const noexcept
+	LIBRF_API bool state_future_t::has_handler() const noexcept
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
 		return has_handler_skip_lock();
 	}
 
-	bool state_future_t::switch_scheduler_await_suspend(scheduler_t* sch)
+	LIBRF_API bool state_future_t::switch_scheduler_await_suspend(scheduler_t* sch)
 	{
 		assert(sch != nullptr);
 		scoped_lock<lock_type> __guard(this->_mtx);
@@ -178,7 +178,7 @@ namespace librf
 		return true;
 	}
 
-	void state_t<void>::future_await_resume()
+	LIBRF_API void state_t<void>::future_await_resume()
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
 
@@ -188,7 +188,7 @@ namespace librf
 			std::rethrow_exception(std::make_exception_ptr(future_exception{error_code::not_ready}));
 	}
 
-	void state_t<void>::set_value()
+	LIBRF_API void state_t<void>::set_value()
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
 		this->_has_value.store(result_type::Value, std::memory_order_release);
@@ -203,7 +203,7 @@ namespace librf
 		}
 	}
 
-	void state_t<void>::set_exception(std::exception_ptr e)
+	LIBRF_API void state_t<void>::set_exception(std::exception_ptr e)
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
 		this->_exception = std::move(e);

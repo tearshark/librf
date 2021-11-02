@@ -12,3 +12,5 @@ private
 bin
 out
 /CMakeSettings.json
+install
+lib

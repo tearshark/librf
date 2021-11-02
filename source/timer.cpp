@@ -2,17 +2,17 @@
 
 namespace librf
 {
-	timer_manager::timer_manager()
+	LIBRF_API timer_manager::timer_manager()
 	{
 		_added_timers.reserve(128);
 	}
 
-	timer_manager::~timer_manager()
+	LIBRF_API timer_manager::~timer_manager()
 	{
 		clear();
 	}
 	
-	void timer_manager::call_target_(const timer_target_ptr & sptr, bool canceld)
+	LIBRF_API void timer_manager::call_target_(const timer_target_ptr & sptr, bool canceld)
 	{
 		auto cb = std::move(sptr->cb);
 		sptr->st = timer_target::State::Invalid;
@@ -23,7 +23,7 @@ namespace librf
 		if(cb) cb(canceld);
 	}
 
-	void timer_manager::clear()
+	LIBRF_API void timer_manager::clear()
 	{
 #if !RESUMEF_DISABLE_MULT_THREAD
 		std::unique_lock<spinlock> __lock(_added_mtx);
@@ -41,7 +41,7 @@ namespace librf
 			call_target_(kv.second, true);
 	}
 
-	detail::timer_target_ptr timer_manager::add_(const timer_target_ptr & sptr)
+	LIBRF_API detail::timer_target_ptr timer_manager::add_(const timer_target_ptr & sptr)
 	{
 		assert(sptr);
 		assert(sptr->st == timer_target::State::Invalid);
@@ -60,7 +60,7 @@ namespace librf
 		return sptr;
 	}
 
-	bool timer_manager::stop(const timer_target_ptr & sptr)
+	LIBRF_API bool timer_manager::stop(const timer_target_ptr & sptr)
 	{
 		if (!sptr || sptr->st == timer_target::State::Invalid) 
 			return false;
@@ -72,7 +72,7 @@ namespace librf
 		return true;
 	}
 
-	void timer_manager::update()
+	LIBRF_API void timer_manager::update()
 	{
 		{
 #if !RESUMEF_DISABLE_MULT_THREAD

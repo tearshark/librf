@@ -2,7 +2,7 @@
 
 namespace librf
 {
-	future_t<> sleep_until_(std::chrono::system_clock::time_point tp_, scheduler_t& scheduler_)
+	LIBRF_API future_t<> sleep_until_(std::chrono::system_clock::time_point tp_, scheduler_t& scheduler_)
 	{
 		awaitable_t<> awaitable;
 

@@ -209,13 +209,13 @@ namespace librf
 		>
 		static void unlock(void* unique_address, _Mtxs&... mtxs);
 
-		mutex_t();
+		LIBRF_API mutex_t();
 
 		/**
 			* @brief 构造一个无效的mutex_t。
 			*/
-		mutex_t(std::adopt_lock_t) noexcept;
-		~mutex_t() noexcept;
+		LIBRF_API mutex_t(std::adopt_lock_t) noexcept;
+		LIBRF_API ~mutex_t() noexcept;
 
 		mutex_t(const mutex_t&) = default;
 		mutex_t(mutex_t&&) = default;

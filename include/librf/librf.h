@@ -71,6 +71,7 @@ extern "C" void _coro_resume_block();
 
 #include "src/def.h"
 #include "src/macro_def.inl"
+#include "src/exception.inl"
 #include "src/counted_ptr.h"
 #include "src/type_traits.inl"
 #include "src/type_concept.inl"

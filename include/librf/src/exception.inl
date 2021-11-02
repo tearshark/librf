@@ -23,12 +23,11 @@ namespace librf
 	/**
 	 * @brief 通过错误码获得错误描述字符串。
 	 */
-	const char* get_error_string(error_code fe, const char* classname);
+	LIBRF_API const char* get_error_string(error_code fe, const char* classname);
 
 	/**
 	 * @brief 在操作future_t<>时产生的异常。
 	 */
-	const char* get_error_string(error_code fe, const char* classname);
 	struct future_exception : std::logic_error
 	{
 		error_code _error;
