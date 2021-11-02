@@ -41,24 +41,24 @@ endif()
 
 
 if(${LIBRF_COMPILER_SETTING} STREQUAL "msvc")
-	option(OPT_INLINE_STATE "Enable Inline state" ON)
+	option(LIBRF_INLINE_STATE "Enable Inline state" OFF)
 elseif(${LIBRF_COMPILER_SETTING} STREQUAL "clang")
-	option(OPT_INLINE_STATE "Enable Inline state" ON)
+	option(LIBRF_INLINE_STATE "Enable Inline state" OFF)
 elseif(${LIBRF_COMPILER_SETTING} STREQUAL "gcc")
-	option(OPT_INLINE_STATE "Enable Inline state" OFF)
+	option(LIBRF_INLINE_STATE "Enable Inline state" OFF)
 else()
-	option(OPT_INLINE_STATE "Enable Inline state" OFF)
+	option(LIBRF_INLINE_STATE "Enable Inline state" OFF)
 endif()
 
-option(OPT_DEBUG_COUNTER "Debug objects count" OFF)
-option(OPT_KEEP_REAL_SIZE "Keep real size in queue" OFF)
-option(OPT_DISABLE_MULT_THREAD "Disable multi-threaded scheduler" OFF)
-option(OPT_USE_MIMALLOC "Use mimalloc" OFF)
-option(OPT_DYNAMIC_LIBRARY "Use shared library" ON)
+option(LIBRF_DEBUG_COUNTER "Debug objects count" OFF)
+option(LIBRF_KEEP_REAL_SIZE "Keep real size in queue" OFF)
+option(LIBRF_DISABLE_MULT_THREAD "Disable multi-threaded scheduler" OFF)
+option(LIBRF_USE_MIMALLOC "Use mimalloc" OFF)
+option(LIBRF_DYNAMIC_LIBRARY "Use shared library" ON)
 option(CMAKE_ENABLE_UNIT_TEST "Enable unit test" OFF)
 
 if (UNIX)
-	if(OPT_USE_MIMALLOC)
+	if(LIBRF_USE_MIMALLOC)
 		find_package(mimalloc 1.4 REQUIRED)
 	endif()
 
@@ -81,33 +81,33 @@ message(STATUS "C++ flags: ${CMAKE_CXX_FLAGS}")
 
 #set(RESUMEF_USE_CUSTOM_SPINLOCK "std::mutex")
 
-if(OPT_INLINE_STATE)
+if(LIBRF_INLINE_STATE)
 	set(RESUMEF_INLINE_STATE 1)
 endif()
-if(OPT_DEBUG_COUNTER)
+if(LIBRF_DEBUG_COUNTER)
 	set(RESUMEF_DEBUG_COUNTER 1)
 endif()
-if(OPT_KEEP_REAL_SIZE)
+if(LIBRF_KEEP_REAL_SIZE)
 	set(_WITH_LOCK_FREE_Q_KEEP_REAL_SIZE 1)
 endif()
-if(OPT_DISABLE_MULT_THREAD)
+if(LIBRF_DISABLE_MULT_THREAD)
 	set(RESUMEF_DISABLE_MULT_THREAD 1)
 endif()
 
 configure_file(
-	${CMAKE_SOURCE_DIR}/config.h.in
-	${CMAKE_SOURCE_DIR}/include/librf/src/config.h
+	${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+	${CMAKE_CURRENT_SOURCE_DIR}/include/librf/src/config.h
 )
 
 
-file(GLOB_RECURSE HEADER_FILES ${CMAKE_SOURCE_DIR}/include/*.*)
-file(GLOB_RECURSE SOURCE_FILES ${CMAKE_SOURCE_DIR}/source/*.*)
+file(GLOB_RECURSE HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.*)
+file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.*)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
-if(OPT_DYNAMIC_LIBRARY)
+if(LIBRF_DYNAMIC_LIBRARY)
 	add_library(${PROJECT_NAME} SHARED
 		${HEADER_FILES}
 		${SOURCE_FILES}
@@ -128,23 +128,20 @@ endif()
 target_include_directories(${PROJECT_NAME}
 	PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include
+	${CMAKE_CURRENT_SOURCE_DIR}/modern_cb
 )
 
-if(OPT_USE_MIMALLOC)
+if(LIBRF_USE_MIMALLOC)
 	set(LIB_MIMALLOC, "mimalloc")
 else()
 	set(LIB_MIMALLOC, "")
 endif()
 
 if(CMAKE_ENABLE_UNIT_TEST)
-	include_directories(
-		${CMAKE_SOURCE_DIR}/modern_cb
-	)
-
 	add_subdirectory(tutorial)
 	#add_subdirectory(benchmark)
 endif()
 
 
 include(${CMAKE_SOURCE_DIR}/cmake/install.cmake)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/librf DESTINATION include)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/librf DESTINATION include)

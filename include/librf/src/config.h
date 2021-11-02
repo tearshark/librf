@@ -2,9 +2,9 @@
 
 #ifndef RESUMEF_INLINE_STATE
 #if defined(__clang__) || defined(_MSC_VER)
-#define RESUMEF_INLINE_STATE 1
+/* #undef RESUMEF_INLINE_STATE */
 #else
-#define RESUMEF_INLINE_STATE 0
+/* #undef RESUMEF_INLINE_STATE */
 #endif	//defined(__clang__) || defined(_MSC_VER)
 #endif	//RESUMEF_INLINE_STATE
 
