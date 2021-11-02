@@ -531,7 +531,7 @@ namespace librf
 	template<class... _Mtxs, typename>
 	inline future_t<batch_unlock_t<_Mtxs...>> mutex_t::lock(_Mtxs&... mtxs)
 	{
-		batch_unlock_t<_Mtxs...> unlock_guard{ std::adopt_lock, root_state(), mtxs... };
+		batch_unlock_t<_Mtxs...> unlock_guard{ std::adopt_lock, librf_root_state(), mtxs... };
 		co_await detail::mutex_lock_await_lock_impl::_Lock_range(unlock_guard._MAA);
 		co_return std::move(unlock_guard);
 	}
@@ -540,14 +540,14 @@ namespace librf
 	inline future_t<> mutex_t::lock(adopt_manual_unlock_t _noused, _Mtxs&... mtxs)
 	{
 		(void)_noused;	//GCC: 这个参数不起一个名字，会导致GCC编译器内部错误。
-		mutex_t::_MutexAwaitAssembleT _MAA{ root_state(), mtxs... };
+		mutex_t::_MutexAwaitAssembleT _MAA{ librf_root_state(), mtxs... };
 		co_await detail::mutex_lock_await_lock_impl::_Lock_range(_MAA);
 	}
 
 	template<class... _Mtxs, typename>
 	inline future_t<> mutex_t::unlock(_Mtxs&... mtxs)
 	{
-		void* unique_address = root_state();
+		void* unique_address = librf_root_state();
 
 		(mtxs.unlock(unique_address), ...);
 	}

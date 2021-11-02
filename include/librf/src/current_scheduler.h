@@ -31,7 +31,7 @@ namespace librf
 		/**
 		 * @brief 获得当前协程绑定的调度器。
 		 * @details 立即返回，没有协程切换和等待。\n
-		 * 推荐使用 current_scheduler() 宏替代 co_await get_current_scheduler()。
+		 * 推荐使用 librf_current_scheduler() 宏替代 co_await get_current_scheduler()。
 		 * @return [co_await] scheduler_t*
 		 * @note 本函数是librf名字空间下的全局函数。由于doxygen使用上的问题，将之归纳到 get_current_scheduler_awaitor 类下。
 		 */
@@ -44,14 +44,14 @@ namespace librf
 		 * @return scheduler_t*
 		 * @note 由于doxygen使用上的问题，将之归纳到 get_current_scheduler_awaitor 类下。
 		 */
-		static scheduler_t* current_scheduler() noexcept;
+		static scheduler_t* librf_current_scheduler() noexcept;
 #endif	//DOXYGEN_SKIP_PROPERTY
 	};
 
 	/**
 	 * @brief 获得当前协程绑定的调度器。
 	 * @details 立即返回，没有协程切换和等待。\n
-	 * 推荐使用 current_scheduler() 宏替代 co_await get_current_scheduler()。
+	 * 推荐使用 librf_current_scheduler() 宏替代 co_await get_current_scheduler()。
 	 * @return [co_await] scheduler_t*
 	 */
 	inline get_current_scheduler_awaitor get_current_scheduler() noexcept
@@ -89,7 +89,7 @@ namespace librf
 		/**
 		 * @brief 获得当前协程的跟state指针。
 		 * @details 立即返回，没有协程切换和等待。\n
-		 * 推荐使用 root_state() 宏替代 co_await get_root_state()。
+		 * 推荐使用 librf_root_state() 宏替代 co_await get_root_state()。
 		 * @return [co_await] state_base_t*
 		 * @note 本函数是librf名字空间下的全局函数。由于doxygen使用上的问题，将之归纳到 get_root_state_awaitor 类下。
 		 */
@@ -102,14 +102,14 @@ namespace librf
 		 * @return state_base_t*
 		 * @note 由于doxygen使用上的问题，将之归纳到 get_root_state_awaitor 类下。
 		 */
-		static state_base_t* root_state() noexcept;
+		static state_base_t* librf_root_state() noexcept;
 #endif	//DOXYGEN_SKIP_PROPERTY
 	};
 
 	/**
 	 * @brief 获得当前协程的跟state指针。
 	 * @details 立即返回，没有协程切换和等待。
-	 * 推荐使用 root_state() 宏替代 co_await get_root_state()。
+	 * 推荐使用 librf_root_state() 宏替代 co_await get_root_state()。
 	 * @return [co_await] state_base_t*
 	 */
 	inline get_root_state_awaitor get_root_state() noexcept
@@ -149,7 +149,7 @@ namespace librf
 		/**
 		 * @brief 获得当前协程的task_t指针。
 		 * @details 立即返回，没有协程切换和等待。
-		 * 推荐使用 current_task() 宏替代 co_await get_current_task()。
+		 * 推荐使用 librf_current_task() 宏替代 co_await get_current_task()。
 		 * @return [co_await] task_t*
 		 * @note 本函数是librf名字空间下的全局函数。由于doxygen使用上的问题，将之归纳到 get_current_task_awaitor 类下。
 		 */
@@ -162,14 +162,14 @@ namespace librf
 		 * @return task_t*
 		 * @note 由于doxygen使用上的问题，将之归纳到 get_current_task_awaitor 类下。
 		 */
-		static task_t* current_task() noexcept;
+		static task_t* librf_current_task() noexcept;
 #endif	//DOXYGEN_SKIP_PROPERTY
 	};
 
 	/**
 	 * @brief 获得当前协程的task_t指针。
 	 * @details 立即返回，没有协程切换和等待。
-	 * 推荐使用 current_task() 宏替代 co_await get_current_task()。
+	 * 推荐使用 librf_current_task() 宏替代 co_await get_current_task()。
 	 * @return [co_await] task_t*
 	 */
 	inline get_current_task_awaitor get_current_task() noexcept

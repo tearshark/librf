@@ -63,7 +63,7 @@ namespace librf
 
 		/**
 			* @brief 尝试在协程中加锁。此操作无论成功与否都会立即返回，不会有协程切换。
-			* @details 如果加锁成功，则需要调用co_await unlock()解锁。或者使用unlock(root_state())解锁。\n
+			* @details 如果加锁成功，则需要调用co_await unlock()解锁。或者使用unlock(librf_root_state())解锁。\n
 			* 如果加锁失败，且要循环尝试加锁，则最好调用co_await yield()让出一次调度。否则，可能造成本调度器死循环。
 			* @return [co_await] bool
 			*/
@@ -127,7 +127,7 @@ namespace librf
 		bool try_lock_until(const std::chrono::time_point<_Rep, _Period>& tp, void* unique_address);
 
 		/**
-			* @brief 在非协程中解锁。立即返回。由于立即返回，也可在协程中如此使用：mtx.unlock(root_state())
+			* @brief 在非协程中解锁。立即返回。由于立即返回，也可在协程中如此使用：mtx.unlock(librf_root_state())
 			* @param unique_address 代表获得锁的拥有者。
 			*/
 		void unlock(void* unique_address) const;
@@ -159,7 +159,7 @@ namespace librf
 		static future_t<> lock(adopt_manual_unlock_t manual_unlock_tag, _Mtxs&... mtxs);
 
 		/**
-			* @brief 在协程中批量解锁。如果可能，使用unlock(root_state(), mtxs...)来替代。
+			* @brief 在协程中批量解锁。如果可能，使用unlock(librf_root_state(), mtxs...)来替代。
 			* @param mtxs... 需要解锁的锁列表。
 			* @return [co_await] void
 			*/
@@ -198,7 +198,7 @@ namespace librf
 		static void lock(adopt_manual_unlock_t manual_unlock_tag, void* unique_address, _Mtxs&... mtxs);
 
 		/**
-			* @brief 在非协程中批量解锁。立即返回。由于立即返回，也可在协程中如此使用：unlock(root_state(), mtxs...)
+			* @brief 在非协程中批量解锁。立即返回。由于立即返回，也可在协程中如此使用：unlock(librf_root_state(), mtxs...)
 			* @param unique_address 代表获得锁的拥有者。
 			* @param mtxs... 需要解锁的锁列表。
 			*/

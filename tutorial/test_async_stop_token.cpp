@@ -53,7 +53,7 @@ static future_t<int64_t> async_get_long_with_stop(stop_token token, int64_t val)
 //如果关联的协程被取消了，则触发canceled_exception异常。
 static future_t<int64_t> async_get_long_with_stop(int64_t val)
 {
-	task_t* task = current_task();
+	task_t* task = librf_current_task();
 	co_return co_await async_get_long_with_stop(task->get_stop_token(), val);
 }
 

@@ -12,9 +12,9 @@
 #define GO (*::librf::this_scheduler()) + [=]()mutable->librf::future_t<>
 #endif
 
-#define current_scheduler() (co_await ::librf::get_current_scheduler())
-#define root_state() (co_await ::librf::get_root_state())
-#define current_task() (co_await ::librf::get_current_task())
+#define librf_current_scheduler() (co_await ::librf::get_current_scheduler())
+#define librf_root_state() (co_await ::librf::get_root_state())
+#define librf_current_task() (co_await ::librf::get_current_task())
 
 #if defined(__clang__) || defined(__GNUC__)
 #ifndef likely

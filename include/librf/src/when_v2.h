@@ -315,7 +315,7 @@ inline namespace when_v2
 
 	/**
 	 * @brief 等待所有的可等待对象完成，不定参数版。
-	 * @details 当前协程的调度器通过current_scheduler()宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
+	 * @details 当前协程的调度器通过 librf_current_scheduler() 宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
 	 * @param args... 所有的可等待对象。要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
 	 * @retval [co_await] std::tuple<...>。每个可等待对象的返回值，逐个存入到std::tuple<...>里面。void 返回值，存的是std::ignore。
 	 */
@@ -323,13 +323,13 @@ inline namespace when_v2
 	auto when_all(_Awaitable&&... args)
 		-> future_t<std::tuple<detail::awaitor_result_t<_Awaitable>...>>
 	{
-		scheduler_t* sch = current_scheduler();
+		scheduler_t* sch = librf_current_scheduler();
 		co_return co_await when_all(*sch, std::forward<_Awaitable>(args)...);
 	}
 
 	/**
 	 * @brief 等待所有的可等待对象完成，迭代器版。
-	 * @details 当前协程的调度器通过current_scheduler()宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
+	 * @details 当前协程的调度器通过 librf_current_scheduler() 宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
 	 * @param begin 可等待对象容器的起始迭代器。迭代器指向的，要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
 	 * @param end 可等待对象容器的结束迭代器。
 	 * @retval [co_await] std::vector<>。每个可等待对象的返回值，逐个存入到std::vector<>里面。void 返回值，存的是std::ignore。
@@ -338,13 +338,13 @@ inline namespace when_v2
 	auto when_all(_Iter begin, _Iter end)
 		-> future_t<std::vector<detail::awaitor_result_t<decltype(*begin)>>>
 	{
-		scheduler_t* sch = current_scheduler();
+		scheduler_t* sch = librf_current_scheduler();
 		co_return co_await when_all(*sch, begin, end);
 	}
 
 	/**
 	 * @brief 等待所有的可等待对象完成，容器版。
-	 * @details 当前协程的调度器通过current_scheduler()宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
+	 * @details 当前协程的调度器通过 librf_current_scheduler() 宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
 	 * @param cont 存访可等待对象的容器。容器内存放的，要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
 	 * @retval [co_await] std::vector<>。每个可等待对象的返回值，逐个存入到std::vector<>里面。void 返回值，存的是std::ignore。
 	 */
@@ -409,7 +409,7 @@ inline namespace when_v2
 
 	/**
 	 * @brief 等待任一的可等待对象完成，不定参数版。
-	 * @details 当前协程的调度器通过current_scheduler()宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
+	 * @details 当前协程的调度器通过 librf_current_scheduler() 宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
 	 * @param args... 所有的可等待对象。要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
 	 * @retval [co_await] std::pair<intptr_t, std::any>。第一个值指示哪个对象完成了，第二个值存访的对应的返回数据。
 	 */
@@ -417,13 +417,13 @@ inline namespace when_v2
 	auto when_any(_Awaitable&&... args)
 		-> future_t<when_any_pair>
 	{
-		scheduler_t* sch = current_scheduler();
+		scheduler_t* sch = librf_current_scheduler();
 		co_return co_await when_any(*sch, std::forward<_Awaitable>(args)...);
 	}
 
 	/**
 	 * @brief 等待任一的可等待对象完成，迭代器版。
-	 * @details 当前协程的调度器通过current_scheduler()宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
+	 * @details 当前协程的调度器通过 librf_current_scheduler() 宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
 	 * @param begin 可等待对象容器的起始迭代器。迭代器指向的，要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
 	 * @param end 可等待对象容器的结束迭代器。
 	 * @retval [co_await] std::pair<intptr_t, std::any>。第一个值指示哪个对象完成了，第二个值存访的对应的返回数据。
@@ -432,13 +432,13 @@ inline namespace when_v2
 	auto when_any(_Iter begin, _Iter end) 
 		-> future_t<when_any_pair>
 	{
-		scheduler_t* sch = current_scheduler();
+		scheduler_t* sch = librf_current_scheduler();
 		co_return co_await when_any(*sch, begin, end);
 	}
 
 	/**
 	 * @brief 等待任一的可等待对象完成，容器版。
-	 * @details 当前协程的调度器通过current_scheduler()宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
+	 * @details 当前协程的调度器通过 librf_current_scheduler() 宏获得，与带调度器参数的版本相比，多一次resumeable function构造，效率可能低一点。
 	 * @param cont 存访可等待对象的容器。容器内存放的，要么是_AwaitableT<>类型，要么是返回_AwaitableT<>类型的函数(对象)。
 	 * @retval [co_await] std::pair<intptr_t, std::any>。第一个值指示哪个对象完成了，第二个值存访的对应的返回数据。
 	 */
