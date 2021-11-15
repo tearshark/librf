@@ -52,6 +52,11 @@ namespace librf
 		//void break_all();
 
 		/**
+		 * @brief 要求所有已经使用了stop token功能的协程停止
+		 */
+		LIBRF_API void request_stop_all_if_possible();
+
+		/**
 		 * @brief 将一个协程加入到调度器里开始运行。
 		 * @details 推荐使用go或者GO这两个宏来启动协程。\n
 		 * go用于启动future_t<>/generator_t<>；\n

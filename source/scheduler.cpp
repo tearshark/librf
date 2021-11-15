@@ -131,6 +131,16 @@ namespace librf
 		return task_ptr;
 	}
 
+	LIBRF_API void scheduler_t::request_stop_all_if_possible()
+	{
+		scoped_lock<spinlock> __guard(_lock_ready);
+
+		for (auto& kv : this->_ready_task)
+			kv.second->request_stop_if_possible();
+		//this->_ready_task.clear();
+		this->_timer->clear();
+	}
+
 /*
 	void scheduler_t::cancel_all_task_()
 	{
