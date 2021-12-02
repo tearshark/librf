@@ -163,23 +163,126 @@ void test_channel_performance_double_thread(size_t buff_size)
 	wr_th.join();
 }
 
+void test_channel_performance_four_thread(size_t buff_size)
+{
+	//1的话，效率跟golang比，有点惨不忍睹。
+	//1000的话，由于几乎不需要调度器接入，效率就很高了，随便过千万数量级。
+	channel_t<int, false, true> c{ buff_size };
+
+	std::thread wr_th[4];
+	std::thread rd_th[4];
+	for (int i = 0; i < 4; ++i)
+	{
+		wr_th[i] = std::thread([c]
+		{
+			local_scheduler_t ls;
+
+			GO
+			{
+				for (int i = N - 1; i >= 0; --i)
+				{
+					co_await(c << i);
+				}
+			};
+
+			this_scheduler()->run_until_notask();
+		});
+	}
+
+	for (int i = 0; i < 4; ++i)
+	{
+		rd_th[i] = std::thread([c]
+		{
+			local_scheduler_t ls;
+			auto tstart = high_resolution_clock::now();
+
+			GO
+			{
+				for (int i = N - 1; i >= 0; --i)
+				{
+					co_await c;
+				}
+			};
+
+			this_scheduler()->run_until_notask();
+
+			auto dt = duration_cast<duration<double>>(high_resolution_clock::now() - tstart).count();
+			std::cout << "channel buff=" << c.capacity() << ", w/r " << N << " times, cost time " << dt << "s" << std::endl;
+		});
+	}
+
+	for (int i = 0; i < 4; ++i)
+		rd_th[i].join();
+	for (int i = 0; i < 4; ++i)
+		wr_th[i].join();
+}
+
+void test_channel_performance_four_coroutine(size_t capacity, size_t nThreads, int n)
+{
+	auto tstart = high_resolution_clock::now();
+
+	channel_t<bool> q{ nThreads };
+	channel_t<bool> c{ capacity };
+
+	for (size_t i = 0; i < nThreads; ++i)
+	{
+		GO
+		{
+			for (int i = 0; i < n; ++i)
+				co_await(c << true);
+			co_await(q << true);
+		};
+
+		GO
+		{
+			for (int i = 0; i < n; ++i)
+				co_await c;
+			co_await(q << true);
+		};
+	}
+
+	GO
+	{
+		for (size_t i = 0; i < nThreads * 2; ++i)
+		{
+			co_await q;
+		}
+	};
+
+	this_scheduler()->run_until_notask();
+
+	auto dt = duration_cast<duration<double>>(high_resolution_clock::now() - tstart).count();
+	std::cout << "channel buff=" << c.capacity() << ", w/r " << n << " times, cost time " << dt << "s" << std::endl;
+}
+
 void resumable_main_channel()
 {
-	test_channel_read_first();
-	std::cout << std::endl;
+	//test_channel_read_first();
+	//std::cout << std::endl;
 
-	test_channel_write_first();
-	std::cout << std::endl;
+	//test_channel_write_first();
+	//std::cout << std::endl;
 
+/*
+	std::cout << "single thread" << std::endl;
 	test_channel_performance_single_thread(1);
 	test_channel_performance_single_thread(10);
 	test_channel_performance_single_thread(100);
 	test_channel_performance_single_thread(1000);
 
+	std::cout << "double thread" << std::endl;
 	test_channel_performance_double_thread(1);
 	test_channel_performance_double_thread(10);
 	test_channel_performance_double_thread(100);
 	test_channel_performance_double_thread(1000);
+*/
+
+	std::cout << "four thread" << std::endl;
+	//test_channel_performance_four_thread(1);
+	//test_channel_performance_four_thread(1000);
+
+	std::cout << "four coroutine" << std::endl;
+	test_channel_performance_four_coroutine(1000, 4, N);
 }
 
 #if LIBRF_TUTORIAL_STAND_ALONE
