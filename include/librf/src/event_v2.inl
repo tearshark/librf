@@ -22,14 +22,14 @@ namespace librf
 			LIBRF_API void signal_all() noexcept;
 			LIBRF_API void signal() noexcept;
 
+			LIBRF_API void add_wait_list(state_event_base_t* state);
+			LIBRF_API void remove_wait_list(state_event_base_t* state);
 		public:
 			static constexpr bool USE_SPINLOCK = true;
-			static constexpr bool USE_LINK_QUEUE = false;
 
 			using lock_type = std::conditional_t<USE_SPINLOCK, spinlock, std::recursive_mutex>;
 			using state_event_ptr = counted_ptr<state_event_base_t>;
-			using link_state_queue = intrusive_link_queue<state_event_base_t, state_event_ptr>;
-			using wait_queue_type = std::conditional_t<USE_LINK_QUEUE, link_state_queue, std::list<state_event_ptr>>;
+			using wait_queue_type = intrusive_link_queue<state_event_base_t, state_event_ptr>;
 
 			bool try_wait_one() noexcept
 			{
@@ -40,12 +40,6 @@ namespace librf
 					_counter.fetch_add(1);
 				}
 				return false;
-			}
-
-			void add_wait_list(state_event_base_t* state) noexcept
-			{
-				assert(state != nullptr);
-				_wait_awakes.push_back(state);
 			}
 
 			lock_type _lock;									//保证访问本对象是线程安全的
@@ -61,6 +55,7 @@ namespace librf
 		};
 
 		struct state_event_base_t : public state_base_t
+								  , public intrusive_link_node<state_event_base_t, counted_ptr<state_event_base_t>>
 		{
 			LIBRF_API virtual void resume() override;
 			LIBRF_API virtual bool has_handler() const  noexcept override;
@@ -86,14 +81,12 @@ namespace librf
 			{
 				this->_thandler = this->_scheduler->timer()->add_handler(tp,
 					[st = counted_ptr<state_event_base_t>{ this }](bool canceld)
-				{
-					if (!canceld)
-						st->on_timeout();
-				});
+					{
+						if (!canceld)
+							st->on_timeout();
+					});
 			}
 
-			//为侵入式单向链表提供的next指针
-			//counted_ptr<state_event_base_t> _next = nullptr;
 			timer_handler _thandler;
 		};
 
@@ -152,6 +145,11 @@ namespace librf
 			: _event(evt)
 		{
 		}
+		~awaiter()
+		{
+			if (_event != nullptr && _state != nullptr)
+				_event->remove_wait_list(_state.get());
+		}
 
 		bool await_ready() noexcept
 		{
@@ -167,14 +165,17 @@ namespace librf
 			scoped_lock<detail::event_v2_impl::lock_type> lock_(evt->_lock);
 
 			if (evt->try_wait_one())
+			{
 				return false;
+			}
 
 			_state = new detail::state_event_t(_event);
-			_event = nullptr;
 			(void)_state->on_await_suspend(handler);
 
 			if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
+			{
 				cb();
+			}
 
 			evt->add_wait_list(_state.get());
 
@@ -218,12 +219,11 @@ namespace librf
 		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
-			if (!_Btype::await_suspend2(handler, [this]
-				{
-					this->_state->add_timeout_timer(_tp);
-				}))
+			if (!_Btype::await_suspend2(handler, [this]{ this->_state->add_timeout_timer(_tp);}))
+			{
 				return false;
-				return true;
+			}
+			return true;
 		}
 	protected:
 		clock_type::time_point _tp;

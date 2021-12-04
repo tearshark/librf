@@ -54,6 +54,9 @@ namespace librf
 			event_v2_impl** oldValue = _value.load(std::memory_order_acquire);
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
 			{
+				event_v2_impl* evt = *oldValue;
+				if (evt != nullptr)
+					evt->remove_wait_list(this);
 				*oldValue = nullptr;
 				_thandler.reset();
 
@@ -183,6 +186,20 @@ namespace librf
 			}
 
 			_counter.fetch_add(1, std::memory_order_acq_rel);
+		}
+
+		LIBRF_API void event_v2_impl::add_wait_list(state_event_base_t* state)
+		{
+			assert(state != nullptr);
+			_wait_awakes.push_back(state);
+		}
+
+		LIBRF_API void event_v2_impl::remove_wait_list(state_event_base_t* state)
+		{
+			assert(state != nullptr);
+
+			scoped_lock<lock_type> lock_(_lock);
+			_wait_awakes.erase(state);
 		}
 	}
 

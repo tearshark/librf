@@ -82,6 +82,10 @@ namespace librf
 		{
 			return _p;
 		}
+		operator T* () const noexcept
+		{
+			return _p;
+		}
 
 		/**
 		 * @brief 获得管理的state指针。

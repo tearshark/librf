@@ -7,7 +7,6 @@ namespace librf
 	{
 		struct event_v2_impl;
 	}
-
 #endif	//DOXYGEN_SKIP_PROPERTY
 
 	/**
@@ -90,7 +89,7 @@ namespace librf
 			* @attention 只能在协程中调用。
 			*/
 		template<class _Rep, class _Period>
-		timeout_awaiter wait_for(const std::chrono::duration<_Rep, _Period>& dt) const noexcept;
+		timeout_awaiter wait_for(const std::chrono::duration<_Rep, _Period>& dt) const noexcept;						//test OK
 
 		/**
 			* @brief 在协程中等待信号触发，直到超时。
@@ -102,7 +101,7 @@ namespace librf
 			* @attention 只能在协程中调用。
 			*/
 		template<class _Clock, class _Duration>
-		timeout_awaiter wait_until(const std::chrono::time_point<_Clock, _Duration>& tp) const noexcept;
+		timeout_awaiter wait_until(const std::chrono::time_point<_Clock, _Duration>& tp) const noexcept;				//test OK
 
 
 		template<class _Iter>
@@ -110,13 +109,11 @@ namespace librf
 
 		template<class _Iter>
 		requires(_IteratorOfT<_Iter, event_t>)
-		static auto wait_any(_Iter begin_, _Iter end_)
-			->any_awaiter<_Iter>;
+		static auto wait_any(_Iter begin_, _Iter end_)->any_awaiter<_Iter>;
 
 		template<class _Cont>
 		requires(_ContainerOfT<_Cont, event_t>)
-		static auto wait_any(const _Cont& cnt_)
-			->any_awaiter<decltype(std::begin(cnt_))>;
+		static auto wait_any(const _Cont& cnt_)->any_awaiter<decltype(std::begin(cnt_))>;
 
 		template<class _Iter>
 		struct [[nodiscard]] timeout_any_awaiter;
