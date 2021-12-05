@@ -9,7 +9,7 @@ namespace librf
 		_Node* _prev;
 		_Nextptr _next;
 
-		template<class _Node, class _Nodeptr>
+		template<class _Node2, class _Nodeptr2>
 		friend struct intrusive_link_queue;
 	};
 

@@ -34,8 +34,8 @@ namespace librf
 	private:
 		LIBRF_API virtual void destroy_deallocate();
 	public:
-		virtual void resume() = 0;
-		virtual bool has_handler() const  noexcept = 0;
+		LIBRF_API virtual void resume();
+		LIBRF_API virtual bool has_handler() const  noexcept;
 		LIBRF_API virtual state_base_t* get_parent() const noexcept;
 
 		void set_scheduler(scheduler_t* sch) noexcept

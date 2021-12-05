@@ -15,12 +15,9 @@ namespace librf
 			{
 				return _counter.load(std::memory_order_acquire) > 0;
 			}
-			void reset() noexcept
-			{
-				_counter.store(0, std::memory_order_release);
-			}
 			LIBRF_API void signal_all() noexcept;
 			LIBRF_API void signal() noexcept;
+			LIBRF_API void reset() noexcept;
 
 			LIBRF_API void add_wait_list(state_event_base_t* state);
 			LIBRF_API void remove_wait_list(state_event_base_t* state);
@@ -57,9 +54,6 @@ namespace librf
 		struct state_event_base_t : public state_base_t
 								  , public intrusive_link_node<state_event_base_t, counted_ptr<state_event_base_t>>
 		{
-			LIBRF_API virtual void resume() override;
-			LIBRF_API virtual bool has_handler() const  noexcept override;
-
 			virtual void on_cancel() noexcept = 0;
 			virtual bool on_notify(event_v2_impl* eptr) = 0;
 			virtual bool on_timeout() = 0;
@@ -87,8 +81,10 @@ namespace librf
 					});
 			}
 
+		protected:
 			timer_handler _thandler;
 		};
+
 
 		struct state_event_t : public state_event_base_t
 		{
@@ -107,20 +103,69 @@ namespace librf
 			std::atomic<event_v2_impl**> _value;
 		};
 
-		struct state_event_all_t : public state_event_base_t
+		struct state_event_all_t : public state_base_t
 		{
+			using sub_state_t = std::pair<counted_ptr<state_event_base_t>, detail::event_v2_impl*>;
+
 			state_event_all_t(intptr_t count, bool& val)
 				: _counter(count)
-				, _value(&val)
-			{}
+				, _result(&val)
+			{
+				_values.resize(count, sub_state_t{nullptr, nullptr});
+			}
 
-			LIBRF_API virtual void on_cancel() noexcept override;
-			LIBRF_API virtual bool on_notify(event_v2_impl* eptr) override;
-			LIBRF_API virtual bool on_timeout() override;
+			LIBRF_API void on_cancel(intptr_t idx);
+			LIBRF_API bool on_notify(event_v2_impl* eptr, intptr_t idx);
+			LIBRF_API bool on_timeout();
 
-			std::atomic<intptr_t> _counter;
+			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			scheduler_t* on_await_suspend(coroutine_handle<_PromiseT> handler) noexcept
+			{
+				_PromiseT& promise = handler.promise();
+				auto* parent = promise.get_state();
+				scheduler_t* sch = parent->get_scheduler();
+
+				this->_scheduler = sch;
+				this->_coro = handler;
+
+				return sch;
+			}
+
+			inline void add_timeout_timer(std::chrono::system_clock::time_point tp)
+			{
+				this->_thandler = this->_scheduler->timer()->add_handler(tp,
+					[st = counted_ptr<state_event_all_t>{ this }](bool canceld)
+					{
+						if (!canceld)
+							st->on_timeout();
+					});
+			}
+
+			std::vector<sub_state_t> _values;
+			intptr_t _counter;
+			event_v2_impl::lock_type _lock;
 		protected:
-			bool* _value;
+			timer_handler _thandler;
+			bool* _result;
+		};
+
+		template<class _StateT>
+		struct state_event_proxy_t : public state_event_base_t
+		{
+			state_event_proxy_t(_StateT* sta, intptr_t idx)
+				: _state(sta)
+				, _index(idx)
+			{
+				assert(sta != nullptr);
+				assert(idx >= 0);
+			}
+
+			void on_cancel() noexcept override { return _state->on_cancel(_index); }
+			bool on_notify(event_v2_impl* eptr) override { return _state->on_notify(eptr, _index); }
+			bool on_timeout() override { assert(false); return false; }
+		private:
+			_StateT* _state;
+			intptr_t _index;
 		};
 	}
 
@@ -293,7 +338,9 @@ namespace librf
 			(void)_state->on_await_suspend(handler);
 
 			if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
+			{
 				cb();
+			}
 
 			for (auto iter = _begin; iter != _end; ++iter)
 			{
@@ -338,6 +385,7 @@ namespace librf
 	requires(_IteratorOfT<_Iter, event_t>)
 	auto event_t::wait_any(_Iter begin_, _Iter end_) ->event_t::any_awaiter<_Iter>
 	{
+		assert(false && "Function is flawed!");
 		return { begin_, end_ };
 	}
 
@@ -345,6 +393,7 @@ namespace librf
 	requires(_ContainerOfT<_Cont, event_t>)
 	auto event_t::wait_any(const _Cont& cnt_) ->event_t::any_awaiter<decltype(std::begin(cnt_))>
 	{
+		assert(false && "Function is flawed!");
 		return { std::begin(cnt_), std::end(cnt_) };
 	}
 
@@ -361,6 +410,7 @@ namespace librf
 	auto event_t::wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
 		->event_t::timeout_any_awaiter<_Iter>
 	{
+		assert(false && "Function is flawed!");
 		clock_type::time_point tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
 		return { tp, begin_, end_ };
 	}
@@ -370,6 +420,7 @@ namespace librf
 	auto event_t::wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, const _Cont& cnt_)
 		->event_t::timeout_any_awaiter<decltype(std::begin(cnt_))>
 	{
+		assert(false && "Function is flawed!");
 		clock_type::time_point tp = clock_type::now() + std::chrono::duration_cast<clock_type::duration>(dt);
 		return { tp, std::begin(cnt_), std::end(cnt_) };
 	}
@@ -395,11 +446,11 @@ namespace librf
 		bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 		{
 			(void)cb;
-			intptr_t count = std::distance(_begin, _end);
+			const intptr_t count = std::distance(_begin, _end);
 
 			using ref_lock_type = std::reference_wrapper<detail::event_v2_impl::lock_type>;
 			std::vector<ref_lock_type> lockes;
-			lockes.reserve(count);
+			lockes.reserve(count + 1);
 
 			for (auto iter = _begin; iter != _end; ++iter)
 			{
@@ -408,27 +459,35 @@ namespace librf
 			}
 
 			_state = new detail::state_event_all_t(count, _value);
+			lockes.push_back(_state->_lock);
 			(void)_state->on_await_suspend(handler);
 
 			if constexpr (!std::is_same_v<std::remove_reference_t<_Timeout>, std::nullptr_t>)
+			{
 				cb();
+			}
 
 			batch_lock_t<ref_lock_type> lock_(lockes);
 
-			for (auto iter = _begin; iter != _end; ++iter)
+			intptr_t idx = 0;
+			for (auto iter = _begin; iter != _end; ++iter, ++idx)
 			{
 				detail::event_v2_impl* evt = (*iter)._event.get();
 				if (evt->try_wait_one())
 				{
-					_state->_counter.fetch_sub(1, std::memory_order_acq_rel);
+					--_state->_counter;
+					_state->_values[idx].second = evt;
 				}
 				else
 				{
-					evt->add_wait_list(_state.get());
+					auto* proxy = new detail::state_event_proxy_t<detail::state_event_all_t>(_state.get(), idx);
+					_state->_values[idx] = detail::state_event_all_t::sub_state_t{ proxy, evt };
+
+					evt->add_wait_list(proxy);
 				}
 			}
 
-			if (_state->_counter.load(std::memory_order_relaxed) == 0)
+			if (_state->_counter == 0)
 			{
 				_state = nullptr;
 				_value = true;

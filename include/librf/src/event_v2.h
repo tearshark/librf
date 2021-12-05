@@ -107,10 +107,29 @@ namespace librf
 		template<class _Iter>
 		struct [[nodiscard]] any_awaiter;
 
+		/**
+			* @brief 在协程中等待任意一个信号触发。
+			* @details 如果已经有信号触发，则立即返回第一个触发信号的索引。\n
+			* 否则，当前协程被阻塞，直到信号被触发后唤醒。
+			* 至少消耗一次信号触发次数。
+			* @param begin_ 容纳信号的容器的首迭代器
+			* @param end_ 容纳信号的容器的尾迭代器（不包含有效信号）
+			* @retval intptr_t [co_await] 返回第一个触发信号的索引
+			* @attention 只能在协程中调用。
+			*/
 		template<class _Iter>
 		requires(_IteratorOfT<_Iter, event_t>)
 		static auto wait_any(_Iter begin_, _Iter end_)->any_awaiter<_Iter>;
 
+		/**
+			* @brief 在协程中等待任意一个信号触发。
+			* @details 如果已经有信号触发，则立即返回第一个触发信号的索引。\n
+			* 否则，当前协程被阻塞，直到信号被触发后唤醒。
+			* 至少消耗一次信号触发次数。
+			* @param cnt_ 容纳信号的容器，需要支持std::begin(cnt_)和std::end(cnt_)
+			* @retval intptr_t [co_await] 返回第一个触发信号的索引
+			* @attention 只能在协程中调用。
+			*/
 		template<class _Cont>
 		requires(_ContainerOfT<_Cont, event_t>)
 		static auto wait_any(const _Cont& cnt_)->any_awaiter<decltype(std::begin(cnt_))>;
@@ -118,11 +137,32 @@ namespace librf
 		template<class _Iter>
 		struct [[nodiscard]] timeout_any_awaiter;
 
+		/**
+			* @brief 在协程中等待任意一个信号触发，直到超时。
+			* @details 如果已经有信号触发，则立即返回第一个触发信号的索引。\n
+			* 否则，当前协程被阻塞，直到信号被触发后，或者超时后唤醒。
+			* 如果等到了信号，则至少消耗一次信号触发次数。
+			* @param dt 超时时长
+			* @param begin_ 容纳信号的容器的首迭代器
+			* @param end_ 容纳信号的容器的尾迭代器（不包含有效信号）
+			* @retval intptr_t [co_await] 如果等到了任意一个信号，返回其索引（相对于begin_的距离）；否则，返回-1
+			* @attention 只能在协程中调用。
+			*/
 		template<class _Rep, class _Period, class _Iter>
 		requires(_IteratorOfT<_Iter, event_t>)
 		static auto wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, _Iter begin_, _Iter end_)
 			->timeout_any_awaiter<_Iter>;
 
+		/**
+			* @brief 在协程中等待任意一个信号触发，直到超时。
+			* @details 如果已经有信号触发，则立即返回第一个触发信号的索引。\n
+			* 否则，当前协程被阻塞，直到信号被触发后，或者超时后唤醒。
+			* 如果等到了信号，则至少消耗一次信号触发次数。
+			* @param dt 超时时长
+			* @param cnt_ 容纳信号的容器，需要支持std::begin(cnt_)和std::end(cnt_)
+			* @retval intptr_t [co_await] 如果等到了任意一个信号，返回其索引（相对于begin_的距离）；否则，返回-1
+			* @attention 只能在协程中调用。
+			*/
 		template<class _Rep, class _Period, class _Cont>
 		requires(_ContainerOfT<_Cont, event_t>)
 		static auto wait_any_for(const std::chrono::duration<_Rep, _Period>& dt, const _Cont& cnt_)
