@@ -4,21 +4,6 @@ namespace librf
 {
 	namespace detail
 	{
-		LIBRF_API void state_event_base_t::resume()
-		{
-			coroutine_handle<> handler = _coro;
-			if (handler)
-			{
-				_coro = nullptr;
-				_scheduler->del_final(this);
-				handler.resume();
-			}
-		}
-
-		LIBRF_API bool state_event_base_t::has_handler() const  noexcept
-		{
-			return (bool)_coro;
-		}
 
 		LIBRF_API void state_event_t::on_cancel() noexcept
 		{
@@ -54,6 +39,9 @@ namespace librf
 			event_v2_impl** oldValue = _value.load(std::memory_order_acquire);
 			if (oldValue != nullptr && _value.compare_exchange_strong(oldValue, nullptr, std::memory_order_acq_rel))
 			{
+				event_v2_impl* evt = *oldValue;
+				if (evt != nullptr)
+					evt->remove_wait_list(this);
 				*oldValue = nullptr;
 				_thandler.reset();
 
@@ -69,54 +57,84 @@ namespace librf
 
 
 
-		LIBRF_API void state_event_all_t::on_cancel() noexcept
+		LIBRF_API void state_event_all_t::on_cancel(intptr_t idx)
 		{
-			intptr_t oldValue = _counter.load(std::memory_order_acquire);
-			if (oldValue >= 0 && _counter.compare_exchange_strong(oldValue, -1, std::memory_order_acq_rel))
+			scoped_lock<event_v2_impl::lock_type> lock_(_lock);
+			
+			if (_counter <= 0) return ;
+			assert(idx < static_cast<intptr_t>(_values.size()));
+
+			_values[idx] = sub_state_t{ nullptr, nullptr };
+			if (--_counter == 0)
 			{
-				*_value = false;
-				_thandler.stop();
-
-				this->_coro = nullptr;
-			}
-		}
-
-		LIBRF_API bool state_event_all_t::on_notify(event_v2_impl*)
-		{
-			intptr_t oldValue = _counter.load(std::memory_order_acquire);
-			if (oldValue <= 0) return false;
-
-			oldValue = _counter.fetch_add(-1, std::memory_order_acq_rel);
-			if (oldValue == 1)
-			{
-				*_value = true;
+				*_result = false;
 				_thandler.stop();
 
 				assert(this->_scheduler != nullptr);
 				if (this->_coro)
 					this->_scheduler->add_generator(this);
+			}
+		}
 
-				return true;
+		LIBRF_API bool state_event_all_t::on_notify(event_v2_impl*, intptr_t idx)
+		{
+			scoped_lock<event_v2_impl::lock_type> lock_(_lock);
+
+			if (_counter <= 0) return false;
+			assert(idx < static_cast<intptr_t>(_values.size()));
+
+			_values[idx].first = nullptr;
+
+			if (--_counter == 0)
+			{
+				bool result = true;
+				for (sub_state_t& sub : _values)
+				{
+					if (sub.second == nullptr)
+					{
+						result = false;
+						break;
+					}
+				}
+
+				*_result = result;
+				_thandler.stop();
+
+				assert(this->_scheduler != nullptr);
+				if (this->_coro)
+					this->_scheduler->add_generator(this);
 			}
 
-			return oldValue >= 1;
+			return true;
 		}
 
 		LIBRF_API bool state_event_all_t::on_timeout()
 		{
-			intptr_t oldValue = _counter.load(std::memory_order_acquire);
-			if (oldValue >= 0 && _counter.compare_exchange_strong(oldValue, -1, std::memory_order_acq_rel))
+			scoped_lock<event_v2_impl::lock_type> lock_(_lock);
+
+			if (_counter <= 0) return false;
+
+			_counter = 0;
+			*_result = false;
+			_thandler.reset();
+
+			for (sub_state_t& sub : _values)
 			{
-				*_value = false;
-				_thandler.reset();
+				if (sub.first != nullptr)
+				{
+					event_v2_impl* evt = sub.second;
+					sub.second = nullptr;
 
-				assert(this->_scheduler != nullptr);
-				if (this->_coro)
-					this->_scheduler->add_generator(this);
-
-				return true;
+					if (evt != nullptr)
+						evt->remove_wait_list(sub.first);
+				}
 			}
-			return false;
+
+			assert(this->_scheduler != nullptr);
+			if (this->_coro)
+				this->_scheduler->add_generator(this);
+
+			return true;
 		}
 
 
@@ -162,8 +180,6 @@ namespace librf
 		{
 			scoped_lock<lock_type> lock_(_lock);
 
-			_counter.store(0, std::memory_order_release);
-
 			state_event_ptr state;
 			for (; (state = try_pop_list(_wait_awakes)) != nullptr;)
 			{
@@ -183,6 +199,25 @@ namespace librf
 			}
 
 			_counter.fetch_add(1, std::memory_order_acq_rel);
+		}
+
+		LIBRF_API void event_v2_impl::reset() noexcept
+		{
+			_counter.store(0, std::memory_order_release);
+		}
+
+		LIBRF_API void event_v2_impl::add_wait_list(state_event_base_t* state)
+		{
+			assert(state != nullptr);
+			_wait_awakes.push_back(state);
+		}
+
+		LIBRF_API void event_v2_impl::remove_wait_list(state_event_base_t* state)
+		{
+			assert(state != nullptr);
+
+			scoped_lock<lock_type> lock_(_lock);
+			_wait_awakes.erase(state);
 		}
 	}
 

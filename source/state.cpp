@@ -10,7 +10,23 @@ namespace librf
 	{
 		delete this;
 	}
-	
+
+	LIBRF_API void state_base_t::resume()
+	{
+		if (likely(_coro))
+		{
+			coroutine_handle<> handler = _coro;
+			_coro = nullptr;
+			_scheduler->del_final(this);
+			handler.resume();
+		}
+	}
+
+	LIBRF_API bool state_base_t::has_handler() const  noexcept
+	{
+		return (bool)_coro;
+	}
+
 	LIBRF_API state_base_t* state_base_t::get_parent() const noexcept
 	{
 		return nullptr;

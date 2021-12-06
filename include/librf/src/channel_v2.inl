@@ -6,6 +6,7 @@ namespace detail
 {
 	template<class _Ty, class _Chty>
 	struct state_channel_t : public state_base_t
+						   , public intrusive_link_node<state_channel_t<_Ty, _Chty>>
 	{
 		using value_type = _Ty;
 
@@ -55,9 +56,6 @@ namespace detail
 		}
 
 		friend _Chty;
-	public:
-		//为浸入式单向链表提供的next指针
-		state_channel_t* _next = nullptr;
 	protected:
 		//co_await产生的临时awaitor会引用state，管理state的生命周期
 		//state再引用channel
