@@ -76,6 +76,17 @@ namespace detail
 		write_awaiter write(U&& val) const noexcept(std::is_nothrow_move_constructible_v<U>);
 
 
+		/**
+			* @brief 构造一个无效的信号量。
+			* @details 如果用于后续保存另外一个信号量，则应当使用此构造函数，便于节省一次不必要的内部初始化。
+			*/
+		channel_t(std::adopt_lock_t);
+
+		/**
+			* @brief 判断是不是一个无效的信号量。
+			*/
+		bool valid() const noexcept;
+
 #ifndef DOXYGEN_SKIP_PROPERTY
 		using value_type = _Ty;
 

@@ -460,7 +460,11 @@ namespace detail
 	channel_t<_Ty, _Optional, _OptimizationThread>::channel_t(size_t cache_size)
 		:_chan(std::make_shared<channel_type>(cache_size))
 	{
+	}
 
+	template<class _Ty, bool _Optional, bool _OptimizationThread>
+	channel_t<_Ty, _Optional, _OptimizationThread>::channel_t(std::adopt_lock_t)
+	{
 	}
 
 	template<class _Ty, bool _Optional, bool _OptimizationThread>
@@ -497,6 +501,12 @@ namespace detail
 		channel_t<_Ty, _Optional, _OptimizationThread>::operator << (U&& val) const noexcept(std::is_nothrow_move_constructible_v<U>)
 	{
 		return write_awaiter{ _chan.get(), std::forward<U>(val) };
+	}
+
+	template<class _Ty, bool _Optional, bool _OptimizationThread>
+	bool channel_t<_Ty, _Optional, _OptimizationThread>::valid() const noexcept
+	{
+		return (bool)_chan;
 	}
 
 }	//namespace librf
