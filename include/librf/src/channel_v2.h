@@ -5,7 +5,7 @@ namespace librf
 #ifndef DOXYGEN_SKIP_PROPERTY
 namespace detail
 {
-	template<class _Ty, bool _Optional>
+	template<class _Ty, bool _Optional, bool _OptimizationThread>
 	struct channel_impl_v2;
 }	//namespace detail
 
@@ -83,7 +83,7 @@ namespace detail
 		static constexpr bool optimization_for_multithreading = _OptimizationThread;
 
 		using optional_type = std::conditional_t<use_optional, std::optional<value_type>, value_type>;
-		using channel_type = detail::channel_impl_v2<value_type, use_optional>;
+		using channel_type = detail::channel_impl_v2<value_type, use_optional, optimization_for_multithreading>;
 		using lock_type = typename channel_type::lock_type;
 
 		channel_t(const channel_t&) = default;

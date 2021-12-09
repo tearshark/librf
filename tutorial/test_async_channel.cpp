@@ -244,13 +244,12 @@ void test_channel_performance_four_coroutine(size_t capacity, size_t nThreads, i
 
 void resumable_main_channel()
 {
-	//test_channel_read_first();
-	//std::cout << std::endl;
+	test_channel_read_first();
+	std::cout << std::endl;
 
-	//test_channel_write_first();
-	//std::cout << std::endl;
+	test_channel_write_first();
+	std::cout << std::endl;
 
-/*
 	std::cout << "single thread" << std::endl;
 	test_channel_performance_single_thread(1);
 	test_channel_performance_single_thread(10);
@@ -262,13 +261,13 @@ void resumable_main_channel()
 	test_channel_performance_double_thread(10);
 	test_channel_performance_double_thread(100);
 	test_channel_performance_double_thread(1000);
-*/
 
 	std::cout << "four thread" << std::endl;
-	//test_channel_performance_four_thread(1);
+	test_channel_performance_four_thread(1);
 	test_channel_performance_four_thread(1000);
 
 	std::cout << "four coroutine" << std::endl;
+	test_channel_performance_four_coroutine(1, 4, N);
 	test_channel_performance_four_coroutine(1000, 4, N);
 }
 
