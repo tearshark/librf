@@ -10,8 +10,8 @@ namespace detail
 	{
 		using value_type = _Ty;
 
-		state_channel_t(_Chty* ch, value_type& val) noexcept
-			: _channel(ch->shared_from_this())
+		state_channel_t(std::shared_ptr<_Chty> ch, value_type& val) noexcept
+			: _channel(std::move(ch))
 			, _value(std::addressof(val))
 		{
 		}
@@ -336,8 +336,8 @@ namespace detail
 	{
 		using state_type = typename channel_type::state_read_t;
 
-		read_awaiter(channel_type* ch) noexcept
-			: _channel(ch)
+		read_awaiter(std::shared_ptr<channel_type> ch) noexcept
+			: _channel(std::move(ch))
 			, _value()
 		{}
 
@@ -390,7 +390,7 @@ namespace detail
 				return std::move(_value);
 		}
 	private:
-		channel_type* _channel;
+		std::shared_ptr<channel_type> _channel;
 		counted_ptr<state_type> _state;	//延迟到await_suspend()里创建，减小不必要的内存申请
 		mutable optional_type _value;
 	};
@@ -401,8 +401,8 @@ namespace detail
 		using state_type = typename channel_type::state_write_t;
 
 		template<class U>
-		write_awaiter(channel_type* ch, U&& val) noexcept(std::is_move_constructible_v<value_type>)
-			: _channel(ch)
+		write_awaiter(std::shared_ptr<channel_type> ch, U&& val) noexcept(std::is_move_constructible_v<value_type>)
+			: _channel(std::move(ch))
 			, _value(std::forward<U>(val))
 		{}
 
@@ -451,7 +451,7 @@ namespace detail
 		{
 		}
 	private:
-		channel_type* _channel;
+		std::shared_ptr<channel_type> _channel;
 		counted_ptr<state_type> _state;	//延迟到await_suspend()里创建，减小不必要的内存申请
 		mutable value_type _value;
 	};
@@ -477,14 +477,14 @@ namespace detail
 	typename channel_t<_Ty, _Optional, _OptimizationThread>::read_awaiter
 		channel_t<_Ty, _Optional, _OptimizationThread>::operator co_await() const noexcept
 	{
-		return { _chan.get() };
+		return { _chan };
 	}
 
 	template<class _Ty, bool _Optional, bool _OptimizationThread>
 	typename channel_t<_Ty, _Optional, _OptimizationThread>::read_awaiter
 		channel_t<_Ty, _Optional, _OptimizationThread>::read() const noexcept
 	{
-		return { _chan.get() };
+		return { _chan };
 	}
 
 	template<class _Ty, bool _Optional, bool _OptimizationThread>
@@ -492,7 +492,7 @@ namespace detail
 	typename channel_t<_Ty, _Optional, _OptimizationThread>::write_awaiter
 		channel_t<_Ty, _Optional, _OptimizationThread>::write(U&& val) const noexcept(std::is_nothrow_move_constructible_v<U>)
 	{
-		return write_awaiter{ _chan.get(), std::forward<U>(val) };
+		return write_awaiter{ _chan, std::forward<U>(val) };
 	}
 
 	template<class _Ty, bool _Optional, bool _OptimizationThread>
@@ -500,7 +500,7 @@ namespace detail
 	typename channel_t<_Ty, _Optional, _OptimizationThread>::write_awaiter
 		channel_t<_Ty, _Optional, _OptimizationThread>::operator << (U&& val) const noexcept(std::is_nothrow_move_constructible_v<U>)
 	{
-		return write_awaiter{ _chan.get(), std::forward<U>(val) };
+		return write_awaiter{ _chan, std::forward<U>(val) };
 	}
 
 	template<class _Ty, bool _Optional, bool _OptimizationThread>
