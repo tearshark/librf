@@ -37,6 +37,7 @@ static future_t<> test_mutex_pop(size_t idx)
 	}
 }
 
+#ifndef __clang__
 //🔒-50ms-🗝-50ms-🔒-50ms-🗝-50ms-|
 //---------........---------.......
 //方法之一
@@ -77,6 +78,7 @@ static future_t<> test_mutex_try_push(size_t idx)
 		co_await 50ms;
 	}
 }
+#endif
 
 static future_t<> test_mutex_timeout_push(size_t idx)
 {

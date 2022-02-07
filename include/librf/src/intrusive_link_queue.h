@@ -44,11 +44,11 @@ namespace librf
 
 	template<class _Node, class _Nodeptr>
 	intrusive_link_queue<_Node, _Nodeptr>::intrusive_link_queue()
-		: _header(nullptr)
-		, _tailer(nullptr)
 #ifdef _WITH_LOCK_FREE_Q_KEEP_REAL_SIZE
-		, _count(0)
+		: _count(0)
 #endif
+		, _header(nullptr)
+		, _tailer(nullptr)
 	{
 	}
 

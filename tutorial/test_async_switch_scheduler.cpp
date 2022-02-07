@@ -88,6 +88,7 @@ static future_t<> resumable_get_long_switch_scheduler(int64_t val, channel_t<boo
 	(void)c_done.write(true);
 }
 
+#if defined(__GNUC__)
 static future_t<> resumable_main_switch_scheduler_fix_gcc_bugs(std::thread & other, channel_t<bool> c_done)
 {
 	co_await c_done;		//第一次等待，等待run_in_thread准备好了
@@ -99,6 +100,7 @@ static future_t<> resumable_main_switch_scheduler_fix_gcc_bugs(std::thread & oth
 	//co_await resumable_get_long(3, c_done);
 	co_await c_done;		//等待新的协程运行完毕，从而保证主线程的协程不会提早退出
 }
+#endif
 
 void resumable_main_switch_scheduler()
 {

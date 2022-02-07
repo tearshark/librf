@@ -26,6 +26,7 @@ static future_t<> passing_next(channel_t<intptr_t> rd, channel_t<intptr_t> wr)
 	}
 }
 
+#if defined(__GNUC__)
 static future_t<> passing_loop_all(channel_t<intptr_t> head, channel_t<intptr_t> tail)
 {
 	for (int i = 0; i < LoopCount; ++i)
@@ -39,6 +40,7 @@ static future_t<> passing_loop_all(channel_t<intptr_t> head, channel_t<intptr_t>
 		std::cout << value << " cost time " << dt << "s" << std::endl;
 	}
 }
+#endif
 
 void benchmark_main_channel_passing_next()
 {

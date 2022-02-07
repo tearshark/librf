@@ -34,7 +34,9 @@
 #include <thread>
 #include <cassert>
 
-#ifdef __cpp_impl_coroutine
+#if defined(__clang__)
+#include "src/unix/coroutine.h"
+#elif __cpp_impl_coroutine
 #include <coroutine>
 #ifdef _MSC_VER
 extern "C" size_t _coro_frame_size();
