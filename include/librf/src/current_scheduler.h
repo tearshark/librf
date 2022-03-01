@@ -11,7 +11,8 @@ namespace librf
 		{
 			return false;
 		}
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			_PromiseT& promise = handler.promise();
@@ -20,6 +21,7 @@ namespace librf
 
 			return false;
 		}
+
 		scheduler_t* await_resume() const noexcept
 		{
 			return _scheduler;
@@ -69,7 +71,8 @@ namespace librf
 		{
 			return false;
 		}
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			_PromiseT& promise = handler.promise();
@@ -78,6 +81,7 @@ namespace librf
 
 			return false;
 		}
+
 		state_base_t* await_resume() const noexcept
 		{
 			return _state;
@@ -126,7 +130,8 @@ namespace librf
 		{
 			return false;
 		}
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			_PromiseT& promise = handler.promise();
@@ -138,6 +143,7 @@ namespace librf
 
 			return false;
 		}
+
 		task_t* await_resume() const noexcept
 		{
 			return _task;

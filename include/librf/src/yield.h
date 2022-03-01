@@ -16,7 +16,7 @@ namespace librf
 		{
 			return false;
 		}
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			counted_ptr<state_t<void>> _state = state_future_t::_Alloc_state<state_type>(true);

@@ -138,11 +138,7 @@ namespace librf
 			* @param mtxs... 需要获得的锁列表。
 			* @return [co_await] batch_unlock_t
 			*/
-		template<class... _Mtxs
-#ifndef DOXYGEN_SKIP_PROPERTY
-			, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
-#endif	//DOXYGEN_SKIP_PROPERTY
-		>
+		template<class... _Mtxs> requires(std::same_as<_Mtxs, mutex_t> && ...)
 		static future_t<batch_unlock_t<_Mtxs...>> lock(_Mtxs&... mtxs);
 
 		/**
@@ -151,11 +147,7 @@ namespace librf
 			* @param mtxs... 需要获得的锁列表。
 			* @return [co_await] void
 			*/
-		template<class... _Mtxs
-#ifndef DOXYGEN_SKIP_PROPERTY
-			, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
-#endif	//DOXYGEN_SKIP_PROPERTY
-		>
+		template<class... _Mtxs> requires(std::same_as<_Mtxs, mutex_t> && ...)
 		static future_t<> lock(adopt_manual_unlock_t manual_unlock_tag, _Mtxs&... mtxs);
 
 		/**
@@ -163,11 +155,7 @@ namespace librf
 			* @param mtxs... 需要解锁的锁列表。
 			* @return [co_await] void
 			*/
-		template<class... _Mtxs
-#ifndef DOXYGEN_SKIP_PROPERTY
-			, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
-#endif	//DOXYGEN_SKIP_PROPERTY
-		>
+		template<class... _Mtxs> requires(std::same_as<_Mtxs, mutex_t> && ...)
 		static future_t<> unlock(_Mtxs&... mtxs);
 
 
@@ -177,11 +165,7 @@ namespace librf
 			* @param mtxs... 需要获得的锁列表。
 			* @return batch_unlock_t
 			*/
-		template<class... _Mtxs
-#ifndef DOXYGEN_SKIP_PROPERTY
-			, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
-#endif	//DOXYGEN_SKIP_PROPERTY
-		>
+		template<class... _Mtxs> requires(std::same_as<_Mtxs, mutex_t> && ...)
 		static batch_unlock_t<_Mtxs...> lock(void* unique_address, _Mtxs&... mtxs);
 
 		/**
@@ -190,11 +174,7 @@ namespace librf
 			* @param unique_address 代表获得锁的拥有者。
 			* @param mtxs... 需要获得的锁列表。
 			*/
-		template<class... _Mtxs
-#ifndef DOXYGEN_SKIP_PROPERTY
-			, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
-#endif	//DOXYGEN_SKIP_PROPERTY
-		>
+		template<class... _Mtxs> requires(std::same_as<_Mtxs, mutex_t> && ...)
 		static void lock(adopt_manual_unlock_t manual_unlock_tag, void* unique_address, _Mtxs&... mtxs);
 
 		/**
@@ -202,11 +182,7 @@ namespace librf
 			* @param unique_address 代表获得锁的拥有者。
 			* @param mtxs... 需要解锁的锁列表。
 			*/
-		template<class... _Mtxs
-#ifndef DOXYGEN_SKIP_PROPERTY
-			, typename = std::enable_if_t<std::conjunction_v<std::is_same<remove_cvref_t<_Mtxs>, mutex_t>...>>
-#endif	//DOXYGEN_SKIP_PROPERTY
-		>
+		template<class... _Mtxs> requires(std::same_as<_Mtxs, mutex_t> && ...)
 		static void unlock(void* unique_address, _Mtxs&... mtxs);
 
 		LIBRF_API mutex_t();

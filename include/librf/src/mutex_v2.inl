@@ -144,20 +144,20 @@ namespace librf
 			: batch_unlock_t(std::adopt_lock, sch, mtx._mutex)
 		{}
 
-		/*
-					//此函数，适合在非协程里使用
-					batch_unlock_t(void* sch, mutex_impl_ptr mtx)
-						: _mutex(std::move(mtx))
-						, _owner(sch)
-					{
-						if (_mutex != nullptr)
-							_mutex->lock_until_succeed(sch);
-					}
+/*
+		//此函数，适合在非协程里使用
+		batch_unlock_t(void* sch, mutex_impl_ptr mtx)
+			: _mutex(std::move(mtx))
+			, _owner(sch)
+		{
+			if (_mutex != nullptr)
+				_mutex->lock_until_succeed(sch);
+		}
 
-					batch_unlock_t(void* sch, const mutex_t& mtx)
-						: batch_unlock_t(sch, mtx._mutex)
-					{}
-		*/
+		batch_unlock_t(void* sch, const mutex_t& mtx)
+			: batch_unlock_t(sch, mtx._mutex)
+		{}
+*/
 
 		~batch_unlock_t()
 		{
@@ -205,7 +205,7 @@ namespace librf
 			return false;
 		}
 
-		template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT, class _Timeout> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 		{
 			(void)cb;
@@ -239,7 +239,7 @@ namespace librf
 	{
 		using lock_awaiter::lock_awaiter;
 
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			return await_suspend2(handler, nullptr);
@@ -266,7 +266,7 @@ namespace librf
 	struct mutex_t::manual_awaiter : public lock_awaiter
 	{
 		using lock_awaiter::lock_awaiter;
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			return await_suspend2(handler, nullptr);
@@ -308,7 +308,7 @@ namespace librf
 			return false;
 		}
 
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			_PromiseT& promise = handler.promise();
@@ -355,7 +355,7 @@ namespace librf
 			return false;
 		}
 
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			_PromiseT& promise = handler.promise();
@@ -528,7 +528,7 @@ namespace librf
 	template<class... _Mtxs>
 	batch_unlock_t()->batch_unlock_t<_Mtxs...>;
 
-	template<class... _Mtxs, typename>
+	template<class... _Mtxs> requires(std::same_as<_Mtxs, mutex_t> && ...)
 	inline future_t<batch_unlock_t<_Mtxs...>> mutex_t::lock(_Mtxs&... mtxs)
 	{
 		batch_unlock_t<_Mtxs...> unlock_guard{ std::adopt_lock, librf_root_state(), mtxs... };
@@ -536,7 +536,7 @@ namespace librf
 		co_return std::move(unlock_guard);
 	}
 
-	template<class... _Mtxs, typename>
+	template<class... _Mtxs> requires(std::same_as<_Mtxs, mutex_t> && ...)
 	inline future_t<> mutex_t::lock(adopt_manual_unlock_t _noused, _Mtxs&... mtxs)
 	{
 		(void)_noused;	//GCC: 这个参数不起一个名字，会导致GCC编译器内部错误。
@@ -544,7 +544,7 @@ namespace librf
 		co_await detail::mutex_lock_await_lock_impl::_Lock_range(_MAA);
 	}
 
-	template<class... _Mtxs, typename>
+	template<class... _Mtxs> requires(std::same_as<_Mtxs, mutex_t> && ...)
 	inline future_t<> mutex_t::unlock(_Mtxs&... mtxs)
 	{
 		void* unique_address = librf_root_state();
@@ -552,7 +552,7 @@ namespace librf
 		(mtxs.unlock(unique_address), ...);
 	}
 
-	template<class... _Mtxs, typename>
+	template<class... _Mtxs> requires(std::same_as<_Mtxs, mutex_t> && ...)
 	inline batch_unlock_t<_Mtxs...> mutex_t::lock(void* unique_address, _Mtxs&... mtxs)
 	{
 		assert(unique_address != nullptr);
@@ -565,7 +565,7 @@ namespace librf
 		return su;
 	}
 
-	template<class... _Mtxs, typename>
+	template<class... _Mtxs> requires(std::same_as<_Mtxs, mutex_t> && ...)
 	inline void mutex_t::lock(adopt_manual_unlock_t, void* unique_address, _Mtxs&... mtxs)
 	{
 		assert(unique_address != nullptr);
@@ -574,7 +574,7 @@ namespace librf
 		detail::scoped_lock_range_lock_impl::_Lock_range(_MAA);
 	}
 
-	template<class... _Mtxs, typename>
+	template<class... _Mtxs> requires(std::same_as<_Mtxs, mutex_t> && ...)
 	inline void mutex_t::unlock(void* unique_address, _Mtxs&... mtxs)
 	{
 		assert(unique_address != nullptr);

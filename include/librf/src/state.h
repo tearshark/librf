@@ -174,14 +174,15 @@ namespace librf
 			//scoped_lock<lock_type> __guard(this->_mtx);
 			return _has_value.load(std::memory_order_acquire) != result_type::None;
 		}
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		void future_await_suspend(coroutine_handle<_PromiseT> handler);
 
 		LIBRF_API bool switch_scheduler_await_suspend(scheduler_t* sch);
 
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		void promise_initial_suspend(coroutine_handle<_PromiseT> handler);
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		void promise_final_suspend(coroutine_handle<_PromiseT> handler);
 
 #if RESUMEF_INLINE_STATE
@@ -239,7 +240,8 @@ namespace librf
 		}
 
 		auto future_await_resume() -> value_type;
-		template<class _PromiseT, typename U, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+
+		template<class _PromiseT, typename U> requires(traits::is_promise_v<_PromiseT>)
 		void promise_yield_value(_PromiseT* promise, U&& val);
 
 		void set_exception(std::exception_ptr e);
@@ -282,7 +284,8 @@ namespace librf
 		}
 
 		auto future_await_resume()->reference_type;
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		void promise_yield_value(_PromiseT* promise, reference_type val);
 
 		void set_exception(std::exception_ptr e);
@@ -313,7 +316,8 @@ namespace librf
 		explicit state_t(bool awaitor) noexcept :state_future_t(awaitor) {}
 	public:
 		LIBRF_API void future_await_resume();
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		void promise_yield_value(_PromiseT* promise);
 
 		LIBRF_API void set_exception(std::exception_ptr e);

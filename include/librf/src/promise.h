@@ -18,7 +18,7 @@ namespace librf
 		{
 			return false;
 		}
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		inline void await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 		{
 			_PromiseT& promise = handler.promise();
@@ -36,7 +36,7 @@ namespace librf
 		{
 			return false;
 		}
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		inline void await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 		{
 			_PromiseT& promise = handler.promise();

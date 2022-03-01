@@ -58,7 +58,7 @@ namespace librf
 			virtual bool on_notify(event_v2_impl* eptr) = 0;
 			virtual bool on_timeout() = 0;
 
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 			scheduler_t* on_await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 			{
 				_PromiseT& promise = handler.promise();
@@ -118,7 +118,7 @@ namespace librf
 			LIBRF_API bool on_notify(event_v2_impl* eptr, intptr_t idx);
 			LIBRF_API bool on_timeout();
 
-			template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+			template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 			scheduler_t* on_await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 			{
 				_PromiseT& promise = handler.promise();
@@ -202,7 +202,7 @@ namespace librf
 			return _event->try_wait_one();
 		}
 
-		template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT, class _Timeout> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 		{
 			(void)cb;
@@ -227,7 +227,7 @@ namespace librf
 			return true;
 		}
 
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			return await_suspend2(handler, nullptr);
@@ -261,7 +261,7 @@ namespace librf
 			: _Btype(std::forward<Args>(args)...)
 			, _tp(tp)
 		{}
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			if (!_Btype::await_suspend2(handler, [this]{ this->_state->add_timeout_timer(_tp);}))
@@ -308,7 +308,7 @@ namespace librf
 			return _begin == _end;
 		}
 
-		template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT, class _Timeout> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 		{
 			(void)cb;
@@ -351,7 +351,7 @@ namespace librf
 			return true;
 		}
 
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			return await_suspend2(handler, nullptr);
@@ -442,7 +442,7 @@ namespace librf
 			return _value;
 		}
 
-		template<class _PromiseT, class _Timeout, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT, class _Timeout> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend2(coroutine_handle<_PromiseT> handler, const _Timeout& cb)
 		{
 			(void)cb;
@@ -498,7 +498,7 @@ namespace librf
 			return true;
 		}
 
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			return await_suspend2(handler, nullptr);

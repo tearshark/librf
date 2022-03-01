@@ -1,7 +1,7 @@
 ﻿
 namespace librf
 {
-	template<class _PromiseT, typename _Enable>
+	template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 	void state_future_t::promise_initial_suspend(coroutine_handle<_PromiseT> handler)
 	{
 		assert(this->_scheduler == nullptr);
@@ -11,7 +11,7 @@ namespace librf
 		this->_is_initor = initor_type::Initial;
 	}
 
-	template<class _PromiseT, typename _Enable>
+	template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 	void state_future_t::promise_final_suspend(coroutine_handle<_PromiseT> handler)
 	{
 		scoped_lock<lock_type> __guard(this->_mtx);
@@ -27,7 +27,7 @@ namespace librf
 		sch->del_final(this);
 	}
 
-	template<class _PromiseT, typename _Enable>
+	template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 	void state_future_t::future_await_suspend(coroutine_handle<_PromiseT> handler)
 	{
 		_PromiseT& promise = handler.promise();
@@ -51,7 +51,7 @@ namespace librf
 
 	//------------------------------------------------------------------------------------------------
 
-	template<class _PromiseT, typename _Enable >
+	template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 	void state_t<void>::promise_yield_value(_PromiseT* promise)
 	{
 		coroutine_handle<_PromiseT> handler = coroutine_handle<_PromiseT>::from_promise(*promise);
@@ -77,7 +77,7 @@ namespace librf
 	//------------------------------------------------------------------------------------------------
 
 	template<typename _Ty>
-	template<class _PromiseT, typename U, typename _Enable >
+	template<class _PromiseT, typename U> requires(traits::is_promise_v<_PromiseT>)
 	void state_t<_Ty>::promise_yield_value(_PromiseT* promise, U&& val)
 	{
 		coroutine_handle<_PromiseT> handler = coroutine_handle<_PromiseT>::from_promise(*promise);
@@ -191,8 +191,8 @@ namespace librf
 	//------------------------------------------------------------------------------------------------
 
 	template<typename _Ty>
-	template<class _PromiseT, typename _Enable >
-	void state_t<_Ty&>::promise_yield_value(_PromiseT* promise, reference_type val)
+	template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
+	void state_t<_Ty&>::promise_yield_value(_PromiseT* promise, typename state_t<_Ty&>::reference_type val)
 	{
 		coroutine_handle<_PromiseT> handler = coroutine_handle<_PromiseT>::from_promise(*promise);
 

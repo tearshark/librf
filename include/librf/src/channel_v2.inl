@@ -44,7 +44,7 @@ namespace detail
 			this->_coro = nullptr;
 		}
 
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		void on_await_suspend(coroutine_handle<_PromiseT> handler) noexcept
 		{
 			_PromiseT& promise = handler.promise();
@@ -364,7 +364,8 @@ namespace detail
 			}
 			return false;
 		}
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			scoped_lock<lock_type> lock_(_channel->_lock);
@@ -429,7 +430,8 @@ namespace detail
 			}
 			return false;
 		}
-		template<class _PromiseT, typename = std::enable_if_t<traits::is_promise_v<_PromiseT>>>
+
+		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		bool await_suspend(coroutine_handle<_PromiseT> handler)
 		{
 			scoped_lock<lock_type> lock_(_channel->_lock);
