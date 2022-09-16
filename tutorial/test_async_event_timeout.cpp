@@ -50,6 +50,7 @@ void test_wait_timeout_one()
 	this_scheduler()->run_until_notask();
 }
 
+#if 0
 void test_wait_timeout_any_invalid()
 {
 	std::cout << __FUNCTION__ << std::endl;
@@ -106,6 +107,7 @@ void test_wait_timeout_any()
 
 	this_scheduler()->run_until_notask();
 }
+#endif
 
 void test_wait_timeout_all_invalid()
 {
@@ -170,11 +172,13 @@ void resumable_main_event_timeout()
 	test_wait_timeout_one();
 	std::cout << std::endl;
 
+#if 0
 	test_wait_timeout_any_invalid();
 	std::cout << std::endl << std::endl;
 
 	test_wait_timeout_any();
 	std::cout << std::endl << std::endl;
+#endif
 
 	test_wait_timeout_all_invalid();
 	std::cout << std::endl;

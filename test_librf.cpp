@@ -51,7 +51,9 @@ int main(int argc, const char* argv[])
 	resumable_main_yield_return();
 	resumable_main_resumable();
 	resumable_main_routine();
+#ifndef __clang__
 	resumable_main_exception(false);
+#endif
 	resumable_main_dynamic_go();
 	resumable_main_multi_thread();
 	resumable_main_timer();

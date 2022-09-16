@@ -90,6 +90,7 @@ static void test_wait_three()
 		tt.join();
 }
 
+#if 0
 static void test_wait_any()
 {
 	using namespace std::chrono;
@@ -118,6 +119,7 @@ static void test_wait_any()
 	for (auto & tt : vtt)
 		tt.join();
 }
+#endif
 
 static void test_wait_all()
 {
@@ -185,8 +187,8 @@ void resumable_main_event()
 	test_wait_three();
 	std::cout << std::endl;
 
-	test_wait_any();
-	std::cout << std::endl;
+	//test_wait_any();
+	//std::cout << std::endl;
 
 	test_wait_all();
 	std::cout << std::endl;
