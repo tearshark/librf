@@ -8,10 +8,10 @@
 	Windows: 使用VS2017/VS2019编译(clang在兼容msvc模式下不支持异常，不再支持clang)
 	Android: 使用NDK 20.1 自带的clang编译
 	Mac: 使用XCode 11.2.1 自带的apple-clang编译
-	Ubuntu: 使用GCC 10.0.1/clang 9 编译（2020-04-18：mutex ranged lock failed）
+	Ubuntu: 使用GCC 11.2/clang 14 编译（2020-04-18：mutex ranged lock failed）
 	
-	注意：GCC 10.0.1在C++ Coroutines上存在很多BUG，并且缺少对应的头文件。
-	当前阶段不推荐使用GCC。
+	注意：GCC 10.0.1在C++ Coroutines上依然存在很多BUG。
+	当前阶段不推荐使用GCC(version 11.2以下)。
 
 <br>
 

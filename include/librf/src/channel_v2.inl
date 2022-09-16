@@ -341,6 +341,11 @@ namespace detail
 			, _value()
 		{}
 
+		read_awaiter(const read_awaiter&) = delete;
+		read_awaiter(read_awaiter&&) = default;
+		read_awaiter& operator=(const read_awaiter&) = delete;
+		read_awaiter& operator=(read_awaiter&&) = default;
+
 		~read_awaiter()
 		{//为了不在协程中也能正常使用
 			if (_channel != nullptr)
@@ -406,6 +411,11 @@ namespace detail
 			: _channel(std::move(ch))
 			, _value(std::forward<U>(val))
 		{}
+
+		write_awaiter(const write_awaiter&) = delete;
+		write_awaiter(write_awaiter&&) = default;
+		write_awaiter& operator=(const write_awaiter&) = delete;
+		write_awaiter& operator=(write_awaiter&&) = default;
 
 		~write_awaiter()
 		{//为了不在协程中也能正常使用

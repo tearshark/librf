@@ -30,22 +30,22 @@ else()
 endif()
 
 message(STATUS "LIBRF_COMPILER_SETTING=${LIBRF_COMPILER_SETTING}")
+message(STATUS "CMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}")
 
-	message(STATUS "CMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}")
 if(${LIBRF_COMPILER_SETTING} STREQUAL "msvc")
 	if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL "19.30.0.0")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20 /EHsc")	#VS2022
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20 /EHsc /await")		#VS2022
 	else()
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest /EHsc /await")	#VS2019
 	endif()
 elseif ("${LIBRF_COMPILER_SETTING}" STREQUAL "clang_on_msvc")
-	if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL "19.30.0.0")
+	if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL "12.0.0")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20 /EHsc")		#VS2022
 	else()
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest /EHsc")	#VS2019
 	endif()
 elseif ("${LIBRF_COMPILER_SETTING}" STREQUAL "clang")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -fcoroutines-ts -stdlib=libc++")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -fcoroutines-ts -stdlib=libstdc++")
 elseif ("${LIBRF_COMPILER_SETTING}" STREQUAL "gcc")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -fcoroutines -fconcepts-diagnostics-depth=8")
 endif()

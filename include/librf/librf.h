@@ -34,9 +34,7 @@
 #include <thread>
 #include <cassert>
 
-#if defined(__clang__)
-#include "src/unix/coroutine.h"
-#elif __cpp_impl_coroutine
+#if __cpp_impl_coroutine
 #include <coroutine>
 #ifdef _MSC_VER
 extern "C" size_t _coro_frame_size();
@@ -59,6 +57,8 @@ extern "C" void _coro_resume_block();
 #pragma intrinsic(_coro_cancel)
 #pragma intrinsic(_coro_resume_block)
 #endif
+#elif defined(__clang__)
+#include "src/unix/coroutine.h"
 #else
 #include <experimental/coroutine>
 #endif
