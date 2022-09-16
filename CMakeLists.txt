@@ -164,7 +164,7 @@ if(CMAKE_ENABLE_UNIT_TEST)
 		${ALL_TUTORIAL_FILES})
 	target_link_libraries(test_librf PUBLIC librf)
 
-	add_subdirectory(benchmark)
+	#add_subdirectory(benchmark)
 endif()
 
 

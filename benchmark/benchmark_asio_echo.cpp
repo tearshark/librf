@@ -7,9 +7,7 @@
 
 #pragma warning(disable : 4834)
 
-using namespace asio;
 using namespace asio::ip;
-
 using namespace librf;
 
 template<class _Ty, size_t _Size>
@@ -43,10 +41,10 @@ future_t<> RunEchoSession(tcp::socket socket)
 		try
 		{
 			bytes_transferred += co_await socket.async_read_some(
-				asio::buffer(buffer.data() + bytes_transferred, buffer.size() - bytes_transferred), rf_task);
+				asio::buffer(buffer.data() + bytes_transferred, buffer.size() - bytes_transferred), asio::rf_task);
 			if (bytes_transferred >= buffer.size())
 			{
-				co_await asio::async_write(socket, asio::buffer(buffer, buffer.size()), rf_task);
+				co_await asio::async_write(socket, asio::buffer(buffer, buffer.size()), asio::rf_task);
 				bytes_transferred = 0;
 
 				g_echo_count.fetch_add(1, std::memory_order_release);
@@ -73,7 +71,7 @@ void AcceptConnections(tcp::acceptor & acceptor, uarray<tcp::socket, _N> & socke
 				{
 					try
 					{
-						co_await acceptor.async_accept(socketes.c[idx], rf_task);
+						co_await acceptor.async_accept(socketes.c[idx], asio::rf_task);
 						go RunEchoSession(std::move(socketes.c[idx]));
 					}
 					catch (std::exception & e)
@@ -143,7 +141,7 @@ future_t<> RunPipelineEchoClient(asio::io_service & ios, tcp::resolver::iterator
 
 	try
 	{
-		co_await asio::async_connect(*sptr, ep, rf_task);
+		co_await asio::async_connect(*sptr, ep, asio::rf_task);
 
 		GO
 		{
@@ -155,7 +153,7 @@ future_t<> RunPipelineEchoClient(asio::io_service & ios, tcp::resolver::iterator
 			{
 				for (;;)
 				{
-					co_await asio::async_write(*sptr, asio::buffer(write_buff_), rf_task);
+					co_await asio::async_write(*sptr, asio::buffer(write_buff_), asio::rf_task);
 				}
 			}
 			catch (std::exception & e)
@@ -171,7 +169,7 @@ future_t<> RunPipelineEchoClient(asio::io_service & ios, tcp::resolver::iterator
 				std::array<char, BUF_SIZE> read_buff_;
 				for (;;)
 				{
-					co_await sptr->async_read_some(asio::buffer(read_buff_), rf_task);
+					co_await sptr->async_read_some(asio::buffer(read_buff_), asio::rf_task);
 				}
 			}
 			catch (std::exception & e)
@@ -197,7 +195,7 @@ future_t<> RunPingPongEchoClient(asio::io_service & ios, tcp::resolver::iterator
 
 	try
 	{
-		co_await asio::async_connect(socket_, ep, rf_task);
+		co_await asio::async_connect(socket_, ep, asio::rf_task);
 
 		for (auto & c : write_buff_)
 			c = 'A' + rand() % 52;
@@ -205,8 +203,8 @@ future_t<> RunPingPongEchoClient(asio::io_service & ios, tcp::resolver::iterator
 		for (;;)
 		{
 			co_await when_all(
-				asio::async_write(socket_, asio::buffer(write_buff_), rf_task),
-				socket_.async_read_some(asio::buffer(read_buff_), rf_task)
+				asio::async_write(socket_, asio::buffer(write_buff_), asio::rf_task),
+				socket_.async_read_some(asio::buffer(read_buff_), asio::rf_task)
 			);
 		}
 	}
