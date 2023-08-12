@@ -351,3 +351,14 @@ void resumable_main_benchmark_asio_client(intptr_t nNum)
 {
 	resumable_main_benchmark_asio_client_with_callback(nNum);
 }
+
+#if LIBRF_TUTORIAL_STAND_ALONE
+int main(int argc, const char* argv[])
+{
+	if (argc > 1)
+		resumable_main_benchmark_asio_client(atoi(argv[1]));
+	else
+		resumable_main_benchmark_asio_server();
+	return 0;
+}
+#endif

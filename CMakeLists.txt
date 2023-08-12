@@ -34,7 +34,7 @@ message(STATUS "CMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}")
 
 if(${LIBRF_COMPILER_SETTING} STREQUAL "msvc")
 	if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL "19.30.0.0")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20 /EHsc /await")		#VS2022
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20 /EHsc")		#VS2022
 	else()
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest /EHsc /await")	#VS2019
 	endif()
@@ -147,6 +147,10 @@ target_include_directories(${PROJECT_NAME}
 	${CMAKE_CURRENT_SOURCE_DIR}/modern_cb
 )
 
+if(UNIX)
+    set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN/")
+endif(UNIX)
+
 if(LIBRF_USE_MIMALLOC)
 	set(LIB_MIMALLOC, "mimalloc")
 else()
@@ -163,8 +167,11 @@ if(CMAKE_ENABLE_UNIT_TEST)
 		${CMAKE_CURRENT_SOURCE_DIR}/benchmark/benchmark_channel_passing_next.cpp
 		${ALL_TUTORIAL_FILES})
 	target_link_libraries(test_librf PUBLIC librf)
+	if(UNIX)
+		set_target_properties(test_librf PROPERTIES INSTALL_RPATH "$ORIGIN/")
+	endif(UNIX)
 
-	#add_subdirectory(benchmark)
+	add_subdirectory(benchmark)
 endif()
 
 

@@ -2,6 +2,7 @@
 //依赖 https://github.com/tearshark/librf 项目
 //依赖 https://github.com/qicosmos/cinatra 项目
 
+#pragma warning(disable : 4996)
 #include <iostream>
 #include "../../cinatra/include/cinatra.hpp"
 #include "librf/librf.h"
@@ -56,3 +57,11 @@ void test_async_cinatra_client()
 
 	librf::this_scheduler()->run_until_notask();
 }
+
+#if LIBRF_TUTORIAL_STAND_ALONE
+int main()
+{
+	test_async_cinatra_client();
+	return 0;
+}
+#endif
