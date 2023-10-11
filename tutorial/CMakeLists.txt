@@ -10,4 +10,7 @@ foreach(TUTORIAL_FILE_PATH ${TUTORIAL_FILES})
     target_compile_definitions(${TUTORIAL_FILE_NAME}
         PRIVATE LIBRF_TUTORIAL_STAND_ALONE=1
     )
+    if(UNIX)
+        set_target_properties(${TUTORIAL_FILE_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN/")
+    endif(UNIX)
 endforeach(TUTORIAL_FILE_PATH)

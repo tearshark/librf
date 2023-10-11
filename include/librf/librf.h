@@ -33,10 +33,12 @@
 #include <optional>
 #include <thread>
 #include <cassert>
+#include <utility>
 
 #if __cpp_impl_coroutine
 #include <coroutine>
 #ifdef _MSC_VER
+#ifndef __clang__
 extern "C" size_t _coro_frame_size();
 extern "C" void* _coro_frame_ptr();
 extern "C" void _coro_init_block();
@@ -56,11 +58,16 @@ extern "C" void _coro_resume_block();
 #pragma intrinsic(_coro_suspend)
 #pragma intrinsic(_coro_cancel)
 #pragma intrinsic(_coro_resume_block)
+#else
+#include "src/unix/clang_builtin.h"
+#endif
 #endif
 #elif defined(__clang__)
 #include "src/unix/coroutine.h"
-#else
+#elif __has_include(<experimental/coroutine>)
 #include <experimental/coroutine>
+#else
+#include "src/unix/coroutine.h"
 #endif
 
 #include "src/stop_token.h"

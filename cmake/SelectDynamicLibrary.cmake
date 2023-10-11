@@ -1,5 +1,33 @@
 include(SelectLibraryConfigurations)
 
+if(NOT DEFINED CMAKE_PROCESSOR_ALIAS)
+    MESSAGE(STATUS "operation system is ${CMAKE_CXX_PLATFORM_ID}")
+    MESSAGE(STATUS "processor is ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+
+	if((${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "i386") OR (${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "AMD64") OR (${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "x86_64"))
+		if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+			set(CMAKE_PROCESSOR_ALIAS "x86" CACHE STRING "Alias of processor")
+		elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+			set(CMAKE_PROCESSOR_ALIAS "x64" CACHE STRING "Alias of processor")
+		else()
+			message(FATAL_ERROR "Unknown processor")
+		endif()
+	elseif(${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "aarch64")
+		if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+			set(CMAKE_PROCESSOR_ALIAS "arm" CACHE STRING "Alias of processor")
+		elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+			set(CMAKE_PROCESSOR_ALIAS "arm64" CACHE STRING "Alias of processor")
+		else()
+			message(FATAL_ERROR "Unknown processor")
+		endif()
+	else()
+		message(FATAL_ERROR "Unknown processor")
+	endif()
+
+    message(STATUS "CMAKE_PROCESSOR_ALIAS=${CMAKE_PROCESSOR_ALIAS}")
+endif()
+
+
 macro(_acl_copy_dynamic_library_build_type basename build_type)
 
     if(${build_type} STREQUAL "Debug")

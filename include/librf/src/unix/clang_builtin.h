@@ -40,13 +40,13 @@ extern "C" bool  __builtin_coro_alloc();
 //extern "C" void* __builtin_coro_begin(void* memory);
 //extern "C" void* __builtin_coro_end(void* coro_frame, bool unwind);
 extern "C" char  __builtin_coro_suspend(bool final);
-extern "C" bool  __builtin_coro_param(void* original, void* copy);
+//extern "C" bool  __builtin_coro_param(void* original, void* copy);
 #pragma intrinsic(__builtin_coro_id)
 #pragma intrinsic(__builtin_coro_alloc)
 //#pragma intrinsic(__builtin_coro_begin)
 //#pragma intrinsic(__builtin_coro_end)
 #pragma intrinsic(__builtin_coro_suspend)
-#pragma intrinsic(__builtin_coro_param)
+//#pragma intrinsic(__builtin_coro_param)
 
 #ifdef __clang__
 #define _coro_frame_size() __builtin_coro_size()
