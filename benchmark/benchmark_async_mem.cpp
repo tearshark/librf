@@ -36,8 +36,8 @@ void resumable_main_benchmark_mem(bool wait_key)
 	}
 }
 
-//clang : 平均 210字节
-//msvc : 平均600字节
+//clang : 平均 256 字节
+//msvc : 平均 320 字节(vs2022,17.7.4)
 
 #if LIBRF_TUTORIAL_STAND_ALONE
 int main()

@@ -40,9 +40,9 @@ if(${LIBRF_COMPILER_SETTING} STREQUAL "msvc")
 	endif()
 elseif ("${LIBRF_COMPILER_SETTING}" STREQUAL "clang_on_msvc")
 	if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL "12.0.0")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20 /EHsc")		#VS2022
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20 /EHsc -Wno-unused-private-field")		#VS2022
 	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest /EHsc")	#VS2019
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest /EHsc -Wno-unused-private-field")	#VS2019
 	endif()
 elseif ("${LIBRF_COMPILER_SETTING}" STREQUAL "clang")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -fcoroutines-ts -stdlib=libstdc++")
@@ -82,8 +82,8 @@ if(${LIBRF_COMPILER_SETTING} STREQUAL "msvc")
 	set(CMAKE_CXX_FLAGS_MINSIZEREL "/W3 /WX /MP /GS- /Gm- /Ox /Ob2 /Oy /Oi /Os /GT /EHsc /Zc:inline")
 	set(CMAKE_CXX_FLAGS_RELEASE    "/W3 /WX /MP /GS- /Gm- /Ox /Ob2 /Oy /Oi /Os /GT /EHsc /Zc:inline")
 elseif ("${LIBRF_COMPILER_SETTING}" STREQUAL "clang_on_msvc")
-	set(CMAKE_CXX_FLAGS_MINSIZEREL "/W3 /WX /GS- /Ox /Ob2 /Oy /Oi /Os /EHsc /Zc:inline")
-	set(CMAKE_CXX_FLAGS_RELEASE    "/W3 /WX /GS- /Ox /Ob2 /Oy /Oi /Os /EHsc /Zc:inline")
+	set(CMAKE_CXX_FLAGS_MINSIZEREL "/W3 /GS- /Ox /Ob2 /Oy /Oi /Os /EHsc /Zc:inline")
+	set(CMAKE_CXX_FLAGS_RELEASE    "/W3 /GS- /Ox /Ob2 /Oy /Oi /Os /EHsc /Zc:inline")
 elseif()
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -ggdb")
