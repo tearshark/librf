@@ -186,7 +186,8 @@ namespace librf
 				char* ptr = reinterpret_cast<char*>(h.address()) - _State_size;
 				return reinterpret_cast<state_type*>(ptr);
 #elif defined(_MSC_VER)
-				char* ptr = reinterpret_cast<char*>(this) - _State_size;
+				auto h = coroutine_handle<promise_type>::from_promise(*this);
+				char* ptr = reinterpret_cast<char*>(h.address()) - _State_size;
 				return reinterpret_cast<state_type*>(ptr);
 #else
 #error "Unknown compiler"

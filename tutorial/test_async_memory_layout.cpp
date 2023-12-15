@@ -65,9 +65,9 @@ future_t<int64_t> resumeable_get_long(int64_t x, int64_t y)
 
 	std::cout << "  frame ptr=" << frame_ptr << "," << (void*)&frame_ptr << std::endl;
 	std::cout << "  frame end=" << (void*)((char*)(frame_ptr)+_coro_frame_size()) << std::endl;
-	std::cout << "  promise ptr=" << promise << "," << (void*)&promise << std::endl;
-	std::cout << "  handle ptr=" << handler.address() << "," << (void*)&handler << std::endl;
-	std::cout << "  state ptr=" << state << "," << (void*)&state << std::endl;
+	std::cout << "  promise ptr=" << promise << "," << (void*)&promise << ",offset=" << ((char*)promise - (char*)frame_ptr) << std::endl;
+	std::cout << "  handle ptr=" << handler.address() << "," << (void*)&handler << ",offset=" << ((char*)handler.address() - (char*)frame_ptr) << std::endl;
+	std::cout << "  state ptr=" << state << "," << (void*)&state << ",offset=" << ((char*)state - (char*)frame_ptr) << std::endl;
 	std::cout << "  parent ptr=" << state->get_parent() << std::endl;
 
 	std::cout << "    x=" << x << ", &x=" << std::addressof(x) << std::endl;
