@@ -17,6 +17,7 @@ void test_memory_leak_event_wait_for()
 		for (;;)
 		{
 			bool val = co_await e.wait_for(1ms);
+			(void)val;
 			assert(val == false);
 			co_await yield();
 		}
@@ -39,6 +40,7 @@ void test_memory_leak_event_wait_all_for()
 		for (;;)
 		{
 			bool val = co_await event_t::wait_all_for(1ms, e);
+			(void)val;
 			assert(val == false);
 			co_await yield();
 		}

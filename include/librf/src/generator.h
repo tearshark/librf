@@ -221,7 +221,7 @@ namespace librf
 				char* ptr = _Al.allocate(_Size + _State_size);
 				char* _Rptr = ptr + _State_size;
 #if RESUMEF_DEBUG_COUNTER
-				std::cout << "  generator_promise::new, alloc size=" << (_Size + _State_size) << std::endl;
+				std::cout << "  generator_promise::new, alloc size=" << (_Size + _State_size) << ", state size=" << _State_size << std::endl;
 				std::cout << "  generator_promise::new, alloc ptr=" << (void*)ptr << std::endl;
 				std::cout << "  generator_promise::new, return ptr=" << (void*)_Rptr << std::endl;
 #endif

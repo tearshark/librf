@@ -36,8 +36,12 @@ void resumable_main_benchmark_mem(bool wait_key)
 	}
 }
 
-//clang : 平均 256 字节
+//clang : 
+//	x64: 平均 256 字节, operator new: size = 48, state size = 32
+//	x86: 平均 121 字节, operator new: size = 40, state size = 16
 //msvc : 平均 304 字节(vs2022,17.7.4)
+//	x64: 平均 304 字节, operator new: size = 144, state size = 32
+//	x86: 平均 153 字节, operator new: size = 72, state size = 16
 
 #if LIBRF_TUTORIAL_STAND_ALONE
 int main()
