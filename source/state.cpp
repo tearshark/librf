@@ -58,10 +58,6 @@ namespace librf
 	LIBRF_API void state_generator_t::destroy_deallocate()
 	{
 		size_t _Size = _Align_size<state_generator_t>();
-#if RESUMEF_INLINE_STATE
-		char* _Ptr = reinterpret_cast<char*>(this) + _Size;
-		_Size = *reinterpret_cast<uint32_t*>(_Ptr);
-#endif
 #if RESUMEF_DEBUG_COUNTER
 		std::cout << "destroy_deallocate, size=" << _Size << std::endl;
 #endif

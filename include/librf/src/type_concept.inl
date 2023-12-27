@@ -5,14 +5,14 @@
 namespace librf
 {
 	template<typename T>
+	concept _ValidAwaitSuspendReturnT = std::same_as<T, void> || std::same_as<T, bool> || traits::is_coroutine_handle_v<T>;
+
+	template<typename T>
 	concept _AwaitorT = requires(T&& v)
 	{
-		{ v.await_ready() } ->std::same_as<bool>;
-		{ v.await_suspend(std::declval<std::coroutine_handle<promise_t<>>>()) };
+		{ v.await_ready() } -> std::same_as<bool>;
+		{ v.await_suspend(std::declval<std::coroutine_handle<promise_t<>>>()) } -> _ValidAwaitSuspendReturnT;
 		{ v.await_resume() };
-		requires traits::is_valid_await_suspend_return_v<
-			decltype(v.await_suspend(std::declval<std::coroutine_handle<promise_t<>>>()))
-		>;
 	};
 
 	template<typename T> 

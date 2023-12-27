@@ -3,7 +3,7 @@
 namespace librf
 {
 	/**
-	 * @brief 专用与state的智能计数指针，通过管理state内嵌的引用计数来管理state的生存期。
+	 * @brief 专用于state的智能计数指针，通过管理state内嵌的引用计数来管理state的生存期。
 	 */
 	template <typename T>
 	struct counted_ptr

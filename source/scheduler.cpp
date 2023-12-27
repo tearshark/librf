@@ -22,7 +22,7 @@ namespace librf
 		"stop_requested",
 	};
 
-	char sz_future_error_buffer[256];
+	thread_local char sz_future_error_buffer[256];
 
 	LIBRF_API const char * get_error_string(error_code fe, const char * classname)
 	{

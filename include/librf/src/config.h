@@ -1,13 +1,5 @@
 #pragma once
 
-#ifndef RESUMEF_INLINE_STATE
-#if defined(__clang__) || defined(_MSC_VER)
-#define RESUMEF_INLINE_STATE 1
-#else
-#define RESUMEF_INLINE_STATE 0
-#endif	//defined(__clang__) || defined(_MSC_VER)
-#endif	//RESUMEF_INLINE_STATE
-
 #ifndef RESUMEF_DEBUG_COUNTER
 /* #undef RESUMEF_DEBUG_COUNTER */
 #endif	//RESUMEF_DEBUG_COUNTER

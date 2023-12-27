@@ -6,7 +6,7 @@
 
 #include "librf/librf.h"
 
-const size_t N = 5000000;
+const size_t N = 10'000'000;
 const size_t LOOP_COUNT = 50;
 
 std::atomic<size_t> globalValue{0};

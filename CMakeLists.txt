@@ -51,18 +51,6 @@ elseif ("${LIBRF_COMPILER_SETTING}" STREQUAL "gcc")
 endif()
 
 
-if(${LIBRF_COMPILER_SETTING} STREQUAL "msvc")
-	option(LIBRF_INLINE_STATE "Enable Inline state" ON)
-elseif ("${LIBRF_COMPILER_SETTING}" STREQUAL "clang_on_msvc")
-	option(LIBRF_INLINE_STATE "Enable Inline state" ON)
-elseif(${LIBRF_COMPILER_SETTING} STREQUAL "clang")
-	option(LIBRF_INLINE_STATE "Enable Inline state" ON)
-elseif(${LIBRF_COMPILER_SETTING} STREQUAL "gcc")
-	option(LIBRF_INLINE_STATE "Enable Inline state" OFF)
-else()
-	option(LIBRF_INLINE_STATE "Enable Inline state" OFF)
-endif()
-
 option(LIBRF_DEBUG_COUNTER "Debug objects count" OFF)
 option(LIBRF_KEEP_REAL_SIZE "Keep real size in queue" OFF)
 option(LIBRF_DISABLE_MULT_THREAD "Disable multi-threaded scheduler" OFF)
@@ -97,9 +85,6 @@ message(STATUS "C++ flags: ${CMAKE_CXX_FLAGS}")
 
 #set(RESUMEF_USE_CUSTOM_SPINLOCK "std::mutex")
 
-if(LIBRF_INLINE_STATE)
-	set(RESUMEF_INLINE_STATE 1)
-endif()
 if(LIBRF_DEBUG_COUNTER)
 	set(RESUMEF_DEBUG_COUNTER 1)
 endif()

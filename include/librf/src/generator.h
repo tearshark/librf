@@ -179,22 +179,7 @@ namespace librf
 
 			state_type* get_state() noexcept
 			{
-#if RESUMEF_INLINE_STATE
-				size_t _State_size = _Align_size<state_type>();
-#if defined(__clang__)
-				auto h = coroutine_handle<promise_type>::from_promise(*this);
-				char* ptr = reinterpret_cast<char*>(h.address()) - _State_size;
-				return reinterpret_cast<state_type*>(ptr);
-#elif defined(_MSC_VER)
-				auto h = coroutine_handle<promise_type>::from_promise(*this);
-				char* ptr = reinterpret_cast<char*>(h.address()) - _State_size;
-				return reinterpret_cast<state_type*>(ptr);
-#else
-#error "Unknown compiler"
-#endif
-#else
 				return _state.get();
-#endif
 			}
 			//counted_ptr<state_type> ref_state() noexcept
 			//{
@@ -214,26 +199,6 @@ namespace librf
 			void* operator new(size_t _Size)
 			{
 				_Alloc_char _Al;
-#if RESUMEF_INLINE_STATE
-				size_t _State_size = _Align_size<state_type>();
-				assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
-
-				char* ptr = _Al.allocate(_Size + _State_size);
-				char* _Rptr = ptr + _State_size;
-#if RESUMEF_DEBUG_COUNTER
-				std::cout << "  generator_promise::new, alloc size=" << (_Size + _State_size) << ", state size=" << _State_size << std::endl;
-				std::cout << "  generator_promise::new, alloc ptr=" << (void*)ptr << std::endl;
-				std::cout << "  generator_promise::new, return ptr=" << (void*)_Rptr << std::endl;
-#endif
-
-				//在初始地址上构造state
-				{
-					state_type* st = state_type::_Construct(ptr);
-					st->lock();
-				}
-
-				return _Rptr;
-#else
 				char* ptr = _Al.allocate(_Size);
 #if RESUMEF_DEBUG_COUNTER
 				std::cout << "  generator_promise::new, alloc size=" << _Size << std::endl;
@@ -242,28 +207,15 @@ namespace librf
 #endif
 
 				return ptr;
-#endif
 			}
 
 			void operator delete(void* _Ptr, size_t _Size)
 			{
-#if RESUMEF_INLINE_STATE
-				size_t _State_size = _Align_size<state_type>();
-				assert(_Size >= sizeof(uint32_t) && _Size < (std::numeric_limits<uint32_t>::max)() - sizeof(_State_size));
-
-				*reinterpret_cast<uint32_t*>(_Ptr) = static_cast<uint32_t>(_Size + _State_size);
-
-				state_type* st = reinterpret_cast<state_type*>(static_cast<char*>(_Ptr) - _State_size);
-				st->unlock();
-#else
 				_Alloc_char _Al;
 				return _Al.deallocate(reinterpret_cast<char *>(_Ptr), _Size);
-#endif
 			}
-#if !RESUMEF_INLINE_STATE
 		private:
 			counted_ptr<state_type> _state = state_generator_t::_Alloc_state();
-#endif
 		};
 #endif	//DOXYGEN_SKIP_PROPERTY
 

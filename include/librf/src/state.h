@@ -83,12 +83,6 @@ namespace librf
 			_coro = handler;
 		}
 
-#if RESUMEF_INLINE_STATE
-		static state_generator_t* _Construct(void* _Ptr)
-		{
-			return new(_Ptr) state_generator_t();
-		}
-#endif
 		LIBRF_API static state_generator_t* _Alloc_state();
 	};
 
@@ -185,16 +179,6 @@ namespace librf
 		template<class _PromiseT> requires(traits::is_promise_v<_PromiseT>)
 		void promise_final_suspend(coroutine_handle<_PromiseT> handler);
 
-#if RESUMEF_INLINE_STATE
-		template<class _Sty>
-		static _Sty* _Construct(void* _Ptr, size_t _Size)
-		{
-			_Sty* st = new(_Ptr) _Sty(false);
-			st->_alloc_size = static_cast<uint32_t>(_Size);
-
-			return st;
-		}
-#endif
 		template<class _Sty>
 		static inline _Sty* _Alloc_state(bool awaitor)
 		{

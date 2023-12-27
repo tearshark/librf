@@ -107,10 +107,8 @@ namespace librf
 		using _Alloc_char = std::allocator<char>;
 		void* operator new(size_t _Size);
 		void operator delete(void* _Ptr, size_t _Size);
-#if !RESUMEF_INLINE_STATE
 	private:
 		counted_ptr<state_type> _state = state_future_t::_Alloc_state<state_type>(false);
-#endif
 	};
 
 	template<class _Ty>
